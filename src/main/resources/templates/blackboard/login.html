@@ -20,8 +20,8 @@
             <img th:src="@{/static/img/logo-banner-green.png}" style="width: 100%"/>
         </div>
 
-        <div class="card" style="margin-top: 100px; padding: 10px 20px 30px 20px">
-            <h5 class="center-align green darken-3 white-text" style="padding: 10px; margin-bottom: 30px">Blackboard</h5>
+        <div class="card" style="margin-top: 100px; padding: 5px 20px 40px 20px">
+            <h5 class="center-align" style="padding: 10px; margin-bottom: 30px">Blackboard</h5>
             <p th:if="${error}" class="center red-text" style="margin: 20px 0 20px 0">Login fehlgeschlagen</p>
             <form action="#" th:action="@{/blackboard/login}" th:object="${login}" method="post">
                 <div class="input-field">

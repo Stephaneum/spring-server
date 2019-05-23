@@ -1,11 +1,14 @@
 package de.stephaneum.backend.routes
 
 import de.stephaneum.backend.Session
+import de.stephaneum.backend.database.Blackboard
 import de.stephaneum.backend.database.BlackboardRepo
+import de.stephaneum.backend.database.Type
 import de.stephaneum.backend.scheduler.ImageGenerator
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
@@ -50,10 +53,52 @@ class BlackboardAPI {
         if(!Session.get().loggedIn)
             return "redirect:/blackboard/login"
 
-        model["blackboards"]  = blackboardRepo.findByOrderByOrder()
+        model["boards"]  = blackboardRepo.findByOrderByOrder()
 
         return "blackboard/admin"
     }
+
+    // Mutations
+
+    @GetMapping("/add")
+    fun add(): String? {
+        if(!Session.get().loggedIn)
+            return "redirect:/blackboard/login"
+
+        val max = if(blackboardRepo.count() == 0L) 0 else blackboardRepo.findMaxOrder()
+        blackboardRepo.save(Blackboard(0, Type.TEXT, "Bitte Text eingeben", 5000, max + 1, true))
+        return "redirect:/blackboard/admin"
+    }
+
+    @GetMapping("/toggle-activate")
+    fun toggleActivate(id: Int): String? {
+        if(!Session.get().loggedIn)
+            return "redirect:/blackboard/login"
+
+        val board = blackboardRepo.findByIdOrNull(id) ?: return null
+        board.activated = !board.activated
+        blackboardRepo.save(board)
+        return "redirect:/blackboard/admin"
+    }
+
+    @GetMapping("/delete")
+    fun delete(id: Int): String? {
+        if(!Session.get().loggedIn)
+            return "redirect:/blackboard/login"
+
+        blackboardRepo.deleteById(id)
+        repairOrder()
+        return "redirect:/blackboard/admin"
+    }
+
+    private fun repairOrder() {
+        val boards = blackboardRepo.findAll()
+        val sorted = boards.sortedBy { it.order }
+        sorted.forEachIndexed { index, blackboard -> blackboard.order = index }
+        blackboardRepo.saveAll(sorted)
+    }
+
+    // Auth
 
     @GetMapping("/login")
     fun login(model: Model, error: Boolean = false): String {

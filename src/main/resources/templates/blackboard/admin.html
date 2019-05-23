@@ -4,7 +4,7 @@
     <title>Blackboard</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" th:href="@{/static/img/favicon.png}" />
+    <link rel="icon" type="image/png" th:href="@{/static/img/favicon.png}"/>
     <link rel="apple-touch-icon" sizes="196x196" th:href="@{/static/img/favicon.png}">
     <link rel="stylesheet" type="text/css" th:href="@{/static/css/materialize.min.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/static/css/material-icons.css}">
@@ -20,10 +20,34 @@
         </div>
 
         <div class="right-align" style="margin-top: 100px">
-            <a class="waves-effect waves-light btn green darken-3" th:href="@{/blackboard/logout}"><i class="material-icons right">exit_to_app</i>Abmelden</a>
+            <a class="waves-effect waves-light btn darken-3" th:href="@{/blackboard/logout}"><i
+                    class="material-icons right">exit_to_app</i>Abmelden</a>
         </div>
-        <div class="card" style="width: 1250px; height: 500px; margin-top: 15px; padding: 5px 20px 10px 20px">
-            <h4>Konfiguration</h4>
+        <div class="card" style="width: 1250px; min-height: 500px; margin-top: 15px; padding: 5px 20px 20px 20px">
+            <div class="row">
+                <div class="col m6">
+                    <h4>Konfiguration des Blackboards</h4>
+                </div>
+                <div class="col m6 right-align">
+                    <a style="margin-top: 25px" class="waves-effect waves-light btn green darken-3" th:href="@{/blackboard/add}"><i
+                            class="material-icons right">add</i>Neuer Eintrag</a>
+                </div>
+            </div>
+
+            <ul th:each="b : ${boards}" class="collection">
+                <li class="collection-item">
+                    <div class="row" style="margin: 0">
+                        <div class="col m6 truncate" style="font-size: 1.4em" th:text="'('+${b.order}+ ') '+${b.value}">
+                            Value
+                        </div>
+                        <div class="col m6 right-align">
+                            <a class="waves-effect waves-light btn red darken-4" th:href="@{/blackboard/delete/(id=${b.id})}"><i
+                                    class="material-icons right">delete</i>Löschen</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
         </div>
 
     </div>
