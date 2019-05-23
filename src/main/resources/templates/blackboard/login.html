@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Blackboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" th:href="@{/static/img/favicon.png}" />
+    <link rel="apple-touch-icon" sizes="196x196" th:href="@{/static/img/favicon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/materialize.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/material-icons.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/style.css}">
+</head>
+
+<body>
+
+<div class="valign-wrapper" style="height: 100vh">
+    <div style="margin: auto; max-width: 400px">
+
+        <div class="center-align">
+            <img th:src="@{/static/img/logo-banner-green.png}" style="width: 100%"/>
+        </div>
+
+        <div class="card" style="margin-top: 100px; padding: 10px 20px 30px 20px">
+            <h5 class="center-align green darken-3 white-text" style="padding: 10px; margin-bottom: 30px">Blackboard</h5>
+            <p th:if="${error}" class="center red-text" style="margin: 20px 0 20px 0">Login fehlgeschlagen</p>
+            <form action="#" th:action="@{/blackboard/login}" th:object="${login}" method="post">
+                <div class="input-field">
+                    <i class="material-icons prefix">vpn_key</i>
+                    <label for="password">Passwort</label>
+                    <input type="password" id="password" th:field="*{password}" />
+                </div>
+                <div class="right-align">
+                    <button type="submit" value="Login" class="btn waves-effect waves-light green darken-3">
+                        Login
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script th:src="@{/static/js/materialize.min.js}"></script>
+<script type="text/javascript">
+    M.updateTextFields();
+</script>
+</body>
+</html>
