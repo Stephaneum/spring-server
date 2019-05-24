@@ -1,11 +1,13 @@
+<#import "/spring.ftl" as spring/>
+
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="de">
 <head>
     <title>Blackboard</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" th:href="@{/static/img/favicon.png}" />
-    <link rel="apple-touch-icon" sizes="196x196" th:href="@{/static/img/favicon.png}">
+    <link rel="icon" type="image/png" href="<@spring.url '/static/img/favicon.png' />">
+    <link rel="apple-touch-icon" sizes="196x196" href="<@spring.url '/static/img/favicon.png' />">
     <style type="text/css">
         body {
             overflow: hidden;
@@ -27,16 +29,16 @@
 <body style="margin: 0">
 
 <div id="title">
-    <p th:text="${date}" style="color: white; margin: 5px; font-size: 24pt"></p>
+    <p style="color: white; margin: 5px; font-size: 24pt">${date}</p>
 </div>
 
-<th:block th:each="i : ${indexes}">
-<div style="padding: 50px">
-    <img id="logo" th:src="@{'/blackboard/img/' + ${i}}" style="width: 100%" alt="plan" />
-</div>
-</th:block>
+<#list indexes as i>
+    <div style="padding: 50px">
+        <img id="logo" src="<@spring.url '/blackboard/img/' + i />" style="width: 100%" alt="plan" />
+    </div>
+</#list>
 
 
-<script th:src="@{/static/js/scroller.js}"></script>
+<script src="<@spring.url '/static/js/scroller.js' />"></script>
 </body>
 </html>

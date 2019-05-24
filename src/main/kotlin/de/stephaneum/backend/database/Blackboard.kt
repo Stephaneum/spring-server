@@ -10,14 +10,22 @@ import javax.persistence.*
 enum class Type {
     PLAN, // show cover plan
     TEXT, // show text only
-    IMG // show image only
+    IMG; // show image only
+
+    fun getString(): String {
+        return when(this) {
+            PLAN -> "Vertretungsplan"
+            TEXT -> "Text"
+            IMG -> "Bild"
+        }
+    }
 }
 
 @Entity
 data class Blackboard(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                       var id: Int = 0,
 
-                      @Column(nullable = false)
+                      @Column(nullable = false) @Enumerated(EnumType.STRING)
                       var type: Type = Type.TEXT,
 
                       @Column(nullable = false)
@@ -30,10 +38,13 @@ data class Blackboard(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                       var order: Int = 0,
 
                       @Column(nullable = false)
-                      var activated: Boolean = true,
+                      var visible: Boolean = true,
 
                       @Column(nullable = false) @JsonIgnore
-                      var lastUpdate: Timestamp = Timestamp(System.currentTimeMillis()))
+                      var lastUpdate: Timestamp = Timestamp(System.currentTimeMillis())) {
+
+    fun getValueWithoutBreaks() = value.replace("<br>", " ")
+}
 
 @Repository
 interface BlackboardRepo : CrudRepository<Blackboard, Int> {
