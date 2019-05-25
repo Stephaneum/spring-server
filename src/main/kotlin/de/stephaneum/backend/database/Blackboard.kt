@@ -32,7 +32,7 @@ data class Blackboard(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                       var value: String = "",
 
                       @Column(nullable = false)
-                      var duration: Int = 5000,
+                      var duration: Int = 0, // in seconds
 
                       @Column(nullable = false, name = "\"order\"")
                       var order: Int = 0,
@@ -40,9 +40,10 @@ data class Blackboard(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                       @Column(nullable = false)
                       var visible: Boolean = true,
 
-                      @Column(nullable = false) @JsonIgnore
-                      var lastUpdate: Timestamp = Timestamp(System.currentTimeMillis())) {
+                      @Column(nullable = false)
+                      var lastUpdate: Timestamp = now()) {
 
+    @JsonIgnore
     fun getValueWithoutBreaks() = value.replace("<br>", " ")
 }
 

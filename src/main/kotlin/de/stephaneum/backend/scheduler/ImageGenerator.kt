@@ -21,7 +21,7 @@ class ImageGenerator {
     val logger = LoggerFactory.getLogger(ImageGenerator::class.java)
 
     @Autowired
-    private lateinit var pdfLocation: PDFLocation
+    private lateinit var configFetcher: ConfigFetcher
 
     private var lastModified: Long = 0
 
@@ -30,7 +30,11 @@ class ImageGenerator {
 
     @Scheduled(initialDelay=5000, fixedDelay = 10000)
     fun update() {
-        val file = File(pdfLocation.location)
+
+        if(configFetcher.pdfLocation == null)
+            return
+
+        val file = File(configFetcher.pdfLocation)
 
         if(file.isFile && lastModified != file.lastModified()) {
             logger.info("")

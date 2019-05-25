@@ -7,22 +7,29 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 @Component
-class PDFLocation {
+class ConfigFetcher {
 
-    val logger = LoggerFactory.getLogger(PDFLocation::class.java)
+    val logger = LoggerFactory.getLogger(ConfigFetcher::class.java)
 
     @Autowired
     private lateinit var configRepo: ConfigRepo
 
     var location: String? = null
+    var pdfLocation: String? = null
 
     @Scheduled(initialDelay=5000, fixedDelay = 10000)
     fun update() {
-        val newLocation = configRepo.findByKey("str_vertretung")?.value
+        val newLocation = configRepo.findByKey("speicherort")?.value
+        val newPDFLocation = configRepo.findByKey("str_vertretung")?.value
 
         if(location != newLocation) {
             location = newLocation
-            logger.info("PDF location: $location")
+            logger.info("Main Location: $location")
+        }
+
+        if(pdfLocation != newPDFLocation) {
+            pdfLocation = newPDFLocation
+            logger.info("PDF Location: $pdfLocation")
         }
     }
 }

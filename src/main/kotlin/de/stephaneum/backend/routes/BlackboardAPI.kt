@@ -4,6 +4,8 @@ import de.stephaneum.backend.Session
 import de.stephaneum.backend.database.Blackboard
 import de.stephaneum.backend.database.BlackboardRepo
 import de.stephaneum.backend.database.Type
+import de.stephaneum.backend.database.now
+import de.stephaneum.backend.scheduler.BlackboardIterator
 import de.stephaneum.backend.scheduler.ImageGenerator
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.util.HtmlUtils
 import javax.servlet.http.HttpServletResponse
+
+data class TimestampJSON(val timestamp: String)
 
 @Controller
 @RequestMapping("/blackboard")
@@ -32,12 +36,17 @@ class BlackboardAPI {
     private lateinit var imageGenerator: ImageGenerator
 
     @Autowired
+    private lateinit var blackboardIterator: BlackboardIterator
+
+    @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
     @GetMapping
     fun html(model: Model): String {
-        model["indexes"] = (0 until imageGenerator.images.size).toList()
-        model["date"] = imageGenerator.date ?: "Stephaneum"
+
+        model["active"] = blackboardIterator.active
+        model["planIndexes"] = (0 until imageGenerator.images.size).toList()
+        model["planDate"] = imageGenerator.date ?: "Stephaneum"
         return "blackboard/index"
     }
 
@@ -49,6 +58,12 @@ class BlackboardAPI {
 
         response.contentType = "image/jpeg"
         response.outputStream.write(imageGenerator.images[index])
+    }
+
+    @GetMapping("/timestamp")
+    @ResponseBody
+    fun active(): TimestampJSON {
+        return TimestampJSON(blackboardIterator.active.lastUpdate.toString())
     }
 
     @GetMapping("/admin")
@@ -70,7 +85,7 @@ class BlackboardAPI {
             return REDIRECT_LOGIN
 
         val max = if(blackboardRepo.count() == 0L) 0 else blackboardRepo.findMaxOrder()
-        blackboardRepo.save(Blackboard(0, Type.TEXT, "Hier klicken, um Text einzugeben", 7000, max + 1, true))
+        blackboardRepo.save(Blackboard(0, Type.TEXT, "Hier klicken, um Text einzugeben", 10, max + 1, true))
         return REDIRECT_ADMIN
     }
 
@@ -81,6 +96,19 @@ class BlackboardAPI {
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
         board.value = HtmlUtils.htmlEscape(value).replace(Regex("\r\n|\n|\r"), "<br>")
+        board.lastUpdate = now()
+        blackboardRepo.save(board)
+        return REDIRECT_ADMIN
+    }
+
+    @GetMapping("/duration/{id}")
+    fun duration(@PathVariable id: Int, duration: Int): String? {
+        if(!Session.get().loggedIn)
+            return REDIRECT_LOGIN
+
+        val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
+        board.duration = duration
+        board.lastUpdate = now()
         blackboardRepo.save(board)
         return REDIRECT_ADMIN
     }
@@ -92,6 +120,7 @@ class BlackboardAPI {
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
         board.type = type
+        board.lastUpdate = now()
         blackboardRepo.save(board)
         return REDIRECT_ADMIN
     }
@@ -103,6 +132,7 @@ class BlackboardAPI {
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
         board.visible = !board.visible
+        board.lastUpdate = now()
         blackboardRepo.save(board)
         return REDIRECT_ADMIN
     }

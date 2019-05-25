@@ -1,4 +1,4 @@
-var refreshDelay = 1000*60*10; // every 10min
+var refreshDelayDoc = 1000*60*10; // every 10min
 var initDelay = 1000;
 var scrollInterval = 20;
 var distancePerTick = 2;
@@ -44,14 +44,15 @@ function getDocHeight() {
     );
 }
 
-function reload() {
+function reloadDoc() {
+    console.log("reload");
     location.reload();
 }
 
 function init() {
     docHeight = getDocHeight();
     setInterval(scroller, scrollInterval);
-    setInterval(reload, refreshDelay);
+    setInterval(reloadDoc, refreshDelayDoc);
 }
 
 setTimeout(init, initDelay);

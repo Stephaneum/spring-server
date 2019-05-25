@@ -1,4 +1,6 @@
 <#import "/spring.ftl" as spring/>
+<#setting locale="de_DE">
+<#setting number_format="computer">
 
 <!DOCTYPE HTML>
 <html lang="de">
@@ -17,23 +19,23 @@
 
 <div class="valign-wrapper" style="height: 100vh">
     <div style="margin: auto">
-        <div class="center-align" style="max-width: 400px; margin: auto">
+        <div class="center-align" style="max-width: 400px; margin: auto; margin-top: 50px">
             <img src="<@spring.url '/static/img/logo-banner-green.png' />" style="width: 100%"/>
         </div>
 
-        <div class="right-align" style="margin-top: 100px">
+        <div class="right-align" style="margin-top: 30px">
             <a class="waves-effect waves-light btn green darken-3" href="<@spring.url '/blackboard/logout' />">
                 <i class="material-icons right">exit_to_app</i>Abmelden</a>
         </div>
-        <div class="card" style="width: 1250px; min-height: 500px; margin-top: 15px; padding: 5px 20px 20px 20px">
-            <h4 style="margin-bottom: 20px">Konfiguration des Blackboards</h4>
+        <div class="card" style="width: 1250px; min-height: 500px; margin: 15px 0 50px 0; padding: 5px 20px 20px 20px">
+            <h4 style="margin-bottom: 20px">Blackboard</h4>
 
             <ul class="collection">
                 <#list boards as b>
                     <li class="collection-item <#if !b.visible>grey lighten-3</#if>">
                         <div class="row" style="margin: 0">
                             <div class="col m5" style="font-size: 1.4em; overflow: hidden;padding-top: 10px">
-                                <span style="margin-right: 10px">(${b.order})</span>
+                                <span class="text-hover" style="margin-right: 10px">(${b.duration}s)</span>
 
                                 <#if b.type == "PLAN">
                                     <span style="margin-left: 10px">&lt;Vertretungsplan&gt;</span>
