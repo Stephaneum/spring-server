@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 class BlackboardIterator {
 
     final val logger = LoggerFactory.getLogger(BlackboardIterator::class.java)
-    final val EMPTY_BLACKBOARD = Blackboard(-1, Type.TEXT, "Noch nicht konfiguriert")
+    final val EMPTY_BLACKBOARD = Blackboard(-1, Type.TEXT, "Keine Anzeige verfügbar.")
     final val FETCH_DELAY = 10000
 
     @Autowired
