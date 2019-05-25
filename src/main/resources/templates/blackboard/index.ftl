@@ -1,5 +1,4 @@
 <#import "/spring.ftl" as spring/>
-<#setting locale="de_DE">
 <#setting number_format="computer">
 
 <!DOCTYPE HTML>
@@ -67,7 +66,7 @@
 <script src="<@spring.url '/static/js/blackboard.js' />"></script>
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {
-        initBlackboard('<@spring.url '/blackboard/timestamp'/>')
+        initBlackboard('<@spring.url '/blackboard/timestamp'/>', ${active.lastUpdate?long})
     });
 </script>
 </body>

@@ -8,9 +8,10 @@ function updateBlackboard() {
     $.ajax({
             method: 'GET',
             url: url,
+            timeout: 10000, // timeout 10s
             success: function (data) {
+                if (currentTimestamp !== data.timestamp) {
 
-                if(currentTimestamp && currentTimestamp !== data.timestamp) {
                     currentTimestamp = data.timestamp;
                     location.reload();
                     return;
@@ -18,13 +19,18 @@ function updateBlackboard() {
 
                 currentTimestamp = data.timestamp;
                 setTimeout(updateBlackboard, refreshDelayBlackboard);
+            },
+            error: function () {
+                // try again
+                setTimeout(updateBlackboard, refreshDelayBlackboard);
             }
         }
     );
 }
 
-function initBlackboard(initURL) {
+function initBlackboard(initURL, timestamp) {
     url = initURL;
+    currentTimestamp = timestamp;
     setTimeout(updateBlackboard, refreshDelayBlackboard);
 }
 

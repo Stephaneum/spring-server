@@ -33,7 +33,8 @@ class BlackboardIterator {
             nextFetch = System.currentTimeMillis() + FETCH_DELAY
         }
 
-        if(System.currentTimeMillis() > next) {
+        val activeIndex = boards.indexOf(active)
+        if(System.currentTimeMillis() > next || activeIndex == -1 || !boards[activeIndex].visible) {
             // next board
             if(boards.isEmpty() || boards.all { !it.visible }) {
                 active = EMPTY_BLACKBOARD
@@ -42,16 +43,15 @@ class BlackboardIterator {
             }
 
             // find next order
-            var activeIndex = boards.indexOf(active)
-
+            var nextIndex = activeIndex
             do {
-                activeIndex++
-                if(activeIndex == boards.size)
-                    activeIndex = 0
-            } while (!boards[activeIndex].visible)
+                nextIndex++
+                if(nextIndex == boards.size)
+                    nextIndex = 0
+            } while (!boards[nextIndex].visible)
 
 
-            active = boards[activeIndex]
+            active = boards[nextIndex]
             next = System.currentTimeMillis() + (active.duration * 1000)
         }
     }

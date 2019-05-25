@@ -19,7 +19,7 @@ import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.util.HtmlUtils
 import javax.servlet.http.HttpServletResponse
 
-data class TimestampJSON(val timestamp: String)
+data class TimestampJSON(val timestamp: Long)
 
 @Controller
 @RequestMapping("/blackboard")
@@ -62,8 +62,8 @@ class BlackboardAPI {
 
     @GetMapping("/timestamp")
     @ResponseBody
-    fun active(): TimestampJSON {
-        return TimestampJSON(blackboardIterator.active.lastUpdate.toString())
+    fun timestamp(): TimestampJSON {
+        return TimestampJSON(blackboardIterator.active.lastUpdate.time)
     }
 
     @GetMapping("/admin")
