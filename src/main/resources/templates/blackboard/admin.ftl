@@ -35,7 +35,8 @@
                     <li class="collection-item <#if !b.visible>grey lighten-3</#if>">
                         <div class="row" style="margin: 0">
                             <div class="col m5" style="font-size: 1.4em; overflow: hidden;padding-top: 10px">
-                                <span class="text-hover" style="margin-right: 10px">(${b.duration}s)</span>
+                                <span class="text-hover" style="margin-right: 10px"
+                                      onclick="updateDuration(${b.id}, '${b.type.string}',${b.duration});$('#modal-duration').modal('open');">(${b.duration}s)</span>
 
                                 <#if b.type == "PLAN">
                                     <span style="margin-left: 10px">&lt;Vertretungsplan&gt;</span>
@@ -94,7 +95,7 @@
     </div>
     <div class="modal-footer">
         <a href="#!" onclick="$('#modal-delete').modal('close')" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
-        <a id="modal-delete-action" href="" class="modal-close waves-effect waves-red btn-flat">Löschen</a>
+        <a id="modal-delete-action" href="" class="modal-close waves-effect waves-red btn red darken-4">Löschen</a>
     </div>
 </div>
 
@@ -123,6 +124,28 @@
     </form>
 </div>
 
+<div id="modal-duration" class="modal">
+    <form id="modal-duration-form" action="" method="GET">
+        <div class="modal-content">
+            <h4 id="modal-duration-title"></h4>
+            <br/>
+
+            <div class="input-field">
+                <label for="modal-duration-input">Dauer in Sekunden</label>
+                <input name="duration" type="number" id="modal-duration-input" min="1" max="3600" />
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" onclick="$('#modal-duration').modal('close')"
+               class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <button type="submit" value="Login" class="btn waves-effect waves-light green darken-3">
+                Speichern
+                <i class="material-icons left">save</i>
+            </button>
+        </div>
+    </form>
+</div>
+
 <script src="<@spring.url '/static/js/jquery.min.js' />"></script>
 <script src="<@spring.url '/static/js/materialize.min.js' />"></script>
 <script type="text/javascript">
@@ -141,6 +164,13 @@
         document.getElementById("modal-rename-title").innerHTML = boardType + " bearbeiten";
         document.getElementById("modal-rename-form").setAttribute('action', "<@spring.url '/blackboard/rename/' />" + boardId);
         document.getElementById("modal-rename-input").innerHTML = boardValue.replace('<br>', '\n')
+    }
+
+    function updateDuration(boardId, boardType, boardDuration) {
+        document.getElementById("modal-duration-title").innerHTML = "Dauer bearbeiten (" + boardType +")";
+        document.getElementById("modal-duration-form").setAttribute('action', "<@spring.url '/blackboard/duration/' />" + boardId);
+        document.getElementById("modal-duration-input").value = boardDuration;
+        M.updateTextFields();
     }
 
 </script>
