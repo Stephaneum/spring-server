@@ -50,25 +50,34 @@
                             </div>
                             <div class="col m3 right-align">
                                 <form action="<@spring.url '/blackboard/type/' + b.id />" method="GET">
-                                        <select name="type" onchange="this.form.submit()" class="browser-default">
-                                            <#list types as t>
-                                                <option value="${t}" <#if b.type == t>selected</#if> style="z-index: 9999">${t.string}</option>
-                                            </#list>
-                                        </select>
+                                    <select name="type" onchange="this.form.submit()" class="browser-default">
+                                        <#list types as t>
+                                            <option value="${t}" <#if b.type == t>selected</#if>
+                                                    style="z-index: 9999">${t.string}</option>
+                                        </#list>
+                                    </select>
                                 </form>
                             </div>
                             <div class="col m4 right-align">
-                                <a class="waves-effect waves-light btn darken-4 margin-1"
-                                   href="<@spring.url '/blackboard/move-up/' + b.id />"><i
+
+                                <a class="tooltipped waves-effect waves-light btn darken-4 margin-1"
+                                   href="<@spring.url '/blackboard/move-up/' + b.id />"
+                                   data-tooltip="Reihenfolge: nach oben" data-position="top"><i
                                             class="material-icons">arrow_upward</i></a>
-                                <a class="waves-effect waves-light btn darken-4 margin-1"
-                                   href="<@spring.url '/blackboard/move-down/' + b.id />"><i
+
+                                <a class="tooltipped waves-effect waves-light btn darken-4 margin-1"
+                                   href="<@spring.url '/blackboard/move-down/' + b.id />"
+                                   data-tooltip="Reihenfolge: nach unten" data-position="top"><i
                                             class="material-icons">arrow_downward</i></a>
-                                <a class="waves-effect waves-light btn green darken-4 margin-1"
-                                   href="<@spring.url '/blackboard/toggle-visibility/' + b.id />"><i
+
+                                <a class="tooltipped waves-effect waves-light btn green darken-4 margin-1"
+                                   href="<@spring.url '/blackboard/toggle-visibility/' + b.id />"
+                                   data-tooltip="Sichtbar: ja/nein" data-position="top"><i
                                             class="material-icons"><#if b.visible>visibility<#else>visibility_off</#if></i></a>
-                                <a class="waves-effect waves-light btn red darken-4 margin-1"
-                                   onclick="updateDelete(${b.id}, '${b.type.string}');$('#modal-delete').modal('open');"><i
+
+                                <a class="tooltipped waves-effect waves-light btn red darken-4 margin-1"
+                                   onclick="updateDelete(${b.id}, '${b.type.string}');$('#modal-delete').modal('open');"
+                                   data-tooltip="Löschen" data-position="top"><i
                                             class="material-icons">delete</i></a>
 
                             </div>
@@ -132,7 +141,7 @@
 
             <div class="input-field">
                 <label for="modal-duration-input">Dauer in Sekunden</label>
-                <input name="duration" type="number" id="modal-duration-input" min="1" max="3600" />
+                <input name="duration" type="number" id="modal-duration-input" min="1" max="3600"/>
             </div>
         </div>
         <div class="modal-footer">
@@ -152,6 +161,13 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         M.AutoInit();
+        <#if toast??>
+        <#if toast.content?has_content>
+        M.toast({html: '${toast.title}<br>${toast.content}'});
+        <#else>
+        M.toast({html: '${toast.title}'});
+        </#if>
+        </#if>
     });
 
     function updateDelete(boardId, boardType) {
@@ -167,7 +183,7 @@
     }
 
     function updateDuration(boardId, boardType, boardDuration) {
-        document.getElementById("modal-duration-title").innerHTML = "Dauer bearbeiten (" + boardType +")";
+        document.getElementById("modal-duration-title").innerHTML = "Dauer bearbeiten (" + boardType + ")";
         document.getElementById("modal-duration-form").setAttribute('action', "<@spring.url '/blackboard/duration/' />" + boardId);
         document.getElementById("modal-duration-input").value = boardDuration;
         M.updateTextFields();

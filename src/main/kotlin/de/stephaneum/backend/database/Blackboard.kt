@@ -9,13 +9,15 @@ import javax.persistence.*
 
 enum class Type {
     PLAN, // show cover plan
-    TEXT, // show text only
-    IMG; // show image only
+    TEXT, // show text
+    PDF, // show pdf
+    IMG; // show image
 
     fun getString(): String {
         return when(this) {
             PLAN -> "Vertretungsplan"
             TEXT -> "Text"
+            PDF -> "PDF"
             IMG -> "Bild"
         }
     }

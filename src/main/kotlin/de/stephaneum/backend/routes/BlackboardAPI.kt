@@ -1,6 +1,7 @@
 package de.stephaneum.backend.routes
 
 import de.stephaneum.backend.Session
+import de.stephaneum.backend.Toast
 import de.stephaneum.backend.database.Blackboard
 import de.stephaneum.backend.database.BlackboardRepo
 import de.stephaneum.backend.database.Type
@@ -42,16 +43,18 @@ class BlackboardAPI {
     private lateinit var blackboardRepo: BlackboardRepo
 
     @GetMapping
-    fun html(model: Model): String {
+    fun index(model: Model): String {
 
         model["active"] = blackboardIterator.active
         model["planIndexes"] = (0 until imageGenerator.images.size).toList()
         model["planDate"] = imageGenerator.date ?: "Stephaneum"
+        model.addAttribute("toast", Session.getAndDeleteToast())
+
         return "blackboard/index"
     }
 
     @GetMapping("/img/{index}")
-    fun jpg(@PathVariable index: Int, response: HttpServletResponse) {
+    fun img(@PathVariable index: Int, response: HttpServletResponse) {
 
         if(index >= imageGenerator.images.size)
             return
@@ -73,6 +76,7 @@ class BlackboardAPI {
 
         model["types"] = Type.values()
         model["boards"]  = blackboardRepo.findByOrderByOrder()
+        model.addAttribute("toast", Session.getAndDeleteToast())
 
         return "blackboard/admin"
     }
@@ -86,6 +90,7 @@ class BlackboardAPI {
 
         val max = if(blackboardRepo.count() == 0L) 0 else blackboardRepo.findMaxOrder()
         blackboardRepo.save(Blackboard(0, Type.TEXT, "Hier klicken, um Text einzugeben", 10, max + 1, true))
+        Session.addToast("Element hinzugefügt")
         return REDIRECT_ADMIN
     }
 
@@ -98,6 +103,7 @@ class BlackboardAPI {
         board.value = HtmlUtils.htmlEscape(value).replace(Regex("\r\n|\n|\r"), "<br>")
         board.lastUpdate = now()
         blackboardRepo.save(board)
+        Session.addToast("Text geändert")
         return REDIRECT_ADMIN
     }
 
@@ -110,6 +116,7 @@ class BlackboardAPI {
         board.duration = duration
         board.lastUpdate = now()
         blackboardRepo.save(board)
+        Session.addToast("Dauer geändert")
         return REDIRECT_ADMIN
     }
 
@@ -122,6 +129,7 @@ class BlackboardAPI {
         board.type = type
         board.lastUpdate = now()
         blackboardRepo.save(board)
+        Session.addToast("Typ geändert")
         return REDIRECT_ADMIN
     }
 
@@ -134,6 +142,8 @@ class BlackboardAPI {
         board.visible = !board.visible
         board.lastUpdate = now()
         blackboardRepo.save(board)
+
+        Session.addToast(if(board.visible) "Element ist wieder sichtbar" else "Element wird ausgeblendet")
         return REDIRECT_ADMIN
     }
 
@@ -180,6 +190,7 @@ class BlackboardAPI {
 
         blackboardRepo.deleteById(id)
         repairOrder()
+        Session.addToast("Element gelöscht")
         return REDIRECT_ADMIN
     }
 
@@ -193,11 +204,15 @@ class BlackboardAPI {
     // Auth
 
     @GetMapping("/login")
-    fun login(model: Model, error: Boolean = false): String {
+    fun login(model: Model, @RequestParam error: Boolean = false): String {
         if(Session.get().loggedIn)
             return REDIRECT_ADMIN
 
         model["loginFailed"] = error
+        if(error) {
+            model["toast"] = Toast("Login gescheitert")
+            println("here")
+        }
 
         return "blackboard/login"
     }
@@ -208,7 +223,7 @@ class BlackboardAPI {
             Session.login()
             return REDIRECT_ADMIN
         } else {
-            return ModelAndView("blackboard/login", mapOf(Pair("loginFailed", true)))
+            return "redirect:/blackboard/login?error=true"
         }
     }
 
