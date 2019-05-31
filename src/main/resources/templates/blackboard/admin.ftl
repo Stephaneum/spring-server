@@ -23,9 +23,15 @@
             <img src="<@spring.url '/static/img/logo-banner-green.png' />" style="width: 100%"/>
         </div>
 
-        <div class="right-align" style="margin-top: 30px">
-            <a class="waves-effect waves-light btn green darken-3" href="<@spring.url '/blackboard/logout' />">
-                <i class="material-icons right">exit_to_app</i>Abmelden</a>
+        <div class="row">
+            <div class="col m6 left-align">
+                <a class="waves-effect waves-light btn green darken-3" href="<@spring.url '/blackboard' />" target="_blank">
+                    <i class="material-icons right">star</i>Live-Version</a>
+            </div>
+            <div class="col m6 right-align">
+                <a class="waves-effect waves-light btn green darken-3" href="<@spring.url '/blackboard/logout' />">
+                    <i class="material-icons right">exit_to_app</i>Abmelden</a>
+            </div>
         </div>
         <div class="card" style="width: 1250px; min-height: 500px; margin: 15px 0 50px 0; padding: 5px 20px 20px 20px">
             <h4 style="margin-bottom: 20px">Blackboard</h4>
