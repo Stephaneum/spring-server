@@ -40,7 +40,7 @@
                 <#list boards as b>
                     <li class="collection-item <#if !b.visible>grey lighten-3</#if>">
                         <div class="row" style="margin: 0">
-                            <div class="col m5" style="font-size: 1.4em; overflow: hidden;padding-top: 10px">
+                            <div class="col m5" style="font-size: 1.4em; overflow: hidden;padding: 10px">
                                 <span class="text-hover" style="margin-right: 10px"
                                       onclick="updateDuration(${b.id}, '${b.type.string}',${b.duration});$('#modal-duration').modal('open');">(${b.duration}s)</span>
 
@@ -49,6 +49,13 @@
                                 <#elseif b.type == "TEXT">
                                     <span class="text-hover" style="white-space: nowrap;"
                                           onclick="updateRename(${b.id}, '${b.type.string}','${b.value}');$('#modal-rename').modal('open');">${b.valueWithoutBreaks}</span>
+                                <#elseif b.type == "PDF">
+                                    <form action="<@spring.url '/blackboard/upload/' + b.id />" method="POST" enctype="multipart/form-data" style="display: inline-block">
+                                        <input name="pdf" type="file" id="upload-pdf" accept="application/pdf" onchange="this.form.submit()" style="display: none">
+                                        <a class="waves-effect waves-light btn-small green darken-3 margin-1"
+                                           onclick="document.getElementById('upload-pdf').click();"><i
+                                                    class="material-icons left">arrow_upward</i>Hochladen</a>
+                                    </form>
                                 <#else>
                                     <span style="margin-left: 10px">&lt;in Arbeit&gt;</span>
                                 </#if>
@@ -131,7 +138,7 @@
         <div class="modal-footer">
             <a href="#!" onclick="$('#modal-rename').modal('close')"
                class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
-            <button type="submit" value="Login" class="btn waves-effect waves-light green darken-3">
+            <button type="submit" class="btn waves-effect waves-light green darken-3">
                 Speichern
                 <i class="material-icons left">save</i>
             </button>

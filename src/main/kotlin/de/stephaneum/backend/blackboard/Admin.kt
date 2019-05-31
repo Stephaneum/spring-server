@@ -1,73 +1,33 @@
-package de.stephaneum.backend.routes
+package de.stephaneum.backend.blackboard
 
+import de.stephaneum.backend.FileService
 import de.stephaneum.backend.Session
-import de.stephaneum.backend.Toast
 import de.stephaneum.backend.database.Blackboard
 import de.stephaneum.backend.database.BlackboardRepo
 import de.stephaneum.backend.database.Type
 import de.stephaneum.backend.database.now
-import de.stephaneum.backend.scheduler.BlackboardIterator
-import de.stephaneum.backend.scheduler.ImageGenerator
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.util.HtmlUtils
-import javax.servlet.http.HttpServletResponse
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.PostMapping
 
-data class TimestampJSON(val timestamp: Long)
+
 
 @Controller
 @RequestMapping("/blackboard")
-class BlackboardAPI {
-
-    val logger = LoggerFactory.getLogger(BlackboardAPI::class.java)
-    val REDIRECT_LOGIN = "redirect:/blackboard/login"
-    val REDIRECT_ADMIN = "redirect:/blackboard/admin"
-
-    @Value("\${security.blackboard.password}")
-    private lateinit var password: String
-
-    @Autowired
-    private lateinit var imageGenerator: ImageGenerator
-
-    @Autowired
-    private lateinit var blackboardIterator: BlackboardIterator
+class Admin {
 
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
-    @GetMapping
-    fun index(model: Model): String {
-
-        model["active"] = blackboardIterator.active
-        model["planIndexes"] = (0 until imageGenerator.images.size).toList()
-        model["planDate"] = imageGenerator.date ?: "Stephaneum"
-        model.addAttribute("toast", Session.getAndDeleteToast())
-
-        return "blackboard/index"
-    }
-
-    @GetMapping("/img/{index}")
-    fun img(@PathVariable index: Int, response: HttpServletResponse) {
-
-        if(index >= imageGenerator.images.size)
-            return
-
-        response.contentType = "image/jpeg"
-        response.outputStream.write(imageGenerator.images[index])
-    }
-
-    @GetMapping("/timestamp")
-    @ResponseBody
-    fun timestamp(): TimestampJSON {
-        return TimestampJSON(blackboardIterator.active.lastUpdate.time)
-    }
+    @Autowired
+    private lateinit var fileService: FileService
 
     @GetMapping("/admin")
     fun admin(model: Model): String {
@@ -91,6 +51,16 @@ class BlackboardAPI {
         val max = if(blackboardRepo.count() == 0L) 0 else blackboardRepo.findMaxOrder()
         blackboardRepo.save(Blackboard(0, Type.TEXT, "Hier klicken, um Text einzugeben", 10, max + 1, true))
         Session.addToast("Element hinzugefügt")
+        return REDIRECT_ADMIN
+    }
+
+    @PostMapping("/upload/{id}")
+    fun uploadFile(@PathVariable id: Int, @RequestParam("pdf") pdf: MultipartFile): String {
+        val success = fileService.storeFile(pdf, "/blackboard")
+        if(success)
+            Session.addToast("Datei hochgeladen")
+        else
+            Session.addToast("Ein Fehler ist aufgetreten")
         return REDIRECT_ADMIN
     }
 
@@ -199,38 +169,5 @@ class BlackboardAPI {
         val sorted = boards.sortedBy { it.order }
         sorted.forEachIndexed { index, blackboard -> blackboard.order = index }
         blackboardRepo.saveAll(sorted)
-    }
-
-    // Auth
-
-    @GetMapping("/login")
-    fun login(model: Model, @RequestParam error: Boolean = false): String {
-        if(Session.get().loggedIn)
-            return REDIRECT_ADMIN
-
-        model["loginFailed"] = error
-        if(error) {
-            model["toast"] = Toast("Login gescheitert")
-            println("here")
-        }
-
-        return "blackboard/login"
-    }
-
-    @PostMapping("/login")
-    fun login(password: String): Any? {
-        if(password == this.password) {
-            Session.login()
-            return REDIRECT_ADMIN
-        } else {
-            return "redirect:/blackboard/login?error=true"
-        }
-    }
-
-    @GetMapping("/logout")
-    fun logout(): String {
-        Session.logout()
-
-        return "redirect:/blackboard"
     }
 }

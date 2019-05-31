@@ -3,7 +3,6 @@ package de.stephaneum.backend.scheduler
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Component
 import java.io.File
 import java.awt.image.BufferedImage
 import org.apache.pdfbox.rendering.PDFRenderer
@@ -14,8 +13,9 @@ import java.io.ByteArrayOutputStream
 import java.awt.Color
 import java.io.IOException
 import org.apache.pdfbox.text.PDFTextStripper
+import org.springframework.stereotype.Service
 
-@Component
+@Service
 class ImageGenerator {
 
     val logger = LoggerFactory.getLogger(ImageGenerator::class.java)
