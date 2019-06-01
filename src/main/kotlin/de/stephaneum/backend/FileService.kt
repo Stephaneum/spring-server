@@ -6,12 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
-import org.springframework.util.StringUtils
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
 import java.net.MalformedURLException
 import java.nio.file.Files
-import java.nio.file.Path
+import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
 @Service
@@ -34,7 +33,7 @@ class FileService {
             }
 
             // Copy file to the target location (Replacing existing file with the same name)
-            val targetLocation = Path.of(configFetcher.location+path).resolve(fileName)
+            val targetLocation = Paths.get(configFetcher.location+path).resolve(fileName)
             Files.copy(file.inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING)
 
             return targetLocation.toString().replace("\\", "/")
@@ -47,7 +46,7 @@ class FileService {
 
     fun loadFileAsResource(fileName: String, path: String = ""): Resource? {
         return try {
-            val filePath = Path.of(configFetcher.location+path).resolve(fileName).normalize()
+            val filePath = Paths.get(configFetcher.location+path).resolve(fileName).normalize()
             val resource = UrlResource(filePath.toUri())
             if (resource.exists()) {
                 resource
