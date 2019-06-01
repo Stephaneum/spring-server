@@ -1,8 +1,6 @@
 package de.stephaneum.backend.blackboard
 
 import de.stephaneum.backend.Session
-import de.stephaneum.backend.scheduler.BlackboardIterator
-import de.stephaneum.backend.scheduler.ImageGenerator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -15,30 +13,34 @@ import javax.servlet.http.HttpServletResponse
 class Public {
 
     @Autowired
-    private lateinit var imageGenerator: ImageGenerator
+    private lateinit var pdfToImageScheduler: PdfToImageScheduler
 
     @Autowired
-    private lateinit var blackboardIterator: BlackboardIterator
+    private lateinit var blackboardIterator: BlackboardScheduler
 
     @GetMapping
     fun index(model: Model): String {
 
         model["active"] = blackboardIterator.active
-        model["planIndexes"] = (0 until imageGenerator.images.size).toList()
-        model["planDate"] = imageGenerator.date ?: "Stephaneum"
+
+        val pdf = pdfToImageScheduler.instances.find { it.boardId == blackboardIterator.active.id } ?: PdfImages(0)
+        model["pdfIndexes"] = (0 until pdf.images.size).toList()
+        model["pdfTitle"] = pdf.title ?: "Stephaneum"
         model.addAttribute("toast", Session.getAndDeleteToast())
 
         return "blackboard/index"
     }
 
-    @GetMapping("/img/{index}")
-    fun img(@PathVariable index: Int, response: HttpServletResponse) {
+    @GetMapping("/img/{boardId}/{index}")
+    fun img(@PathVariable boardId: Int, @PathVariable index: Int, response: HttpServletResponse) {
 
-        if(index >= imageGenerator.images.size)
+        val pdf = pdfToImageScheduler.instances.find { it.boardId == boardId } ?: PdfImages(0)
+
+        if(index >= pdf.images.size)
             return
 
         response.contentType = "image/jpeg"
-        response.outputStream.write(imageGenerator.images[index])
+        response.outputStream.write(pdf.images[index])
     }
 
     @GetMapping("/timestamp")

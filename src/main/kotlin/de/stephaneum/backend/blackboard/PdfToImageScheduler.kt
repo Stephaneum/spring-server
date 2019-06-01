@@ -1,149 +1,102 @@
-package de.stephaneum.backend.scheduler
+package de.stephaneum.backend.blackboard
 
+import de.stephaneum.backend.ImageService
+import de.stephaneum.backend.database.BlackboardRepo
+import de.stephaneum.backend.database.Type
+import de.stephaneum.backend.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import java.io.File
-import java.awt.image.BufferedImage
 import org.apache.pdfbox.rendering.PDFRenderer
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.rendering.ImageType
-import javax.imageio.ImageIO
-import java.io.ByteArrayOutputStream
-import java.awt.Color
 import java.io.IOException
 import org.apache.pdfbox.text.PDFTextStripper
 import org.springframework.stereotype.Service
 
-@Service
-class ImageGenerator {
+data class PdfImages(val boardId: Int,
+                     val images: List<ByteArray> = emptyList(),
+                     val lastModified: Long = 0,
+                     val title: String? = null)
 
-    val logger = LoggerFactory.getLogger(ImageGenerator::class.java)
+@Service
+class PdfToImageScheduler {
+
+    val logger = LoggerFactory.getLogger(PdfToImageScheduler::class.java)
 
     @Autowired
     private lateinit var configFetcher: ConfigFetcher
 
-    private var lastModified: Long = 0
+    @Autowired
+    private lateinit var imageService: ImageService
 
-    var images: List<ByteArray> = emptyList()
-    var date: String? = null
+    @Autowired
+    private lateinit var blackboardRepo: BlackboardRepo
+
+    var instances = listOf<PdfImages>()
 
     @Scheduled(initialDelay=5000, fixedDelay = 10000)
     fun update() {
 
-        if(configFetcher.pdfLocation == null)
-            return
+        val boards = blackboardRepo.findByOrderByOrder()
+        val nextInstances = mutableListOf<PdfImages>()
+        boards.forEach { board ->
+            when(board.type) {
+                Type.PLAN -> {
+                    val pdfLocation = configFetcher.planLocation
+                    if(pdfLocation != null) {
+                        val file = File(pdfLocation) // the pdf file
+                        var instance = instances.find { it.boardId == board.id } ?: PdfImages(board.id)
 
-        val file = File(configFetcher.pdfLocation)
-
-        if(file.isFile && lastModified != file.lastModified()) {
-            logger.info("")
-            logger.info("--- updating images ---")
-
-            val nextImages = mutableListOf<ByteArray>()
-            val document = PDDocument.load(file)
-            val pdfRenderer = PDFRenderer(document)
-            for (page in 0 until document.numberOfPages) {
-                val bim = pdfRenderer.renderImageWithDPI(page, 300f, ImageType.RGB)
-                val trimmed = trimImage(bim)
-                nextImages.add(convertToJPG(trimmed))
-            }
-            document.close()
-
-            date = resolveDate(file)
-            lastModified = file.lastModified()
-            images = nextImages
-            logger.info("--- images generated ---")
-            logger.info("")
-        }
-    }
-
-    fun trimImage(img: BufferedImage): BufferedImage {
-        val x = getWhiteLeft(img)
-        val y = getWhiteTop(img)
-        val width = getWhiteRight(img) - x
-        val height = getWhiteBottom(img) - y
-
-        return img.getSubimage(x, y, width, height)
-    }
-
-    private fun getWhiteLeft(img: BufferedImage): Int {
-        val height = img.height
-        val width = img.width
-        var left = img.width
-
-        for(y in 0 until height) {
-            for(x in 0 until width) {
-                if(img.getRGB(x, y) != Color.WHITE.rgb && x < left) {
-                    left = x
-                    break
+                        if(file.isFile && instance.lastModified != file.lastModified()) {
+                            val images = generateImages(file)
+                            val title = resolveDate(file)
+                            val lastModified = file.lastModified()
+                            instance = PdfImages(board.id, images, lastModified, title)
+                        }
+                        nextInstances.add(instance)
+                    }
                 }
-            }
-        }
-        return left
-    }
+                Type.PDF -> {
+                    val pdfLocation = board.value
+                    val file = File(pdfLocation) // the pdf file
+                    var instance = instances.find { it.boardId == board.id } ?: PdfImages(board.id)
 
-    private fun getWhiteRight(img: BufferedImage): Int {
-        val height = img.height
-        val width = img.width
-        var right = 0
-
-        for (y in 0 until height) {
-            for (x in width - 1 downTo 0) {
-                if (img.getRGB(x, y) != Color.WHITE.rgb && x > right) {
-                    right = x
-                    break
+                    if(file.isFile && instance.lastModified != file.lastModified()) {
+                        val images = generateImages(file)
+                        val lastModified = file.lastModified()
+                        instance = PdfImages(board.id, images, lastModified)
+                    }
+                    nextInstances.add(instance)
                 }
+                else -> {}
             }
         }
-
-        return right
+        instances = nextInstances
     }
 
-    private fun getWhiteBottom(img: BufferedImage): Int {
-        val width = img.width
-        val height = img.height
-        var bottom = 0
-
-        for (x in 0 until width) {
-            for (y in height - 1 downTo 0) {
-                if (img.getRGB(x, y) != Color.WHITE.rgb && y > bottom) {
-                    bottom = y
-                    break
-                }
-            }
+    private fun generateImages(file: File): List<ByteArray> {
+        logger.info("")
+        logger.info("--- updating images ---")
+        val images = mutableListOf<ByteArray>()
+        val document = PDDocument.load(file)
+        val pdfRenderer = PDFRenderer(document)
+        for (page in 0 until document.numberOfPages) {
+            val bim = pdfRenderer.renderImageWithDPI(page, 300f, ImageType.RGB)
+            val trimmed = imageService.trimImage(bim)
+            images.add(imageService.convertToJPG(trimmed))
         }
-
-        return bottom
-    }
-
-    private fun getWhiteTop(img: BufferedImage): Int {
-        val width = img.width
-        val height = img.height
-        var top = img.height
-
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                if (img.getRGB(x, y) != Color.WHITE.rgb && y < top) {
-                    top = y
-                    break
-                }
-            }
-        }
-
-        return top
-    }
-
-    fun convertToJPG(img: BufferedImage): ByteArray {
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        ImageIO.write(img, "jpg", byteArrayOutputStream)
-        return byteArrayOutputStream.toByteArray()
+        document.close()
+        logger.info("--- images generated ---")
+        logger.info("")
+        return images
     }
 
     private val days = arrayOf("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag")
     private val months = arrayOf("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember")
 
-    fun resolveDate(file: File): String? {
+    private fun resolveDate(file: File): String? {
         java.util.logging.Logger.getLogger("org.apache.pdfbox").level = java.util.logging.Level.SEVERE
 
         var result: String? = null

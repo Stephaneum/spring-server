@@ -1,4 +1,4 @@
-package de.stephaneum.backend.scheduler
+package de.stephaneum.backend.blackboard
 
 import de.stephaneum.backend.database.Blackboard
 import de.stephaneum.backend.database.BlackboardRepo
@@ -8,17 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
-@Service
-class BlackboardIterator {
 
-    final val logger = LoggerFactory.getLogger(BlackboardIterator::class.java)
+@Service
+class BlackboardScheduler {
+
+    final val logger = LoggerFactory.getLogger(BlackboardScheduler::class.java)
     final val EMPTY_BLACKBOARD = Blackboard(-1, Type.TEXT, "Noch nicht konfiguriert")
     final val FETCH_DELAY = 10000
 
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
-    private val boards = mutableListOf<Blackboard>()
+    private var boards = emptyList<Blackboard>()
 
     var active = EMPTY_BLACKBOARD
     var next = 0L
@@ -28,8 +29,7 @@ class BlackboardIterator {
     fun update() {
 
         if(System.currentTimeMillis() > nextFetch) {
-            boards.clear()
-            boards.addAll(blackboardRepo.findByOrderByOrder())
+            boards = blackboardRepo.findByOrderByOrder()
             nextFetch = System.currentTimeMillis() + FETCH_DELAY
         }
 

@@ -6,6 +6,7 @@ import de.stephaneum.backend.database.Blackboard
 import de.stephaneum.backend.database.BlackboardRepo
 import de.stephaneum.backend.database.Type
 import de.stephaneum.backend.database.now
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Controller
@@ -18,10 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.PostMapping
 
 
-
 @Controller
 @RequestMapping("/blackboard")
 class Admin {
+
+    final val logger = LoggerFactory.getLogger(Admin::class.java)
+    final val STANDARD_VALUE = "Hier klicken, um Text einzugeben"
 
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
@@ -49,17 +52,37 @@ class Admin {
             return REDIRECT_LOGIN
 
         val max = if(blackboardRepo.count() == 0L) 0 else blackboardRepo.findMaxOrder()
-        blackboardRepo.save(Blackboard(0, Type.TEXT, "Hier klicken, um Text einzugeben", 10, max + 1, true))
+        blackboardRepo.save(Blackboard(0, Type.TEXT, STANDARD_VALUE, 10, max + 1, true))
         Session.addToast("Element hinzugefügt")
         return REDIRECT_ADMIN
     }
 
     @PostMapping("/upload/{id}")
     fun uploadFile(@PathVariable id: Int, @RequestParam("pdf") pdf: MultipartFile): String {
-        val success = fileService.storeFile(pdf, "/blackboard")
-        if(success)
+
+        if(!Session.get().loggedIn)
+            return REDIRECT_LOGIN
+
+        val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
+
+        val fileName = pdf.originalFilename
+        if(fileName == null || !fileName.endsWith(".pdf")) {
+            Session.addToast("Ein Fehler ist aufgetreten", "Datei muss mit .pdf enden")
+            return REDIRECT_ADMIN
+        }
+
+        if(blackboardRepo.findAll().any { blackboard -> blackboard.id != id && blackboard.getFileName() == fileName }) {
+            Session.addToast("Ein Fehler ist aufgetreten", "Dateiname existiert bereits")
+            return REDIRECT_ADMIN
+        }
+
+        val path = fileService.storeFile(pdf, "/blackboard", fileName)
+        if(path != null) {
+            board.value = path
+            board.lastUpdate = now()
+            blackboardRepo.save(board)
             Session.addToast("Datei hochgeladen")
-        else
+        } else
             Session.addToast("Ein Fehler ist aufgetreten")
         return REDIRECT_ADMIN
     }
@@ -97,9 +120,11 @@ class Admin {
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
         board.type = type
+        board.value = STANDARD_VALUE
         board.lastUpdate = now()
         blackboardRepo.save(board)
-        Session.addToast("Typ geändert")
+
+        Session.addToast("Typ geändert -> ${type.getString()}")
         return REDIRECT_ADMIN
     }
 

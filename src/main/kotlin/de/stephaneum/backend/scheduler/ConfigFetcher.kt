@@ -15,21 +15,21 @@ class ConfigFetcher {
     private lateinit var configRepo: ConfigRepo
 
     var location: String? = null
-    var pdfLocation: String? = null
+    var planLocation: String? = null
 
     @Scheduled(initialDelay=5000, fixedDelay = 10000)
     fun update() {
         val newLocation = configRepo.findByKey("speicherort")?.value
-        val newPDFLocation = configRepo.findByKey("str_vertretung")?.value
+        val newPlanLocation = configRepo.findByKey("str_vertretung")?.value
 
         if(location != newLocation) {
             location = newLocation
             logger.info("Main Location: $location")
         }
 
-        if(pdfLocation != newPDFLocation) {
-            pdfLocation = newPDFLocation
-            logger.info("PDF Location: $pdfLocation")
+        if(planLocation != newPlanLocation) {
+            planLocation = newPlanLocation
+            logger.info("PDF Location: $planLocation")
         }
     }
 }

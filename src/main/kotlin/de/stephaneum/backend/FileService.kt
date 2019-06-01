@@ -22,23 +22,25 @@ class FileService {
     @Autowired
     private lateinit var configFetcher: ConfigFetcher
 
-    fun storeFile(file: MultipartFile, path: String = ""): Boolean {
-        // Normalize file name
-        val fileName = StringUtils.cleanPath(file.originalFilename ?: "")
+    /**
+     * @return path to file if saving was successful
+     */
+    fun storeFile(file: MultipartFile, path: String = "", fileName: String): String? {
 
         try {
             // Check if the file's name contains invalid characters
             if (fileName.contains("..")) {
-                return false
+                return null
             }
 
             // Copy file to the target location (Replacing existing file with the same name)
             val targetLocation = Path.of(configFetcher.location+path).resolve(fileName)
             Files.copy(file.inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING)
 
-            return true
+            return targetLocation.toString().replace("\\", "/")
         } catch (ex: IOException) {
-            return false
+            logger.error("Storing file failed",ex)
+            return null
         }
 
     }
