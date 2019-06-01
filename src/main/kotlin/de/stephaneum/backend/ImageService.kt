@@ -3,11 +3,20 @@ package de.stephaneum.backend
 import org.springframework.stereotype.Service
 import java.awt.Color
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
 @Service
 class ImageService {
+
+    /**
+     * @param bytes which should be converted
+     * @return BufferedImage from Byte Array
+     */
+    fun convertToBufferedImage(bytes: ByteArray): BufferedImage {
+        return ImageIO.read(ByteArrayInputStream(bytes))
+    }
 
     /**
      * @param img image which should be converted

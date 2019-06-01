@@ -1,6 +1,7 @@
 package de.stephaneum.backend.blackboard
 
 import de.stephaneum.backend.FileService
+import de.stephaneum.backend.ImageService
 import de.stephaneum.backend.Session
 import de.stephaneum.backend.database.Blackboard
 import de.stephaneum.backend.database.BlackboardRepo
@@ -31,6 +32,9 @@ class Admin {
 
     @Autowired
     private lateinit var fileService: FileService
+
+    @Autowired
+    private lateinit var imageService: ImageService
 
     @GetMapping("/admin")
     fun admin(model: Model): String {
@@ -65,7 +69,7 @@ class Admin {
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
 
-        val fileName = file.originalFilename
+        var fileName = file.originalFilename
         if(fileName == null) {
             Session.addToast("Ein Fehler ist aufgetreten", "Dateiname unbekannt")
             return REDIRECT_ADMIN
@@ -83,7 +87,16 @@ class Admin {
             return REDIRECT_ADMIN
         }
 
-        val path = fileService.storeFile(file, "/blackboard", fileName)
+        var bytes = file.bytes
+        if(board.type == Type.IMG && !fileName.toLowerCase().endsWith(".jpg") && !fileName.toLowerCase().endsWith(".jpeg")) {
+            // to jpeg
+            val image = imageService.convertToBufferedImage(file.bytes)
+            bytes = imageService.convertToJPG(image)
+            fileName = fileService.changeExtension(fileName, "jpg")
+            logger.info("converted to jpeg: $fileName")
+        }
+
+        val path = fileService.storeFile(bytes, "/blackboard", fileName)
         if(path != null) {
             board.value = path
             board.lastUpdate = now()

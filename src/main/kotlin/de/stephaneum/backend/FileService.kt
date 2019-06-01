@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
+import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.net.MalformedURLException
 import java.nio.file.Files
@@ -22,9 +22,26 @@ class FileService {
     private lateinit var configFetcher: ConfigFetcher
 
     /**
+     * @param original the original path to file
+     * @param extension the new extension
+     * @return path with new extension
+     */
+    fun changeExtension(original: String, extension: String): String {
+        val index = original.lastIndexOf('.')+1
+        if(index == 0)
+            return "$original.$extension"
+
+        val withoutExtension = original.substring(0, index)
+        return withoutExtension+extension
+    }
+
+    /**
+     * @param content byte array which should be saved
+     * @param path the path to the folder relative to the main location
+     * @param fileName name of file which will be appended to the path
      * @return path to file if saving was successful
      */
-    fun storeFile(file: MultipartFile, path: String = "", fileName: String): String? {
+    fun storeFile(content: ByteArray, path: String = "", fileName: String): String? {
 
         try {
             // Check if the file's name contains invalid characters
@@ -34,7 +51,7 @@ class FileService {
 
             // Copy file to the target location (Replacing existing file with the same name)
             val targetLocation = Paths.get(configFetcher.location+path).resolve(fileName)
-            Files.copy(file.inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING)
+            Files.copy(ByteArrayInputStream(content), targetLocation, StandardCopyOption.REPLACE_EXISTING)
 
             return targetLocation.toString().replace("\\", "/")
         } catch (ex: IOException) {

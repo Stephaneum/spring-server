@@ -46,7 +46,7 @@ class BlackboardScheduler {
             var nextIndex = activeIndex
             do {
                 nextIndex++
-                if(nextIndex == boards.size)
+                if(nextIndex >= boards.size)
                     nextIndex = 0
             } while (!boards[nextIndex].visible)
 

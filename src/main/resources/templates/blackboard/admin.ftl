@@ -1,4 +1,5 @@
 <#import "/spring.ftl" as spring/>
+<#import "../components/loading.ftl" as loading/>
 <#setting locale="de_DE">
 <#setting number_format="computer">
 
@@ -52,7 +53,7 @@
                                 <#elseif b.type == "PDF" || b.type == "IMG">
                                     <span style="margin-left: 10px">[ <#if b.uploaded>${b.fileName}<#else>leer</#if> ]</span>
                                     <form action="<@spring.url '/blackboard/upload/' + b.id />" method="POST" enctype="multipart/form-data" style="display: inline-block">
-                                        <input name="file" type="file" id="upload-file-${b.id}" onchange="this.form.submit()" style="display: none">
+                                        <input name="file" type="file" id="upload-file-${b.id}" onchange="loading(); this.form.submit()" style="display: none">
                                         <a class="waves-effect waves-light btn-small green darken-3 margin-1"
                                            onclick="document.getElementById('upload-file-${b.id}').click();"><i
                                                     class="material-icons left">arrow_upward</i>Hochladen</a>
@@ -166,6 +167,8 @@
         </div>
     </form>
 </div>
+
+<@loading.render/>
 
 <script src="<@spring.url '/static/js/jquery.min.js' />"></script>
 <script src="<@spring.url '/static/js/materialize.min.js' />"></script>
