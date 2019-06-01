@@ -58,16 +58,23 @@ class Admin {
     }
 
     @PostMapping("/upload/{id}")
-    fun uploadFile(@PathVariable id: Int, @RequestParam("pdf") pdf: MultipartFile): String {
+    fun uploadFile(@PathVariable id: Int, @RequestParam("file") file: MultipartFile): String {
 
         if(!Session.get().loggedIn)
             return REDIRECT_LOGIN
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
 
-        val fileName = pdf.originalFilename
-        if(fileName == null || !fileName.endsWith(".pdf")) {
-            Session.addToast("Ein Fehler ist aufgetreten", "Datei muss mit .pdf enden")
+        val fileName = file.originalFilename
+        if(fileName == null) {
+            Session.addToast("Ein Fehler ist aufgetreten", "Dateiname unbekannt")
+            return REDIRECT_ADMIN
+        }
+        if(board.type == Type.PDF && !fileName.toLowerCase().endsWith(".pdf")) {
+            Session.addToast("Ein Fehler ist aufgetreten", "Nur PDF-Dateien erlaubt")
+            return REDIRECT_ADMIN
+        } else if(board.type == Type.IMG && !fileName.toLowerCase().endsWith(".png") && !fileName.toLowerCase().endsWith("jpg") && !fileName.toLowerCase().endsWith("jpeg")) {
+            Session.addToast("Ein Fehler ist aufgetreten", "Nur PNG oder JPG Dateien erlaubt")
             return REDIRECT_ADMIN
         }
 
@@ -76,7 +83,7 @@ class Admin {
             return REDIRECT_ADMIN
         }
 
-        val path = fileService.storeFile(pdf, "/blackboard", fileName)
+        val path = fileService.storeFile(file, "/blackboard", fileName)
         if(path != null) {
             board.value = path
             board.lastUpdate = now()

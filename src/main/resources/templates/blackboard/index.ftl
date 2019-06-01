@@ -37,11 +37,14 @@
     </#if>
     <#list pdfIndexes as i>
         <div style="padding: 50px">
-            <img id="logo" src="<@spring.url '/blackboard/img/' + active.id + '/' + i />" style="width: 100%" alt="plan" />
+            <img src="<@spring.url '/blackboard/img/' + active.id + '/' + i />" style="width: 100%" />
         </div>
     </#list>
 
     <script src="<@spring.url '/static/js/scroller.js' />"></script>
+<#elseif active.type == "IMG">
+    <div style="width: 100vw; height: 100vh; background-image: url(<@spring.url '/blackboard/img/' + active.id />); background-size: contain; background-repeat: no-repeat; background-position: center;">
+    </div>
 <#elseif active.type == "TEXT">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/materialize.min.css' />">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/material-icons.css' />">

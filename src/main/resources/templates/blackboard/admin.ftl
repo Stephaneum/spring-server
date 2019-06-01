@@ -49,16 +49,14 @@
                                 <#elseif b.type == "TEXT">
                                     <span class="text-hover" style="white-space: nowrap;"
                                           onclick="updateRename(${b.id}, '${b.type.string}','${b.value}');$('#modal-rename').modal('open');">${b.valueWithoutBreaks}</span>
-                                <#elseif b.type == "PDF">
+                                <#elseif b.type == "PDF" || b.type == "IMG">
                                     <span style="margin-left: 10px">[ <#if b.uploaded>${b.fileName}<#else>leer</#if> ]</span>
                                     <form action="<@spring.url '/blackboard/upload/' + b.id />" method="POST" enctype="multipart/form-data" style="display: inline-block">
-                                        <input name="pdf" type="file" id="upload-pdf-${b.id}" accept="application/pdf" onchange="this.form.submit()" style="display: none">
+                                        <input name="file" type="file" id="upload-file-${b.id}" onchange="this.form.submit()" style="display: none">
                                         <a class="waves-effect waves-light btn-small green darken-3 margin-1"
-                                           onclick="document.getElementById('upload-pdf-${b.id}').click();"><i
+                                           onclick="document.getElementById('upload-file-${b.id}').click();"><i
                                                     class="material-icons left">arrow_upward</i>Hochladen</a>
                                     </form>
-                                <#else>
-                                    <span style="margin-left: 10px">&lt;in Arbeit&gt;</span>
                                 </#if>
 
                             </div>
