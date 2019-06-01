@@ -21,7 +21,7 @@ class GarbageCollector {
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
-    @Scheduled(initialDelay=10000, fixedDelay = 10000)
+    @Scheduled(initialDelay=10000, fixedDelay = 1000*60)
     fun update() {
 
         val blackboardPath = configFetcher.location + "/blackboard"
