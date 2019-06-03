@@ -3,6 +3,7 @@ package de.stephaneum.backend.blackboard
 import de.stephaneum.backend.ImageService
 import de.stephaneum.backend.database.BlackboardRepo
 import de.stephaneum.backend.database.Type
+import de.stephaneum.backend.database.now
 import de.stephaneum.backend.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,6 +14,7 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.rendering.ImageType
 import java.io.IOException
 import org.apache.pdfbox.text.PDFTextStripper
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 data class PdfImages(val boardId: Int,
@@ -54,6 +56,9 @@ class PdfToImageScheduler {
                             val title = resolveDate(file)
                             val lastModified = file.lastModified()
                             instance = PdfImages(board.id, images, lastModified, title)
+
+                            // update last update
+                            updateTimestamp(board.id)
                         }
                         nextInstances.add(instance)
                     }
@@ -67,6 +72,9 @@ class PdfToImageScheduler {
                         val images = generateImages(file)
                         val lastModified = file.lastModified()
                         instance = PdfImages(board.id, images, lastModified)
+
+                        // update last update
+                        updateTimestamp(board.id)
                     }
                     nextInstances.add(instance)
                 }
@@ -91,6 +99,10 @@ class PdfToImageScheduler {
         logger.info("--- images generated ---")
         logger.info("")
         return images
+    }
+
+    private fun updateTimestamp(blackboardId: Int) {
+        blackboardRepo.findByIdOrNull(blackboardId)?.apply { lastUpdate = now() }?.also { blackboardRepo.save(it) }
     }
 
     private val days = arrayOf("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag")
