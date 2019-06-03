@@ -1,4 +1,5 @@
 <#import "/spring.ftl" as spring/>
+<#import "../components/loading.ftl" as loading/>
 <#setting locale="de_DE">
 <#setting number_format="computer">
 
@@ -23,9 +24,15 @@
             <img src="<@spring.url '/static/img/logo-banner-green.png' />" style="width: 100%"/>
         </div>
 
-        <div class="right-align" style="margin-top: 30px">
-            <a class="waves-effect waves-light btn green darken-3" href="<@spring.url '/blackboard/logout' />">
-                <i class="material-icons right">exit_to_app</i>Abmelden</a>
+        <div class="row">
+            <div class="col m6 left-align">
+                <a class="waves-effect waves-light btn green darken-3" href="<@spring.url '/blackboard' />" target="_blank">
+                    <i class="material-icons right">star</i>Live-Version</a>
+            </div>
+            <div class="col m6 right-align">
+                <a class="waves-effect waves-light btn green darken-3" href="<@spring.url '/blackboard/logout' />">
+                    <i class="material-icons right">exit_to_app</i>Abmelden</a>
+            </div>
         </div>
         <div class="card" style="width: 1250px; min-height: 500px; margin: 15px 0 50px 0; padding: 5px 20px 20px 20px">
             <h4 style="margin-bottom: 20px">Blackboard</h4>
@@ -34,41 +41,56 @@
                 <#list boards as b>
                     <li class="collection-item <#if !b.visible>grey lighten-3</#if>">
                         <div class="row" style="margin: 0">
-                            <div class="col m5" style="font-size: 1.4em; overflow: hidden;padding-top: 10px">
+                            <div class="col m6" style="font-size: 1.4em; overflow: hidden;padding: 10px">
                                 <span class="text-hover" style="margin-right: 10px"
                                       onclick="updateDuration(${b.id}, '${b.type.string}',${b.duration});$('#modal-duration').modal('open');">(${b.duration}s)</span>
 
                                 <#if b.type == "PLAN">
-                                    <span style="margin-left: 10px">&lt;Vertretungsplan&gt;</span>
+                                    <span style="margin-left: 10px">[ Vertretungsplan ]</span>
                                 <#elseif b.type == "TEXT">
                                     <span class="text-hover" style="white-space: nowrap;"
                                           onclick="updateRename(${b.id}, '${b.type.string}','${b.value}');$('#modal-rename').modal('open');">${b.valueWithoutBreaks}</span>
-                                <#else>
-                                    <span style="margin-left: 10px">&lt;in Arbeit&gt;</span>
+                                <#elseif b.type == "PDF" || b.type == "IMG">
+                                    <span style="margin-left: 10px">[ <#if b.uploaded>${b.fileName}<#else>leer</#if> ]</span>
+                                    <form action="<@spring.url '/blackboard/upload/' + b.id />" method="POST" enctype="multipart/form-data" style="display: inline-block">
+                                        <input name="file" type="file" id="upload-file-${b.id}" onchange="loading(); this.form.submit()" style="display: none">
+                                        <a class="waves-effect waves-light btn-small green darken-3 margin-1"
+                                           onclick="document.getElementById('upload-file-${b.id}').click();"><i
+                                                    class="material-icons left">arrow_upward</i>Hochladen</a>
+                                    </form>
                                 </#if>
 
                             </div>
                             <div class="col m3 right-align">
                                 <form action="<@spring.url '/blackboard/type/' + b.id />" method="GET">
-                                        <select name="type" onchange="this.form.submit()" class="browser-default">
-                                            <#list types as t>
-                                                <option value="${t}" <#if b.type == t>selected</#if> style="z-index: 9999">${t.string}</option>
-                                            </#list>
-                                        </select>
+                                    <select name="type" onchange="this.form.submit()" class="browser-default">
+                                        <#list types as t>
+                                            <option value="${t}" <#if b.type == t>selected</#if>
+                                                    style="z-index: 9999">${t.string}</option>
+                                        </#list>
+                                    </select>
                                 </form>
                             </div>
-                            <div class="col m4 right-align">
-                                <a class="waves-effect waves-light btn darken-4 margin-1"
-                                   href="<@spring.url '/blackboard/move-up/' + b.id />"><i
+                            <div class="col m3 right-align">
+
+                                <a class="tooltipped waves-effect waves-light btn darken-4 margin-1"
+                                   href="<@spring.url '/blackboard/move-up/' + b.id />"
+                                   data-tooltip="Reihenfolge: nach oben" data-position="top"><i
                                             class="material-icons">arrow_upward</i></a>
-                                <a class="waves-effect waves-light btn darken-4 margin-1"
-                                   href="<@spring.url '/blackboard/move-down/' + b.id />"><i
+
+                                <a class="tooltipped waves-effect waves-light btn darken-4 margin-1"
+                                   href="<@spring.url '/blackboard/move-down/' + b.id />"
+                                   data-tooltip="Reihenfolge: nach unten" data-position="top"><i
                                             class="material-icons">arrow_downward</i></a>
-                                <a class="waves-effect waves-light btn green darken-4 margin-1"
-                                   href="<@spring.url '/blackboard/toggle-visibility/' + b.id />"><i
+
+                                <a class="tooltipped waves-effect waves-light btn green darken-4 margin-1"
+                                   href="<@spring.url '/blackboard/toggle-visibility/' + b.id />"
+                                   data-tooltip="Sichtbar: ja/nein" data-position="top"><i
                                             class="material-icons"><#if b.visible>visibility<#else>visibility_off</#if></i></a>
-                                <a class="waves-effect waves-light btn red darken-4 margin-1"
-                                   onclick="updateDelete(${b.id}, '${b.type.string}');$('#modal-delete').modal('open');"><i
+
+                                <a class="tooltipped waves-effect waves-light btn red darken-4 margin-1"
+                                   onclick="updateDelete(${b.id}, '${b.type.string}');$('#modal-delete').modal('open');"
+                                   data-tooltip="Löschen" data-position="top"><i
                                             class="material-icons">delete</i></a>
 
                             </div>
@@ -116,7 +138,7 @@
         <div class="modal-footer">
             <a href="#!" onclick="$('#modal-rename').modal('close')"
                class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
-            <button type="submit" value="Login" class="btn waves-effect waves-light green darken-3">
+            <button type="submit" class="btn waves-effect waves-light green darken-3">
                 Speichern
                 <i class="material-icons left">save</i>
             </button>
@@ -132,7 +154,7 @@
 
             <div class="input-field">
                 <label for="modal-duration-input">Dauer in Sekunden</label>
-                <input name="duration" type="number" id="modal-duration-input" min="1" max="3600" />
+                <input name="duration" type="number" id="modal-duration-input" min="1" max="3600"/>
             </div>
         </div>
         <div class="modal-footer">
@@ -146,12 +168,21 @@
     </form>
 </div>
 
+<@loading.render/>
+
 <script src="<@spring.url '/static/js/jquery.min.js' />"></script>
 <script src="<@spring.url '/static/js/materialize.min.js' />"></script>
 <script type="text/javascript">
 
     document.addEventListener('DOMContentLoaded', function () {
         M.AutoInit();
+        <#if toast??>
+        <#if toast.content?has_content>
+        M.toast({html: '${toast.title}<br>${toast.content}'});
+        <#else>
+        M.toast({html: '${toast.title}'});
+        </#if>
+        </#if>
     });
 
     function updateDelete(boardId, boardType) {
@@ -167,7 +198,7 @@
     }
 
     function updateDuration(boardId, boardType, boardDuration) {
-        document.getElementById("modal-duration-title").innerHTML = "Dauer bearbeiten (" + boardType +")";
+        document.getElementById("modal-duration-title").innerHTML = "Dauer bearbeiten (" + boardType + ")";
         document.getElementById("modal-duration-form").setAttribute('action', "<@spring.url '/blackboard/duration/' />" + boardId);
         document.getElementById("modal-duration-input").value = boardDuration;
         M.updateTextFields();

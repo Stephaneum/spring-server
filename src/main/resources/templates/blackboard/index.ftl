@@ -29,18 +29,22 @@
 
 <body style="margin: 0">
 
-<#if active.type == "PLAN">
-    <div id="title">
-        <p style="color: white; margin: 5px; font-size: 24pt">${planDate}</p>
-    </div>
-
-    <#list planIndexes as i>
+<#if active.type == "PLAN" || active.type == "PDF">
+    <#if active.type == "PLAN">
+        <div id="title">
+            <p style="color: white; margin: 5px; font-size: 24pt">${pdfTitle}</p>
+        </div>
+    </#if>
+    <#list pdfIndexes as i>
         <div style="padding: 50px">
-            <img id="logo" src="<@spring.url '/blackboard/img/' + i />" style="width: 100%" alt="plan" />
+            <img src="<@spring.url '/blackboard/img/' + active.id + '/' + i />" style="width: 100%" />
         </div>
     </#list>
 
     <script src="<@spring.url '/static/js/scroller.js' />"></script>
+<#elseif active.type == "IMG">
+    <div style="width: 100vw; height: 100vh; background-image: url(<@spring.url '/blackboard/img/' + active.id />); background-size: contain; background-repeat: no-repeat; background-position: center;">
+    </div>
 <#elseif active.type == "TEXT">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/materialize.min.css' />">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/material-icons.css' />">
@@ -65,6 +69,7 @@
 <script src="<@spring.url '/static/js/materialize.min.js' />"></script>
 <script src="<@spring.url '/static/js/blackboard.js' />"></script>
 <script type="text/javascript">
+    window.scrollTo(0, 0);
     document.addEventListener('DOMContentLoaded', function() {
         initBlackboard('<@spring.url '/blackboard/timestamp'/>', ${active.lastUpdate?long})
     });

@@ -1,70 +1,40 @@
-package de.stephaneum.backend.routes
+package de.stephaneum.backend.blackboard
 
+import de.stephaneum.backend.FileService
+import de.stephaneum.backend.ImageService
 import de.stephaneum.backend.Session
 import de.stephaneum.backend.database.Blackboard
 import de.stephaneum.backend.database.BlackboardRepo
 import de.stephaneum.backend.database.Type
 import de.stephaneum.backend.database.now
-import de.stephaneum.backend.scheduler.BlackboardIterator
-import de.stephaneum.backend.scheduler.ImageGenerator
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.util.HtmlUtils
-import javax.servlet.http.HttpServletResponse
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.PostMapping
 
-data class TimestampJSON(val timestamp: Long)
 
 @Controller
 @RequestMapping("/blackboard")
-class BlackboardAPI {
+class Admin {
 
-    val logger = LoggerFactory.getLogger(BlackboardAPI::class.java)
-    val REDIRECT_LOGIN = "redirect:/blackboard/login"
-    val REDIRECT_ADMIN = "redirect:/blackboard/admin"
-
-    @Value("\${security.blackboard.password}")
-    private lateinit var password: String
-
-    @Autowired
-    private lateinit var imageGenerator: ImageGenerator
-
-    @Autowired
-    private lateinit var blackboardIterator: BlackboardIterator
+    final val logger = LoggerFactory.getLogger(Admin::class.java)
+    final val STANDARD_VALUE = "Hier klicken, um Text einzugeben"
 
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
-    @GetMapping
-    fun html(model: Model): String {
+    @Autowired
+    private lateinit var fileService: FileService
 
-        model["active"] = blackboardIterator.active
-        model["planIndexes"] = (0 until imageGenerator.images.size).toList()
-        model["planDate"] = imageGenerator.date ?: "Stephaneum"
-        return "blackboard/index"
-    }
-
-    @GetMapping("/img/{index}")
-    fun jpg(@PathVariable index: Int, response: HttpServletResponse) {
-
-        if(index >= imageGenerator.images.size)
-            return
-
-        response.contentType = "image/jpeg"
-        response.outputStream.write(imageGenerator.images[index])
-    }
-
-    @GetMapping("/timestamp")
-    @ResponseBody
-    fun timestamp(): TimestampJSON {
-        return TimestampJSON(blackboardIterator.active.lastUpdate.time)
-    }
+    @Autowired
+    private lateinit var imageService: ImageService
 
     @GetMapping("/admin")
     fun admin(model: Model): String {
@@ -73,6 +43,7 @@ class BlackboardAPI {
 
         model["types"] = Type.values()
         model["boards"]  = blackboardRepo.findByOrderByOrder()
+        model.addAttribute("toast", Session.getAndDeleteToast())
 
         return "blackboard/admin"
     }
@@ -85,7 +56,54 @@ class BlackboardAPI {
             return REDIRECT_LOGIN
 
         val max = if(blackboardRepo.count() == 0L) 0 else blackboardRepo.findMaxOrder()
-        blackboardRepo.save(Blackboard(0, Type.TEXT, "Hier klicken, um Text einzugeben", 10, max + 1, true))
+        blackboardRepo.save(Blackboard(0, Type.TEXT, STANDARD_VALUE, 10, max + 1, true))
+        Session.addToast("Element hinzugefügt")
+        return REDIRECT_ADMIN
+    }
+
+    @PostMapping("/upload/{id}")
+    fun uploadFile(@PathVariable id: Int, @RequestParam("file") file: MultipartFile): String {
+
+        if(!Session.get().loggedIn)
+            return REDIRECT_LOGIN
+
+        val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
+
+        var fileName = file.originalFilename
+        if(fileName == null) {
+            Session.addToast("Ein Fehler ist aufgetreten", "Dateiname unbekannt")
+            return REDIRECT_ADMIN
+        }
+        if(board.type == Type.PDF && !fileName.toLowerCase().endsWith(".pdf")) {
+            Session.addToast("Ein Fehler ist aufgetreten", "Nur PDF-Dateien erlaubt")
+            return REDIRECT_ADMIN
+        } else if(board.type == Type.IMG && !fileName.toLowerCase().endsWith(".png") && !fileName.toLowerCase().endsWith("jpg") && !fileName.toLowerCase().endsWith("jpeg")) {
+            Session.addToast("Ein Fehler ist aufgetreten", "Nur PNG oder JPG Dateien erlaubt")
+            return REDIRECT_ADMIN
+        }
+
+        if(blackboardRepo.findAll().any { blackboard -> blackboard.id != id && blackboard.getFileName() == fileName }) {
+            Session.addToast("Ein Fehler ist aufgetreten", "Dateiname existiert bereits")
+            return REDIRECT_ADMIN
+        }
+
+        var bytes = file.bytes
+        if(board.type == Type.IMG && !fileName.toLowerCase().endsWith(".jpg") && !fileName.toLowerCase().endsWith(".jpeg")) {
+            // to jpeg
+            val image = imageService.convertToBufferedImage(file.bytes)
+            bytes = imageService.convertToJPG(image)
+            fileName = fileService.changeExtension(fileName, "jpg")
+            logger.info("converted to jpeg: $fileName")
+        }
+
+        val path = fileService.storeFile(bytes, "/blackboard", fileName)
+        if(path != null) {
+            board.value = path
+            board.lastUpdate = now()
+            blackboardRepo.save(board)
+            Session.addToast("Datei hochgeladen")
+        } else
+            Session.addToast("Ein Fehler ist aufgetreten")
         return REDIRECT_ADMIN
     }
 
@@ -98,6 +116,7 @@ class BlackboardAPI {
         board.value = HtmlUtils.htmlEscape(value).replace(Regex("\r\n|\n|\r"), "<br>")
         board.lastUpdate = now()
         blackboardRepo.save(board)
+        Session.addToast("Text geändert")
         return REDIRECT_ADMIN
     }
 
@@ -110,6 +129,7 @@ class BlackboardAPI {
         board.duration = duration
         board.lastUpdate = now()
         blackboardRepo.save(board)
+        Session.addToast("Dauer geändert")
         return REDIRECT_ADMIN
     }
 
@@ -120,8 +140,11 @@ class BlackboardAPI {
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
         board.type = type
+        board.value = STANDARD_VALUE
         board.lastUpdate = now()
         blackboardRepo.save(board)
+
+        Session.addToast("Typ geändert -> ${type.getString()}")
         return REDIRECT_ADMIN
     }
 
@@ -134,6 +157,8 @@ class BlackboardAPI {
         board.visible = !board.visible
         board.lastUpdate = now()
         blackboardRepo.save(board)
+
+        Session.addToast(if(board.visible) "Element ist wieder sichtbar" else "Element wird ausgeblendet")
         return REDIRECT_ADMIN
     }
 
@@ -180,6 +205,7 @@ class BlackboardAPI {
 
         blackboardRepo.deleteById(id)
         repairOrder()
+        Session.addToast("Element gelöscht")
         return REDIRECT_ADMIN
     }
 
@@ -188,34 +214,5 @@ class BlackboardAPI {
         val sorted = boards.sortedBy { it.order }
         sorted.forEachIndexed { index, blackboard -> blackboard.order = index }
         blackboardRepo.saveAll(sorted)
-    }
-
-    // Auth
-
-    @GetMapping("/login")
-    fun login(model: Model, error: Boolean = false): String {
-        if(Session.get().loggedIn)
-            return REDIRECT_ADMIN
-
-        model["loginFailed"] = error
-
-        return "blackboard/login"
-    }
-
-    @PostMapping("/login")
-    fun login(password: String): Any? {
-        if(password == this.password) {
-            Session.login()
-            return REDIRECT_ADMIN
-        } else {
-            return ModelAndView("blackboard/login", mapOf(Pair("loginFailed", true)))
-        }
-    }
-
-    @GetMapping("/logout")
-    fun logout(): String {
-        Session.logout()
-
-        return "redirect:/blackboard"
     }
 }

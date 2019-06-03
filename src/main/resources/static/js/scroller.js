@@ -1,6 +1,6 @@
 var refreshDelayDoc = 1000*60*10; // every 10min
 var initDelay = 1000;
-var scrollInterval = 20;
+var scrollInterval = 15;
 var distancePerTick = 2;
 var docHeight; // will be set after init
 var waitTicks = 200; // wait 4s when reached top or bottom

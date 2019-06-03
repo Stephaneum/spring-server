@@ -4,18 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import java.io.File
 import java.sql.Timestamp
 import javax.persistence.*
 
 enum class Type {
     PLAN, // show cover plan
-    TEXT, // show text only
-    IMG; // show image only
+    TEXT, // show text
+    PDF, // show pdf
+    IMG; // show image
 
     fun getString(): String {
         return when(this) {
             PLAN -> "Vertretungsplan"
             TEXT -> "Text"
+            PDF -> "PDF"
             IMG -> "Bild"
         }
     }
@@ -45,6 +48,12 @@ data class Blackboard(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @JsonIgnore
     fun getValueWithoutBreaks() = value.replace("<br>", " ")
+
+    @JsonIgnore
+    fun isUploaded() = File(value).isFile
+
+    @JsonIgnore
+    fun getFileName() = value.substring(value.lastIndexOf("/")+1)
 }
 
 @Repository
