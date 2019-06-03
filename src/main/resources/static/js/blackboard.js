@@ -11,13 +11,10 @@ function updateBlackboard() {
             timeout: 10000, // timeout 10s
             success: function (data) {
                 if (currentTimestamp !== data.timestamp) {
-
-                    currentTimestamp = data.timestamp;
                     location.reload();
                     return;
                 }
 
-                currentTimestamp = data.timestamp;
                 setTimeout(updateBlackboard, refreshDelayBlackboard);
             },
             error: function () {

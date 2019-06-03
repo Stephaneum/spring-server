@@ -51,16 +51,26 @@ class PdfToImageScheduler {
                         val file = File(pdfLocation) // the pdf file
                         var instance = instances.find { it.boardId == board.id } ?: PdfImages(board.id)
 
-                        if(file.isFile && instance.lastModified != file.lastModified()) {
-                            val images = generateImages(file)
-                            val title = resolveDate(file)
-                            val lastModified = file.lastModified()
-                            instance = PdfImages(board.id, images, lastModified, title)
+                        if(file.isFile) {
+                            var changed = false
+                            if(instance.lastModified < board.lastUpdate.time) {
+                                changed = true
+                                logger.info("updating (instance in database is newer)")
+                            }
 
-                            // update last update
-                            updateTimestamp(board.id)
+                            if(instance.lastModified < file.lastModified()) {
+                                changed = true
+                                logger.info("updating (instance on harddrive is newer)")
+                            }
+                            if(changed) {
+                                val images = generateImages(file)
+                                val title = resolveDate(file)
+                                val lastModified = updateTimestamp(board.id) // also update database
+                                instance = PdfImages(board.id, images, lastModified, title)
+                            }
+                            nextInstances.add(instance)
                         }
-                        nextInstances.add(instance)
+
                     }
                 }
                 Type.PDF -> {
@@ -68,15 +78,24 @@ class PdfToImageScheduler {
                     val file = File(pdfLocation) // the pdf file
                     var instance = instances.find { it.boardId == board.id } ?: PdfImages(board.id)
 
-                    if(file.isFile && instance.lastModified != file.lastModified()) {
-                        val images = generateImages(file)
-                        val lastModified = file.lastModified()
-                        instance = PdfImages(board.id, images, lastModified)
+                    if(file.isFile) {
+                        var changed = false
+                        if(instance.lastModified < board.lastUpdate.time) {
+                            changed = true
+                            logger.info("updating (instance in database is newer)")
+                        }
 
-                        // update last update
-                        updateTimestamp(board.id)
+                        if(instance.lastModified < file.lastModified()) {
+                            changed = true
+                            logger.info("updating (instance on harddrive is newer)")
+                        }
+                        if(changed) {
+                            val images = generateImages(file)
+                            val lastModified = updateTimestamp(board.id) // also update database
+                            instance = PdfImages(board.id, images, lastModified)
+                        }
+                        nextInstances.add(instance)
                     }
-                    nextInstances.add(instance)
                 }
                 else -> {}
             }
@@ -101,8 +120,10 @@ class PdfToImageScheduler {
         return images
     }
 
-    private fun updateTimestamp(blackboardId: Int) {
-        blackboardRepo.findByIdOrNull(blackboardId)?.apply { lastUpdate = now() }?.also { blackboardRepo.save(it) }
+    private fun updateTimestamp(blackboardId: Int): Long {
+        val now = now()
+        blackboardRepo.findByIdOrNull(blackboardId)?.apply { lastUpdate = now }?.also { blackboardRepo.save(it) }
+        return now.time
     }
 
     private val days = arrayOf("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag")
