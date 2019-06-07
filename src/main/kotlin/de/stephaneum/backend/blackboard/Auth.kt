@@ -24,7 +24,6 @@ class Auth {
         model["loginFailed"] = error
         if(error) {
             model["toast"] = Toast("Login gescheitert")
-            println("here")
         }
 
         return "blackboard/login"

@@ -11,7 +11,7 @@
     <groupId>de.stephaneum</groupId>
     <artifactId>backend</artifactId>
     <version>0.0.1</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>backend</name>
     <description>Stephaneum Spring</description>
 
