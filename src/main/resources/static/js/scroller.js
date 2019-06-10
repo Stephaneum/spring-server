@@ -2,7 +2,8 @@ var refreshDelayDoc = 1000*60*10; // every 10min
 var initDelay = 2000;
 var waitTopDuration = 2000;
 var waitBottomDuration = 2000;
-var scrollSpeed = 0.5;
+var scrollSpeed = 0.15;
+var bugfixSwitch = false;
 
 function getDocHeight() {
     return Math.max(
@@ -17,8 +18,13 @@ function scroller() {
 }
 
 function waitBottom() {
+    if(!bugfixSwitch) {
+        bugfixSwitch = true;
+        return;
+    }
     console.log('wait bottom');
-    setTimeout(waitTop, waitBottomDuration)
+    setTimeout(waitTop, waitBottomDuration);
+    bugfixSwitch = false;
 }
 
 function waitTop() {
@@ -26,10 +32,10 @@ function waitTop() {
     setTimeout(scroller, waitTopDuration);
 }
 
-function init() {
+function initScoller() {
     setTimeout(location.reload, refreshDelayDoc);
     scroller();
 }
 
-setTimeout(init, initDelay);
+setTimeout(initScoller, initDelay);
 
