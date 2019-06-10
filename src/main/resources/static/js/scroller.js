@@ -1,40 +1,8 @@
 var refreshDelayDoc = 1000*60*10; // every 10min
-var initDelay = 1000;
-var scrollInterval = 20;
-var distancePerTick = 2;
-var docHeight; // will be set after init
-var waitTicks = 200; // wait 4s when reached top or bottom
-
-var currentY = 0;
-var waitTop = 0;
-var waitBottom = 0;
-
-function scroller() {
-
-    if(waitBottom !== 0) {
-        waitBottom--;
-
-        if(waitBottom === 0) {
-            currentY = 0;
-            window.scrollTo(0, currentY);
-            docHeight = getDocHeight(); // update in case window is resized
-            waitTop = waitTicks;
-        }
-        return;
-    }
-
-    if(waitTop !== 0) {
-        waitTop--;
-        return;
-    }
-
-    window.scrollTo(0, currentY);
-
-    currentY += distancePerTick;
-    if(currentY + window.innerHeight >= docHeight) {
-        waitBottom = waitTicks;
-    }
-}
+var initDelay = 2000;
+var waitTopDuration = 2000;
+var waitBottomDuration = 2000;
+var scrollSpeed = 0.5;
 
 function getDocHeight() {
     return Math.max(
@@ -44,15 +12,23 @@ function getDocHeight() {
     );
 }
 
-function reloadDoc() {
-    console.log("reload");
-    location.reload();
+function scroller() {
+    $("html, body").animate({ scrollTop: getDocHeight() }, getDocHeight() / scrollSpeed, 'linear', waitBottom);
+}
+
+function waitBottom() {
+    console.log('wait bottom');
+    setTimeout(waitTop, waitBottomDuration)
+}
+
+function waitTop() {
+    $(window).scrollTop(0);
+    setTimeout(scroller, waitTopDuration);
 }
 
 function init() {
-    docHeight = getDocHeight();
-    setInterval(scroller, scrollInterval);
-    setInterval(reloadDoc, refreshDelayDoc);
+    setTimeout(location.reload, refreshDelayDoc);
+    scroller();
 }
 
 setTimeout(init, initDelay);

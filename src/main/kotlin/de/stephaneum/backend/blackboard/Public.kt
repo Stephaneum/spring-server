@@ -41,32 +41,6 @@ class Public {
         return "blackboard/index"
     }
 
-    @GetMapping("/2")
-    fun index2(model: Model): String {
-
-        model["active"] = blackboardIterator.active
-
-        val pdf = pdfToImageScheduler.instances.find { it.boardId == blackboardIterator.active.id } ?: PdfImages(0)
-        model["pdfIndexes"] = (0 until pdf.images.size).toList()
-        model["pdfTitle"] = pdf.title ?: "Stephaneum"
-        model.addAttribute("toast", Session.getAndDeleteToast())
-
-        return "blackboard/index2"
-    }
-
-    @GetMapping("/3")
-    fun index3(model: Model): String {
-
-        model["active"] = blackboardIterator.active
-
-        val pdf = pdfToImageScheduler.instances.find { it.boardId == blackboardIterator.active.id } ?: PdfImages(0)
-        model["pdfIndexes"] = (0 until pdf.images.size).toList()
-        model["pdfTitle"] = pdf.title ?: "Stephaneum"
-        model.addAttribute("toast", Session.getAndDeleteToast())
-
-        return "blackboard/index3"
-    }
-
     @GetMapping("/img/{boardId}/{index}")
     fun pdfImg(@PathVariable boardId: Int, @PathVariable index: Int, request: HttpServletRequest, response: HttpServletResponse) {
 

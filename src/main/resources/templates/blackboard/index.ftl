@@ -10,10 +10,6 @@
     <link rel="icon" type="image/png" href="<@spring.url '/static/img/favicon.png' />">
     <link rel="apple-touch-icon" sizes="196x196" href="<@spring.url '/static/img/favicon.png' />">
     <style type="text/css">
-        body {
-            overflow: hidden;
-        }
-
         #title {
             background-color: #1b5e20;
             position: fixed;
@@ -41,7 +37,6 @@
         </div>
     </#list>
 
-    <script src="<@spring.url '/static/js/scroller.js' />"></script>
 <#elseif active.type == "IMG">
     <div style="width: 100vw; height: 100vh; background-image: url(<@spring.url '/blackboard/img/' + active.id />); background-size: contain; background-repeat: no-repeat; background-position: center;">
     </div>
@@ -74,5 +69,9 @@
         initBlackboard('<@spring.url '/blackboard/timestamp'/>', ${active.lastUpdate?long})
     });
 </script>
+
+<#if active.type == "PLAN" || active.type == "PDF">
+    <script src="<@spring.url '/static/js/scroller.js' />"></script>
+</#if>
 </body>
 </html>
