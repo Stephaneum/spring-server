@@ -6,9 +6,44 @@ import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
+import java.awt.Image
+
 
 @Service
 class ImageService {
+
+    /**
+     *
+     * @param img image which should be resized
+     * @param maxWidth max width of output image
+     * @param maxHeight max height of output image
+     * @return resized BufferedImage
+     */
+    fun reduceSize(img: BufferedImage, maxWidth: Int, maxHeight: Int): BufferedImage {
+        var scaledWidth = img.getWidth(null)
+        var scaledHeight = img.getHeight(null)
+
+        // adjust width
+        if (scaledWidth > maxWidth) {
+
+            scaledWidth = maxWidth
+            scaledHeight = scaledWidth * img.getHeight(null) / img.getWidth(null)
+        }
+
+        // adjust height
+        if (scaledHeight > maxHeight) {
+
+            scaledHeight = maxHeight
+            scaledWidth = scaledHeight * img.getWidth(null) / img.getHeight(null)
+        }
+
+        val tmp = img.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH)
+        val resized = BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_RGB)
+        val g2d = resized.createGraphics()
+        g2d.drawImage(tmp, 0, 0, null)
+        g2d.dispose()
+        return resized
+    }
 
     /**
      * @param bytes which should be converted
