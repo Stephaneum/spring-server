@@ -1,7 +1,7 @@
 var refreshDelayDoc = 1000*60*10; // every 10min
 var initDelay = 2000;
-var waitTopDuration = 2000;
-var waitBottomDuration = 2000;
+var waitTopDuration = 1500;
+var waitBottomDuration = 1500;
 var scrollSpeed = 0.15;
 var bugfixSwitch = false;
 

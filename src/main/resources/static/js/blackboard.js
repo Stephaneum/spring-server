@@ -1,9 +1,10 @@
-var refreshDelayBlackboard = 1000; // every sec
+var refreshDelayBlackboard = 1500; // every sec
 var currentTimestamp;
 var url;
+var requestFetchBlackboard = true;
 
 
-function updateBlackboard() {
+function fetchBlackboard() {
 
     $.ajax({
             method: 'GET',
@@ -15,19 +16,26 @@ function updateBlackboard() {
                     return;
                 }
 
-                setTimeout(updateBlackboard, refreshDelayBlackboard);
+                requestFetchBlackboard = true;
             },
             error: function () {
                 // try again
-                setTimeout(updateBlackboard, refreshDelayBlackboard);
+                requestFetchBlackboard = true;
             }
         }
     );
 }
 
+function updateBlackboard() {
+    if(requestFetchBlackboard) {
+        updateBlackboard = false;
+        fetchBlackboard();
+    }
+}
+
 function initBlackboard(initURL, timestamp) {
     url = initURL;
     currentTimestamp = timestamp;
-    setTimeout(updateBlackboard, refreshDelayBlackboard);
+    setInterval(updateBlackboard, refreshDelayBlackboard);
 }
 
