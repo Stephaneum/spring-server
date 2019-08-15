@@ -110,9 +110,10 @@ class PdfToImageScheduler {
         val document = PDDocument.load(file)
         val pdfRenderer = PDFRenderer(document)
         for (page in 0 until document.numberOfPages) {
-            val bim = pdfRenderer.renderImageWithDPI(page, 300f, ImageType.RGB)
-            val trimmed = imageService.trimImage(bim)
-            images.add(imageService.convertToJPG(trimmed))
+            val image = pdfRenderer.renderImageWithDPI(page, 300f, ImageType.RGB)
+            val trimmed = imageService.trimImage(image)
+            val resized = imageService.reduceSize(trimmed, 1600, 9999)
+            images.add(imageService.convertToJPG(resized))
         }
         document.close()
         logger.info("--- images generated ---")

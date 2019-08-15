@@ -42,7 +42,6 @@
     </div>
 <#elseif active.type == "TEXT">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/materialize.min.css' />">
-    <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/material-icons.css' />">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/style.css' />">
 
     <div style="height: 100vh; display: flex; align-items: center; justify-content: center">
@@ -61,7 +60,6 @@
 </#if>
 
 <script src="<@spring.url '/static/js/jquery.min.js' />"></script>
-<script src="<@spring.url '/static/js/materialize.min.js' />"></script>
 <script src="<@spring.url '/static/js/blackboard.js' />"></script>
 <script type="text/javascript">
     window.scrollTo(0, 0);
