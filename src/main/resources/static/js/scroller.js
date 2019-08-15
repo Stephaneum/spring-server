@@ -1,9 +1,9 @@
 // KONSTANTEN
 var initDelay = 1000; // 1 Sekunde initialisierung
-var scrollInterval = 20; // 1 tick = 25ms
-var distancePerTick = 1; // pro tick: 2 pixel nach unten scrollen
+var scrollInterval = 16; // 1 tick = 16ms (60 FPS)
+var distancePerTick = 1; // pro tick: 1 pixel nach unten scrollen
 var docHeight; // höhe des dokuments, wird automatisch initialisiert
-var waitTicks = 200; // 4 sekunden(20*200) warten, wenn man unten ist
+var waitTicks = 200; // ca. 3 sekunden(16*200) warten, wenn man unten/oben ist
 
 // VARIABLEN
 var currentY = 0; // momentane y koordinate
