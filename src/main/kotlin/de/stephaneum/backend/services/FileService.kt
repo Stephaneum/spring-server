@@ -1,4 +1,4 @@
-package de.stephaneum.backend
+package de.stephaneum.backend.services
 
 import de.stephaneum.backend.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
@@ -26,7 +26,7 @@ class FileService {
      * @param extension the new extension
      * @return path with new extension
      */
-    fun changeExtension(original: String, extension: String): String {
+    fun getPathWithNewExtension(original: String, extension: String): String {
         val index = original.lastIndexOf('.')+1
         if(index == 0)
             return "$original.$extension"

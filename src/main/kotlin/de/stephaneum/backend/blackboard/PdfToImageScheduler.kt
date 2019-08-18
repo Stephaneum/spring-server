@@ -1,6 +1,6 @@
 package de.stephaneum.backend.blackboard
 
-import de.stephaneum.backend.ImageService
+import de.stephaneum.backend.services.ImageService
 import de.stephaneum.backend.database.BlackboardRepo
 import de.stephaneum.backend.database.Type
 import de.stephaneum.backend.database.now

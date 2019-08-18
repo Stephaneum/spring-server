@@ -1,4 +1,4 @@
-package de.stephaneum.backend
+package de.stephaneum.backend.services
 
 import org.springframework.stereotype.Service
 import java.awt.Color

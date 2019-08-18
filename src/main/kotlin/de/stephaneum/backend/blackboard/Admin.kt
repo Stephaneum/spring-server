@@ -1,7 +1,7 @@
 package de.stephaneum.backend.blackboard
 
-import de.stephaneum.backend.FileService
-import de.stephaneum.backend.ImageService
+import de.stephaneum.backend.services.FileService
+import de.stephaneum.backend.services.ImageService
 import de.stephaneum.backend.Session
 import de.stephaneum.backend.database.Blackboard
 import de.stephaneum.backend.database.BlackboardRepo
@@ -92,7 +92,7 @@ class Admin {
             // to jpeg
             val image = imageService.convertToBufferedImage(file.bytes)
             bytes = imageService.convertToJPG(image)
-            fileName = fileService.changeExtension(fileName, "jpg")
+            fileName = fileService.getPathWithNewExtension(fileName, "jpg")
             logger.info("converted to jpeg: $fileName")
         }
 
