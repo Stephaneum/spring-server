@@ -28,7 +28,7 @@ class Public {
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
-    @GetMapping
+    @GetMapping("/")
     fun index(model: Model): String {
 
         model["active"] = blackboardIterator.active
@@ -100,5 +100,11 @@ class Public {
     @ResponseBody
     fun timestamp(): TimestampJSON {
         return TimestampJSON(blackboardIterator.active.lastUpdate.time)
+    }
+
+    @GetMapping("/robots.txt", produces = ["text/plain; charset=utf-8"])
+    @ResponseBody
+    fun robots(): String {
+        return "User-agent: *\nDisallow: /"
     }
 }

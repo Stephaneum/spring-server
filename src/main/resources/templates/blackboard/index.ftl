@@ -33,12 +33,12 @@
     </#if>
     <#list pdfIndexes as i>
         <div style="padding: 50px">
-            <img src="<@spring.url '/blackboard/img/' + active.id + '/' + i />" style="width: 100%" />
+            <img src="<@spring.url './img/' + active.id + '/' + i />" style="width: 100%" />
         </div>
     </#list>
 
 <#elseif active.type == "IMG">
-    <div style="width: 100vw; height: 100vh; background-image: url(<@spring.url '/blackboard/img/' + active.id />); background-size: contain; background-repeat: no-repeat; background-position: center;">
+    <div style="width: 100vw; height: 100vh; background-image: url(<@spring.url './img/' + active.id />); background-size: contain; background-repeat: no-repeat; background-position: center;">
     </div>
 <#elseif active.type == "TEXT">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/materialize.min.css' />">
@@ -64,12 +64,18 @@
 <script type="text/javascript">
     window.scrollTo(0, 0);
     document.addEventListener('DOMContentLoaded', function() {
-        initBlackboard('<@spring.url '/blackboard/timestamp'/>', ${active.lastUpdate?long})
+        window.scrollTo(0, 0);
+        initBlackboard('<@spring.url './timestamp'/>', ${active.lastUpdate?long})
     });
 </script>
 
 <#if active.type == "PLAN" || active.type == "PDF">
     <script src="<@spring.url '/static/js/scroller.js' />"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initScroller, 1000);
+        });
+    </script>
 </#if>
 </body>
 </html>

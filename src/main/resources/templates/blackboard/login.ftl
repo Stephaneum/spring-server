@@ -28,7 +28,7 @@
                 <p class="center red-text" style="margin: 20px 0 20px 0">Login fehlgeschlagen</p>
             </#if>
 
-            <form action="<@spring.url '/blackboard/login' />" method="POST">
+            <form action="<@spring.url './login' />" method="POST">
                 <div class="input-field">
                     <i class="material-icons prefix">vpn_key</i>
                     <label for="password">Passwort</label>

@@ -26,11 +26,11 @@
 
         <div class="row">
             <div class="col m6 left-align">
-                <a class="waves-effect waves-light btn green darken-3" href="<@spring.url '/blackboard' />" target="_blank">
+                <a class="waves-effect waves-light btn green darken-3" href="<@spring.url './' />" target="_blank">
                     <i class="material-icons right">star</i>Live-Version</a>
             </div>
             <div class="col m6 right-align">
-                <a class="waves-effect waves-light btn green darken-3" href="<@spring.url '/blackboard/logout' />">
+                <a class="waves-effect waves-light btn green darken-3" href="<@spring.url './logout' />">
                     <i class="material-icons right">exit_to_app</i>Abmelden</a>
             </div>
         </div>
@@ -52,7 +52,7 @@
                                           onclick="updateRename(${b.id}, '${b.type.string}','${b.value}');$('#modal-rename').modal('open');">${b.valueWithoutBreaks}</span>
                                 <#elseif b.type == "PDF" || b.type == "IMG">
                                     <span style="margin-left: 10px">[ <#if b.uploaded>${b.fileName}<#else>leer</#if> ]</span>
-                                    <form action="<@spring.url '/blackboard/upload/' + b.id />" method="POST" enctype="multipart/form-data" style="display: inline-block">
+                                    <form action="<@spring.url './upload/' + b.id />" method="POST" enctype="multipart/form-data" style="display: inline-block">
                                         <input name="file" type="file" id="upload-file-${b.id}" onchange="loading(); this.form.submit()" style="display: none">
                                         <a class="waves-effect waves-light btn-small green darken-3 margin-1"
                                            onclick="document.getElementById('upload-file-${b.id}').click();"><i
@@ -62,7 +62,7 @@
 
                             </div>
                             <div class="col m3 right-align">
-                                <form action="<@spring.url '/blackboard/type/' + b.id />" method="GET">
+                                <form action="<@spring.url './type/' + b.id />" method="GET">
                                     <select name="type" onchange="this.form.submit()" class="browser-default">
                                         <#list types as t>
                                             <option value="${t}" <#if b.type == t>selected</#if>
@@ -74,17 +74,17 @@
                             <div class="col m3 right-align">
 
                                 <a class="tooltipped waves-effect waves-light btn darken-4 margin-1"
-                                   href="<@spring.url '/blackboard/move-up/' + b.id />"
+                                   href="<@spring.url './move-up/' + b.id />"
                                    data-tooltip="Reihenfolge: nach oben" data-position="top"><i
                                             class="material-icons">arrow_upward</i></a>
 
                                 <a class="tooltipped waves-effect waves-light btn darken-4 margin-1"
-                                   href="<@spring.url '/blackboard/move-down/' + b.id />"
+                                   href="<@spring.url './move-down/' + b.id />"
                                    data-tooltip="Reihenfolge: nach unten" data-position="top"><i
                                             class="material-icons">arrow_downward</i></a>
 
                                 <a class="tooltipped waves-effect waves-light btn green darken-4 margin-1"
-                                   href="<@spring.url '/blackboard/toggle-visibility/' + b.id />"
+                                   href="<@spring.url './toggle-visibility/' + b.id />"
                                    data-tooltip="Sichtbar: ja/nein" data-position="top"><i
                                             class="material-icons"><#if b.visible>visibility<#else>visibility_off</#if></i></a>
 
@@ -101,7 +101,7 @@
 
             <div class="center-align">
                 <a style="margin-top: 25px" class="waves-effect waves-light btn green darken-3"
-                   href="<@spring.url '/blackboard/add' />"><i
+                   href="<@spring.url './add' />"><i
                             class="material-icons right">add</i>Neuer Eintrag</a>
             </div>
 
@@ -122,7 +122,7 @@
 </div>
 
 <div id="modal-rename" class="modal">
-    <form id="modal-rename-form" action="<@spring.url '/blackboard/rename' />" method="GET">
+    <form id="modal-rename-form" action="<@spring.url './rename' />" method="GET">
         <div class="modal-content">
             <h4 id="modal-rename-title"></h4>
             <br/>
@@ -186,20 +186,20 @@
     });
 
     function updateDelete(boardId, boardType) {
-        document.getElementById("modal-delete-action").setAttribute('href', "<@spring.url '/blackboard/delete/' />" + boardId);
+        document.getElementById("modal-delete-action").setAttribute('href', "<@spring.url './delete/' />" + boardId);
         document.getElementById("modal-delete-title").innerHTML = boardType + " wirklich löschen?";
         document.getElementById("modal-delete-text").innerHTML = boardType + " wird gelöscht. Dieser Vorgang kann nicht rückgangig gemacht werden.";
     }
 
     function updateRename(boardId, boardType, boardValue) {
         document.getElementById("modal-rename-title").innerHTML = boardType + " bearbeiten";
-        document.getElementById("modal-rename-form").setAttribute('action', "<@spring.url '/blackboard/rename/' />" + boardId);
+        document.getElementById("modal-rename-form").setAttribute('action', "<@spring.url './rename/' />" + boardId);
         document.getElementById("modal-rename-input").innerHTML = boardValue.replace('<br>', '\n')
     }
 
     function updateDuration(boardId, boardType, boardDuration) {
         document.getElementById("modal-duration-title").innerHTML = "Dauer bearbeiten (" + boardType + ")";
-        document.getElementById("modal-duration-form").setAttribute('action', "<@spring.url '/blackboard/duration/' />" + boardId);
+        document.getElementById("modal-duration-form").setAttribute('action', "<@spring.url './duration/' />" + boardId);
         document.getElementById("modal-duration-input").value = boardDuration;
         M.updateTextFields();
     }

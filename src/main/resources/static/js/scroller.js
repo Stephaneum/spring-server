@@ -1,5 +1,4 @@
 // KONSTANTEN
-var initDelay = 1000; // 1 Sekunde initialisierung
 var scrollInterval = 16; // 1 tick = 16ms (60 FPS)
 var distancePerTick = 1; // pro tick: 1 pixel nach unten scrollen
 var docHeight; // höhe des dokuments, wird automatisch initialisiert
@@ -45,9 +44,7 @@ function getDocHeight() {
     );
 }
 
-function init() {
+function initScroller() {
     docHeight = getDocHeight();
     setInterval(scroller, scrollInterval);
 }
-
-setTimeout(init, initDelay);

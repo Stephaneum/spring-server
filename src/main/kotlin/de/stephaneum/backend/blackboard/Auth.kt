@@ -43,6 +43,6 @@ class Auth {
     fun logout(): String {
         Session.logout()
 
-        return "redirect:/blackboard"
+        return "redirect:/blackboard/"
     }
 }
