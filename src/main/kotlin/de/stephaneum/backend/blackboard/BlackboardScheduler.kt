@@ -12,18 +12,23 @@ import org.springframework.stereotype.Service
 @Service
 class BlackboardScheduler {
 
+    /**
+     * this scheduler cycles through the boards
+     */
+
     final val logger = LoggerFactory.getLogger(BlackboardScheduler::class.java)
-    final val EMPTY_BLACKBOARD = Blackboard(-1, Type.TEXT, "Noch nicht konfiguriert")
+    final val EMPTY_BLACKBOARD = Blackboard(-1, Type.TEXT, "Leere Konfiguration")
     final val FETCH_DELAY = 10000
 
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
     private var boards = emptyList<Blackboard>()
+    private var next = 0L
+    private var nextFetch = 0L
 
+    // only this variable should be accessed from outside
     var active = EMPTY_BLACKBOARD
-    var next = 0L
-    var nextFetch = 0L
 
     @Scheduled(initialDelay=10000, fixedDelay = 1000)
     fun update() {

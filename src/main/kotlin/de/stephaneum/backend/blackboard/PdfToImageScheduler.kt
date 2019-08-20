@@ -17,6 +17,10 @@ import org.apache.pdfbox.text.PDFTextStripper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
+/**
+ * this file handles the generated images from the pdf files
+ * when the file on hard drive or the instance in the database change, a new image will be generated
+ */
 data class PdfImages(val boardId: Int,
                      val images: List<ByteArray> = emptyList(),
                      val lastModified: Long = 0,
@@ -36,6 +40,7 @@ class PdfToImageScheduler {
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
+    // only this variable should be accessed from outside
     var instances = listOf<PdfImages>()
 
     @Scheduled(initialDelay=5000, fixedDelay = 10000)
