@@ -47,9 +47,9 @@
     <div style="height: 100vh; display: flex; align-items: center; justify-content: center">
         <div class="center-align">
 
-            <img src="<@spring.url '/static/img/logo-banner-green.png' />" style="height: 10vh; margin-bottom: 5vh"/>
+            <img src="<@spring.url '/static/img/logo-banner-green.png' />" style="height: 10vh; margin-bottom: 4vh"/>
 
-            <div class="card" style="width: 90vw; height: 65vh; display: flex; align-items: center; justify-content: center">
+            <div class="card" style="width: 95vw; height: 75vh; display: flex; align-items: center; justify-content: center">
                 <p id="blackboard-text">${active.value}</p>
             </div>
 
