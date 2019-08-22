@@ -15,33 +15,3 @@ body {
     background-color: #00C853;
     border-radius: 20px;
 }
-
-@media only screen and (min-width: 601px) and (max-width: 992px) {
-    #blackboard-text {
-        font-size: 3em;
-    }
-}
-
-@media only screen and (min-width: 993px) and (max-width: 1300px) {
-    #blackboard-text {
-        font-size: 4em;
-    }
-}
-
-@media only screen and (min-width: 1301px) and (max-width: 1600px) {
-    #blackboard-text {
-        font-size: 5em;
-    }
-}
-
-@media only screen and (min-width: 1601px) and (max-width: 2400px) {
-    #blackboard-text {
-        font-size: 7em;
-    }
-}
-
-@media only screen and (min-width: 2401px) {
-    #blackboard-text {
-        font-size: 9em;
-    }
-}

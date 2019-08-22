@@ -50,7 +50,7 @@
             <img src="<@spring.url '/static/img/logo-banner-green.png' />" style="height: 10vh; margin-bottom: 4vh"/>
 
             <div class="card" style="width: 95vw; height: 75vh; display: flex; align-items: center; justify-content: center">
-                <p id="blackboard-text">${active.value}</p>
+                <p style="font-size: 4vw">${active.value}</p>
             </div>
 
         </div>
