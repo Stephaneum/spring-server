@@ -194,7 +194,8 @@
     function updateRename(boardId, boardType, boardValue) {
         document.getElementById("modal-rename-title").innerHTML = boardType + " bearbeiten";
         document.getElementById("modal-rename-form").setAttribute('action', "<@spring.url './rename/' />" + boardId);
-        document.getElementById("modal-rename-input").innerHTML = boardValue.replace('<br>', '\n')
+        document.getElementById("modal-rename-input").innerHTML = boardValue.replace(/<br\s*[\/]?>/gi, '\n');
+        M.textareaAutoResize(document.getElementById("modal-rename-input")); // auto resize text area
     }
 
     function updateDuration(boardId, boardType, boardDuration) {
