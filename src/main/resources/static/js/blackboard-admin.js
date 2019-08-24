@@ -25,11 +25,13 @@ function fetchBlackboardAdmin() {
                 if(value) {
                     var indexSlash = value.indexOf('/');
                     if(indexSlash >= 0) {
+                        // board was already active
                         active.html('('+data.activeSeconds+'/'+value.substr(indexSlash+1));
                     } else {
+                        // board was inactive
                         active.html('('+data.activeSeconds+'/'+value.substr(1));
+                        active.css({ color: 'green' });
                     }
-                    active.css({ color: 'green' });
                 }
                 $('#active-counter').html('aktive Blackboards: '+data.activeClients);
             }
