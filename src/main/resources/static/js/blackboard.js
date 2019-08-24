@@ -1,4 +1,4 @@
-var refreshDelayBlackboard = 1500; // every sec
+var refreshDelayBlackboard = 1500; // every 1.5 sec
 var currentTimestamp;
 var url;
 var requestFetchBlackboard = true;

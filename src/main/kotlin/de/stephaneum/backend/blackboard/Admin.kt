@@ -36,6 +36,12 @@ class Admin {
     @Autowired
     private lateinit var imageService: ImageService
 
+    @Autowired
+    private lateinit var blackboardScheduler: BlackboardScheduler
+
+    @Autowired
+    private lateinit var public: Public
+
     @GetMapping("/admin")
     fun admin(model: Model): String {
         if(!Session.get().loggedIn)
@@ -46,6 +52,18 @@ class Admin {
         model.addAttribute("toast", Session.getAndDeleteToast())
 
         return "blackboard/admin"
+    }
+
+    // live updates
+
+    @GetMapping("/info")
+    @ResponseBody
+    fun info(): Any? {
+        if(Session.get().loggedIn) {
+            val activeSec = (System.currentTimeMillis()-blackboardScheduler.activeSince) / 1000 + 1
+            return InfoJSON(blackboardScheduler.active.id, activeSec.toInt(), public.activeClients.size)
+        }
+        return null
     }
 
     // Mutations

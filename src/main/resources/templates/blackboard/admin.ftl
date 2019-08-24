@@ -34,7 +34,7 @@
                     <i class="material-icons right">exit_to_app</i>Abmelden</a>
             </div>
         </div>
-        <div class="card" style="width: 1250px; min-height: 500px; margin: 15px 0 50px 0; padding: 5px 20px 20px 20px">
+        <div class="card" style="width: 1250px; min-height: 500px; margin: 15px 0 15px 0; padding: 5px 20px 20px 20px">
             <h4 style="margin-bottom: 20px">Blackboard</h4>
 
             <ul class="collection">
@@ -42,24 +42,28 @@
                     <li class="collection-item <#if !b.visible>grey lighten-3</#if>">
                         <div class="row" style="margin: 0">
                             <div class="col m6" style="font-size: 1.4em; overflow: hidden;padding: 10px">
-                                <span class="text-hover" style="margin-right: 10px"
-                                      onclick="updateDuration(${b.id}, '${b.type.string}',${b.duration});$('#modal-duration').modal('open');">(${b.duration}s)</span>
-
-                                <#if b.type == "PLAN">
-                                    <span style="margin-left: 10px">[ Vertretungsplan ]</span>
-                                <#elseif b.type == "TEXT">
-                                    <span class="text-hover" style="white-space: nowrap;"
-                                          onclick="updateRename(${b.id}, '${b.type.string}','${b.value}');$('#modal-rename').modal('open');">${b.valueWithoutBreaks}</span>
-                                <#elseif b.type == "PDF" || b.type == "IMG">
-                                    <span style="margin-left: 10px">[ <#if b.uploaded>${b.fileName}<#else>leer</#if> ]</span>
-                                    <form action="<@spring.url './upload/' + b.id />" method="POST" enctype="multipart/form-data" style="display: inline-block">
-                                        <input name="file" type="file" id="upload-file-${b.id}" onchange="loading(); this.form.submit()" style="display: none">
-                                        <a class="waves-effect waves-light btn-small green darken-3 margin-1"
-                                           onclick="document.getElementById('upload-file-${b.id}').click();"><i
-                                                    class="material-icons left">arrow_upward</i>Hochladen</a>
-                                    </form>
-                                </#if>
-
+                                <div style="display: flex; justify-content: space-between">
+                                    <div style="display:inline-block; flex-shrink: 0; width: 125px">
+                                        <span class="text-hover board-sec-class" id="board-sec-${b.id}" style="display: inline-block"
+                                              onclick="updateDuration(${b.id}, '${b.type.string}',${b.duration});$('#modal-duration').modal('open');">(${b.duration} s)</span>
+                                    </div>
+                                    <div style="flex: 1; display:inline-block;">
+                                        <#if b.type == "PLAN">
+                                            <span style="margin-left: 10px">[ Vertretungsplan ]</span>
+                                        <#elseif b.type == "TEXT">
+                                            <span class="text-hover" style="white-space: nowrap;"
+                                                  onclick="updateRename(${b.id}, '${b.type.string}','${b.value}');$('#modal-rename').modal('open');">${b.valueWithoutBreaks}</span>
+                                        <#elseif b.type == "PDF" || b.type == "IMG">
+                                            <span style="margin-left: 10px">[ <#if b.uploaded>${b.fileName}<#else>leer</#if> ]</span>
+                                            <form action="<@spring.url './upload/' + b.id />" method="POST" enctype="multipart/form-data" style="display: inline-block">
+                                                <input name="file" type="file" id="upload-file-${b.id}" onchange="loading(); this.form.submit()" style="display: none">
+                                                <a class="waves-effect waves-light btn-small green darken-3 margin-1"
+                                                   onclick="document.getElementById('upload-file-${b.id}').click();"><i
+                                                            class="material-icons left">arrow_upward</i>Hochladen</a>
+                                            </form>
+                                        </#if>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col m3 right-align">
                                 <form action="<@spring.url './type/' + b.id />" method="GET">
@@ -106,7 +110,7 @@
             </div>
 
         </div>
-
+        <div id="active-counter" style="text-align: center; color: #808080">aktive Blackboards: ?</div>
     </div>
 </div>
 
@@ -172,6 +176,7 @@
 
 <script src="<@spring.url '/static/js/jquery.min.js' />"></script>
 <script src="<@spring.url '/static/js/materialize.min.js' />"></script>
+<script src="<@spring.url '/static/js/blackboard-admin.js' />"></script>
 <script type="text/javascript">
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -183,6 +188,8 @@
         M.toast({html: '${toast.title}'});
         </#if>
         </#if>
+
+        initBlackboardAdmin('<@spring.url './info'/>')
     });
 
     function updateDelete(boardId, boardType) {

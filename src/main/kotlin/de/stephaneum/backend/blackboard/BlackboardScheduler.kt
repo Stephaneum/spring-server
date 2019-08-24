@@ -18,17 +18,18 @@ class BlackboardScheduler {
 
     final val logger = LoggerFactory.getLogger(BlackboardScheduler::class.java)
     final val EMPTY_BLACKBOARD = Blackboard(-1, Type.TEXT, "Leere Konfiguration")
-    final val FETCH_DELAY = 10000
+    final val FETCH_DELAY = 10000 // sync every 10s with the database
 
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
     private var boards = emptyList<Blackboard>()
-    private var next = 0L
-    private var nextFetch = 0L
+    private var next = 0L // the time of the next board
+    private var nextFetch = 0L // the time to sync with the database
 
-    // only this variable should be accessed from outside
+    // only these variables should be accessed from outside
     var active = EMPTY_BLACKBOARD
+    var activeSince = System.currentTimeMillis()
 
     @Scheduled(initialDelay=10000, fixedDelay = 1000)
     fun update() {
@@ -55,8 +56,8 @@ class BlackboardScheduler {
                     nextIndex = 0
             } while (!boards[nextIndex].visible)
 
-
             active = boards[nextIndex]
+            activeSince = System.currentTimeMillis()
             next = System.currentTimeMillis() + (active.duration * 1000)
         }
     }

@@ -28,6 +28,8 @@ class Public {
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
+    var activeClients = mutableMapOf<String, Long>()
+
     @GetMapping("/")
     fun index(model: Model): String {
 
@@ -98,7 +100,13 @@ class Public {
 
     @GetMapping("/timestamp")
     @ResponseBody
-    fun timestamp(): TimestampJSON {
+    fun timestamp(@RequestHeader(value="X-Forwarded-For", required = false) forwardedIP: String?,
+                  request: HttpServletRequest): TimestampJSON {
+
+        // track active clients
+        val ip = resolveIP(forwardedIP, request)
+        activeClients[ip] = System.currentTimeMillis()
+
         return TimestampJSON(blackboardIterator.active.lastUpdate.time)
     }
 
@@ -106,5 +114,9 @@ class Public {
     @ResponseBody
     fun robots(): String {
         return "User-agent: *\nDisallow: /"
+    }
+
+    private fun resolveIP(forwardedIP: String?, request: HttpServletRequest): String {
+        return forwardedIP?.split(",")?.first()?.trim() ?: request.remoteAddr
     }
 }
