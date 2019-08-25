@@ -12,27 +12,14 @@ function fetchBlackboardAdmin() {
 
                 // hide all counters
                 $(".board-sec-class").each(function(i, obj) {
-                    var html = $(this).html();
-                    var indexSlash = html.indexOf('/');
-                    if(indexSlash >= 0) {
-                        $(this).html('('+html.substr(indexSlash+1));
-                        $(this).css({ color: 'black' });
-                    }
+                    $(this).html(null);
                 });
 
                 var active = $('#board-sec-' + data.activeID);
-                var value = active.html();
-                if(value) {
-                    var indexSlash = value.indexOf('/');
-                    if(indexSlash >= 0) {
-                        // board was already active
-                        active.html('('+data.activeSeconds+'/'+value.substr(indexSlash+1));
-                    } else {
-                        // board was inactive
-                        active.html('('+data.activeSeconds+'/'+value.substr(1));
-                        active.css({ color: 'green' });
-                    }
+                if(active) {
+                    active.html(data.activeSeconds+'s');
                 }
+
                 $('#active-counter').html('aktive Blackboards: '+data.activeClients);
             }
         }

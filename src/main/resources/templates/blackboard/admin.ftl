@@ -43,9 +43,12 @@
                         <div class="row" style="margin: 0">
                             <div class="col m6" style="font-size: 1.4em; overflow: hidden;padding: 10px">
                                 <div style="display: flex; justify-content: space-between">
-                                    <div style="display:inline-block; flex-shrink: 0; width: 125px">
-                                        <span class="text-hover board-sec-class" id="board-sec-${b.id}" style="display: inline-block"
-                                              onclick="updateDuration(${b.id}, '${b.type.string}',${b.duration});$('#modal-duration').modal('open');">(${b.duration} s)</span>
+                                    <div style="display:inline-block; flex-shrink: 0; width: 60px">
+                                        <span class="board-sec-class" id="board-sec-${b.id}" style="color: #008000"></span>
+                                    </div>
+                                    <div style="display:inline-block; flex-shrink: 0; width: 80px">
+                                        <span class="text-hover" style="display: inline-block"
+                                              onclick="updateDuration(${b.id}, '${b.type.string}',${b.duration});$('#modal-duration').modal('open');">(${b.duration}s)</span>
                                     </div>
                                     <div style="flex: 1; display:inline-block;">
                                         <#if b.type == "PLAN">
@@ -157,6 +160,7 @@
             <br/>
 
             <div class="input-field">
+                <i class="material-icons prefix">timer</i>
                 <label for="modal-duration-input">Dauer in Sekunden</label>
                 <input name="duration" type="number" id="modal-duration-input" min="1" max="3600"/>
             </div>
