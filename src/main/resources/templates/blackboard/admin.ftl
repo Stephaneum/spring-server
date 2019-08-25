@@ -44,7 +44,8 @@
                             <div class="col m6" style="font-size: 1.4em; overflow: hidden;padding: 10px">
                                 <div style="display: flex; justify-content: space-between">
                                     <div style="display:inline-block; flex-shrink: 0; width: 60px">
-                                        <span class="board-sec-class" id="board-sec-${b.id}" style="color: #008000"></span>
+                                        <span class="board-sec-class" id="board-sec-${b.id}"
+                                              style="visibility: hidden; background-color: #2e7d32; border-radius: 10px; padding: 0 10px 0 10px; font-size: 0.8em; color: #ffffff"></span>
                                     </div>
                                     <div style="display:inline-block; flex-shrink: 0; width: 80px">
                                         <span class="text-hover" style="display: inline-block"

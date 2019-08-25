@@ -13,11 +13,13 @@ function fetchBlackboardAdmin() {
                 // hide all counters
                 $(".board-sec-class").each(function(i, obj) {
                     $(this).html(null);
+                    $(this).css({ visibility: 'hidden'});
                 });
 
                 var active = $('#board-sec-' + data.activeID);
                 if(active) {
                     active.html(data.activeSeconds+'s');
+                    active.css({ visibility: 'visible'});
                 }
 
                 $('#active-counter').html('aktive Blackboards: '+data.activeClients);
