@@ -23,6 +23,11 @@ function fetchBlackboardAdmin() {
                 }
 
                 $('#active-counter').html('aktive Blackboards: '+data.activeClients);
+
+                // dev: print time to refresh every 5s
+                if(data.timeToRefresh % 5 == 0) {
+                    console.log('Time to refresh: ' + data.timeToRefresh+'s')
+                }
             }
         }
     );

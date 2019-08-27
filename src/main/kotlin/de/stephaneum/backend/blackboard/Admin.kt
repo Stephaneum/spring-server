@@ -61,7 +61,7 @@ class Admin {
     fun info(): Any? {
         if(Session.get().loggedIn) {
             val activeSec = (System.currentTimeMillis()-blackboardScheduler.activeSince) / 1000 + 1
-            return InfoJSON(blackboardScheduler.active.id, activeSec.toInt(), public.activeClients.size)
+            return InfoJSON(blackboardScheduler.active.id, activeSec.toInt(), public.activeClients.size, blackboardScheduler.timeToNextRefreshSec().toInt())
         }
         return null
     }
