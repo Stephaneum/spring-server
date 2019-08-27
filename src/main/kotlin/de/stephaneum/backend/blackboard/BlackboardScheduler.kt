@@ -29,7 +29,7 @@ class BlackboardScheduler {
     private var boards = emptyList<Blackboard>()
     private var nextBoard = 0L // the time of the next board
     private var nextFetch = 0L // the time to sync with the database
-    private var nextRefresh = 0L // the time to force a refresh
+    private var nextRefresh = System.currentTimeMillis() // the time to force a refresh
 
     // only these variables should be accessed from outside
     var active = EMPTY_BLACKBOARD
