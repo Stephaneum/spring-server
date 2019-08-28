@@ -1,5 +1,6 @@
-package de.stephaneum.backend.blackboard
+package de.stephaneum.backend.backup
 
+import de.stephaneum.backend.Permission
 import de.stephaneum.backend.Session
 import de.stephaneum.backend.Toast
 import org.springframework.beans.factory.annotation.Value
@@ -10,32 +11,41 @@ import org.springframework.web.bind.annotation.*
 
 
 @Controller
-@RequestMapping("/blackboard")
-class Auth {
+@RequestMapping("/backup")
+class BackupAuth {
 
-    @Value("\${blackboard.password}")
+    @Value("\${backup.password}")
     private lateinit var password: String
+
+    @GetMapping
+    fun home(): String {
+        if(Session.get().permission == Permission.BACKUP)
+            return REDIRECT_ADMIN
+        else
+            return REDIRECT_LOGIN
+    }
 
     @GetMapping("/login")
     fun login(model: Model, @RequestParam error: Boolean = false): String {
-        if(Session.get().loggedIn)
+        if(Session.get().permission == Permission.BACKUP)
             return REDIRECT_ADMIN
 
         model["loginFailed"] = error
+        model["title"] = "Backup"
         if(error) {
             model["toast"] = Toast("Login gescheitert")
         }
 
-        return "blackboard/login"
+        return "login"
     }
 
     @PostMapping("/login")
     fun login(password: String): Any? {
         if(password == this.password) {
-            Session.login()
+            Session.login(Permission.BACKUP)
             return REDIRECT_ADMIN
         } else {
-            return "redirect:/blackboard/login?error=true"
+            return "redirect:/backup/login?error=true"
         }
     }
 
@@ -43,6 +53,6 @@ class Auth {
     fun logout(): String {
         Session.logout()
 
-        return "redirect:/blackboard/"
+        return "redirect:/backup/login"
     }
 }

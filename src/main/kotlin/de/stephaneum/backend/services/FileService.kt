@@ -50,7 +50,7 @@ class FileService {
             }
 
             // Copy file to the target location (Replacing existing file with the same name)
-            val targetLocation = Paths.get(configFetcher.location+path).resolve(fileName)
+            val targetLocation = Paths.get(configFetcher.fileLocation+path).resolve(fileName)
             Files.copy(ByteArrayInputStream(content), targetLocation, StandardCopyOption.REPLACE_EXISTING)
 
             return targetLocation.toString().replace("\\", "/")
@@ -63,7 +63,7 @@ class FileService {
 
     fun loadFileAsResource(fileName: String, path: String = ""): Resource? {
         return try {
-            val filePath = Paths.get(configFetcher.location+path).resolve(fileName).normalize()
+            val filePath = Paths.get(configFetcher.fileLocation+path).resolve(fileName).normalize()
             val resource = UrlResource(filePath.toUri())
             if (resource.exists()) {
                 resource

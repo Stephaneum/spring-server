@@ -3,8 +3,9 @@ package de.stephaneum.backend
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
-data class StephSession(var loggedIn: Boolean = false, var toast: Toast? = null)
+data class StephSession(var permission: Permission = Permission.NONE, var toast: Toast? = null)
 data class Toast(var title: String, var content: String? = null)
+enum class Permission { NONE, BLACKBOARD, BACKUP }
 
 object Session {
 
@@ -22,14 +23,14 @@ object Session {
         return voteSession
     }
 
-    fun login() {
+    fun login(permission: Permission) {
         val session = get()
-        session.loggedIn = true
+        session.permission = permission
     }
 
     fun logout() {
         val session = get()
-        session.loggedIn = false
+        session.permission = Permission.NONE
     }
 
     fun addToast(title: String) = addToast(title, null)

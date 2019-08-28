@@ -1,9 +1,14 @@
+<#-- @ftlvariable name="toast" type="de.stephaneum.backend.Toast" -->
+<#-- @ftlvariable name="loginFailed" type="java.lang.Boolean" -->
+<#-- @ftlvariable name="title" type="java.lang.String" -->
+
 <#import "/spring.ftl" as spring/>
+<#import "components/toaster.ftl" as toaster/>
 
 <!DOCTYPE HTML>
 <html lang="de">
 <head>
-    <title>Blackboard</title>
+    <title>${title}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="<@spring.url '/static/img/favicon.png' />" />
@@ -23,7 +28,7 @@
         </div>
 
         <div class="card" style="margin-top: 100px; padding: 5px 20px 40px 20px">
-            <h5 class="center-align" style="padding: 10px; margin-bottom: 30px">Blackboard</h5>
+            <h5 class="center-align" style="padding: 10px; margin-bottom: 30px">${title}</h5>
             <#if loginFailed>
                 <p class="center red-text" style="margin: 20px 0 20px 0">Login fehlgeschlagen</p>
             </#if>
@@ -51,14 +56,8 @@
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {
         M.AutoInit();
-        <#if toast??>
-        <#if toast.content?has_content>
-        M.toast({html: '${toast.title}<br>${toast.content}'});
-        <#else>
-        M.toast({html: '${toast.title}'});
-        </#if>
-        </#if>
     });
 </script>
+<@toaster.render/>
 </body>
 </html>

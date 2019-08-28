@@ -1,5 +1,6 @@
 package de.stephaneum.backend.blackboard
 
+import de.stephaneum.backend.Permission
 import de.stephaneum.backend.services.FileService
 import de.stephaneum.backend.services.ImageService
 import de.stephaneum.backend.Session
@@ -22,9 +23,9 @@ import org.springframework.web.bind.annotation.PostMapping
 
 @Controller
 @RequestMapping("/blackboard")
-class Admin {
+class BlackboardAdmin {
 
-    final val logger = LoggerFactory.getLogger(Admin::class.java)
+    final val logger = LoggerFactory.getLogger(BlackboardAdmin::class.java)
     final val STANDARD_VALUE = "Hier klicken, um Text einzugeben"
 
     @Autowired
@@ -44,7 +45,7 @@ class Admin {
 
     @GetMapping("/admin")
     fun admin(model: Model): String {
-        if(!Session.get().loggedIn)
+        if(Session.get().permission != Permission.BLACKBOARD)
             return REDIRECT_LOGIN
 
         model["types"] = Type.values()
@@ -59,7 +60,7 @@ class Admin {
     @GetMapping("/info")
     @ResponseBody
     fun info(): Any? {
-        if(Session.get().loggedIn) {
+        if(Session.get().permission == Permission.BLACKBOARD) {
             val activeSec = (System.currentTimeMillis()-blackboardScheduler.activeSince) / 1000 + 1
             return InfoJSON(blackboardScheduler.active.id, activeSec.toInt(), public.activeClients.size, blackboardScheduler.timeToNextRefreshSec().toInt())
         }
@@ -70,7 +71,7 @@ class Admin {
 
     @GetMapping("/add")
     fun add(): String? {
-        if(!Session.get().loggedIn)
+        if(Session.get().permission != Permission.BLACKBOARD)
             return REDIRECT_LOGIN
 
         val max = if(blackboardRepo.count() == 0L) 0 else blackboardRepo.findMaxOrder()
@@ -82,7 +83,7 @@ class Admin {
     @PostMapping("/upload/{id}")
     fun uploadFile(@PathVariable id: Int, @RequestParam("file") file: MultipartFile): String {
 
-        if(!Session.get().loggedIn)
+        if(Session.get().permission != Permission.BLACKBOARD)
             return REDIRECT_LOGIN
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
@@ -127,7 +128,7 @@ class Admin {
 
     @GetMapping("/rename/{id}")
     fun rename(@PathVariable id: Int, value: String): String? {
-        if(!Session.get().loggedIn)
+        if(Session.get().permission != Permission.BLACKBOARD)
             return REDIRECT_LOGIN
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
@@ -140,7 +141,7 @@ class Admin {
 
     @GetMapping("/duration/{id}")
     fun duration(@PathVariable id: Int, duration: Int): String? {
-        if(!Session.get().loggedIn)
+        if(Session.get().permission != Permission.BLACKBOARD)
             return REDIRECT_LOGIN
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
@@ -153,7 +154,7 @@ class Admin {
 
     @GetMapping("/type/{id}")
     fun type(@PathVariable id: Int, type: Type): String? {
-        if(!Session.get().loggedIn)
+        if(Session.get().permission != Permission.BLACKBOARD)
             return REDIRECT_LOGIN
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
@@ -168,7 +169,7 @@ class Admin {
 
     @GetMapping("/toggle-visibility/{id}")
     fun toggleVisibility(@PathVariable id: Int): String? {
-        if(!Session.get().loggedIn)
+        if(Session.get().permission != Permission.BLACKBOARD)
             return REDIRECT_LOGIN
 
         val board = blackboardRepo.findByIdOrNull(id) ?: return REDIRECT_ADMIN
@@ -182,7 +183,7 @@ class Admin {
 
     @GetMapping("/move-up/{id}")
     fun moveUp(@PathVariable id: Int): String? {
-        if(!Session.get().loggedIn)
+        if(Session.get().permission != Permission.BLACKBOARD)
             return REDIRECT_LOGIN
 
         val boards = blackboardRepo.findByOrderByOrder()
@@ -200,7 +201,7 @@ class Admin {
 
     @GetMapping("/move-down/{id}")
     fun moveDown(@PathVariable id: Int): String? {
-        if(!Session.get().loggedIn)
+        if(Session.get().permission != Permission.BLACKBOARD)
             return REDIRECT_LOGIN
 
         val boards = blackboardRepo.findByOrderByOrder()
@@ -218,7 +219,7 @@ class Admin {
 
     @GetMapping("/delete/{id}")
     fun delete(@PathVariable id: Int): String? {
-        if(!Session.get().loggedIn)
+        if(Session.get().permission != Permission.BLACKBOARD)
             return REDIRECT_ADMIN
 
         blackboardRepo.deleteById(id)

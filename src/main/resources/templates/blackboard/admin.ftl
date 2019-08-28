@@ -1,5 +1,6 @@
 <#import "/spring.ftl" as spring/>
 <#import "../components/loading.ftl" as loading/>
+<#import "../components/toaster.ftl" as toaster/>
 <#setting locale="de_DE">
 <#setting number_format="computer">
 
@@ -44,8 +45,8 @@
                             <div class="col m6" style="font-size: 1.4em; overflow: hidden;padding: 10px">
                                 <div style="display: flex; justify-content: space-between">
                                     <div style="display:inline-block; flex-shrink: 0; width: 60px">
-                                        <span class="board-sec-class" id="board-sec-${b.id}"
-                                              style="visibility: hidden; background-color: #2e7d32; border-radius: 10px; padding: 0 10px 0 10px; font-size: 0.8em; color: #ffffff"></span>
+                                        <span class="board-sec-class green-badge" id="board-sec-${b.id}"
+                                              style="visibility: hidden"></span>
                                     </div>
                                     <div style="display:inline-block; flex-shrink: 0; width: 80px">
                                         <span class="text-hover" style="display: inline-block"
@@ -177,8 +178,6 @@
     </form>
 </div>
 
-<@loading.render/>
-
 <script src="<@spring.url '/static/js/jquery.min.js' />"></script>
 <script src="<@spring.url '/static/js/materialize.min.js' />"></script>
 <script src="<@spring.url '/static/js/blackboard-admin.js' />"></script>
@@ -186,14 +185,6 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         M.AutoInit();
-        <#if toast??>
-        <#if toast.content?has_content>
-        M.toast({html: '${toast.title}<br>${toast.content}'});
-        <#else>
-        M.toast({html: '${toast.title}'});
-        </#if>
-        </#if>
-
         initBlackboardAdmin('<@spring.url './info'/>')
     });
 
@@ -218,5 +209,7 @@
     }
 
 </script>
+<@loading.render/>
+<@toaster.render/>
 </body>
 </html>
