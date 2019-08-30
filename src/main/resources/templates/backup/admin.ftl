@@ -18,8 +18,7 @@
     <style>
         .backup-card {
             flex-basis: 400px;
-            min-height: 70vh;
-            margin: 0 50px 0 50px;
+            min-height: 600px;
             text-align: center;
 
             display: flex;
@@ -29,114 +28,103 @@
 
         .info-card {
             text-align: center;
-            background-color: #f1f8e9;
+            background-color: #dcedc8;
             color: black;
             border-radius: 20px;
             padding: 10px 10px 10px 10px;
             margin: 0 20px 0 20px;
             font-size: 1.2em;
-        }
-
-        .backup-btn {
-            margin: 0 50px 50px 50px;
-            font-size: 1.3em;
+            flex-shrink: 0;
         }
     </style>
 </head>
 
 <body>
 
-<div style="margin: auto; width: 1500px">
-    <!-- title -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 100px 0 100px">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <img src="<@spring.url '/static/img/favicon.png' />" style="width: 50px"/>
-            <h4 style="color: #396e3a; margin-left: 10px; padding-bottom: 5px">Backup-System</h4>
+<div style="display: flex; justify-content: center">
+    <div style="width: 1400px; margin-bottom: 100px">
+        <!-- title -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 100px 0 100px">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <img src="<@spring.url '/static/img/favicon.png' />" style="width: 50px"/>
+                <h4 style="color: #396e3a; margin-left: 10px; padding-bottom: 5px">Backup-System</h4>
+            </div>
+
+            <a class="waves-effect waves-light btn teal darken-3" href="<@spring.url './logout' />">
+                <i class="material-icons right">exit_to_app</i>Abmelden</a>
         </div>
 
-        <a class="waves-effect waves-light btn green darken-3" href="<@spring.url './logout' />">
-            <i class="material-icons right">exit_to_app</i>Abmelden</a>
-    </div>
-
-    <!-- cards -->
-    <div style="display: flex; justify-content: center; margin-top: 50px">
-
         <!-- main card -->
-        <div class="card backup-card" style="background-color: #dcedc8; text-align: center">
 
-            <div>
-                <h4 style="text-align: center">Allgemein</h4>
-                <br>
+        <div class="card" style="background-color: #f1f8e9; margin-top: 50px; padding: 20px">
+            <div style="display: flex; justify-content: center; align-items: center;">
+
                 <div class="info-card">
                     <b>Nächste automatische Sicherung:</b>
                     <br>
                     Samstag, 31.August 2019, um 4:30 Uhr
                 </div>
-                <br>
+
                 <div class="info-card">
                     <b>Sicherungspfad:</b>
                     <br>
                     ${backupLocation}
                 </div>
-                <br>
+
                 <div class="info-card">
-                    <b>Gesamtgröße der Sicherungen:</b>
+                    <b>Gesamtgröße:</b>
                     <br>
                     3,7 GB
                 </div>
+
+                <div style="text-align: center; flex-basis: 500px">
+                    <a class="backup-btn waves-effect waves-light btn-large green darken-3" style="margin-bottom: 0" href="<@spring.url './backup-all' />">
+                        <i class="material-icons left">photo_camera</i>Backup erstellen
+                    </a>
+                    <p style="margin: 10px 0 0 0">Hierbei werden Backups von <b>allen</b> Modulen erstellt.</p>
+                </div>
+
             </div>
 
-            <div>
-                <a class="backup-btn waves-effect waves-light btn-large green darken-3" style="margin-bottom: 0" href="<@spring.url './backup-all' />">
-                    <i class="material-icons left">photo_camera</i>Backup erstellen
-                </a>
-                <p>Hierbei werden Backups von <b>allen</b> Modulen erstellt.</p>
-            </div>
         </div>
 
-        <div class="card backup-card">
-            <div>
-                <h4 style="text-align: center">Homepage</h4>
-                <br>
-                <ul class="collection">
-                    <#list backupHomepage as b>
-                        <li class="collection-item">
-                            <div style="display: flex; justify-content: space-between">
-                                <span>${b.name}</span>
-                                <span class="green-badge">${b.size}</span>
-                            </div>
+        <!-- cards -->
+        <div style="display: flex; justify-content: space-between; margin-top: 50px">
 
-                        </li>
-                    </#list>
-                </ul>
-            </div>
-            <a class="backup-btn waves-effect waves-light btn-large green darken-3" href="<@spring.url './backup-homepage' />">
-                <i class="material-icons left">photo_camera</i>Backup erstellen
-            </a>
-        </div>
+            <#list sections as s>
+                <div class="card backup-card">
+                    <div>
+                        <h4 style="text-align: center">${s.title}</h4>
+                        <br>
+                        <ul class="collection">
+                            <#list s.backups as b>
+                                <li class="collection-item">
+                                    <div style="display: flex; justify-content: space-between">
+                                        <span>${b.name}</span>
+                                        <span class="green-badge">${b.size}</span>
+                                    </div>
 
-        <div class="card backup-card">
-            <div>
-                <h4 style="text-align: center">Moodle</h4>
-                <br>
-                <ul class="collection">
-                    <#list backupMoodle as b>
-                        <li class="collection-item">
-                            <div style="display: flex; justify-content: space-between">
-                                <span>${b.name}</span>
-                                <span class="green-badge">${b.size}</span>
-                            </div>
+                                </li>
+                            </#list>
+                        </ul>
+                    </div>
 
-                        </li>
-                    </#list>
-                </ul>
-            </div>
-            <a class="backup-btn waves-effect waves-light btn-large green darken-3" href="<@spring.url './backup-moodle' />">
-                <i class="material-icons left">photo_camera</i>Backup erstellen
-            </a>
+                    <div>
+                        <a class="waves-effect waves-light btn teal darken-3" href="${s.uploadURL}">
+                            <i class="material-icons left">cloud_upload</i>Backup hochladen
+                        </a>
+                        <a class="waves-effect waves-light btn-large green darken-3"
+                           style="margin: 30px 50px 50px 50px;font-size: 1.3em;" href="${s.backupURL}">
+                            <i class="material-icons left">photo_camera</i>Backup erstellen
+                        </a>
+
+                    </div>
+                </div>
+            </#list>
         </div>
     </div>
 </div>
+
 
 
 

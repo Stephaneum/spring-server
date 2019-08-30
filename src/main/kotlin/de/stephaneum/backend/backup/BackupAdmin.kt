@@ -22,20 +22,35 @@ class BackupAdmin {
         if(Session.get().permission != Permission.BACKUP)
             return REDIRECT_LOGIN
 
+        val homepage = Section("Homepage",
+                listOf(
+                        Backup("homepage_2019-08-24_04-30-34.zip", "304 MB"),
+                        Backup("homepage_2019-08-24_04-30-34.zip", "304 MB"),
+                        Backup("homepage_2019-08-24_04-30-34.zip", "304 MB"),
+                        Backup("homepage_2019-08-24_04-30-34.zip", "304 MB"),
+                        Backup("homepage_2019-08-24_04-30-34.zip", "304 MB")),
+                "./backup-homepage", "./upload-homepage")
+
+        val moodle = Section("Moodle", listOf(
+                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"),
+                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"),
+                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"),
+                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"),
+                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"),
+                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB")),
+                "./backup-moodle", "./upload-moodle")
+
+        val ar = Section("AR", listOf(
+                Backup("ar_2019-08-24_04-30-34.zip", "304 MB"),
+                Backup("ar_2019-08-24_04-30-34.zip", "304 MB"),
+                Backup("ar_2019-08-24_04-30-34.zip", "304 MB"),
+                Backup("ar_2019-08-24_04-30-34.zip", "304 MB"),
+                Backup("ar_2019-08-24_04-30-34.zip", "304 MB"),
+                Backup("ar_2019-08-24_04-30-34.zip", "304 MB")),
+                "./backup-ar", "./upload-ar")
+
+        model["sections"] = listOf(homepage, moodle, ar)
         model["backupLocation"] = configFetcher.backupLocation ?: "?"
-        model["backupHomepage"] = listOf(
-                Backup("homepage_2019-08-24_04-30-34.zip", "304 MB"),
-                Backup("homepage_2019-08-24_04-30-34.zip", "304 MB"),
-                Backup("homepage_2019-08-24_04-30-34.zip", "304 MB"),
-                Backup("homepage_2019-08-24_04-30-34.zip", "304 MB"),
-                Backup("homepage_2019-08-24_04-30-34.zip", "304 MB"))
-        model["backupMoodle"] = listOf(
-                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"),
-                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"),
-                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"),
-                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"),
-                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"),
-                Backup("moodle_2019-08-24_04-30-34.zip", "304 MB"))
         model.addAttribute("toast", Session.getAndDeleteToast())
 
         return "backup/admin"
