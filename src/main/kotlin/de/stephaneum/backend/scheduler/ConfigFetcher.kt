@@ -23,7 +23,7 @@ class ConfigFetcher {
     var planLocation: String? = null
     var backupLocation: String? = null
 
-    @Scheduled(initialDelay=5000, fixedDelay = 10000)
+    @Scheduled(initialDelay=3000, fixedDelay = 10000)
     fun update() {
         val newLocation = configRepo.findByKey("speicherort")?.value
         val newPlanLocation = configRepo.findByKey("str_vertretung")?.value

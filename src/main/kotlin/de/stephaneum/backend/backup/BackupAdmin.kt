@@ -3,7 +3,7 @@ package de.stephaneum.backend.backup
 import de.stephaneum.backend.Permission
 import de.stephaneum.backend.Session
 import de.stephaneum.backend.scheduler.ConfigFetcher
-import de.stephaneum.backend.services.FileService
+import de.stephaneum.backend.helper.FileService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -26,25 +26,24 @@ class BackupAdmin {
         if(Session.get().permission != Permission.BACKUP)
             return REDIRECT_LOGIN
 
+        var modules = listOf<Module>()
+        var totalSize = 0L
         with(configFetcher.backupLocation) {
             if(this != null) {
-                model["modules"] = MODULES.map { module ->
+                modules = MODULES.map { module ->
                     val moduleLowerCase = module.toLowerCase()
-                    val files = fileService.listFiles("$this/$moduleLowerCase")
-                    val backups = mutableListOf<Backup>()
-                    files?.forEach { file ->
-                        if (file.isFile) {
-                            backups.add(Backup(file.name, fileService.convertSizeToString(file.length())))
-                        }
-                    }
-                    Module(module, backups.sortedBy { it.name }, "backup-$moduleLowerCase", "upload-$moduleLowerCase")
+                    val backups = fileService.listFiles("$this/$moduleLowerCase")?.map { file ->
+                        totalSize += file.length()
+                        Backup(file.name, fileService.convertSizeToString(file.length()))
+                    }?.sortedBy { it.name }
+                    Module(module, backups ?: emptyList(), "backup-$moduleLowerCase", "upload-$moduleLowerCase")
                 }
-            } else {
-                model["modules"] = listOf<Module>()
             }
         }
 
+        model["modules"] = modules
         model["backupLocation"] = configFetcher.backupLocation ?: "?"
+        model["totalSize"] = fileService.convertSizeToString(totalSize)
         model.addAttribute("toast", Session.getAndDeleteToast())
 
         return "backup/admin"

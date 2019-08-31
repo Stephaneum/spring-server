@@ -1,8 +1,8 @@
 package de.stephaneum.backend.blackboard
 
 import de.stephaneum.backend.Permission
-import de.stephaneum.backend.services.FileService
-import de.stephaneum.backend.services.ImageService
+import de.stephaneum.backend.helper.FileService
+import de.stephaneum.backend.helper.ImageService
 import de.stephaneum.backend.Session
 import de.stephaneum.backend.database.Blackboard
 import de.stephaneum.backend.database.BlackboardRepo

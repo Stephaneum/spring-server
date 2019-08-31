@@ -44,7 +44,7 @@
 <div style="display: flex; justify-content: center">
     <div style="width: 1400px; margin-bottom: 100px">
         <!-- title -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0 0 100px">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <img src="<@spring.url '/static/img/favicon.png' />" style="width: 50px"/>
                 <h4 style="color: #396e3a; margin-left: 10px; padding-bottom: 5px">Backup-System</h4>
@@ -74,7 +74,7 @@
                 <div class="info-card">
                     <b>Gesamtgröße:</b>
                     <br>
-                    3,7 GB
+                    ${totalSize}
                 </div>
 
                 <div style="text-align: center; flex-basis: 500px">

@@ -1,4 +1,4 @@
-package de.stephaneum.backend.services
+package de.stephaneum.backend.helper
 
 import de.stephaneum.backend.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
@@ -82,11 +82,11 @@ class FileService {
 
     /**
      * @param path the path to the folder containing the listed files
-     * @return list of all files (which can be folders)
+     * @return list of all files
      */
     fun listFiles(path: String): List<File>? {
         val folder = File(path)
-        return folder.listFiles()?.toList()
+        return folder.listFiles()?.toList()?.filter { it.isFile }
     }
 
     /**
