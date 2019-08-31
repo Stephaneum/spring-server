@@ -44,7 +44,7 @@
 <div style="display: flex; justify-content: center">
     <div style="width: 1400px; margin-bottom: 100px">
         <!-- title -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 100px 0 100px">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0 0 100px">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <img src="<@spring.url '/static/img/favicon.png' />" style="width: 50px"/>
                 <h4 style="color: #396e3a; margin-left: 10px; padding-bottom: 5px">Backup-System</h4>
@@ -91,30 +91,34 @@
         <!-- cards -->
         <div style="display: flex; justify-content: space-between; margin-top: 50px">
 
-            <#list sections as s>
+            <#list modules as m>
                 <div class="card backup-card">
                     <div>
-                        <h4 style="text-align: center">${s.title}</h4>
+                        <h4 style="text-align: center">${m.title}</h4>
                         <br>
                         <ul class="collection">
-                            <#list s.backups as b>
+                            <#if m.backups?has_content>
+                            <#list m.backups as b>
                                 <li class="collection-item">
                                     <div style="display: flex; justify-content: space-between">
                                         <span>${b.name}</span>
-                                        <span class="green-badge">${b.size}</span>
+                                        <span class="green-badge-light">${b.size}</span>
                                     </div>
 
                                 </li>
                             </#list>
+                            <#else>
+                                <p>Keine Backups vorhanden</p>
+                            </#if>
                         </ul>
                     </div>
 
                     <div>
-                        <a class="waves-effect waves-light btn teal darken-3" href="${s.uploadURL}">
+                        <a class="waves-effect waves-light btn teal darken-3" href="${m.uploadURL}">
                             <i class="material-icons left">cloud_upload</i>Backup hochladen
                         </a>
                         <a class="waves-effect waves-light btn-large green darken-3"
-                           style="margin: 30px 50px 50px 50px;font-size: 1.3em;" href="${s.backupURL}">
+                           style="margin: 30px 50px 50px 50px;font-size: 1.3em;" href="${m.backupURL}">
                             <i class="material-icons left">photo_camera</i>Backup erstellen
                         </a>
 

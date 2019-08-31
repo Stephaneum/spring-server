@@ -7,33 +7,23 @@ import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.io.IOException
 import java.net.MalformedURLException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.text.DecimalFormat
 
 @Service
 class FileService {
 
     final val logger = LoggerFactory.getLogger(FileService::class.java)
 
+    val formatter = DecimalFormat("#.#")
+
     @Autowired
     private lateinit var configFetcher: ConfigFetcher
-
-    /**
-     * @param original the original path to file
-     * @param extension the new extension
-     * @return path with new extension
-     */
-    fun getPathWithNewExtension(original: String, extension: String): String {
-        val index = original.lastIndexOf('.')+1
-        if(index == 0)
-            return "$original.$extension"
-
-        val withoutExtension = original.substring(0, index)
-        return withoutExtension+extension
-    }
 
     /**
      * @param content byte array which should be saved
@@ -74,5 +64,42 @@ class FileService {
             null
         }
 
+    }
+
+    /**
+     * @param original the original path to file
+     * @param extension the new extension
+     * @return path with new extension
+     */
+    fun getPathWithNewExtension(original: String, extension: String): String {
+        val index = original.lastIndexOf('.')+1
+        if(index == 0)
+            return "$original.$extension"
+
+        val withoutExtension = original.substring(0, index)
+        return withoutExtension+extension
+    }
+
+    /**
+     * @param path the path to the folder containing the listed files
+     * @return list of all files (which can be folders)
+     */
+    fun listFiles(path: String): List<File>? {
+        val folder = File(path)
+        return folder.listFiles()?.toList()
+    }
+
+    /**
+     * @param bytes the amount of bytes
+     * @return human readable string
+     */
+    fun convertSizeToString(bytes: Long): String {
+        val s = when {
+            bytes < 1024                -> "$bytes Bytes"
+            bytes < 1024 * 1024         -> formatter.format(bytes.toDouble() / 1024) + " KB"
+            bytes < 1024 * 1024 * 1024  -> formatter.format(bytes.toDouble() / (1024 * 1024)) + " MB"
+            else                        -> formatter.format(bytes.toDouble() / (1024 * 1024 * 1024)) + " GB"
+        }
+        return s.replace('.', ',')
     }
 }
