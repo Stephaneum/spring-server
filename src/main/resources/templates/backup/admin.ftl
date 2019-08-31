@@ -42,9 +42,9 @@
 <body>
 
 <div style="display: flex; justify-content: center">
-    <div style="width: 1400px; margin-bottom: 100px">
+    <div style="width: 1300px; margin-bottom: 100px">
         <!-- title -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 50px 0 50px">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <img src="<@spring.url '/static/img/favicon.png' />" style="width: 50px"/>
                 <h4 style="color: #396e3a; margin-left: 10px; padding-bottom: 5px">Backup-System</h4>
@@ -56,36 +56,31 @@
 
         <!-- main card -->
 
-        <div class="card" style="background-color: #f1f8e9; margin-top: 50px; padding: 20px">
-            <div style="display: flex; justify-content: center; align-items: center;">
-
-                <div class="info-card">
-                    <b>Nächste automatische Sicherung:</b>
-                    <br>
-                    Samstag, 31.August 2019, um 4:30 Uhr
-                </div>
-
-                <div class="info-card">
-                    <b>Sicherungspfad:</b>
-                    <br>
-                    ${backupLocation}
-                </div>
-
-                <div class="info-card">
-                    <b>Gesamtgröße:</b>
-                    <br>
-                    ${totalSize}
-                </div>
-
-                <div style="text-align: center; flex-basis: 500px">
-                    <a class="backup-btn waves-effect waves-light btn-large green darken-3" style="margin-bottom: 0" href="<@spring.url './backup-all' />">
-                        <i class="material-icons left">photo_camera</i>Backup erstellen
-                    </a>
-                    <p style="margin: 10px 0 0 0">Hierbei werden Backups von <b>allen</b> Modulen erstellt.</p>
-                </div>
-
+        <div class="card" style="background-color: #f1f8e9; margin-top: 50px; padding: 20px;display: flex; justify-content: center; align-items: center;">
+            <div class="info-card">
+                <b>Nächste automatische Sicherung:</b>
+                <br>
+                Samstag, 31.August 2019, um 4:30 Uhr
             </div>
 
+            <div class="info-card">
+                <b>Sicherungspfad:</b>
+                <br>
+                ${backupLocation}
+            </div>
+
+            <div class="info-card">
+                <b>Gesamtgröße:</b>
+                <br>
+                ${totalSize}
+            </div>
+
+            <div style="text-align: center; flex-basis: 500px">
+                <a class="backup-btn waves-effect waves-light btn-large green darken-3" style="margin-bottom: 0" href="<@spring.url './backup-all' />">
+                    <i class="material-icons left">photo_camera</i>Backup erstellen
+                </a>
+                <p style="margin: 10px 0 0 0">Hierbei werden Backups von <b>allen</b> Modulen erstellt.</p>
+            </div>
         </div>
 
         <!-- cards -->
