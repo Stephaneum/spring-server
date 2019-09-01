@@ -157,7 +157,6 @@ class FileService {
             return
         }
         if (fileToZip.isDirectory) {
-            println("Enter folder \"$fileName\"")
             val children = fileToZip.listFiles()
             for (i in children!!.indices) {
 

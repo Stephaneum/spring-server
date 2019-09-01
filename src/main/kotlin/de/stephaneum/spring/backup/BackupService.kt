@@ -40,6 +40,22 @@ class BackupService {
     var running = false
     var error = false
 
+    fun backupFull() {
+        running = true
+        error = false
+        BackupLogs.clear()
+        Thread {
+            BackupLogs.addLine("Vollständiges Backup gestartet.")
+            BackupLogs.addLine("(A) Homepage")
+            homepageBackup()
+            BackupLogs.addLine("(B) Homepage")
+            moodleBackup()
+            BackupLogs.addLine("(C) AR")
+            arBackup()
+            running = false
+        }.start()
+    }
+
     fun backup(type: ModuleType) {
         if(running)
             return
@@ -54,7 +70,10 @@ class BackupService {
                     BackupLogs.addLine("Backup von der Homepage gestartet.")
                     homepageBackup()
                 }
-                ModuleType.MOODLE -> TODO()
+                ModuleType.MOODLE -> {
+                    BackupLogs.addLine("Backup von Moodle gestartet.")
+                    moodleBackup()
+                }
                 ModuleType.AR -> {
                     BackupLogs.addLine("Backup von AR gestartet.")
                     arBackup()
@@ -82,16 +101,19 @@ class BackupService {
         error = false
         BackupLogs.clear()
         Thread {
-
+            val filePath = "${configFetcher.backupLocation}/${type.code}/$file"
             val result = when(type) {
                 ModuleType.HOMEPAGE -> {
                     BackupLogs.addLine("Homepage wird wiederhergestellt. ($file)")
-                    homepageRestore("${configFetcher.backupLocation}/${type.code}/$file", configFetcher.backupLocation!!, configFetcher.fileLocation!!)
+                    homepageRestore(filePath, configFetcher.backupLocation!!, configFetcher.fileLocation!!)
                 }
-                ModuleType.MOODLE -> TODO()
+                ModuleType.MOODLE -> {
+                    BackupLogs.addLine("Moodle wird wiederhergestellt. ($file)")
+                    moodleRestore(filePath)
+                }
                 ModuleType.AR -> {
                     BackupLogs.addLine("AR wird wiederhergestellt. ($file)")
-                    arRestore("${configFetcher.backupLocation}/${type.code}/$file")
+                    arRestore(filePath)
                 }
             }
 
@@ -242,6 +264,14 @@ class BackupService {
         return null
     }
 
+    private fun moodleBackup(): String? {
+        return null
+    }
+
+    private fun moodleRestore(zipFile: String): String? {
+        return null
+    }
+
     fun arBackup(): String? {
         val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
         BackupLogs.addLine("[1/1] Datenbank wird gesichert.")
@@ -285,12 +315,11 @@ class BackupService {
         try {
             val file = File(destination)
             file.parentFile.mkdirs()
-            var exitStatus = 0
-            if(windows) {
+            val exitStatus = if(windows) {
                 // on windows, dump file path cannot have spaces
-                exitStatus = cmd(""""${dbHelper.getDatabaseLocation()}bin\mysqldump.exe" -u"$username" -p"$password" "$database" > $destination""")
+                cmd(""""${dbHelper.getDatabaseLocation()}bin\mysqldump.exe" -u"$username" -p"$password" "$database" > $destination""")
             } else {
-                exitStatus = cmd("""mysqldump -u"$username" -p"$password" "$database" > "$destination"""")
+                cmd("""mysqldump -u"$username" -p"$password" "$database" > "$destination"""")
             }
 
             return if (exitStatus == 0) {
@@ -317,12 +346,11 @@ class BackupService {
     private fun restoreDump(username: String, password: String, database: String, source: String): String? {
 
         try {
-            val exitStatus: Int
-            if(windows) {
+            val exitStatus = if(windows) {
                 // on windows, dump file path cannot have spaces
-                exitStatus = cmd(""""${dbHelper.getDatabaseLocation()}bin\mysql.exe" -u"$username" -p"$password" "$database" < $source""")
+                cmd(""""${dbHelper.getDatabaseLocation()}bin\mysql.exe" -u"$username" -p"$password" "$database" < $source""")
             } else {
-                exitStatus = cmd("""mysql -u"$username" -p"$password" "$database" < "$source"""")
+                cmd("""mysql -u"$username" -p"$password" "$database" < "$source"""")
             }
 
             return if (exitStatus == 0) {

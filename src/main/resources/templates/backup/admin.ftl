@@ -80,7 +80,7 @@
             </div>
 
             <div style="text-align: center; flex-basis: 500px">
-                <a class="backup-btn waves-effect waves-light btn-large green darken-3" style="margin-bottom: 0" href="<@spring.url './backup-all' />">
+                <a class="backup-btn waves-effect waves-light btn-large green darken-3" style="margin: 5px 0 0 0" href="<@spring.url './backup' />">
                     <i class="material-icons left">photo_camera</i>Backup erstellen
                 </a>
                 <p style="margin: 10px 0 0 0">Hierbei werden Backups von <b>allen</b> Modulen erstellt.</p>

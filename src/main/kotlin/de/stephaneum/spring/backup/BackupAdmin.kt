@@ -58,6 +58,16 @@ class BackupAdmin {
         return "backup/admin"
     }
 
+    @GetMapping("/backup")
+    fun backupFull(): String {
+
+        if(backupService.running)
+            return REDIRECT_LOGS
+
+        backupService.backupFull()
+        return REDIRECT_LOGS
+    }
+
     @GetMapping("/backup-{module}")
     fun backup(@PathVariable module: String): String {
 
