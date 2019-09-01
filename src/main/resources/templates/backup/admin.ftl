@@ -36,6 +36,10 @@
             font-size: 1.2em;
             flex-shrink: 0;
         }
+
+        .action-btn {
+            margin: 0 10px 0 10px;
+        }
     </style>
 </head>
 
@@ -91,29 +95,48 @@
                     <div>
                         <h4 style="text-align: center">${m.title}</h4>
                         <br>
-                        <ul class="collection">
-                            <#if m.backups?has_content>
+                        <#if m.backups?has_content>
+                        <ul class="collapsible" style="box-shadow: none !important;">
                             <#list m.backups as b>
-                                <li class="collection-item">
-                                    <div style="display: flex; justify-content: space-between">
-                                        <span>${b.name}</span>
-                                        <span class="green-badge-light">${b.size}</span>
+                                <li>
+                                    <div class="collapsible-header">
+                                        <div style="display: flex; justify-content: space-between; width: 100%;">
+                                            <span>${b.name}</span>
+                                            <span class="green-badge-light">${b.size}</span>
+                                        </div>
                                     </div>
+                                    <div class="collapsible-body">
+                                        <div style="display: flex; justify-content: center; align-items: center">
+                                            <i class="material-icons" style="display: inline-block; margin: 0 10px 10px 0; font-size: 2em;">subdirectory_arrow_right</i>
+                                            <span style="margin-right: 10px">Aktionen:</span>
+                                            <a class="action-btn tooltipped waves-effect waves-light btn green darken-3" data-tooltip="Download" data-position="bottom"
+                                               href="<@spring.url './download/' + m.code + '/' + b.name />">
+                                                <i class="material-icons">arrow_downward</i></a>
+                                            <a class="action-btn tooltipped waves-effect waves-light btn yellow darken-3" data-tooltip="Wiederherstellen" data-position="bottom"
+                                               href="<@spring.url './restore/' + m.code + '/' + b.name />">
+                                                <i class="material-icons">restore</i></a>
+                                            <a class="action-btn tooltipped waves-effect waves-light btn red darken-3" data-tooltip="Löschen" data-position="bottom"
+                                               href="<@spring.url './delete/' + m.code + '/' + b.name />">
+                                                <i class="material-icons">delete</i></a>
+                                        </div>
 
+                                    </div>
                                 </li>
                             </#list>
-                            <#else>
-                                <p>Keine Backups vorhanden</p>
-                            </#if>
                         </ul>
+                        <#else>
+                        <div>
+                            <p class="green-badge-light" style="display: inline-block; font-size: 1em">Keine Backups vorhanden</p>
+                        </div>
+                        </#if>
                     </div>
 
                     <div>
-                        <a class="waves-effect waves-light btn teal darken-3" href="${m.uploadURL}">
+                        <a class="waves-effect waves-light btn teal darken-3" href="upload-${m.code}">
                             <i class="material-icons left">cloud_upload</i>Backup hochladen
                         </a>
                         <a class="waves-effect waves-light btn-large green darken-3"
-                           style="margin: 30px 50px 50px 50px;font-size: 1.3em;" href="${m.backupURL}">
+                           style="margin: 30px 50px 50px 50px;font-size: 1.3em;" href="backup-${m.code}">
                             <i class="material-icons left">photo_camera</i>Backup erstellen
                         </a>
 
@@ -126,6 +149,13 @@
 
 <script src="<@spring.url '/static/js/jquery.min.js' />"></script>
 <script src="<@spring.url '/static/js/materialize.min.js' />"></script>
+<script type="text/javascript">
+
+    document.addEventListener('DOMContentLoaded', function () {
+        M.AutoInit();
+    });
+
+</script>
 <@loading.render/>
 <@toaster.render/>
 </body>

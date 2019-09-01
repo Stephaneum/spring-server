@@ -52,10 +52,9 @@ class FileService {
 
     }
 
-    fun loadFileAsResource(fileName: String, path: String = ""): Resource? {
+    fun loadFileAsResource(path: String): Resource? {
         return try {
-            val filePath = Paths.get(configFetcher.fileLocation+path).resolve(fileName).normalize()
-            val resource = UrlResource(filePath.toUri())
+            val resource = UrlResource(Paths.get(path).toUri())
             if (resource.exists()) {
                 resource
             } else {
@@ -122,6 +121,20 @@ class FileService {
 
         if (deleteParent)
             folder.delete()
+    }
+
+
+    /**
+     * deletes the file
+     * @return true if it was successful
+     */
+    fun deleteFile(path: String): Boolean {
+        val file = File(path)
+        if(file.exists()) {
+            return file.delete()
+        } else {
+            return false
+        }
     }
 
     @Throws(IOException::class)

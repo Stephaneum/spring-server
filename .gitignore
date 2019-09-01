@@ -8,6 +8,7 @@ gradle-app.setting
 !gradle-wrapper.jar
 
 ### IntelliJ IDEA ###
+/out/
 .idea
 *.iws
 *.iml

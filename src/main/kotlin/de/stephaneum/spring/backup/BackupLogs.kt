@@ -23,7 +23,7 @@ object BackupLogs {
             logger.info(s)
         } else {
             var s2 = s
-            repeat(level) { s2 = "        $s2" }
+            repeat(level) { s2 = "            $s2" }
             logsHTML.append("&gt;     $s2<br>".replace(" ", "&nbsp;"))
             logger.info(s)
         }

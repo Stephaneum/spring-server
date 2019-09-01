@@ -38,34 +38,77 @@ class BackupService {
     private lateinit var dbPassword: String
 
     var running = false
+    var error = false
 
     fun backup(type: ModuleType) {
         if(running)
             return
 
         running = true
+        error = false
         BackupLogs.clear()
-        when(type) {
-            ModuleType.HOMEPAGE -> {
-                Thread {
-                    BackupLogs.addLine("Backup von der Homepage wird gestartet.")
-                    val result = homepageBackup()
-                    if(result == null) {
-                        BackupLogs.addLine("Backup ist fertig! Sie werden in Kürze weitergeleitet.")
-                    } else {
-                        BackupLogs.addLine("Backup fehlgeschlagen.")
-                    }
-                    Thread.sleep(3000)
-                    running = false
-                }.start()
+        Thread {
+
+            val result = when(type) {
+                ModuleType.HOMEPAGE -> {
+                    BackupLogs.addLine("Backup von der Homepage gestartet.")
+                    homepageBackup()
+                }
+                ModuleType.MOODLE -> TODO()
+                ModuleType.AR -> {
+                    BackupLogs.addLine("Backup von AR gestartet.")
+                    arBackup()
+                }
             }
-            ModuleType.MOODLE -> TODO()
-            ModuleType.AR -> TODO()
-        }
+
+            if(result == null) {
+                BackupLogs.addLine("Backup ist fertig! Sie werden in Kürze weitergeleitet.")
+                Thread.sleep(3000)
+            } else {
+                BackupLogs.addLine(result)
+                BackupLogs.addLine("Backup fehlgeschlagen.")
+                error = true
+            }
+            running = false
+        }.start()
+
+    }
+
+    fun restore(type: ModuleType, file: String) {
+        if(running)
+            return
+
+        running = true
+        error = false
+        BackupLogs.clear()
+        Thread {
+
+            val result = when(type) {
+                ModuleType.HOMEPAGE -> {
+                    BackupLogs.addLine("Homepage wird wiederhergestellt. ($file)")
+                    homepageRestore("${configFetcher.backupLocation}/${type.code}/$file", configFetcher.backupLocation!!, configFetcher.fileLocation!!)
+                }
+                ModuleType.MOODLE -> TODO()
+                ModuleType.AR -> {
+                    BackupLogs.addLine("AR wird wiederhergestellt. ($file)")
+                    arRestore("${configFetcher.backupLocation}/${type.code}/$file")
+                }
+            }
+
+            if(result == null) {
+                BackupLogs.addLine("Wiederherstellung ist fertig! Sie werden in Kürze weitergeleitet.")
+                Thread.sleep(3000)
+            } else {
+                BackupLogs.addLine(result)
+                BackupLogs.addLine("Wiederherstellung fehlgeschlagen.")
+                error = true
+            }
+            running = false
+        }.start()
     }
 
     /**
-     * @return empty string if it was successful, else then the error message
+     * @return empty string if it was successful, non-empty else when an error occurs
      */
     private fun homepageBackup(): String? {
         val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
@@ -75,8 +118,8 @@ class BackupService {
         val tempPath = "$backupPath/tmp"
 
         // create temporary folders
-        BackupLogs.addLine("[1/5] Temporäre Ordner werden erstellt.");
-        val file = File("$tempPath/dateien");
+        BackupLogs.addLine("[1/5] Temporäre Ordner werden erstellt.")
+        val file = File("$tempPath/dateien")
         if (!file.exists() && !file.mkdirs())
             return "Temporäre Ordner (${file.absolutePath} konnte nicht erstellt werden."
 
@@ -84,13 +127,11 @@ class BackupService {
 
         // database
         BackupLogs.addLine("[2/5] Datenbank wird gesichert.")
-        var windowsMySQLPath: String? = null
         var dumpPath = "$tempPath/datenbank.sql"
         if(windows) {
-            windowsMySQLPath = dbHelper.getDatabaseLocation()
             dumpPath = dumpPath.replace("/", "\\")
         }
-        val result = backupDump(windowsMySQLPath, dbUser, dbPassword, db, dumpPath)
+        val result = backupDump(dbUser, dbPassword, db, dumpPath)
         if(result != null)
             return result
 
@@ -124,23 +165,170 @@ class BackupService {
         return null
     }
 
-    private fun backupDump(windowsMySQLPath: String?, username: String, password: String, database: String, destination: String): String? {
+    private fun homepageRestore(zipFile: String, backupPath: String, filePath: String): String? {
+        Thread.sleep(2000)
+
+        val tempPath = "$backupPath/tmp"
+
+        // create temporary folders
+        BackupLogs.addLine("[1/7] Temporäre Ordner werden erstellt.")
+        val file = File("$tempPath/dateien")
+        if (!file.exists() && !file.mkdirs())
+            return "Temporäre Ordner (${file.absolutePath} konnte nicht erstellt werden."
+
+        Thread.sleep(2000)
+
+        // extract zip
+        BackupLogs.addLine("[2/7] Zip-Archiv wird extrahiert.")
+        try {
+            fileService.unzip(zipFile, tempPath)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return e.message
+        }
+
+        Thread.sleep(1000)
+
+        // clear old files
+        BackupLogs.addLine("[3/7] Alter Speicher wird gelöscht.")
+        fileService.deleteFolder(File(filePath), false)
+
+        Thread.sleep(1000)
+
+        // copy files
+        BackupLogs.addLine("[4/7] Neue Dateien werden kopiert.")
+        try {
+            FileUtils.copyDirectory(file, File(filePath))
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return e.message
+        }
+
+        Thread.sleep(1000)
+
+        // load db
+        BackupLogs.addLine("[5/7] Datenbank wird geladen und ggf. aktualisiert.")
+        var dumpPath = tempPath+"/datenbank.sql"
+        if(windows) {
+            dumpPath = dumpPath.replace("/", "\\")
+        }
+
+        val result = restoreDump(dbUser, dbPassword, db, dumpPath)
+        if(result != null)
+            return result
+        else
+            configFetcher.update()
+
+        Thread.sleep(1000)
+
+        val oldFilePath = configFetcher.fileLocation!!
+        val oldBackupPath = configFetcher.backupLocation!!
+
+        // adjust paths
+        BackupLogs.addLine("[6/7] Speicherort und Backup-Ordner werden gesetzt.")
+        BackupLogs.addLine("-> Speicherort: $oldFilePath -> $filePath", 1)
+        BackupLogs.addLine("-> Cloudspeicher", 2)
+        BackupLogs.addLine("-> Vertretungsplan", 2)
+        BackupLogs.addLine("-> Diashow", 2)
+        dbHelper.updateFilePath(oldFilePath, filePath)
+        BackupLogs.addLine("-> Backup-Ordner: $oldBackupPath -> $backupPath", 1)
+        dbHelper.updateBackupPath(backupPath)
+
+        Thread.sleep(1000)
+
+        // clear temporary files
+        BackupLogs.addLine("[7/7] Temporäre Dateien werden gelöscht.")
+        fileService.deleteFolder(File(tempPath), true)
+        return null
+    }
+
+    fun arBackup(): String? {
+        val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
+        BackupLogs.addLine("[1/1] Datenbank wird gesichert.")
+        val time = LocalDateTime.now().format(dateTimeFormat)
+        var destination = "$backupPath/ar/ar_$time.sql"
+        if(windows) {
+            destination = destination.replace("/", "\\")
+        }
+        val result = backupDump(dbUser, dbPassword, "ar", destination)
+        if(result != null)
+            return result
+
+        Thread.sleep(2000)
+        return null
+    }
+
+    fun arRestore(sqlFile: String): String? {
+        BackupLogs.addLine("[1/1] Datenbank wird geladen.")
+        var dump = sqlFile
+        if(windows) {
+            dump = dump.replace("/", "\\")
+        }
+        val result = restoreDump(dbUser, dbPassword, "ar", dump)
+        if(result != null)
+            return result
+
+        Thread.sleep(2000)
+        return null
+    }
+
+    /**
+     * creates a dump.sql file
+     * @param username db user
+     * @param password db password
+     * @param database the database which will be dumped
+     * @param destination the location where to store the file
+     * @return null if it was successful
+     */
+    private fun backupDump(username: String, password: String, database: String, destination: String): String? {
 
         try {
             val file = File(destination)
             file.parentFile.mkdirs()
             var exitStatus = 0
-            if(windowsMySQLPath != null) {
+            if(windows) {
                 // on windows, dump file path cannot have spaces
-                exitStatus = cmd("\"" + windowsMySQLPath + "bin\\mysqldump.exe\" -u\"" + username + "\" -p\"" + password + "\" \"" + database + "\" > " + destination)
+                exitStatus = cmd(""""${dbHelper.getDatabaseLocation()}bin\mysqldump.exe" -u"$username" -p"$password" "$database" > $destination""")
             } else {
-                exitStatus = cmd("mysqldump -u\"$username\" -p\"$password\" \"$database\" > \"$destination\"")
+                exitStatus = cmd("""mysqldump -u"$username" -p"$password" "$database" > "$destination"""")
             }
 
             return if (exitStatus == 0) {
                 null
             } else {
                 "Error-Code: $exitStatus"
+            }
+
+        } catch (ex: IOException) {
+            return ex.message
+        } catch (ex: InterruptedException) {
+            return ex.message
+        }
+    }
+
+    /**
+     * loads the dump.sql into the database
+     * @param username db user
+     * @param password db password
+     * @param database the database which will be dumped
+     * @param source the location where the file currently is
+     * @return null if it was successful
+     */
+    private fun restoreDump(username: String, password: String, database: String, source: String): String? {
+
+        try {
+            val exitStatus: Int
+            if(windows) {
+                // on windows, dump file path cannot have spaces
+                exitStatus = cmd(""""${dbHelper.getDatabaseLocation()}bin\mysql.exe" -u"$username" -p"$password" "$database" < $source""")
+            } else {
+                exitStatus = cmd("""mysql -u"$username" -p"$password" "$database" < "$source"""")
+            }
+
+            return if (exitStatus == 0) {
+                null
+            } else {
+                "Error-Status: $exitStatus"
             }
 
         } catch (ex: IOException) {

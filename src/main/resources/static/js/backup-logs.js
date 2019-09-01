@@ -1,6 +1,6 @@
 var refreshDelayLogs = 1000; // every 1 sec
 var url;
-
+var logsTimer;
 
 function fetchBlackboardAdmin() {
 
@@ -10,8 +10,13 @@ function fetchBlackboardAdmin() {
             timeout: 10000, // timeout 10s
             success: function (data) {
                 if(!data.running) {
-                    location.reload();
-                    return;
+                    if (data.error) {
+                        document.getElementById('log-container').style.backgroundColor = '#ffcdd2';
+                    } else {
+                        location.reload();
+                    }
+                    document.getElementById('log-back-btn').style.display = 'inline-block';
+                    clearInterval(logsTimer);
                 }
                 document.getElementById('log').innerHTML = data.log;
 
@@ -23,5 +28,5 @@ function fetchBlackboardAdmin() {
 
 function initLogs(initURL) {
     url = initURL;
-    setInterval(fetchBlackboardAdmin, refreshDelayLogs);
+    logsTimer = setInterval(fetchBlackboardAdmin, refreshDelayLogs);
 }

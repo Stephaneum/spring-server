@@ -30,11 +30,13 @@
                 <i class="material-icons right">exit_to_app</i>Abmelden</a>
         </div>
 
-        <div class="card" style="min-height: 60vh; padding: 30px">
-            <p style="margin: 0 0 20px 0; font-size: 2em">Logdaten</p>
+        <div id="log-container" class="card" style="min-height: 60vh; padding: 30px">
+            <p style="margin: 0 0 20px 0; font-size: 2em">Konsolenausgabe</p>
             <div id="log">
                 ${logs}
             </div>
+            <a id="log-back-btn" class="waves-effect waves-light btn green darken-3" style="display: none; margin-top: 30px" href="<@spring.url './admin' />">
+                <i class="material-icons left">arrow_back</i>Zurück</a>
         </div>
     </div>
 
