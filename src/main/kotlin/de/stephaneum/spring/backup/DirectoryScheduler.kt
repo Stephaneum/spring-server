@@ -23,7 +23,7 @@ class DirectoryScheduler {
     fun update() {
         configFetcher.backupLocation?.let {
             MODULES.forEach { module ->
-                val file = File("$it/${module.toLowerCase()}")
+                val file = File("$it/${module.code}")
                 if(!file.exists()) {
                     logger.info("create missing folder: ${file.absolutePath}")
                     file.mkdirs()

@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "de.stephaneum"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
@@ -19,17 +19,24 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	// General
 	implementation("org.springframework.boot:spring-boot-starter-freemarker")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+
+	// DB
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
+	runtimeOnly("mysql:mysql-connector-java")
+
+	// Kotlin
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
+	// Specific Libraries
 	implementation("org.apache.pdfbox:pdfbox:2.0.15")
-	runtimeOnly("mysql:mysql-connector-java")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.springframework.security:spring-security-test")
+	implementation("commons-io:commons-io:2.6")
 }
 
 tasks.withType<KotlinCompile> {

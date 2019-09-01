@@ -6,14 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
-import java.io.ByteArrayInputStream
-import java.io.File
-import java.io.IOException
+import java.io.*
 import java.net.MalformedURLException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.text.DecimalFormat
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 @Service
 class FileService {
@@ -101,5 +102,107 @@ class FileService {
             else                        -> formatter.format(bytes.toDouble() / (1024 * 1024 * 1024)) + " GB"
         }
         return s.replace('.', ',')
+    }
+
+    /**
+     * @param folder the folder to delete
+     * @param deleteParent if true, then the folder itself will be also deleted
+     */
+    fun deleteFolder(folder: File, deleteParent: Boolean) {
+        val files = folder.listFiles()
+        if (files != null) { //some JVMs return null for empty dirs
+            for (f in files) {
+                if (f.isDirectory) {
+                    deleteFolder(f, true)
+                } else {
+                    f.delete()
+                }
+            }
+        }
+
+        if (deleteParent)
+            folder.delete()
+    }
+
+    @Throws(IOException::class)
+    fun zip(fileToZip: String, destination: String) {
+
+        val fos = FileOutputStream(destination)
+        val zipOut = ZipOutputStream(fos)
+        val file = File(fileToZip)
+
+        _zip(file, null, zipOut)
+        zipOut.close()
+        fos.close()
+    }
+
+    // recursive function
+    @Throws(IOException::class)
+    private fun _zip(fileToZip: File, fileName: String?, zipOut: ZipOutputStream) {
+
+        if (fileToZip.isHidden) {
+            return
+        }
+        if (fileToZip.isDirectory) {
+            println("Enter folder \"$fileName\"")
+            val children = fileToZip.listFiles()
+            for (i in children!!.indices) {
+
+                val childFile = children[i]
+
+                val current: String
+                if (fileName != null)
+                    current = fileName + "/" + childFile.name
+                else
+                    current = childFile.name
+
+                _zip(childFile, current, zipOut)
+            }
+            return
+        }
+
+        if (fileName != null) {
+            val fis = FileInputStream(fileToZip)
+            val zipEntry = ZipEntry(fileName)
+            zipOut.putNextEntry(zipEntry)
+            val bytes = ByteArray(1024)
+            while (true) {
+                val length = fis.read(bytes)
+                if(length < 0)
+                    break
+                zipOut.write(bytes, 0, length)
+            }
+            fis.close()
+        }
+    }
+
+    @Throws(IOException::class)
+    fun unzip(fileToUnzip: String, destination: String) {
+
+        val buffer = ByteArray(1024)
+        val zis = ZipInputStream(FileInputStream(fileToUnzip))
+        var zipEntry: ZipEntry? = zis.nextEntry
+
+        while (zipEntry != null) {
+
+            val fileName = zipEntry.name                       // e.g. dateien/23_Bild.png
+            val filePath = "$destination/$fileName"            // e.g. /home/projekt/dateien/23_Bild.png
+            val newFile = File(filePath)
+
+            newFile.parentFile.mkdirs() // create missing parent folders
+
+            val fos = FileOutputStream(newFile)
+            while (true) {
+                val length = zis.read(buffer)
+                if(length <= 0)
+                    break
+
+                fos.write(buffer, 0, length)
+            }
+            fos.close()
+            zipEntry = zis.nextEntry
+        }
+        zis.closeEntry()
+        zis.close()
     }
 }

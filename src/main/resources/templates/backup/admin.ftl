@@ -124,9 +124,6 @@
     </div>
 </div>
 
-
-
-
 <script src="<@spring.url '/static/js/jquery.min.js' />"></script>
 <script src="<@spring.url '/static/js/materialize.min.js' />"></script>
 <@loading.render/>
