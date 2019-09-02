@@ -30,6 +30,9 @@ class BackupAdmin {
     @Autowired
     private lateinit var backupService: BackupService
 
+    @Autowired
+    private lateinit var backupScheduler: BackupScheduler
+
     @GetMapping("/admin")
     fun admin(model: Model): String {
         if(Session.get().permission != Permission.BACKUP)
@@ -53,6 +56,7 @@ class BackupAdmin {
         model["modules"] = modules
         model["backupLocation"] = configFetcher.backupLocation ?: "?"
         model["totalSize"] = fileService.convertSizeToString(totalSize)
+        model["nextBackup"] = backupScheduler.getNextBackup()
         model.addAttribute("toast", Session.getAndDeleteToast())
 
         return "backup/admin"

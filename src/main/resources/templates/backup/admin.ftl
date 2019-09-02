@@ -64,7 +64,7 @@
             <div class="info-card">
                 <b>Nächste automatische Sicherung:</b>
                 <br>
-                Samstag, 31.August 2019, um 4:30 Uhr
+                ${nextBackup}
             </div>
 
             <div class="info-card">
@@ -80,7 +80,7 @@
             </div>
 
             <div style="text-align: center; flex-basis: 500px">
-                <a class="backup-btn waves-effect waves-light btn-large green darken-3" style="margin: 5px 0 0 0" href="<@spring.url './backup' />">
+                <a class="backup-btn waves-effect waves-light btn-large green darken-3" style="margin: 5px 0 0 0;font-size: 1.3em;" href="<@spring.url './backup' />">
                     <i class="material-icons left">photo_camera</i>Backup erstellen
                 </a>
                 <p style="margin: 10px 0 0 0">Hierbei werden Backups von <b>allen</b> Modulen erstellt.</p>
@@ -132,7 +132,7 @@
                     </div>
 
                     <div>
-                        <a class="waves-effect waves-light btn teal darken-3" href="upload-${m.code}">
+                        <a class="waves-effect waves-light btn teal darken-3" style="margin-top: 30px" href="upload-${m.code}">
                             <i class="material-icons left">cloud_upload</i>Backup hochladen
                         </a>
                         <a class="waves-effect waves-light btn-large green darken-3"

@@ -265,11 +265,74 @@ class BackupService {
     }
 
     private fun moodleBackup(): String? {
+
+        if(windows)
+            return "Moodle wird auf Windows nicht unterstützt."
+
+        val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
+        val tempPath = "$backupPath/tmp"
+        val moodlePath = File("$tempPath/moodle")
+        val moodleDataPath = File("$tempPath/moodledata")
+
+        // create temporary folders
+        BackupLogs.addLine("[1/6] Temporäre Ordner werden erstellt.")
+
+        if (!moodlePath.exists() && !moodlePath.mkdirs())
+            return "Temporäre Ordner (${moodlePath.absolutePath} konnte nicht erstellt werden."
+        if (!moodleDataPath.exists() && !moodleDataPath.mkdirs())
+            return "Temporäre Ordner (${moodleDataPath.absolutePath} konnte nicht erstellt werden."
+
+        Thread.sleep(2000)
+
+        // database
+        BackupLogs.addLine("[2/6] Datenbank wird gesichert.")
+        var dumpPath = "$tempPath/moodle.sql"
+        val result = backupDump(dbUser, dbPassword, "moodle", dumpPath)
+        if(result != null)
+            return result
+
+        Thread.sleep(2000)
+
+        // files (moodle)
+        BackupLogs.addLine("[3/6] Moodle-Ordner wird kopiert.")
+        try {
+            FileUtils.copyDirectory(File("/var/www/html/moodle"), moodlePath)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return e.message
+        }
+
+        Thread.sleep(2000)
+
+        BackupLogs.addLine("[4/6] Moodledata-Ordner wird kopiert.")
+        try {
+            FileUtils.copyDirectory(File("/var/www/html/moodledata"), moodleDataPath)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return e.message
+        }
+
+        Thread.sleep(2000)
+
+        // zip
+        BackupLogs.addLine("[5/6] Zip-Archiv wird erstellt.")
+        val time = LocalDateTime.now().format(dateTimeFormat)
+        val destination = "$backupPath/moodle/moodle_$time.zip"
+        try {
+            fileService.zip(tempPath, destination)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return e.message
+        }
+
+        // clear temporary files
+        BackupLogs.addLine("[6/6] Temporäre Dateien werden gelöscht.")
+        fileService.deleteFolder(File(tempPath), true)
         return null
     }
 
     private fun moodleRestore(zipFile: String): String? {
-        return null
+        return "Moodle wird noch nicht unterstützt."
     }
 
     fun arBackup(): String? {
