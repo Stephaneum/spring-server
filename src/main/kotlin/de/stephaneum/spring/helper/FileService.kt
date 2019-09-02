@@ -28,20 +28,14 @@ class FileService {
 
     /**
      * @param content byte array which should be saved
-     * @param path the path to the folder relative to the main location
-     * @param fileName name of file which will be appended to the path
+     * @param path the path where to store the file
      * @return path to file if saving was successful
      */
-    fun storeFile(content: ByteArray, path: String = "", fileName: String): String? {
+    fun storeFile(content: ByteArray, path: String): String? {
 
         try {
-            // Check if the file's name contains invalid characters
-            if (fileName.contains("..")) {
-                return null
-            }
-
             // Copy file to the target location (Replacing existing file with the same name)
-            val targetLocation = Paths.get(configFetcher.fileLocation+path).resolve(fileName)
+            val targetLocation = Paths.get(path)
             Files.copy(ByteArrayInputStream(content), targetLocation, StandardCopyOption.REPLACE_EXISTING)
 
             return targetLocation.toString().replace("\\", "/")

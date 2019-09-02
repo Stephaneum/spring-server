@@ -40,6 +40,10 @@
         .action-btn {
             margin: 0 10px 0 10px;
         }
+
+        .collapsible li.active .collapsible-header{
+            background-color: #f1f8e9;
+        }
     </style>
 </head>
 
@@ -105,18 +109,18 @@
                                             <span class="green-badge-light">${b.size}</span>
                                         </div>
                                     </div>
-                                    <div class="collapsible-body">
+                                    <div class="collapsible-body light-green lighten-5">
                                         <div style="display: flex; justify-content: center; align-items: center">
                                             <i class="material-icons" style="display: inline-block; margin: 0 10px 10px 0; font-size: 2em;">subdirectory_arrow_right</i>
                                             <span style="margin-right: 10px">Aktionen:</span>
                                             <a class="action-btn tooltipped waves-effect waves-light btn green darken-3" data-tooltip="Download" data-position="bottom"
                                                href="<@spring.url './download/' + m.code + '/' + b.name />">
                                                 <i class="material-icons">arrow_downward</i></a>
-                                            <a class="action-btn tooltipped waves-effect waves-light btn yellow darken-3" data-tooltip="Wiederherstellen" data-position="bottom"
+                                            <a class="action-btn tooltipped waves-effect waves-light btn yellow darken-3 <#if m.passwordNeeded>disabled</#if>" data-tooltip="Wiederherstellen" data-position="bottom"
                                                href="<@spring.url './restore/' + m.code + '/' + b.name />">
                                                 <i class="material-icons">restore</i></a>
                                             <a class="action-btn tooltipped waves-effect waves-light btn red darken-3" data-tooltip="Löschen" data-position="bottom"
-                                               href="<@spring.url './delete/' + m.code + '/' + b.name />">
+                                               onclick="updateDelete('${m.code}', '${b.name}', '${b.size}');$('#modal-delete').modal('open');">
                                                 <i class="material-icons">delete</i></a>
                                         </div>
 
@@ -129,13 +133,25 @@
                             <p class="green-badge-light" style="display: inline-block; font-size: 1em">Keine Backups vorhanden</p>
                         </div>
                         </#if>
+                        <#if m.passwordNeeded>
+                            <div>
+                                <a class="waves-effect waves-light btn red darken-3 modal-trigger" style="margin-top: 30px" href="#modal-password">
+                                    <i class="material-icons left">vpn_key</i>sudo-Passwort eingeben
+                                </a>
+                            </div>
+                        </#if>
                     </div>
 
                     <div>
-                        <a class="waves-effect waves-light btn teal darken-3" style="margin-top: 30px" href="upload-${m.code}">
-                            <i class="material-icons left">cloud_upload</i>Backup hochladen
-                        </a>
-                        <a class="waves-effect waves-light btn-large green darken-3"
+                        <form action="<@spring.url './upload-' + m.code />" method="POST" enctype="multipart/form-data" style="display: inline-block">
+                            <input name="file" type="file" id="upload-${m.code}" onchange="loading(); this.form.submit()" style="display: none">
+                            <a class="waves-effect waves-light btn teal darken-3" style="margin-top: 30px"
+                               onclick="document.getElementById('upload-${m.code}').click();">
+                                <i class="material-icons left">cloud_upload</i>Backup hochladen
+                            </a>
+                        </form>
+
+                        <a class="waves-effect waves-light btn-large green darken-3 <#if m.passwordNeeded>disabled</#if>"
                            style="margin: 30px 50px 50px 50px;font-size: 1.3em;" href="backup-${m.code}">
                             <i class="material-icons left">photo_camera</i>Backup erstellen
                         </a>
@@ -147,6 +163,41 @@
     </div>
 </div>
 
+<div id="modal-delete" class="modal">
+    <div class="modal-content">
+        <h4 id="modal-delete-title">Wirklich löschen?</h4>
+        <p id="modal-delete-text"></p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" onclick="$('#modal-delete').modal('close')" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+        <a id="modal-delete-action" href="" class="modal-close waves-effect waves-red btn red darken-4">Löschen</a>
+    </div>
+</div>
+<div id="modal-password" class="modal" style="width: 500px">
+    <form id="modal-rename-form" action="<@spring.url './set-password' />" method="POST">
+        <div class="modal-content">
+            <h4>sudo-Passwort</h4>
+            <br>
+            <p>Bitte geben Sie unten das sudo-Passwort des Servers ein.</p>
+            <p>Das Passwort bleibt im RAM und wird nicht persistent gespeichert.</p>
+            <br>
+            <div class="input-field">
+                <i class="material-icons prefix">vpn_key</i>
+                <label for="modal-password-input">Passwort</label>
+                <input id="modal-password-input" name="password" type="password">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" onclick="$('#modal-password').modal('close')"
+               class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <button type="submit" class="btn waves-effect waves-light green darken-3" onclick="$('#modal-password').modal('close');loading();">
+                Speichern
+                <i class="material-icons left">save</i>
+            </button>
+        </div>
+    </form>
+</div>
+
 <script src="<@spring.url '/static/js/jquery.min.js' />"></script>
 <script src="<@spring.url '/static/js/materialize.min.js' />"></script>
 <script type="text/javascript">
@@ -154,6 +205,12 @@
     document.addEventListener('DOMContentLoaded', function () {
         M.AutoInit();
     });
+
+    function updateDelete(module, name, size) {
+        document.getElementById("modal-delete-action").setAttribute('href', './delete/' + module + '/' + name);
+        document.getElementById("modal-delete-title").innerHTML = 'Backup wirklich löschen?';
+        document.getElementById("modal-delete-text").innerHTML = '<b>' + name + '</b> (' + size + ') wird gelöscht. Dieser Vorgang kann nicht rückgangig gemacht werden.';
+    }
 
 </script>
 <@loading.render/>

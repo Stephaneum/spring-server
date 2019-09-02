@@ -12,5 +12,5 @@ enum class ModuleType(val display: String, val code: String) {
 val MODULES = listOf(ModuleType.HOMEPAGE, ModuleType.MOODLE, ModuleType.AR)
 
 data class Backup(val name: String, val size: String)
-data class Module(val title: String, val code: String, val backups: List<Backup>)
+data class Module(val title: String, val code: String, val backups: List<Backup>, val passwordNeeded: Boolean)
 data class Log(val log: String, val running: Boolean, val error: Boolean)

@@ -8,6 +8,7 @@ import de.stephaneum.spring.database.Blackboard
 import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.database.now
+import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
@@ -19,6 +20,7 @@ import org.springframework.web.util.HtmlUtils
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.PostMapping
+import java.io.File
 
 
 @Controller
@@ -39,6 +41,9 @@ class BlackboardAdmin {
 
     @Autowired
     private lateinit var blackboardScheduler: BlackboardScheduler
+
+    @Autowired
+    private lateinit var configFetcher: ConfigFetcher
 
     @Autowired
     private lateinit var public: Public
@@ -115,7 +120,12 @@ class BlackboardAdmin {
             logger.info("converted to jpeg: $fileName")
         }
 
-        val path = fileService.storeFile(bytes, "/blackboard", fileName)
+        // create missing blackboard folder
+        val folder = File("${configFetcher.fileLocation}/blackboard")
+        if (!folder.exists())
+            folder.mkdirs()
+
+        val path = fileService.storeFile(bytes, "${configFetcher.fileLocation}/blackboard/$fileName")
         if(path != null) {
             board.value = path
             board.lastUpdate = now()

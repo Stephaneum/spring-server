@@ -1,5 +1,6 @@
 package de.stephaneum.spring.backup
 
+import de.stephaneum.spring.Session.addToast
 import de.stephaneum.spring.helper.DBHelper
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.cmd
@@ -39,6 +40,16 @@ class BackupService {
 
     var running = false
     var error = false
+    var sudoPassword: String? = null
+        set(value) {
+            val result = cmd("echo test", sudoPassword = value)
+            if(result == 0) {
+                addToast("Passwort im RAM hinterlegt.")
+                field = value
+            } else {
+                addToast("Falsches Passwort.")
+            }
+        }
 
     fun backupFull() {
         running = true
@@ -48,10 +59,17 @@ class BackupService {
             BackupLogs.addLine("Vollständiges Backup gestartet.")
             BackupLogs.addLine("(A) Homepage")
             homepageBackup()
-            BackupLogs.addLine("(B) Homepage")
-            moodleBackup()
+            Thread.sleep(3000)
+            if(sudoPassword != null) {
+                BackupLogs.addLine("(B) Homepage")
+                moodleBackup()
+            } else {
+                BackupLogs.addLine("(B) Homepage wird übersprungen, weil sudo-Passwort nicht mitgeteilt wurde.")
+            }
+            Thread.sleep(3000)
             BackupLogs.addLine("(C) AR")
             arBackup()
+            Thread.sleep(3000)
             running = false
         }.start()
     }
@@ -269,70 +287,171 @@ class BackupService {
         if(windows)
             return "Moodle wird auf Windows nicht unterstützt."
 
-        val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
-        val tempPath = "$backupPath/tmp"
-        val moodlePath = File("$tempPath/moodle")
-        val moodleDataPath = File("$tempPath/moodledata")
+        sudoPassword?.let { password ->
+            val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
+            val tempPath = "$backupPath/tmp"
+            val moodlePath = File("$tempPath/moodle")
+            val moodleDataPath = File("$tempPath/moodledata")
 
-        // create temporary folders
-        BackupLogs.addLine("[1/6] Temporäre Ordner werden erstellt.")
+            // create temporary folders
+            BackupLogs.addLine("[1/7] Temporäre Ordner werden erstellt.")
 
-        if (!moodlePath.exists() && !moodlePath.mkdirs())
-            return "Temporäre Ordner (${moodlePath.absolutePath} konnte nicht erstellt werden."
-        if (!moodleDataPath.exists() && !moodleDataPath.mkdirs())
-            return "Temporäre Ordner (${moodleDataPath.absolutePath} konnte nicht erstellt werden."
+            if (!moodlePath.exists() && !moodlePath.mkdirs())
+                return "Temporäre Ordner (${moodlePath.absolutePath} konnte nicht erstellt werden."
+            if (!moodleDataPath.exists() && !moodleDataPath.mkdirs())
+                return "Temporäre Ordner (${moodleDataPath.absolutePath} konnte nicht erstellt werden."
 
-        Thread.sleep(2000)
+            Thread.sleep(2000)
 
-        // database
-        BackupLogs.addLine("[2/6] Datenbank wird gesichert.")
-        var dumpPath = "$tempPath/moodle.sql"
-        val result = backupDump(dbUser, dbPassword, "moodle", dumpPath)
-        if(result != null)
-            return result
+            // database
+            BackupLogs.addLine("[2/7] Datenbank wird gesichert.")
+            var dumpPath = "$tempPath/moodle.sql"
+            val result = backupDump(dbUser, dbPassword, "moodle", dumpPath)
+            if(result != null)
+                return result
 
-        Thread.sleep(2000)
+            Thread.sleep(2000)
 
-        // files (moodle)
-        BackupLogs.addLine("[3/6] Moodle-Ordner wird kopiert.")
-        try {
-            FileUtils.copyDirectory(File("/var/www/html/moodle"), moodlePath)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            return e.message
+            // files (moodle)
+            BackupLogs.addLine("[3/7] Moodle-Ordner wird kopiert.")
+            var exitStatus = cmd("cp -R /var/www/html/moodle $tempPath", sudoPassword = password)
+            if(exitStatus != 0)
+                return "Exit-Status: $exitStatus"
+
+            Thread.sleep(2000)
+
+            // files (moodledata)
+            BackupLogs.addLine("[4/7] Moodledata-Ordner wird kopiert.")
+            exitStatus = cmd("cp -R /var/www/html/moodledata $tempPath", sudoPassword = password)
+            if(exitStatus != 0)
+                return "Exit-Status: $exitStatus"
+
+            Thread.sleep(2000)
+
+            // chmod
+            BackupLogs.addLine("[5/7] Rechtevergabe wird konfiguriert.")
+            exitStatus = cmd("chmod -R 777 $tempPath", sudoPassword = password)
+            if(exitStatus != 0)
+                return "Exit-Status: $exitStatus"
+
+            Thread.sleep(2000)
+
+            // zip
+            BackupLogs.addLine("[6/7] Zip-Archiv wird erstellt.")
+            val time = LocalDateTime.now().format(dateTimeFormat)
+            val destination = "$backupPath/moodle/moodle_$time.zip"
+            try {
+                fileService.zip(tempPath, destination)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return e.message
+            }
+
+            Thread.sleep(1000)
+
+            // clear temporary files
+            BackupLogs.addLine("[7/7] Temporäre Dateien werden gelöscht.")
+            exitStatus = cmd("rm -rf $tempPath", sudoPassword = password)
+            if(exitStatus != 0)
+                return "Exit-Status: $exitStatus"
+            return null
         }
 
-        Thread.sleep(2000)
-
-        BackupLogs.addLine("[4/6] Moodledata-Ordner wird kopiert.")
-        try {
-            FileUtils.copyDirectory(File("/var/www/html/moodledata"), moodleDataPath)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            return e.message
-        }
-
-        Thread.sleep(2000)
-
-        // zip
-        BackupLogs.addLine("[5/6] Zip-Archiv wird erstellt.")
-        val time = LocalDateTime.now().format(dateTimeFormat)
-        val destination = "$backupPath/moodle/moodle_$time.zip"
-        try {
-            fileService.zip(tempPath, destination)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            return e.message
-        }
-
-        // clear temporary files
-        BackupLogs.addLine("[6/6] Temporäre Dateien werden gelöscht.")
-        fileService.deleteFolder(File(tempPath), true)
-        return null
+        return "sudo-Passwort unbekannt"
     }
 
     private fun moodleRestore(zipFile: String): String? {
-        return "Moodle wird noch nicht unterstützt."
+        if(windows)
+            return "Moodle wird auf Windows nicht unterstützt."
+
+        sudoPassword?.let { password ->
+            val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
+            val tempPath = "$backupPath/tmp"
+
+            // create temporary folders
+            BackupLogs.addLine("[1/9] Temporäre Ordner werden erstellt.")
+            val file = File(tempPath)
+            if (!file.exists() && !file.mkdirs())
+                return "Temporäre Ordner (${file.absolutePath} konnte nicht erstellt werden."
+
+            Thread.sleep(2000)
+
+            // extract zip
+            BackupLogs.addLine("[2/9] Zip-Archiv wird extrahiert.")
+            try {
+                fileService.unzip(zipFile, tempPath)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return e.message
+            }
+
+            Thread.sleep(1000)
+
+            // clear old files (moodle)
+            BackupLogs.addLine("[3/9] Alter Moodle-Ordner wird gelöscht.")
+            var exitStatus = cmd("rm -rf /var/www/html/moodle", sudoPassword = password)
+            if(exitStatus != 0)
+                return "Exit-Status: $exitStatus"
+
+            Thread.sleep(1000)
+
+            // clear old files (moodledata)
+            BackupLogs.addLine("[4/9] Alter Moodledata-Ordner wird gelöscht.")
+            exitStatus = cmd("rm -rf /var/www/html/moodledata", sudoPassword = password)
+            if(exitStatus != 0)
+                return "Exit-Status: $exitStatus"
+
+            Thread.sleep(1000)
+
+            // copy files (moodle)
+            BackupLogs.addLine("[5/9] Moodle-Ordner wird kopiert.")
+            exitStatus = cmd("cp -R $tempPath/moodle /var/www/html", sudoPassword = password)
+            if(exitStatus != 0)
+                return "Exit-Status: $exitStatus"
+
+            Thread.sleep(1000)
+
+            // copy files (moodledata)
+            BackupLogs.addLine("[6/9] Moodledata-Ordner wird kopiert.")
+            exitStatus = cmd("cp -R $tempPath/moodledata /var/www/html", sudoPassword = password)
+            if(exitStatus != 0)
+                return "Exit-Status: $exitStatus"
+
+            Thread.sleep(1000)
+
+            // chmod
+            BackupLogs.addLine("[7/9] Rechtevergabe wird konfiguriert.")
+            exitStatus = cmd("chmod -R 777 /var/www/html/moodle", sudoPassword = password)
+            if(exitStatus != 0)
+                return "Exit-Status: $exitStatus"
+
+            exitStatus = cmd("chmod -R 777 /var/www/html/moodledata", sudoPassword = password)
+            if(exitStatus != 0)
+                return "Exit-Status: $exitStatus"
+
+            Thread.sleep(1000)
+
+            // load db
+            BackupLogs.addLine("[8/9] Datenbank wird geladen.")
+            var dumpPath = "$tempPath/moodle.sql"
+            if(windows) {
+                dumpPath = dumpPath.replace("/", "\\")
+            }
+
+            val result = restoreDump(dbUser, dbPassword, "moodle", dumpPath)
+            if(result != null)
+                return result
+            else
+                configFetcher.update()
+
+            Thread.sleep(1000)
+
+            // clear temporary files
+            BackupLogs.addLine("[9/9] Temporäre Dateien werden gelöscht.")
+            fileService.deleteFolder(File(tempPath), true)
+            return null
+        }
+        return "sudo-Passwort unbekannt"
     }
 
     fun arBackup(): String? {

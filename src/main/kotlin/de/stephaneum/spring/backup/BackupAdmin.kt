@@ -11,10 +11,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletResponse
 
 @Controller
@@ -49,7 +47,7 @@ class BackupAdmin {
                     totalSize += file.length()
                     Backup(file.name, fileService.convertSizeToString(file.length()))
                 }?.sortedBy { it.name }
-                Module(module.display, module.code, backups ?: emptyList())
+                Module(module.display, module.code, backups ?: emptyList(), module == ModuleType.MOODLE && backupService.sudoPassword == null)
             }
         }
 
@@ -108,6 +106,51 @@ class BackupAdmin {
         return REDIRECT_LOGS
     }
 
+    @PostMapping("/upload-{module}")
+    fun uploadFile(@PathVariable module: String, @RequestParam("file") file: MultipartFile): String {
+
+        if(Session.get().permission != Permission.BACKUP)
+            return REDIRECT_LOGIN
+
+        val fileName = file.originalFilename
+        if(fileName == null) {
+            addToast("Ein Fehler ist aufgetreten", "Dateiname unbekannt")
+            return REDIRECT_ADMIN
+        }
+
+        when(module) {
+            ModuleType.HOMEPAGE.code -> {
+                if(!fileName.toLowerCase().endsWith(".zip")) {
+                    addToast("Ein Fehler ist aufgetreten", "Nur ZIP-Dateien erlaubt")
+                    return REDIRECT_ADMIN
+                }
+            }
+            ModuleType.MOODLE.code -> {
+                if(!fileName.toLowerCase().endsWith(".zip")) {
+                    addToast("Ein Fehler ist aufgetreten", "Nur ZIP-Dateien erlaubt")
+                    return REDIRECT_ADMIN
+                }
+            }
+            ModuleType.AR.code -> {
+                if(!fileName.toLowerCase().endsWith(".sql")) {
+                    addToast("Ein Fehler ist aufgetreten", "Nur SQL-Dateien erlaubt")
+                    return REDIRECT_ADMIN
+                }
+            }
+            else -> {
+                addToast("Server Error", "$module existiert nicht")
+                return REDIRECT_ADMIN
+            }
+        }
+
+        val path = fileService.storeFile(file.bytes, "${configFetcher.backupLocation}/$module/$fileName")
+        if(path != null) {
+            addToast("Datei hochgeladen")
+        } else
+            addToast("Ein Fehler ist aufgetreten")
+        return REDIRECT_ADMIN
+    }
+
     @GetMapping("/download/{folder}/{file}")
     fun download(@PathVariable folder: String, @PathVariable file: String, response: HttpServletResponse): Any? {
 
@@ -139,6 +182,12 @@ class BackupAdmin {
             }
         }
 
+        return REDIRECT_ADMIN
+    }
+
+    @PostMapping("/set-password")
+    fun setPassword(@RequestParam password: String): String {
+        backupService.sudoPassword = password
         return REDIRECT_ADMIN
     }
 
