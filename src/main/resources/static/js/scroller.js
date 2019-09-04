@@ -1,6 +1,6 @@
 // KONSTANTEN
 var scrollInterval = 16; // 1 tick = 16ms (60 FPS)
-var distancePerTick = 1; // pro tick: 1 pixel nach unten scrollen
+var distancePerTick = 1.3; // pro tick: 1 pixel nach unten scrollen
 var docHeight; // höhe des dokuments, wird automatisch initialisiert
 var waitTicks = 200; // ca. 3 sekunden(16*200) warten, wenn man unten/oben ist
 
