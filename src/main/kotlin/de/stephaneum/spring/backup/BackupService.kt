@@ -1,6 +1,5 @@
 package de.stephaneum.spring.backup
 
-import de.stephaneum.spring.Session.addToast
 import de.stephaneum.spring.helper.DBHelper
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.cmd

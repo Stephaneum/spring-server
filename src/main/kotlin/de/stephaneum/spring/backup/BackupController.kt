@@ -40,7 +40,7 @@ class BackupController {
             return REDIRECT_LOGIN
 
         if(backupService.running)
-            return REDIRECT_LOGS
+            return "redirect:/backup/logs"
 
         return "backup/admin"
     }

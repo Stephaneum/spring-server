@@ -2,7 +2,6 @@ package de.stephaneum.spring.backup
 
 val REDIRECT_LOGIN = "redirect:/backup/login"
 val REDIRECT_ADMIN = "redirect:/backup/admin"
-val REDIRECT_LOGS = "redirect:/backup/logs"
 
 enum class ModuleType(val display: String, val code: String) {
     HOMEPAGE("Homepage", "homepage"),

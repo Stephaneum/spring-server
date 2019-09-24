@@ -2,7 +2,6 @@ package de.stephaneum.spring.backup
 
 import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session
-import de.stephaneum.spring.Session.addToast
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import de.stephaneum.spring.helper.FileService
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,7 +14,7 @@ import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/backup")
-class BackupAdmin {
+class BackupAdminAPI {
 
     @Autowired
     private lateinit var configFetcher: ConfigFetcher
@@ -80,10 +79,7 @@ class BackupAdmin {
             ModuleType.HOMEPAGE.code -> backupService.backup(ModuleType.HOMEPAGE)
             ModuleType.MOODLE.code -> backupService.backup(ModuleType.MOODLE)
             ModuleType.AR.code -> backupService.backup(ModuleType.AR)
-            else -> {
-                addToast("Server Error", "$module existiert nicht")
-                return Response.Feedback(false)
-            }
+            else -> return Response.Feedback(false)
         }
         return Response.Feedback(true)
     }
@@ -101,10 +97,7 @@ class BackupAdmin {
             ModuleType.HOMEPAGE.code -> backupService.restore(ModuleType.HOMEPAGE, file)
             ModuleType.MOODLE.code -> backupService.restore(ModuleType.MOODLE, file)
             ModuleType.AR.code -> backupService.restore(ModuleType.AR, file)
-            else -> {
-                addToast("Server Error", "$module existiert nicht")
-                return Response.Feedback(false)
-            }
+            else -> return Response.Feedback(false)
         }
         return Response.Feedback(true)
     }
@@ -120,34 +113,26 @@ class BackupAdmin {
         when(module) {
             ModuleType.HOMEPAGE.code -> {
                 if(!fileName.toLowerCase().endsWith(".zip")) {
-                    addToast("Ein Fehler ist aufgetreten", "Nur ZIP-Dateien erlaubt")
                     return Response.Feedback(false, message = "Nur ZIP-Dateien erlaubt")
                 }
             }
             ModuleType.MOODLE.code -> {
                 if(!fileName.toLowerCase().endsWith(".zip")) {
-                    addToast("Ein Fehler ist aufgetreten", "Nur ZIP-Dateien erlaubt")
                     return Response.Feedback(false, message = "Nur ZIP-Dateien erlaubt")
                 }
             }
             ModuleType.AR.code -> {
                 if(!fileName.toLowerCase().endsWith(".sql")) {
-                    addToast("Ein Fehler ist aufgetreten", "Nur SQL-Dateien erlaubt")
                     return Response.Feedback(false, message = "Nur SQL-Dateien erlaubt")
                 }
             }
-            else -> {
-                addToast("Server Error", "$module existiert nicht")
-                return Response.Feedback(false, message = "$module existiert nicht")
-            }
+            else -> return Response.Feedback(false, message = "$module existiert nicht")
         }
 
         val path = fileService.storeFile(file.bytes, "${configFetcher.backupLocation}/$module/$fileName")
         if(path != null) {
-            addToast("Datei hochgeladen")
             return Response.Feedback(true)
         } else {
-            addToast("Ein Fehler ist aufgetreten")
             return Response.Feedback(false, message = "Ein Fehler ist aufgetreten")
         }
     }
