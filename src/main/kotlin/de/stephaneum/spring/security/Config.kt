@@ -20,47 +20,13 @@ import javax.annotation.PostConstruct
 class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Autowired
-    private lateinit var redirectHTTPSFiler: RedirectHTTPSFiler
-
-    @Autowired
     private lateinit var corsFilter: CorsFilter
 
     override fun configure(http: HttpSecurity) {
         http.csrf().disable()
         http.authorizeRequests().anyRequest().permitAll()
 
-        http.addFilterBefore(redirectHTTPSFiler, BasicAuthenticationFilter::class.java)
         http.addFilterAfter(corsFilter, BasicAuthenticationFilter::class.java)
-    }
-}
-
-@Component
-class RedirectHTTPSFiler: GenericFilterBean() {
-
-    // redirect http requests to https
-
-    @Value("\${security.redirect.https}")
-    private lateinit var redirectHTTPS: String
-
-    override fun doFilter(req: ServletRequest, res: ServletResponse, filterChain: FilterChain) {
-
-        if(redirectHTTPS != "true") {
-            filterChain.doFilter(req, res)
-            return
-        }
-
-        val httpRequest = req as HttpServletRequest
-        val httpResponse = res as HttpServletResponse
-
-        val uri = httpRequest.requestURI
-        val protocol = httpRequest.scheme
-        val domain = httpRequest.serverName
-
-        if (protocol.toLowerCase() == "http") {
-            httpResponse.sendRedirect("https://$domain$uri")
-        } else {
-            filterChain.doFilter(req, res)
-        }
     }
 }
 
