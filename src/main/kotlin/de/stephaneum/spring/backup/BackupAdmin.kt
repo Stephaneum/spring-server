@@ -30,7 +30,11 @@ class BackupAdmin {
     private lateinit var backupScheduler: BackupScheduler
 
     @GetMapping("/data")
-    fun data(): Response.AdminData {
+    fun data(): Any {
+
+        if(Session.get().permission != Permission.BACKUP)
+            return Response.Feedback(false, needLogin = true)
+
         var modules = listOf<Module>()
         var totalSize = 0L
         configFetcher.backupLocation?.let { backupLocation ->
@@ -53,6 +57,9 @@ class BackupAdmin {
     @PostMapping("/backup")
     fun backupFull(): Response.Feedback {
 
+        if(Session.get().permission != Permission.BACKUP)
+            return Response.Feedback(false, needLogin = true)
+
         if(backupService.running)
             return Response.Feedback(false)
 
@@ -62,6 +69,9 @@ class BackupAdmin {
 
     @PostMapping("/backup-{module}")
     fun backup(@PathVariable module: String): Response.Feedback {
+
+        if(Session.get().permission != Permission.BACKUP)
+            return Response.Feedback(false, needLogin = true)
 
         if(backupService.running)
             return Response.Feedback(false)
@@ -80,6 +90,9 @@ class BackupAdmin {
 
     @PostMapping("/restore/{module}/{file}")
     fun restore(@PathVariable module: String, @PathVariable file: String): Response.Feedback {
+
+        if(Session.get().permission != Permission.BACKUP)
+            return Response.Feedback(false, needLogin = true)
 
         if(backupService.running)
             return Response.Feedback(false)
@@ -162,6 +175,9 @@ class BackupAdmin {
     @PostMapping("/delete/{folder}/{file}")
     fun delete(@PathVariable folder: String, @PathVariable file: String): Response.Feedback {
 
+        if(Session.get().permission != Permission.BACKUP)
+            return Response.Feedback(false, needLogin = true)
+
         var success = true
         configFetcher.backupLocation?.let { location ->
             success = fileService.deleteFile("$location/$folder/$file")
@@ -172,14 +188,19 @@ class BackupAdmin {
 
     @PostMapping("/set-password")
     fun setPassword(@RequestBody request: Request.Password): Response.Feedback {
+
+        if(Session.get().permission != Permission.BACKUP)
+            return Response.Feedback(false, needLogin = true)
+
         backupService.sudoPassword = request.password
         return Response.Feedback(backupService.sudoPassword != null)
     }
 
     @GetMapping("/log-data")
-    fun logData(): Log? {
+    fun logData(): Any {
         if(Session.get().permission != Permission.BACKUP)
-            return null
-        return Log(BackupLogs.getLogsHTML(), backupService.running, backupService.error)
+            return Response.Feedback(false, needLogin = true)
+        else
+            return Log(BackupLogs.getLogsHTML(), backupService.running, backupService.error)
     }
 }

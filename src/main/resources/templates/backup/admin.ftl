@@ -346,6 +346,12 @@
         axios.get('data')
             .then((response) => {
             if(response.data) {
+
+                if(response.data.needLogin) {
+                    window.location = 'login';
+                    return;
+                }
+
                 instance.nextBackup = response.data.nextBackup;
                 instance.backupLocation = response.data.backupLocation;
                 instance.totalSize = response.data.totalSize;
