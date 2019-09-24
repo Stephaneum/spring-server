@@ -327,9 +327,6 @@
         computed: {
             downloadURL() {
                 return (module, name) => './download/'+module+'/'+name;
-            },
-            restoreURL() {
-                return (module, name) => './restore/'+module+'/'+name;
             }
         },
         watch: {
