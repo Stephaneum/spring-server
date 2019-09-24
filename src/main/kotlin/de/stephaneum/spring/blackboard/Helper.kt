@@ -1,15 +1,21 @@
 package de.stephaneum.spring.blackboard
 
+import de.stephaneum.spring.database.Blackboard
+import de.stephaneum.spring.database.Type
+
 val REDIRECT_LOGIN = "redirect:/blackboard/login"
 val REDIRECT_ADMIN = "redirect:/blackboard/admin"
 
-data class TimestampJSON(val timestamp: Long)
-data class InfoJSON(val activeID: Int, val activeSeconds: Int, val activeClients: Int, val timeToRefresh: Int)
-
 object Request {
     data class Login(val password: String?)
+    data class Type(val type: de.stephaneum.spring.database.Type)
+    data class Duration(val duration: Int?)
+    data class Value(val value: String?)
 }
 
 object Response {
-    data class Feedback(val success: Boolean)
+    data class Feedback(val success: Boolean, val needLogin: Boolean = false, val message: String? = null)
+    data class Timestamp(val timestamp: Long)
+    data class AdminData(val types: List<Type>, val boards: List<Blackboard>)
+    data class AdminInfo(val activeID: Int, val activeSeconds: Int, val activeClients: Int, val timeToRefresh: Int)
 }

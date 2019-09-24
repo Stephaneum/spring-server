@@ -29,7 +29,7 @@ data class PdfImages(val boardId: Int,
 @Service
 class PdfToImageScheduler {
 
-    val logger = LoggerFactory.getLogger(PdfToImageScheduler::class.java)
+    private val logger = LoggerFactory.getLogger(PdfToImageScheduler::class.java)
 
     @Autowired
     private lateinit var configFetcher: ConfigFetcher

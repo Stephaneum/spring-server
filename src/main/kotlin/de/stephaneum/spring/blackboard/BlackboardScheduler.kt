@@ -18,10 +18,10 @@ class BlackboardScheduler {
      * every 10min a refresh is forced by updating all the timestamps
      */
 
-    final val logger = LoggerFactory.getLogger(BlackboardScheduler::class.java)
-    final val EMPTY_BLACKBOARD = Blackboard(-1, Type.TEXT, "Leere Konfiguration")
-    final val FETCH_DELAY = 10000 // sync every 10s with the database
-    final val REFRESH_DELAY = 10*60*1000 // force refresh every 10min
+    private final val logger = LoggerFactory.getLogger(BlackboardScheduler::class.java)
+    private final val EMPTY_BLACKBOARD = Blackboard(-1, Type.TEXT, "Leere Konfiguration")
+    private final val FETCH_DELAY = 10000 // sync every 10s with the database
+    private final val REFRESH_DELAY = 10*60*1000 // force refresh every 10min
 
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo

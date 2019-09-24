@@ -1,5 +1,6 @@
 package de.stephaneum.spring.blackboard
 
+import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.Type
@@ -15,9 +16,10 @@ import java.io.FileInputStream
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+
 @Controller
 @RequestMapping("/blackboard")
-class Public {
+class BlackboardController {
 
     @Autowired
     private lateinit var pdfToImageScheduler: PdfToImageScheduler
@@ -28,8 +30,6 @@ class Public {
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
-    var activeClients = mutableMapOf<String, Long>()
-
     @GetMapping("/")
     fun index(model: Model): String {
 
@@ -38,10 +38,28 @@ class Public {
         val pdf = pdfToImageScheduler.instances.find { it.boardId == blackboardIterator.active.id } ?: PdfImages(0)
         model["pdfIndexes"] = (0 until pdf.images.size).toList()
         model["pdfTitle"] = pdf.title ?: "Stephaneum"
-        model.addAttribute("toast", Session.getAndDeleteToast())
 
         return "blackboard/index"
     }
+
+    @GetMapping("/login")
+    fun login(model: Model, @RequestParam error: Boolean = false): String {
+        if(Session.get().permission == Permission.BLACKBOARD)
+            return REDIRECT_ADMIN
+
+        model["title"] = "Blackboard"
+        return "login"
+    }
+
+    @GetMapping("/admin")
+    fun admin(model: Model): String {
+        if(Session.get().permission != Permission.BLACKBOARD)
+            return REDIRECT_LOGIN
+
+        return "blackboard/admin"
+    }
+
+    // miscellaneous
 
     @GetMapping("/img/{boardId}/{index}")
     fun pdfImg(@PathVariable boardId: Int, @PathVariable index: Int, request: HttpServletRequest, response: HttpServletResponse) {
@@ -97,26 +115,9 @@ class Public {
         response.outputStream.write(bytes)
     }
 
-
-    @GetMapping("/timestamp")
-    @ResponseBody
-    fun timestamp(@RequestHeader(value="X-Forwarded-For", required = false) forwardedIP: String?,
-                  request: HttpServletRequest): TimestampJSON {
-
-        // track active clients
-        val ip = resolveIP(forwardedIP, request)
-        activeClients[ip] = System.currentTimeMillis()
-
-        return TimestampJSON(blackboardIterator.active.lastUpdate.time)
-    }
-
     @GetMapping("/robots.txt", produces = ["text/plain; charset=utf-8"])
     @ResponseBody
     fun robots(): String {
         return "User-agent: *\nDisallow: /"
-    }
-
-    private fun resolveIP(forwardedIP: String?, request: HttpServletRequest): String {
-        return forwardedIP?.split(",")?.first()?.trim() ?: request.remoteAddr
     }
 }

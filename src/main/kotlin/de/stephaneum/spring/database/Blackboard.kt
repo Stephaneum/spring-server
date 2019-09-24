@@ -13,15 +13,6 @@ enum class Type {
     TEXT, // show text
     PDF, // show pdf
     IMG; // show image
-
-    fun getString(): String {
-        return when(this) {
-            PLAN -> "Vertretungsplan"
-            TEXT -> "Text"
-            PDF -> "PDF"
-            IMG -> "Bild"
-        }
-    }
 }
 
 @Entity
@@ -46,13 +37,11 @@ data class Blackboard(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                       @Column(nullable = false)
                       var lastUpdate: Timestamp = now()) {
 
-    @JsonIgnore
+    // will be called from json
     fun getValueWithoutBreaks() = value.replace("<br>", " ")
 
-    @JsonIgnore
     fun isUploaded() = File(value).isFile
 
-    @JsonIgnore
     fun getFileName() = value.substring(value.lastIndexOf("/")+1)
 }
 
