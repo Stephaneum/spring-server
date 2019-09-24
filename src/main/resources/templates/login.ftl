@@ -58,6 +58,7 @@
 <script src="/static/js/vue.min.js" ></script>
 <script type="text/javascript">
     M.AutoInit();
+
     var app = new Vue({
         el: '#app',
         data: {
@@ -68,11 +69,8 @@
         methods: {
             login: function() {
                 this.loggingIn = true;
-                axios({
-                    method: 'post',
-                    url: 'login',
-                    data: { password: this.password }
-                }).then((response) => {
+                axios.post('login', { password: this.password })
+                    .then((response) => {
                     if(response.data.success) {
                         this.loginFailed = false;
                         window.location = 'admin';

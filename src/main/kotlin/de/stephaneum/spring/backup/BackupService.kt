@@ -43,12 +43,8 @@ class BackupService {
     var sudoPassword: String? = null
         set(value) {
             val result = cmd("echo test", sudoPassword = value)
-            if(result == 0) {
-                addToast("Passwort im RAM hinterlegt.")
-                field = value
-            } else {
-                addToast("Falsches Passwort.")
-            }
+            if(result == 0)
+                field = value // only update password if success
         }
 
     fun backupFull() {
@@ -100,7 +96,6 @@ class BackupService {
 
             if(result == null) {
                 BackupLogs.addLine("Backup ist fertig! Sie werden in Kürze weitergeleitet.")
-                Thread.sleep(3000)
             } else {
                 BackupLogs.addLine(result)
                 BackupLogs.addLine("Backup fehlgeschlagen.")
@@ -137,7 +132,6 @@ class BackupService {
 
             if(result == null) {
                 BackupLogs.addLine("Wiederherstellung ist fertig! Sie werden in Kürze weitergeleitet.")
-                Thread.sleep(3000)
             } else {
                 BackupLogs.addLine(result)
                 BackupLogs.addLine("Wiederherstellung fehlgeschlagen.")

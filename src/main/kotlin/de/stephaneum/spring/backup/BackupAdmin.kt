@@ -8,14 +8,12 @@ import de.stephaneum.spring.helper.FileService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
-import org.springframework.ui.Model
-import org.springframework.ui.set
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletResponse
 
-@Controller
+
+@RestController
 @RequestMapping("/backup")
 class BackupAdmin {
 
@@ -31,14 +29,8 @@ class BackupAdmin {
     @Autowired
     private lateinit var backupScheduler: BackupScheduler
 
-    @GetMapping("/admin")
-    fun admin(model: Model): String {
-        if(Session.get().permission != Permission.BACKUP)
-            return REDIRECT_LOGIN
-
-        if(backupService.running)
-            return REDIRECT_LOGS
-
+    @GetMapping("/data")
+    fun data(): Response.AdminData {
         var modules = listOf<Module>()
         var totalSize = 0L
         configFetcher.backupLocation?.let { backupLocation ->
@@ -51,30 +43,28 @@ class BackupAdmin {
             }
         }
 
-        model["modules"] = modules
-        model["backupLocation"] = configFetcher.backupLocation ?: "?"
-        model["totalSize"] = fileService.convertSizeToString(totalSize)
-        model["nextBackup"] = backupScheduler.getNextBackup()
-        model.addAttribute("toast", Session.getAndDeleteToast())
-
-        return "backup/admin"
+        return Response.AdminData(
+                modules = modules,
+                backupLocation = configFetcher.backupLocation ?: "?",
+                totalSize = fileService.convertSizeToString(totalSize),
+                nextBackup = backupScheduler.getNextBackup())
     }
 
-    @GetMapping("/backup")
-    fun backupFull(): String {
+    @PostMapping("/backup")
+    fun backupFull(): Response.Feedback {
 
         if(backupService.running)
-            return REDIRECT_LOGS
+            return Response.Feedback(false)
 
         backupService.backupFull()
-        return REDIRECT_LOGS
+        return Response.Feedback(true)
     }
 
-    @GetMapping("/backup-{module}")
-    fun backup(@PathVariable module: String): String {
+    @PostMapping("/backup-{module}")
+    fun backup(@PathVariable module: String): Response.Feedback {
 
         if(backupService.running)
-            return REDIRECT_LOGS
+            return Response.Feedback(false)
 
         when(module) {
             ModuleType.HOMEPAGE.code -> backupService.backup(ModuleType.HOMEPAGE)
@@ -82,17 +72,17 @@ class BackupAdmin {
             ModuleType.AR.code -> backupService.backup(ModuleType.AR)
             else -> {
                 addToast("Server Error", "$module existiert nicht")
-                return REDIRECT_ADMIN
+                return Response.Feedback(false)
             }
         }
-        return REDIRECT_LOGS
+        return Response.Feedback(true)
     }
 
-    @GetMapping("/restore/{module}/{file}")
-    fun restore(@PathVariable module: String, @PathVariable file: String): String {
+    @PostMapping("/restore/{module}/{file}")
+    fun restore(@PathVariable module: String, @PathVariable file: String): Response.Feedback {
 
         if(backupService.running)
-            return REDIRECT_LOGS
+            return Response.Feedback(false)
 
         when(module) {
             ModuleType.HOMEPAGE.code -> backupService.restore(ModuleType.HOMEPAGE, file)
@@ -100,55 +90,53 @@ class BackupAdmin {
             ModuleType.AR.code -> backupService.restore(ModuleType.AR, file)
             else -> {
                 addToast("Server Error", "$module existiert nicht")
-                return REDIRECT_ADMIN
+                return Response.Feedback(false)
             }
         }
-        return REDIRECT_LOGS
+        return Response.Feedback(true)
     }
 
     @PostMapping("/upload-{module}")
-    fun uploadFile(@PathVariable module: String, @RequestParam("file") file: MultipartFile): String {
+    fun uploadFile(@PathVariable module: String, @RequestParam("file") file: MultipartFile): Response.Feedback {
 
         if(Session.get().permission != Permission.BACKUP)
-            return REDIRECT_LOGIN
+            return Response.Feedback(false, needLogin = true)
 
-        val fileName = file.originalFilename
-        if(fileName == null) {
-            addToast("Ein Fehler ist aufgetreten", "Dateiname unbekannt")
-            return REDIRECT_ADMIN
-        }
+        val fileName = file.originalFilename ?: return Response.Feedback(false, message = "Dateiname unbekannt")
 
         when(module) {
             ModuleType.HOMEPAGE.code -> {
                 if(!fileName.toLowerCase().endsWith(".zip")) {
                     addToast("Ein Fehler ist aufgetreten", "Nur ZIP-Dateien erlaubt")
-                    return REDIRECT_ADMIN
+                    return Response.Feedback(false, message = "Nur ZIP-Dateien erlaubt")
                 }
             }
             ModuleType.MOODLE.code -> {
                 if(!fileName.toLowerCase().endsWith(".zip")) {
                     addToast("Ein Fehler ist aufgetreten", "Nur ZIP-Dateien erlaubt")
-                    return REDIRECT_ADMIN
+                    return Response.Feedback(false, message = "Nur ZIP-Dateien erlaubt")
                 }
             }
             ModuleType.AR.code -> {
                 if(!fileName.toLowerCase().endsWith(".sql")) {
                     addToast("Ein Fehler ist aufgetreten", "Nur SQL-Dateien erlaubt")
-                    return REDIRECT_ADMIN
+                    return Response.Feedback(false, message = "Nur SQL-Dateien erlaubt")
                 }
             }
             else -> {
                 addToast("Server Error", "$module existiert nicht")
-                return REDIRECT_ADMIN
+                return Response.Feedback(false, message = "$module existiert nicht")
             }
         }
 
         val path = fileService.storeFile(file.bytes, "${configFetcher.backupLocation}/$module/$fileName")
         if(path != null) {
             addToast("Datei hochgeladen")
-        } else
+            return Response.Feedback(true)
+        } else {
             addToast("Ein Fehler ist aufgetreten")
-        return REDIRECT_ADMIN
+            return Response.Feedback(false, message = "Ein Fehler ist aufgetreten")
+        }
     }
 
     @GetMapping("/download/{folder}/{file}")
@@ -171,40 +159,24 @@ class BackupAdmin {
             return null
     }
 
-    @GetMapping("/delete/{folder}/{file}")
-    fun delete(@PathVariable folder: String, @PathVariable file: String): String {
+    @PostMapping("/delete/{folder}/{file}")
+    fun delete(@PathVariable folder: String, @PathVariable file: String): Response.Feedback {
 
+        var success = true
         configFetcher.backupLocation?.let { location ->
-            if(fileService.deleteFile("$location/$folder/$file")) {
-                addToast("Backup gelöscht", file)
-            } else {
-                addToast("Löschen fehlgeschlagen", file)
-            }
+            success = fileService.deleteFile("$location/$folder/$file")
         }
 
-        return REDIRECT_ADMIN
+        return Response.Feedback(success)
     }
 
     @PostMapping("/set-password")
-    fun setPassword(@RequestParam password: String): String {
-        backupService.sudoPassword = password
-        return REDIRECT_ADMIN
-    }
-
-    @GetMapping("/logs")
-    fun logs(model: Model): String {
-        if(Session.get().permission != Permission.BACKUP)
-            return REDIRECT_LOGIN
-
-        if(!backupService.running && !backupService.error)
-            return REDIRECT_ADMIN
-
-        model["logs"] = BackupLogs.getLogsHTML()
-        return "backup/logs"
+    fun setPassword(@RequestBody request: Request.Password): Response.Feedback {
+        backupService.sudoPassword = request.password
+        return Response.Feedback(backupService.sudoPassword != null)
     }
 
     @GetMapping("/log-data")
-    @ResponseBody
     fun logData(): Log? {
         if(Session.get().permission != Permission.BACKUP)
             return null
