@@ -164,7 +164,7 @@
 
 <script src="/static/js/materialize.min.js" ></script>
 <script src="/static/js/axios.min.js" ></script>
-<script src="/static/js/vue.js" ></script>
+<script src="/static/js/vue.min.js" ></script>
 <script type="text/javascript">
 
     var instance;

@@ -156,6 +156,7 @@
         </div>
     </div>
 
+    <!-- delete modal -->
     <div id="modal-delete" class="modal">
         <div class="modal-content">
             <h4>Backup wirklich löschen?</h4>
@@ -168,6 +169,8 @@
             <a @click="deleteBackup" href="#!" class="modal-close waves-effect waves-red btn red darken-4">Löschen</a>
         </div>
     </div>
+
+    <!-- set password modal -->
     <div id="modal-password" class="modal" style="width: 500px">
         <div class="modal-content">
             <h4>sudo-Passwort</h4>
@@ -250,8 +253,6 @@
             },
             upload: function(file, moduleCode) {
                 showLoading('Hochladen: 0 %');
-                console.log('file: ' + file);
-                console.log('module: ' + moduleCode);
                 var data = new FormData();
                 data.append('file', file);
                 var config = {
