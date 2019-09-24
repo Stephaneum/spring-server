@@ -1,5 +1,3 @@
-<#-- @ftlvariable name="toast" type="de.stephaneum.backend.Toast" -->
-<#-- @ftlvariable name="loginFailed" type="java.lang.Boolean" -->
 <#-- @ftlvariable name="title" type="java.lang.String" -->
 
 <#import "/spring.ftl" as spring/>
@@ -16,11 +14,17 @@
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/materialize.min.css' />">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/material-icons.css' />">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/style.css' />">
+    <style>
+        .info {
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="valign-wrapper" style="height: 100vh">
+<div id="app" class="valign-wrapper" style="height: 100vh">
     <div style="margin: auto; max-width: 400px">
 
         <div class="center-align">
@@ -29,33 +33,57 @@
 
         <div class="card" style="margin-top: 100px; padding: 5px 20px 40px 20px">
             <h5 class="center-align" style="padding: 10px; margin-bottom: 30px">${title}</h5>
-            <#if loginFailed>
-                <p class="center red-text" style="margin: 20px 0 20px 0">Login fehlgeschlagen</p>
-            </#if>
-
-            <form action="<@spring.url './login' />" method="POST">
-                <div class="input-field">
-                    <i class="material-icons prefix">vpn_key</i>
-                    <label for="password">Passwort</label>
-                    <input type="password" id="password" name="password" />
-                </div>
-                <div class="right-align">
-                    <button type="submit" value="Login" class="btn waves-effect waves-light green darken-3">
-                        Login
-                        <i class="material-icons right">send</i>
-                    </button>
-                </div>
-            </form>
+            <div class="input-field">
+                <i class="material-icons prefix">vpn_key</i>
+                <label for="password">Passwort</label>
+                <input @keyup.enter="login" v-model:value="password" :disabled="loggingIn" type="password" id="password"/>
+            </div>
+            <div style="text-align: right">
+                <button @click="login" type="button" value="Login" class="btn waves-effect waves-light green darken-3" :class="{ disabled: loggingIn }">
+                    Login
+                    <i class="material-icons right">send</i>
+                </button>
+            </div>
         </div>
-
+        <div style="text-align: center">
+            <p class="info" v-show="!loggingIn && !loginFailed" style="visibility: hidden">placeholder</p>
+            <p class="info" v-show="loggingIn" style="display: none">Authentifizierung</p>
+            <p class="info red-text" v-show="!loggingIn && loginFailed" style="display: none">Login fehlgeschlagen</p>
+        </div>
     </div>
 </div>
 
-<script src="<@spring.url '/static/js/jquery.min.js' />"></script>
-<script src="<@spring.url '/static/js/materialize.min.js' />" ></script>
+<script src="/static/js/materialize.min.js" ></script>
+<script src="/static/js/axios.min.js" ></script>
+<script src="/static/js/vue.min.js" ></script>
 <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        M.AutoInit();
+    M.AutoInit();
+    var app = new Vue({
+        el: '#app',
+        data: {
+            password: null,
+            loginFailed: false,
+            loggingIn: false
+        },
+        methods: {
+            login: function() {
+                this.loggingIn = true;
+                axios({
+                    method: 'post',
+                    url: 'login',
+                    data: { password: this.password }
+                }).then((response) => {
+                    if(response.data.success) {
+                        this.loginFailed = false;
+                        window.location = 'admin';
+                    } else {
+                        this.loginFailed = true;
+                        M.toast({html: 'Login fehlgeschlagen.'});
+                    }
+                    this.loggingIn = false;
+                });
+            }
+        }
     });
 </script>
 <@toaster.render/>

@@ -14,3 +14,11 @@ val MODULES = listOf(ModuleType.HOMEPAGE, ModuleType.MOODLE, ModuleType.AR)
 data class Backup(val name: String, val size: String)
 data class Module(val title: String, val code: String, val backups: List<Backup>, val passwordNeeded: Boolean)
 data class Log(val log: String, val running: Boolean, val error: Boolean)
+
+object Request {
+    data class Login(val password: String?)
+}
+
+object Response {
+    data class Feedback(val success: Boolean)
+}
