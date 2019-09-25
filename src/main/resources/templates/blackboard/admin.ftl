@@ -239,6 +239,8 @@
                     .then((response) => {
                         if(response.data.success) {
                             M.toast({html: 'Änderungen gespeichert.<br>'+this.boardDuration.boardType});
+                        } else if(response.data.message) {
+                            M.toast({html: 'Speichern fehlgeschlagen.<br>'+response.data.message});
                         } else {
                             M.toast({html: 'Speichern fehlgeschlagen.<br>'+this.boardDuration.boardType});
                         }

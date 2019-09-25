@@ -142,8 +142,11 @@ class BlackboardAdminAPI {
         if(Session.get().permission != Permission.BLACKBOARD)
             return Response.Feedback(false, needLogin = true)
 
+        if(request.duration == null || request.duration <= 0 || request.duration >= 3600)
+            return Response.Feedback(false, message = "Die Dauer muss zwischen 0 und 3600 liegen")
+
         val board = blackboardRepo.findByIdOrNull(id) ?: return Response.Feedback(false, message = "Element nicht gefunden")
-        board.duration = request.duration ?: 5
+        board.duration = request.duration
         board.lastUpdate = now()
         blackboardRepo.save(board)
         return Response.Feedback(true)
