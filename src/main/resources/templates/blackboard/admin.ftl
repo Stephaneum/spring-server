@@ -1,6 +1,6 @@
 <#import "/spring.ftl" as spring/>
 <#import "../components/loading.ftl" as loading/>
-<#import "../components/toaster.ftl" as toaster/>
+<#import "../components/vue-loader.ftl" as vueLoader/>
 <#setting locale="de_DE">
 <#setting number_format="computer">
 
@@ -15,11 +15,17 @@
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/materialize.min.css' />">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/material-icons.css' />">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/style.css' />">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
 
-<div id="app">
+<@vueLoader.render/>
+<div id="app" v-cloak>
     <div class="valign-wrapper" style="height: 100vh">
         <div style="margin: auto">
             <div class="center-align" style="max-width: 400px; margin: auto; margin-top: 50px">
@@ -40,7 +46,7 @@
                 <h4 style="margin-bottom: 20px">Blackboard</h4>
 
                 <ul class="collection">
-                    <li v-for="b in boards" class="collection-item" :class="b.visible ? [] : ['grey', 'lighten-3']">
+                    <li v-for="(b, index) in boards" class="collection-item" :class="b.visible ? [] : ['grey', 'lighten-3']">
                         <div class="row" style="margin: 0">
                             <div class="col m6" style="font-size: 1.4em; overflow: hidden;padding: 10px">
                                 <div style="display: flex; justify-content: space-between">
@@ -60,7 +66,7 @@
                                             <span v-else style="margin-left: 10px">[ leer ]</span>
                                             <form method="POST" enctype="multipart/form-data" style="display: inline-block">
                                                 <input name="file" type="file" :id="'upload-file-'+ b.id" @change="upload($event.currentTarget.files[0], b.id)" style="display: none">
-                                                <a class="waves-effect waves-light btn-small green darken-3 margin-1"
+                                                <a class="waves-effect waves-light btn-small green darken-3 margin-1" :class="{disabled: waitingForData}"
                                                    @click="showUpload(b.id)"><i class="material-icons left">arrow_upward</i>Hochladen</a>
                                             </form>
                                         </div>
@@ -68,25 +74,25 @@
                                 </div>
                             </div>
                             <div class="col m3 right-align">
-                                <select name="type" @change="updateType(b.id, $event.currentTarget.value)" class="browser-default">
+                                <select name="type" @change="updateType(b.id, $event.currentTarget.value)" class="browser-default" :disabled="waitingForData">
                                     <option v-for="t in types" :value="t" :selected="b.type === t" style="z-index: 9999">{{ typeReadable(t) }}</option>
                                 </select>
                             </div>
                             <div class="col m3 right-align">
 
-                                <a class="tooltipped waves-effect waves-light btn darken-4 margin-1"
+                                <a class="tooltipped waves-effect waves-light btn darken-4 margin-1" :class="{disabled: index === 0 || waitingForData}"
                                    @click="moveUp(b.id)" href="#!" data-tooltip="Reihenfolge: nach oben" data-position="top">
                                     <i class="material-icons">arrow_upward</i></a>
 
-                                <a class="tooltipped waves-effect waves-light btn darken-4 margin-1"
+                                <a class="tooltipped waves-effect waves-light btn darken-4 margin-1" :class="{disabled: index === boards.length -1 || waitingForData}"
                                    @click="moveDown(b.id)" href="#!" data-tooltip="Reihenfolge: nach unten" data-position="top">
                                     <i class="material-icons">arrow_downward</i></a>
 
-                                <a class="tooltipped waves-effect waves-light btn green darken-4 margin-1"
+                                <a class="tooltipped waves-effect waves-light btn green darken-4 margin-1" :class="{disabled: waitingForData}"
                                    @click="toggleVisibility(b.id)" href="#!" data-tooltip="Sichtbar: ja/nein" data-position="top">
                                     <i class="material-icons">{{ b.visible ? 'visibility' : 'visibility_off' }}</i></a>
 
-                                <a class="tooltipped waves-effect waves-light btn red darken-4 margin-1"
+                                <a class="tooltipped waves-effect waves-light btn red darken-4 margin-1" :class="{disabled: waitingForData}"
                                    @click="showDelete(b.id, typeReadable(b.type))" data-tooltip="Löschen" data-position="top">
                                     <i class="material-icons">delete</i></a>
 
@@ -96,7 +102,7 @@
                 </ul>
 
                 <div class="center-align">
-                    <a style="margin-top: 25px" class="waves-effect waves-light btn green darken-3"
+                    <a style="margin-top: 25px" class="waves-effect waves-light btn green darken-3" :class="{disabled: waitingForData}"
                        @click="newEntry">
                         <i class="material-icons right">add</i>Neuer Eintrag</a>
                 </div>
@@ -157,7 +163,10 @@
         </div>
         <div class="modal-footer">
             <a @click="closeDelete" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
-            <a @click="deleteBoard" href="#!" class="modal-close waves-effect waves-red btn red darken-4">Löschen</a>
+            <a @click="deleteBoard" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
+                <i class="material-icons left">delete</i>
+                Löschen
+            </a>
         </div>
     </div>
 </div>
@@ -183,10 +192,15 @@
 
             activeID: null,
             activeSeconds: null,
-            activeClients: null
+            activeClients: null,
+
+            waitingForData: false
         },
         methods: {
             showRename: function(boardID, boardType, boardValue) {
+                if(this.waitingForData)
+                    return;
+
                 this.boardRename = { boardID, boardType };
                 this.boardValue = boardValue.replace(/<br\s*[\/]?>/gi, '\n')
                 M.Modal.getInstance(document.getElementById('modal-rename')).open();
@@ -196,7 +210,7 @@
                             },
             updateValue: function() {
                 M.Modal.getInstance(document.getElementById('modal-rename')).close();
-                showLoading('Änderungen speichern...');
+                this.waitingForData = true;
                 axios.post( './rename/'+this.boardRename.boardID, { value: this.boardValue })
                     .then((response) => {
                         if(response.data.success) {
@@ -205,10 +219,12 @@
                             M.toast({html: 'Speichern fehlgeschlagen.<br>'+this.boardRename.boardType});
                         }
                         fetchData(this);
-                        hideLoading();
                     });
             },
             showDuration: function(boardID, boardType, boardDuration) {
+                if(this.waitingForData)
+                    return;
+
                 this.boardDuration = { boardID, boardType };
                 this.duration = boardDuration
                 M.Modal.getInstance(document.getElementById('modal-duration')).open();
@@ -218,7 +234,7 @@
             },
             updateDuration: function() {
                 M.Modal.getInstance(document.getElementById('modal-rename')).close();
-                showLoading('Änderungen speichern...');
+                this.waitingForData = true;
                 axios.post( './duration/'+this.boardDuration.boardID, { duration: this.duration })
                     .then((response) => {
                         if(response.data.success) {
@@ -227,7 +243,6 @@
                             M.toast({html: 'Speichern fehlgeschlagen.<br>'+this.boardDuration.boardType});
                         }
                         fetchData(this);
-                        hideLoading();
                     });
             },
             showDelete: function(boardID, boardType) {
@@ -239,7 +254,7 @@
             },
             deleteBoard: function() {
                 M.Modal.getInstance(document.getElementById('modal-delete')).close();
-                showLoading('Element löschen...');
+                this.waitingForData = true;
                 axios.post( './delete/'+this.boardDelete.boardID)
                     .then((response) => {
                         if(response.data.success) {
@@ -248,11 +263,10 @@
                             M.toast({html: 'Löschen fehlgeschlagen.<br>'+this.boardDelete.boardType});
                         }
                         fetchData(this);
-                        hideLoading();
                     });
             },
             updateType: function(boardID, type) {
-                showLoading('Typ ändern...');
+                this.waitingForData = true;
                 axios.post( './type/'+boardID, { type })
                     .then((response) => {
                         if(response.data.success) {
@@ -261,11 +275,10 @@
                             M.toast({ html: 'Änderung fehlgeschlagen.<br>'+ type });
                         }
                         fetchData(this);
-                        hideLoading();
                     });
             },
             moveUp: function(boardID) {
-                showLoading('Position ändern...');
+                this.waitingForData = true;
                 axios.post( './move-up/'+boardID)
                     .then((response) => {
                         if(response.data.success) {
@@ -274,11 +287,10 @@
                             M.toast({ html: 'Änderung fehlgeschlagen.' });
                         }
                         fetchData(this);
-                        hideLoading();
                     });
             },
             moveDown: function(boardID) {
-                showLoading('Position ändern...');
+                this.waitingForData = true;
                 axios.post( './move-down/'+boardID)
                     .then((response) => {
                         if(response.data.success) {
@@ -287,11 +299,10 @@
                             M.toast({ html: 'Änderung fehlgeschlagen.' });
                         }
                         fetchData(this);
-                        hideLoading();
                     });
             },
             toggleVisibility: function(boardID) {
-                showLoading('Sichtbarkeit ändern...');
+                this.waitingForData = true;
                 axios.post( './toggle-visibility/'+boardID)
                     .then((response) => {
                         if(response.data.success) {
@@ -300,11 +311,10 @@
                             M.toast({ html: 'Änderung fehlgeschlagen.' });
                         }
                         fetchData(this);
-                        hideLoading();
                     });
             },
             newEntry: function() {
-                showLoading('Neuer Eintrag erstellen...');
+                this.waitingForData = true;
                 axios.post( './add')
                     .then((response) => {
                         if(response.data.success) {
@@ -313,7 +323,6 @@
                             M.toast({ html: 'Änderung fehlgeschlagen.' });
                         }
                         fetchData(this);
-                        hideLoading();
                     });
             },
             showUpload: function(boardID) {
@@ -348,12 +357,14 @@
                     });
             },
             logout: function() {
+                showLoading("Abmelden...");
                 axios.post('./logout')
                     .then((response) => {
                         if(response.data.success) {
-                            window.location = 'login';
+                            window.location = './';
                         } else {
                             M.toast({html: 'Logout fehlgeschlagen.'});
+                            hideLoading();
                         }
                     });
             }
@@ -406,6 +417,7 @@
 
                     instance.types = response.data.types;
                     instance.boards = response.data.boards;
+                    instance.waitingForData = false;
 
                     console.log("Data fetched.");
                 } else {
@@ -435,6 +447,5 @@
 
 </script>
 <@loading.render/>
-<@toaster.render/>
 </body>
 </html>

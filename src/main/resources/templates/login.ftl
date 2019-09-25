@@ -19,12 +19,16 @@
             margin-top: 20px;
             font-style: italic;
         }
+
+        [v-cloak] {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
 
-<div id="app" class="valign-wrapper" style="height: 100vh">
+<div id="app" class="valign-wrapper" style="height: 100vh" v-cloak>
     <div style="margin: auto; max-width: 400px">
 
         <div class="center-align">
@@ -76,9 +80,9 @@
                         window.location = 'admin';
                     } else {
                         this.loginFailed = true;
+                        this.loggingIn = false;
                         M.toast({html: 'Login fehlgeschlagen.'});
                     }
-                    this.loggingIn = false;
                 });
             }
         }

@@ -1,6 +1,6 @@
 <#import "/spring.ftl" as spring/>
 <#import "../components/loading.ftl" as loading/>
-<#import "../components/toaster.ftl" as toaster/>
+<#import "../components/vue-loader.ftl" as vueLoader/>
 <#setting locale="de_DE">
 <#setting number_format="computer">
 
@@ -44,12 +44,17 @@
         .collapsible li.active .collapsible-header {
             background-color: #f1f8e9;
         }
+
+        [v-cloak] {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
 
-<div id="app">
+<@vueLoader.render/>
+<div id="app" v-cloak>
     <div style="display: flex; justify-content: center">
         <div style="width: 1300px; margin-bottom: 100px">
             <!-- title -->
@@ -166,7 +171,10 @@
         </div>
         <div class="modal-footer">
             <a @click="closeDelete" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
-            <a @click="deleteBackup" href="#!" class="modal-close waves-effect waves-red btn red darken-4">Löschen</a>
+            <a @click="deleteBackup" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
+                <i class="material-icons left">delete</i>
+                Löschen
+            </a>
         </div>
     </div>
 
@@ -188,8 +196,8 @@
             <a @click="closePassword" href="#!"
                class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
             <button @click="setSudoPassword" type="button" class="btn waves-effect waves-light green darken-3">
-                Speichern
                 <i class="material-icons left">save</i>
+                Speichern
             </button>
         </div>
     </div>
@@ -310,12 +318,14 @@
                     });
             },
             logout: function() {
+                showLoading("Abmelden...");
                 axios.post('./logout')
                     .then((response) => {
                         if(response.data.success) {
                             window.location = 'login';
                         } else {
                             M.toast({html: 'Logout fehlgeschlagen.'});
+                            hideLoading();
                         }
                     });
             }
@@ -366,6 +376,5 @@
 
 </script>
 <@loading.render/>
-<@toaster.render/>
 </body>
 </html>
