@@ -1,4 +1,4 @@
-package de.stephaneum.spring.backup
+package de.stephaneum.spring.features.backup
 
 import org.slf4j.LoggerFactory
 import java.lang.StringBuilder

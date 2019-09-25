@@ -1,4 +1,4 @@
-package de.stephaneum.spring.backup
+package de.stephaneum.spring.features.backup
 
 import de.stephaneum.spring.helper.DBHelper
 import de.stephaneum.spring.helper.FileService

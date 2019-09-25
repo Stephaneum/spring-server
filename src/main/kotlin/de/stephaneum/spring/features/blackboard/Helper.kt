@@ -1,4 +1,4 @@
-package de.stephaneum.spring.blackboard
+package de.stephaneum.spring.features.blackboard
 
 import de.stephaneum.spring.database.Blackboard
 import de.stephaneum.spring.database.Type

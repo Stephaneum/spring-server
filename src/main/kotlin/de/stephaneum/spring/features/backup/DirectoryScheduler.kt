@@ -1,4 +1,4 @@
-package de.stephaneum.spring.backup
+package de.stephaneum.spring.features.backup
 
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
