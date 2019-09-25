@@ -1,4 +1,5 @@
 <#import "/spring.ftl" as spring/>
+<#import "../components/vue-loader.ftl" as vueLoader/>
 <#setting locale="de_DE">
 <#setting number_format="computer">
 
@@ -13,11 +14,17 @@
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/materialize.min.css' />">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/material-icons.css' />">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/style.css' />">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
 
-<div id="app" style="display: flex; justify-content: center">
+<@vueLoader.blank/>
+<div id="app" style="display: flex; justify-content: center" v-cloak>
     <div style="width: 1300px; margin-bottom: 100px">
         <!-- title -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 50px 100px 50px">

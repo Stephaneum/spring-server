@@ -1,7 +1,7 @@
 <#-- @ftlvariable name="title" type="java.lang.String" -->
 
 <#import "/spring.ftl" as spring/>
-<#import "components/toaster.ftl" as toaster/>
+<#import "components/vue-loader.ftl" as vueLoader/>
 
 <!DOCTYPE HTML>
 <html lang="de">
@@ -28,6 +28,7 @@
 
 <body>
 
+<@vueLoader.blank/>
 <div id="app" class="valign-wrapper" style="height: 100vh" v-cloak>
     <div style="margin: auto; max-width: 400px">
 
@@ -88,6 +89,5 @@
         }
     });
 </script>
-<@toaster.render/>
 </body>
 </html>

@@ -24,7 +24,7 @@
 
 <body>
 
-<@vueLoader.render/>
+<@vueLoader.text/>
 <div id="app" v-cloak>
     <div class="valign-wrapper" style="height: 100vh">
         <div style="margin: auto">
@@ -331,13 +331,13 @@
                 document.getElementById('upload-file-'+boardID).click();
             },
             upload: function(file, boardID) {
-                showLoading('Hochladen: 0 %');
+                showLoading('Hochladen (0%)', 0);
                 var data = new FormData();
                 data.append('file', file);
                 var config = {
                     onUploadProgress: function(progressEvent) {
                         var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
-                        showLoading('Hochladen: '+ percentCompleted +' %');
+                        showLoading('Hochladen ('+ percentCompleted +'%)', percentCompleted);
                     }
                 };
                 var instance = this;

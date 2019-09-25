@@ -53,7 +53,7 @@
 
 <body>
 
-<@vueLoader.render/>
+<@vueLoader.text/>
 <div id="app" v-cloak>
     <div style="display: flex; justify-content: center">
         <div style="width: 1300px; margin-bottom: 100px">
@@ -116,7 +116,7 @@
                                         <i class="material-icons" style="display: inline-block; margin: 0 10px 10px 0; font-size: 2em;">subdirectory_arrow_right</i>
                                         <span style="margin-right: 10px">Aktionen:</span>
                                         <a class="action-btn tooltipped waves-effect waves-light btn green darken-3" data-tooltip="Download" data-position="bottom"
-                                           :href="downloadURL(m.code,b.name)">
+                                           :href="'./download/'+m.code+'/'+b.name">
                                             <i class="material-icons">arrow_downward</i></a>
                                         <a class="action-btn tooltipped waves-effect waves-light btn yellow darken-3" :class="{ disabled: m.passwordNeeded }" data-tooltip="Wiederherstellen" data-position="bottom"
                                            @click="restore(m.code, b.name)">
@@ -260,13 +260,13 @@
                 document.getElementById('upload-'+moduleCode).click();
             },
             upload: function(file, moduleCode) {
-                showLoading('Hochladen: 0 %');
+                showLoading('Hochladen (0%)');
                 var data = new FormData();
                 data.append('file', file);
                 var config = {
                     onUploadProgress: function(progressEvent) {
                         var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
-                        showLoading('Hochladen: '+ percentCompleted +' %');
+                        showLoading('Hochladen ('+ percentCompleted +'%)', percentCompleted);
                     }
                 };
                 var instance = this;
@@ -288,32 +288,38 @@
                     });
             },
             backupAll: function(moduleCode) {
+                showLoading("Backup wird gestartet...");
                 axios.post('./backup')
                     .then((response) => {
                         if(response.data.success) {
                             window.location = 'logs';
                         } else {
                             M.toast({html: 'Backup fehlgeschlagen.'});
+                            hideLoading();
                         }
                     });
             },
             backup: function(moduleCode) {
+                showLoading("Backup wird gestartet...");
                 axios.post('./backup-' + moduleCode)
                 .then((response) => {
                     if(response.data.success) {
                         window.location = 'logs';
                     } else {
                         M.toast({html: 'Backup fehlgeschlagen.'});
+                        hideLoading();
                     }
                 });
             },
             restore: function(moduleCode, name) {
+                showLoading("Wiederherstellung wird gestartet...");
                 axios.post('./restore/' + moduleCode + '/' + name)
                     .then((response) => {
                         if(response.data.success) {
                             window.location = 'logs';
                         } else {
                             M.toast({html: 'Wiederherstellung fehlgeschlagen.'});
+                            hideLoading();
                         }
                     });
             },
@@ -334,11 +340,6 @@
             this.$nextTick(() => {
                 fetchData(this);
             })
-        },
-        computed: {
-            downloadURL() {
-                return (module, name) => './download/'+module+'/'+name;
-            }
         },
         watch: {
             modules: function (val, oldVal) {

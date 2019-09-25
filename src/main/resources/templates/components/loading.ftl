@@ -4,15 +4,23 @@
             <div style="text-align: center; padding: 25px; border-radius: 10px; background-color: white">
                 <h4 id="modal-loading-text" style="margin: 0">Verarbeitung...</h4>
                 <div class="progress" style="margin-top: 25px">
-                    <div class="indeterminate"></div>
+                    <div id="modal-loading-bar" class="indeterminate"></div>
                 </div>
             </div>
         </div>
     </div>
     <script type="text/javascript">
-        function showLoading(text = 'Verarbeitung...') {
+        function showLoading(text = 'Verarbeitung...', percent = null) {
             document.getElementById("modal-loading-text").innerHTML = text;
             document.getElementById("modal-loading").style.display = "block";
+
+            if(percent) {
+                document.getElementById("modal-loading-bar").className = "determinate";
+                document.getElementById("modal-loading-bar").style.width = percent+"%";
+            } else {
+                document.getElementById("modal-loading-bar").className = "indeterminate";
+                document.getElementById("modal-loading-bar").style.width = "auto";
+            }
         }
 
         function hideLoading() {
