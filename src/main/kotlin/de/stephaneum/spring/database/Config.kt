@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository
 import javax.persistence.*
 
 @Entity
-@Table(name="Konfig")
+@Table(name="konfig")
 data class Config(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                   var id: Int = 0,
 
