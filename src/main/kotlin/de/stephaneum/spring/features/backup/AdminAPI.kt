@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse
 
 
 @RestController
-@RequestMapping("/backup")
+@RequestMapping("/backup/api")
 class BackupAdminAPI {
 
     @Autowired

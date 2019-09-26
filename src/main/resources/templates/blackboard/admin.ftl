@@ -211,7 +211,7 @@
             updateValue: function() {
                 M.Modal.getInstance(document.getElementById('modal-rename')).close();
                 this.waitingForData = true;
-                axios.post( './rename/'+this.boardRename.boardID, { value: this.boardValue })
+                axios.post( './api/rename/'+this.boardRename.boardID, { value: this.boardValue })
                     .then((response) => {
                         if(response.data.success) {
                             M.toast({html: 'Änderungen gespeichert.<br>'+this.boardRename.boardType});
@@ -235,7 +235,7 @@
             updateDuration: function() {
                 M.Modal.getInstance(document.getElementById('modal-rename')).close();
                 this.waitingForData = true;
-                axios.post( './duration/'+this.boardDuration.boardID, { duration: this.duration })
+                axios.post( './api/duration/'+this.boardDuration.boardID, { duration: this.duration })
                     .then((response) => {
                         if(response.data.success) {
                             M.toast({html: 'Änderungen gespeichert.<br>'+this.boardDuration.boardType});
@@ -257,7 +257,7 @@
             deleteBoard: function() {
                 M.Modal.getInstance(document.getElementById('modal-delete')).close();
                 this.waitingForData = true;
-                axios.post( './delete/'+this.boardDelete.boardID)
+                axios.post( './api/delete/'+this.boardDelete.boardID)
                     .then((response) => {
                         if(response.data.success) {
                             M.toast({html: 'Element gelöscht.<br>'+this.boardDelete.boardType});
@@ -269,7 +269,7 @@
             },
             updateType: function(boardID, type) {
                 this.waitingForData = true;
-                axios.post( './type/'+boardID, { type })
+                axios.post( './api/type/'+boardID, { type })
                     .then((response) => {
                         if(response.data.success) {
                             M.toast({ html: 'Typ geändert.<br>'+ type });
@@ -281,7 +281,7 @@
             },
             moveUp: function(boardID) {
                 this.waitingForData = true;
-                axios.post( './move-up/'+boardID)
+                axios.post( './api/move-up/'+boardID)
                     .then((response) => {
                         if(response.data.success) {
                             M.toast({ html: 'Position geändert.' });
@@ -293,7 +293,7 @@
             },
             moveDown: function(boardID) {
                 this.waitingForData = true;
-                axios.post( './move-down/'+boardID)
+                axios.post( './api/move-down/'+boardID)
                     .then((response) => {
                         if(response.data.success) {
                             M.toast({ html: 'Position geändert.' });
@@ -305,7 +305,7 @@
             },
             toggleVisibility: function(boardID) {
                 this.waitingForData = true;
-                axios.post( './toggle-visibility/'+boardID)
+                axios.post( './api/toggle-visibility/'+boardID)
                     .then((response) => {
                         if(response.data.success) {
                             M.toast({ html: 'Sichtbarkeit geändert.' });
@@ -317,7 +317,7 @@
             },
             newEntry: function() {
                 this.waitingForData = true;
-                axios.post( './add')
+                axios.post( './api/add')
                     .then((response) => {
                         if(response.data.success) {
                             M.toast({ html: 'Neuer Eintrag erstellt.' });
@@ -341,7 +341,7 @@
                     }
                 };
                 var instance = this;
-                axios.post('./upload/' + boardID, data, config)
+                axios.post('./api/upload/' + boardID, data, config)
                     .then(function (res) {
                         if(res.data.success) {
                             fetchData(instance);
@@ -360,7 +360,7 @@
             },
             logout: function() {
                 showLoading("Abmelden...");
-                axios.post('./logout')
+                axios.post('./api/logout')
                     .then((response) => {
                         if(response.data.success) {
                             window.location = './';
@@ -408,7 +408,7 @@
     });
 
     function fetchData(instance) {
-        axios.get('data')
+        axios.get('./api/data')
             .then((response) => {
                 if(response.data) {
 
@@ -429,7 +429,7 @@
     }
 
     function fetchInfo() {
-        axios.get('./info')
+        axios.get('./api/info')
             .then((response) => {
                 if(response.data) {
                     instance.activeID = response.data.activeID;

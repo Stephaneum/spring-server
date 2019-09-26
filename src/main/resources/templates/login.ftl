@@ -74,7 +74,7 @@
         methods: {
             login: function() {
                 this.loggingIn = true;
-                axios.post('login', { password: this.password })
+                axios.post('./api/login', { password: this.password })
                     .then((response) => {
                     if(response.data.success) {
                         this.loginFailed = false;

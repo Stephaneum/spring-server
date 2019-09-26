@@ -64,7 +64,7 @@
         },
         methods: {
             logout: function() {
-                axios.post('./logout')
+                axios.post('./api/logout')
                     .then((response) => {
                         if(response.data.success) {
                             window.location = 'login';
@@ -83,7 +83,7 @@
     });
 
     function fetchLogs() {
-        axios.get('./log-data')
+        axios.get('./api/log-data')
             .then((response) => {
                 if(response.data) {
                     instance.logs = response.data.logs;

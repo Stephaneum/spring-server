@@ -65,7 +65,7 @@
     window.scrollTo(0, 0);
     document.addEventListener('DOMContentLoaded', function() {
         window.scrollTo(0, 0);
-        initBlackboard('<@spring.url './timestamp'/>', ${active.lastUpdate?long})
+        initBlackboard('./api/timestamp', ${active.lastUpdate?long})
     });
 </script>
 

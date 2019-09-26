@@ -116,7 +116,7 @@
                                         <i class="material-icons" style="display: inline-block; margin: 0 10px 10px 0; font-size: 2em;">subdirectory_arrow_right</i>
                                         <span style="margin-right: 10px">Aktionen:</span>
                                         <a class="action-btn tooltipped waves-effect waves-light btn green darken-3" data-tooltip="Download" data-position="bottom"
-                                           :href="'./download/'+m.code+'/'+b.name">
+                                           :href="'./api/download/'+m.code+'/'+b.name">
                                             <i class="material-icons">arrow_downward</i></a>
                                         <a class="action-btn tooltipped waves-effect waves-light btn yellow darken-3" :class="{ disabled: m.passwordNeeded }" data-tooltip="Wiederherstellen" data-position="bottom"
                                            @click="restore(m.code, b.name)">
@@ -222,7 +222,7 @@
             setSudoPassword: function() {
                 M.Modal.getInstance(document.getElementById('modal-password')).close();
                 showLoading('Passwort setzen...');
-                axios.post( './set-password', { password: this.sudoPassword })
+                axios.post( './api/set-password', { password: this.sudoPassword })
                     .then((response) => {
                         if(response.data.success) {
                             M.toast({html: 'Passwort im RAM hinterlegt.'});
@@ -242,7 +242,7 @@
             },
             deleteBackup: function() {
                 showLoading('Backup löschen...');
-                axios.post( './delete/'+this.backupDelete.moduleCode+'/'+this.backupDelete.name)
+                axios.post( './api/delete/'+this.backupDelete.moduleCode+'/'+this.backupDelete.name)
                 .then((response) => {
                     if(response.data.success) {
                         M.toast({html: 'Backup gelöscht.<br>'+this.backupDelete.name});
@@ -270,7 +270,7 @@
                     }
                 };
                 var instance = this;
-                axios.post('./upload-' + moduleCode, data, config)
+                axios.post('./api/upload-' + moduleCode, data, config)
                     .then(function (res) {
                         if(res.data.success) {
                             fetchData(instance);
@@ -289,7 +289,7 @@
             },
             backupAll: function(moduleCode) {
                 showLoading("Backup wird gestartet...");
-                axios.post('./backup')
+                axios.post('./api/backup')
                     .then((response) => {
                         if(response.data.success) {
                             window.location = 'logs';
@@ -301,7 +301,7 @@
             },
             backup: function(moduleCode) {
                 showLoading("Backup wird gestartet...");
-                axios.post('./backup-' + moduleCode)
+                axios.post('./api/backup-' + moduleCode)
                 .then((response) => {
                     if(response.data.success) {
                         window.location = 'logs';
@@ -313,7 +313,7 @@
             },
             restore: function(moduleCode, name) {
                 showLoading("Wiederherstellung wird gestartet...");
-                axios.post('./restore/' + moduleCode + '/' + name)
+                axios.post('./api/restore/' + moduleCode + '/' + name)
                     .then((response) => {
                         if(response.data.success) {
                             window.location = 'logs';
@@ -325,7 +325,7 @@
             },
             logout: function() {
                 showLoading("Abmelden...");
-                axios.post('./logout')
+                axios.post('./api/logout')
                     .then((response) => {
                         if(response.data.success) {
                             window.location = 'login';
@@ -352,7 +352,7 @@
     });
 
     function fetchData(instance) {
-        axios.get('data')
+        axios.get('./api/data')
             .then((response) => {
             if(response.data) {
 

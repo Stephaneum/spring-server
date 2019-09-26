@@ -21,7 +21,7 @@ import java.io.File
 
 
 @RestController
-@RequestMapping("/blackboard")
+@RequestMapping("/blackboard/api")
 class BlackboardAdminAPI {
 
     final val logger = LoggerFactory.getLogger(BlackboardAdminAPI::class.java)
