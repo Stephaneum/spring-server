@@ -38,7 +38,7 @@
         li:hover li a {
             background: white;
             white-space: nowrap;
-            padding-right: 5px;
+            padding-right: 10px;
             height: 35px;
             line-height: 35px;
             color: #1b5e20;
@@ -87,10 +87,7 @@
         }
 
         #internal-btn:hover ~ #internal-menu-account, #internal-menu:hover ~ #internal-menu-account {
-            visibility: visible !important;
-            left: -190px !important;
-            width: 200px !important;
-            transition: all 1s ease 0s;
+            display: block !important;
         }
 
         /* bugfix height */
@@ -206,7 +203,7 @@
                                         <li><a href="klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
                                         <li><a href="projekt_all.xhtml"><span><i class="material-icons">flag</i>Projekte</span></a></li>
                                     </ul>
-                                    <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: 20px; visibility: hidden; overflow: hidden;text-align: center; width: 130px; height: 160px; background-color: #f1f8e9; color: #1b5e20; line-height: normal;" class="z-depth-1">
+                                    <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: -190px; display: none; overflow: hidden;text-align: center; width: 200px; height: 160px; background-color: #f1f8e9; color: #1b5e20; line-height: normal;" class="z-depth-1">
                                             <i style="font-size: 4em; margin-top: 10px" class="material-icons">person</i>
                                             <p style="white-space: nowrap">{{ user != null && user.firstName }} {{ user != null && user.lastName }}</p>
                                             <p style="white-space: nowrap">({{ role }})</p>
