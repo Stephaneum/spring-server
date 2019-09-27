@@ -1,10 +1,12 @@
 package de.stephaneum.spring.database
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import javax.persistence.*
 
 @Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name="klasse")
 data class SchoolClass(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                        var id: Int = 0,

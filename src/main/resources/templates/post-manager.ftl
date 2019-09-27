@@ -1,6 +1,7 @@
 
 <#import "/spring.ftl" as spring/>
 <#import "components/vue-loader.ftl" as vueLoader/>
+<#import "components/menu.ftl" as menu/>
 
 <!DOCTYPE HTML>
 <html lang="de">
@@ -14,11 +15,6 @@
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/material-icons.css' />">
     <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/style.css' />">
     <style>
-        .info {
-            margin-top: 20px;
-            font-style: italic;
-        }
-
         [v-cloak] {
             display: none;
         }
@@ -28,37 +24,36 @@
 <body>
 
 <@vueLoader.blank/>
-<div id="app" style="height: 100vh" v-cloak>
+<div id="app" v-cloak>
+    <nav-menu :menu="menu"></nav-menu>
 </div>
 
 <script src="/static/js/materialize.min.js" ></script>
 <script src="/static/js/axios.min.js" ></script>
-<script src="/static/js/vue.min.js" ></script>
+<script src="/static/js/vue.js" ></script>
+<@menu.render/>
 <script type="text/javascript">
     M.AutoInit();
 
     var app = new Vue({
         el: '#app',
         data: {
-            password: null,
-            loginFailed: false,
-            loggingIn: false
+            menu: []
         },
         methods: {
-            login: function() {
-                this.loggingIn = true;
-                axios.post('login', { password: this.password })
+        },
+        mounted: function () {
+            this.$nextTick(() => {
+                axios.get('./api/menu')
                     .then((response) => {
-                        if(response.data.success) {
-                            this.loginFailed = false;
-                            window.location = 'admin';
+                        if(response.data) {
+                            this.menu = response.data;
+                            console.log(this.menu);
                         } else {
-                            this.loginFailed = true;
-                            this.loggingIn = false;
-                            M.toast({html: 'Login fehlgeschlagen.'});
+                            M.toast({html: 'Interner Fehler.'});
                         }
                     });
-            }
+            })
         }
     });
 </script>

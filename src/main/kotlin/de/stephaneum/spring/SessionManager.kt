@@ -1,9 +1,10 @@
 package de.stephaneum.spring
 
+import de.stephaneum.spring.database.User
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
-data class StephSession(var permission: Permission = Permission.NONE, var toast: Toast? = null)
+data class StephSession(var permission: Permission = Permission.NONE, var user: User? = null, var toast: Toast? = null)
 data class Toast(var title: String, var content: String? = null)
 enum class Permission { NONE, BLACKBOARD, BACKUP }
 

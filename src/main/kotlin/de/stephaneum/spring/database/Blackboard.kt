@@ -1,6 +1,7 @@
 package de.stephaneum.spring.database
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
@@ -16,6 +17,7 @@ enum class Type {
 }
 
 @Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Blackboard(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                       var id: Int = 0,
 

@@ -1,5 +1,6 @@
 package de.stephaneum.spring.database
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import org.springframework.data.repository.CrudRepository
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Repository
 import javax.persistence.*
 
 @Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name="ordner")
 data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                   var id: Int = 0,
