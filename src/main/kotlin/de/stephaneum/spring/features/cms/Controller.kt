@@ -14,7 +14,7 @@ class CMSController {
     @Autowired
     private lateinit var userRepo: UserRepo
 
-    @GetMapping("/post-manager")
+    @GetMapping("/beitrag-manager")
     fun get(@RequestParam(defaultValue = "0") key: Int): String {
 
         // login
@@ -22,7 +22,7 @@ class CMSController {
             Session.get().user = userRepo.findByIdOrNull(key)
             if(Session.get().user != null) {
                 println(Session.get().user)
-                return "redirect:post-manager"
+                return "redirect:beitrag-manager"
             }
         }
 
