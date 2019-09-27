@@ -1,12 +1,5 @@
 <#macro render>
     <style>
-        #internal {
-            background-color: #558b2f;
-		}
-			
-		#internal:hover {
-		    background-color: #689f38;
-		}
 
         /* css hacks to create dropdown menu */
 
@@ -45,6 +38,7 @@
         li:hover li a {
             background: white;
             white-space: nowrap;
+            padding-right: 5px;
             height: 35px;
             line-height: 35px;
             color: #1b5e20;
@@ -56,8 +50,7 @@
 
         /* hover one item in dropdown */
         li li:hover > a {
-            background-color: #e0e0e0 !important;
-            color: #4caf50 !important;
+            background-color: #e0e0e0;
         }
 
         /* all icons in dropdowns */
@@ -72,6 +65,34 @@
             margin-right: 5px
         }
 
+        /* internal */
+        #internal-btn {
+            background-color: #558b2f;
+        }
+
+        #internal-btn:hover {
+            background-color: #689f38;
+        }
+
+        #internal-menu > li > a {
+            background-color: #e8f5e9;
+        }
+
+        #internal-menu > li > a:hover {
+            background-color: #a5d6a7;
+        }
+
+        #internal-menu > li > a > span > i {
+            font-size: 1.2em;
+        }
+
+        #internal-btn:hover ~ #internal-menu-account, #internal-menu:hover ~ #internal-menu-account {
+            visibility: visible !important;
+            left: -190px !important;
+            width: 200px !important;
+            transition: all 1s ease 0s;
+        }
+
         /* bugfix height */
         li:hover li a span {
             height: 35px;
@@ -81,13 +102,36 @@
     </style>
     <script type="text/javascript">
         Vue.component('nav-menu', {
-            props: ['menu'],
+            props: ['menu', 'user'],
             data: function () {
                 return {
                     count: 0
                 }
             },
             computed: {
+                loggedIn: function () {
+                    return this.user && this.user.code.role >= 0;
+                },
+                role: function () {
+                    if(this.user) {
+                        switch(this.user.code.role) {
+                            case 0: return "Schüler/in";
+                            case 1: return "Lehrer/in";
+                            case 2: return "Gast";
+                            case 100: return "Admin";
+                        }
+                    }
+                    return "?"
+                },
+                admin: function () {
+                    return this.user && this.user.code.role === 100;
+                },
+                managePlans: function () {
+                    return this.user && this.user.managePlans;
+                },
+                createCategories: function () {
+                    return this.user && this.user.createCategories;
+                },
                 url: function () {
                     return (menu) => menu.link ? menu.link : 'home.xhtml?id='+menu.id;
                 },
@@ -144,12 +188,33 @@
                                         </li>
                                     </ul>
                                 </li>
-                                <li>
-                                    <a id="internal">Intern</a>
+                                <li v-if="loggedIn">
+                                    <a id="internal-btn">Intern</a>
+                                    <ul id="internal-menu" class="z-depth-1" style="z-index: 200">
+                                        <li v-if="admin"><a href="admin_konfig.xhtml"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
+                                        <li v-if="admin"><a href="admin_static.xhtml"><span><i class="material-icons">brush</i>Benutzerdefinierte Seiten</span></a></li>
+                                        <li v-if="admin"><a href="admin_rubriken.xhtml"><span><i class="material-icons">bookmark</i>Rubriken</span></a></li>
+                                        <li v-if="admin"><a href="admin_backup.xhtml"><span><i class="material-icons">save</i>Backup</span></a></li>
+                                        <li v-if="admin"><a href="admin_zugangscode.xhtml"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
+                                        <li v-if="admin"><a href="admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
+                                        <li v-if="admin"><a href="admin_logs.xhtml"><span><i class="material-icons">history</i>Logbuch</span></a></li>
+                                        <li v-if="admin || managePlans"><a href="konfig_vertretung.xhtml"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
+                                        <li v-if="createCategories"><a href="nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
+                                        <li><a href="nutzer_beitrag.xhtml"><span><i class="material-icons">edit</i>Beiträge</span></a></li>
+                                        <li><a href="nutzer_dateien.xhtml"><span><i class="material-icons">folder</i>Dateien</span></a></li>
+                                        <li><a href="nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>
+                                        <li><a href="klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
+                                        <li><a href="projekt_all.xhtml"><span><i class="material-icons">flag</i>Projekte</span></a></li>
+                                    </ul>
+                                    <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: 20px; visibility: hidden; overflow: hidden;text-align: center; width: 130px; height: 160px; background-color: #f1f8e9; color: #1b5e20; line-height: normal;" class="z-depth-1">
+                                            <i style="font-size: 4em; margin-top: 10px" class="material-icons">person</i>
+                                            <p style="white-space: nowrap">{{ user != null && user.firstName }} {{ user != null && user.lastName }}</p>
+                                            <p style="white-space: nowrap">({{ role }})</p>
+                                    </div>
                                 </li>
                                 <li>
-                                    <a class="waves-effect waves-dark btn" style="background-color: #1b5e20">
-                                        Abmelden
+                                    <a class="waves-effect waves-dark btn" style="background-color: #1b5e20" :href="loggedIn ? 'logout' : 'login'">
+                                        {{ loggedIn ? 'Abmelden' : 'Login' }}
                                         <i class="material-icons right">exit_to_app</i>
                                     </a>
                                 </li>

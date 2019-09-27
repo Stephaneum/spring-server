@@ -25,7 +25,7 @@
 
 <@vueLoader.blank/>
 <div id="app" v-cloak>
-    <nav-menu :menu="menu"></nav-menu>
+    <nav-menu :menu="menu" :user="user"></nav-menu>
 </div>
 
 <script src="/static/js/materialize.min.js" ></script>
@@ -38,7 +38,8 @@
     var app = new Vue({
         el: '#app',
         data: {
-            menu: []
+            menu: [],
+            user: null
         },
         methods: {
         },
@@ -49,6 +50,16 @@
                         if(response.data) {
                             this.menu = response.data;
                             console.log(this.menu);
+                        } else {
+                            M.toast({html: 'Interner Fehler.'});
+                        }
+                    });
+
+                axios.get('./api/me')
+                    .then((response) => {
+                        if(response.data) {
+                            this.user = response.data;
+                            console.log(this.user);
                         } else {
                             M.toast({html: 'Interner Fehler.'});
                         }

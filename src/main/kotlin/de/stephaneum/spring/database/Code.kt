@@ -5,6 +5,13 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import javax.persistence.*
 
+const val ROLE_UNDEFINED = -2
+const val ROLE_NO_LOGIN = -1
+const val ROLE_STUDENT = 0
+const val ROLE_TEACHER = 1
+const val ROLE_GUEST = 2
+const val ROLE_ADMIN = 100
+
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name="zugangscode")
