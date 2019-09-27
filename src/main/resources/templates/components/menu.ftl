@@ -41,11 +41,6 @@
             clear: both;
         }
 
-        /* hover one item in dropdown */
-        li:hover li a:hover {
-            background: #e0e0e0;
-        }
-
         /* all dropdowns */
         li:hover li a {
             background: white;
@@ -57,6 +52,12 @@
             justify-content: space-between;
             align-items: center;
             min-width: 150px;
+        }
+
+        /* hover one item in dropdown */
+        li li:hover > a {
+            background-color: #e0e0e0 !important;
+            color: #4caf50 !important;
         }
 
         /* all icons in dropdowns */
