@@ -22,12 +22,14 @@ class ConfigFetcher {
     var fileLocation: String? = null
     var planLocation: String? = null
     var backupLocation: String? = null
+    var copyright: String? = null
 
     @Scheduled(initialDelay=3000, fixedDelay = 10000)
     fun update() {
         val newLocation = configRepo.findByKey("speicherort")?.value
         val newPlanLocation = configRepo.findByKey("str_vertretung")?.value
         val newBackupLocation = configRepo.findByKey("backup_dir")?.value
+        val newCopyright = configRepo.findByKey("str_bottom")?.value
 
         if(fileLocation != newLocation) {
             fileLocation = newLocation
@@ -42,6 +44,11 @@ class ConfigFetcher {
         if(backupLocation != newBackupLocation) {
             backupLocation = newBackupLocation
             logger.info("Backup Location: $backupLocation")
+        }
+
+        if(copyright != newCopyright) {
+            copyright = newCopyright
+            logger.info("Copyright: $copyright")
         }
     }
 }

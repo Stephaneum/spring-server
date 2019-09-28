@@ -21,7 +21,6 @@ class CMSController {
         if(key != 0) {
             Session.get().user = userRepo.findByIdOrNull(key)
             if(Session.get().user != null) {
-                println(Session.get().user)
                 return "redirect:beitrag-manager"
             }
         }

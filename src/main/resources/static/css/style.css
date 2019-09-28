@@ -3,6 +3,10 @@ body {
     overflow-y: scroll;
 }
 
+#main-row {
+    max-width: 1600px;
+}
+
 .margin-1 {
     margin-left: 10px;
 }

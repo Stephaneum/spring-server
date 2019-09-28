@@ -1,4 +1,127 @@
 <#macro render>
+    <template id="nav-menu">
+        <nav>
+            <div class="nav-wrapper" style="z-index: 100; background-color: white">
+                <a href="#" data-target="side-nav" class="sidenav-trigger hide-on-large-only">
+                    <i class="material-icons" style="color: #1b5e20">menu</i>
+                </a>
+                <a href="./home.xhtml" class="brand-logo">
+                    <img src="/static/img/logo-banner-green.png" style="height:50px;margin-top:5px;margin-left:10px"/>
+                </a>
+                <ul class="right hide-on-med-and-down">
+                    <li v-for="m1 in menu">
+                        <a v-text="m1.name" :href="url(m1)" :target="target(m1)"  style="color: #1b5e20"></a>
+                        <ul v-if="m1.children.length != 0" class="z-depth-1" style="z-index: 200">
+                            <li v-for="m2 in m1.children">
+                                <a :href="url(m2)" :target="target(m2)">
+                                            <span>
+                                                <i v-if="m2.link" class="material-icons">arrow_upward</i>
+                                                <i v-else class="material-icons">stop</i>
+                                                {{m2.name}}
+                                            </span>
+                                    <i v-if="m2.children.length != 0" class="material-icons">keyboard_arrow_right</i>
+                                </a>
+                                <ul v-if="m2.children.length != 0" class="z-depth-1" style="z-index: 300">
+                                    <li v-for="m3 in m2.children">
+                                        <a :href="url(m3)" :target="target(m3)">
+                                                    <span>
+                                                        <i v-if="m3.link" class="material-icons">arrow_upward</i>
+                                                        <i v-else class="material-icons">stop</i>
+                                                        {{m3.name}}
+                                                    </span>
+                                            <i v-if="m3.children.length != 0" class="material-icons">keyboard_arrow_right</i>
+                                        </a>
+                                        <ul v-if="m3.children.length != 0" class="z-depth-1" style="z-index: 400">
+                                            <li v-for="m4 in m3.children">
+                                                <a :href="url(m4)" :target="target(m4)">
+                                                            <span>
+                                                                <i v-if="m4.link" class="material-icons">arrow_upward</i>
+                                                                <i v-else class="material-icons">stop</i>
+                                                                {{m4.name}}
+                                                            </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li v-if="loggedIn">
+                        <a id="internal-btn">Intern</a>
+                        <ul id="internal-menu" class="z-depth-1" style="z-index: 200">
+                            <li v-if="admin"><a href="admin_konfig.xhtml"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
+                            <li v-if="admin"><a href="admin_static.xhtml"><span><i class="material-icons">brush</i>Benutzerdefinierte Seiten</span></a></li>
+                            <li v-if="admin"><a href="admin_rubriken.xhtml"><span><i class="material-icons">bookmark</i>Rubriken</span></a></li>
+                            <li v-if="admin"><a href="admin_backup.xhtml"><span><i class="material-icons">save</i>Backup</span></a></li>
+                            <li v-if="admin"><a href="admin_zugangscode.xhtml"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
+                            <li v-if="admin"><a href="admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
+                            <li v-if="admin"><a href="admin_logs.xhtml"><span><i class="material-icons">history</i>Logbuch</span></a></li>
+                            <li class="internal-divider"></li>
+                            <li v-if="admin || managePlans"><a href="konfig_vertretung.xhtml"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
+                            <li v-if="createCategories"><a href="nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
+                            <li><a href="nutzer_beitrag.xhtml"><span><i class="material-icons">edit</i>Beiträge</span></a></li>
+                            <li><a href="klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
+                            <li><a href="projekt_all.xhtml"><span><i class="material-icons">flag</i>Projekte</span></a></li>
+                            <li class="internal-divider"></li>
+                            <li><a href="nutzer_dateien.xhtml"><span><i class="material-icons">folder</i>Dateien</span></a></li>
+                            <li><a href="nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>
+                        </ul>
+                        <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: -190px; display: none; overflow: hidden;text-align: center; width: 200px; height: 160px; background-color: #f1f8e9; color: #1b5e20; line-height: normal;" class="z-depth-1">
+                            <i style="font-size: 4em; margin-top: 10px" class="material-icons">person</i>
+                            <p style="white-space: nowrap">{{ user != null && user.firstName }} {{ user != null && user.lastName }}</p>
+                            <p style="white-space: nowrap">({{ role }})</p>
+                        </div>
+                    </li>
+                    <li>
+                        <a class="waves-effect waves-dark btn" style="background-color: #1b5e20" :href="loggedIn ? 'logout' : 'login'">
+                            {{ loggedIn ? 'Abmelden' : 'Login' }}
+                            <i class="material-icons right">exit_to_app</i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </template>
+
+    <script type="text/javascript">
+        Vue.component('nav-menu', {
+            props: ['menu', 'user'],
+            computed: {
+                loggedIn: function () {
+                    return this.user && this.user.code.role >= 0;
+                },
+                role: function () {
+                    if(this.user) {
+                        switch(this.user.code.role) {
+                            case 0: return "Schüler/in";
+                            case 1: return "Lehrer/in";
+                            case 2: return "Gast";
+                            case 100: return "Admin";
+                        }
+                    }
+                    return "?"
+                },
+                admin: function () {
+                    return this.user && this.user.code.role === 100;
+                },
+                managePlans: function () {
+                    return this.user && this.user.managePlans;
+                },
+                createCategories: function () {
+                    return this.user && this.user.createCategories;
+                },
+                url: function () {
+                    return (menu) => menu.link ? menu.link : 'home.xhtml?id='+menu.id;
+                },
+                target: function () {
+                    return (menu) => menu.link ? '_blank' : '_self';
+                }
+            },
+            template: '#nav-menu'
+        });
+    </script>
+
     <style>
 
         /* css hacks to create dropdown menu */
@@ -102,130 +225,4 @@
             align-items: center;
         }
     </style>
-    <script type="text/javascript">
-        Vue.component('nav-menu', {
-            props: ['menu', 'user'],
-            data: function () {
-                return {
-                    count: 0
-                }
-            },
-            computed: {
-                loggedIn: function () {
-                    return this.user && this.user.code.role >= 0;
-                },
-                role: function () {
-                    if(this.user) {
-                        switch(this.user.code.role) {
-                            case 0: return "Schüler/in";
-                            case 1: return "Lehrer/in";
-                            case 2: return "Gast";
-                            case 100: return "Admin";
-                        }
-                    }
-                    return "?"
-                },
-                admin: function () {
-                    return this.user && this.user.code.role === 100;
-                },
-                managePlans: function () {
-                    return this.user && this.user.managePlans;
-                },
-                createCategories: function () {
-                    return this.user && this.user.createCategories;
-                },
-                url: function () {
-                    return (menu) => menu.link ? menu.link : 'home.xhtml?id='+menu.id;
-                },
-                target: function () {
-                    return (menu) => menu.link ? '_blank' : '_self';
-                }
-            },
-            template: `
-                <div>
-                    <nav>
-                        <div class="nav-wrapper" style="z-index: 100; background-color: white">
-                            <a href="#" data-target="side-nav" class="sidenav-trigger hide-on-large-only">
-                                <i class="material-icons" style="color: #1b5e20">menu</i>
-                            </a>
-                            <a href="./home.xhtml" class="brand-logo">
-                                <img src="/static/img/logo-banner-green.png" style="height:50px;margin-top:5px;margin-left:10px"/>
-                            </a>
-                            <ul class="right hide-on-med-and-down">
-                                <li v-for="m1 in menu">
-                                    <a v-text="m1.name" :href="url(m1)" :target="target(m1)"  style="color: #1b5e20"></a>
-                                    <ul v-if="m1.children.length != 0" class="z-depth-1" style="z-index: 200">
-                                        <li v-for="m2 in m1.children">
-                                            <a :href="url(m2)" :target="target(m2)">
-                                                <span>
-                                                    <i v-if="m2.link" class="material-icons">arrow_upward</i>
-                                                    <i v-else class="material-icons">stop</i>
-                                                    {{m2.name}}
-                                                </span>
-                                                <i v-if="m2.children.length != 0" class="material-icons">keyboard_arrow_right</i>
-                                            </a>
-                                            <ul v-if="m2.children.length != 0" class="z-depth-1" style="z-index: 300">
-                                                <li v-for="m3 in m2.children">
-                                                    <a :href="url(m3)" :target="target(m3)">
-                                                        <span>
-                                                            <i v-if="m3.link" class="material-icons">arrow_upward</i>
-                                                            <i v-else class="material-icons">stop</i>
-                                                            {{m3.name}}
-                                                        </span>
-                                                        <i v-if="m3.children.length != 0" class="material-icons">keyboard_arrow_right</i>
-                                                    </a>
-                                                    <ul v-if="m3.children.length != 0" class="z-depth-1" style="z-index: 400">
-                                                        <li v-for="m4 in m3.children">
-                                                            <a :href="url(m4)" :target="target(m4)">
-                                                                <span>
-                                                                    <i v-if="m4.link" class="material-icons">arrow_upward</i>
-                                                                    <i v-else class="material-icons">stop</i>
-                                                                    {{m4.name}}
-                                                                </span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li v-if="loggedIn">
-                                    <a id="internal-btn">Intern</a>
-                                    <ul id="internal-menu" class="z-depth-1" style="z-index: 200">
-                                        <li v-if="admin"><a href="admin_konfig.xhtml"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
-                                        <li v-if="admin"><a href="admin_static.xhtml"><span><i class="material-icons">brush</i>Benutzerdefinierte Seiten</span></a></li>
-                                        <li v-if="admin"><a href="admin_rubriken.xhtml"><span><i class="material-icons">bookmark</i>Rubriken</span></a></li>
-                                        <li v-if="admin"><a href="admin_backup.xhtml"><span><i class="material-icons">save</i>Backup</span></a></li>
-                                        <li v-if="admin"><a href="admin_zugangscode.xhtml"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
-                                        <li v-if="admin"><a href="admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
-                                        <li v-if="admin"><a href="admin_logs.xhtml"><span><i class="material-icons">history</i>Logbuch</span></a></li>
-                                        <li class="internal-divider"></li>
-                                        <li v-if="admin || managePlans"><a href="konfig_vertretung.xhtml"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
-                                        <li v-if="createCategories"><a href="nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
-                                        <li><a href="nutzer_beitrag.xhtml"><span><i class="material-icons">edit</i>Beiträge</span></a></li>
-                                        <li><a href="klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
-                                        <li><a href="projekt_all.xhtml"><span><i class="material-icons">flag</i>Projekte</span></a></li>
-                                        <li class="internal-divider"></li>
-                                        <li><a href="nutzer_dateien.xhtml"><span><i class="material-icons">folder</i>Dateien</span></a></li>
-                                        <li><a href="nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>
-                                    </ul>
-                                    <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: -190px; display: none; overflow: hidden;text-align: center; width: 200px; height: 160px; background-color: #f1f8e9; color: #1b5e20; line-height: normal;" class="z-depth-1">
-                                            <i style="font-size: 4em; margin-top: 10px" class="material-icons">person</i>
-                                            <p style="white-space: nowrap">{{ user != null && user.firstName }} {{ user != null && user.lastName }}</p>
-                                            <p style="white-space: nowrap">({{ role }})</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <a class="waves-effect waves-dark btn" style="background-color: #1b5e20" :href="loggedIn ? 'logout' : 'login'">
-                                        {{ loggedIn ? 'Abmelden' : 'Login' }}
-                                        <i class="material-icons right">exit_to_app</i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </nav>
-                </div>`
-        });
-    </script>
 </#macro>
