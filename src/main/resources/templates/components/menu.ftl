@@ -126,39 +126,39 @@
 
         /* css hacks to create dropdown menu */
 
-        ul li {
+        nav ul li {
             position: relative;
         }
 
-        li ul {
+        nav li ul {
             display: none;
         }
 
-        li:hover > ul {
+        nav li:hover > ul {
             display: block;
             position: absolute;
         }
 
-        li:hover li {
+        nav li:hover li {
             float: none;
         }
 
-        ul ul ul {
+        nav ul ul ul {
             left: 100%;
             top: 0;
         }
 
-        ul:before, ul:after {
+        nav ul:before, ul:after {
             content: " ";
             display: table;
         }
 
-        ul:after {
+        nav ul:after {
             clear: both;
         }
 
         /* all dropdowns */
-        li:hover li a {
+        nav li:hover li a {
             background: white;
             white-space: nowrap;
             padding-right: 10px;
@@ -172,17 +172,17 @@
         }
 
         /* hover one item in dropdown */
-        li li:hover > a {
+        nav li li:hover > a {
             background-color: #e0e0e0;
         }
 
         /* all icons in dropdowns */
-        li:hover li a i {
+        nav li:hover li a i {
             display: inline-block;
         }
 
         /* left icon in dropdowns */
-        li:hover li a span i {
+        nav li:hover li a span i {
             display: inline-block;
             font-size: 0.8em;
             margin-right: 5px
@@ -219,7 +219,7 @@
         }
 
         /* bugfix height */
-        li:hover li a span {
+        nav li:hover li a span {
             height: 35px;
             display: flex;
             align-items: center;
