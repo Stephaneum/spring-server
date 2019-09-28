@@ -90,6 +90,11 @@
             display: block !important;
         }
 
+        .internal-divider {
+            height: 1px;
+            background-color: #4caf50;
+        }
+
         /* bugfix height */
         li:hover li a span {
             height: 35px;
@@ -195,13 +200,15 @@
                                         <li v-if="admin"><a href="admin_zugangscode.xhtml"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
                                         <li v-if="admin"><a href="admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
                                         <li v-if="admin"><a href="admin_logs.xhtml"><span><i class="material-icons">history</i>Logbuch</span></a></li>
+                                        <li class="internal-divider"></li>
                                         <li v-if="admin || managePlans"><a href="konfig_vertretung.xhtml"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
                                         <li v-if="createCategories"><a href="nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
                                         <li><a href="nutzer_beitrag.xhtml"><span><i class="material-icons">edit</i>Beiträge</span></a></li>
-                                        <li><a href="nutzer_dateien.xhtml"><span><i class="material-icons">folder</i>Dateien</span></a></li>
-                                        <li><a href="nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>
                                         <li><a href="klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
                                         <li><a href="projekt_all.xhtml"><span><i class="material-icons">flag</i>Projekte</span></a></li>
+                                        <li class="internal-divider"></li>
+                                        <li><a href="nutzer_dateien.xhtml"><span><i class="material-icons">folder</i>Dateien</span></a></li>
+                                        <li><a href="nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>
                                     </ul>
                                     <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: -190px; display: none; overflow: hidden;text-align: center; width: 200px; height: 160px; background-color: #f1f8e9; color: #1b5e20; line-height: normal;" class="z-depth-1">
                                             <i style="font-size: 4em; margin-top: 10px" class="material-icons">person</i>
