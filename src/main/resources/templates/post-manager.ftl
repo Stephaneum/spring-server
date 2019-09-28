@@ -68,8 +68,31 @@
         }
 
         .tab-panel {
+            min-height: 700px;
             padding: 20px;
-            z-index: 100;
+        }
+
+        .layout-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 200px;
+            margin: 20px;
+            background-color: #43a047;
+            filter: grayscale(100%);
+        }
+
+        .layout-btn:hover {
+            filter: none;
+            cursor: pointer;
+        }
+
+        .layout-btn-active {
+            filter: none !important;
+        }
+
+        .layout-btn > img {
+            width: 150px;
         }
     </style>
 </head>
@@ -110,8 +133,22 @@
             <div v-show="currTab.id === tabs.images.id " class="tab-panel white z-depth-1">
                 BILDER
             </div>
-            <div v-show="currTab.id === tabs.layout.id " class="tab-panel white z-depth-1">
-                LAYOUT
+            <div v-show="currTab.id === tabs.layout.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center; justify-content: center">
+                <div>
+                    <h5>Beitrag</h5>
+                    <div v-for="l in postLayouts" @click="setLayoutPost(l)" style="height: 200px" class="layout-btn" :class="{ 'layout-btn-active': l === currPost.layoutPost }">
+                        <img :src="'/static/img/layout-post-'+l+'.png'">
+                    </div>
+                    <h5>Vorschau</h5>
+                    <div v-for="l in previewLayouts" @click="setLayoutPreview(l)" style="height: 100px" class="layout-btn" :class="{ 'layout-btn-active': l === currPost.layoutPreview }">
+                        <img :src="'/static/img/layout-preview-'+l+'.png'">
+                    </div>
+                    <div style="margin-top: 30px" class="input-field">
+                        <i class="material-icons prefix">crop</i>
+                        <label for="post-preview-count">Zeichenlänge der Vorschau</label>
+                        <input v-model:value="currPost.preview" type="number" id="post-preview-count" min="0" max="1000"/>
+                    </div>
+                </div>
             </div>
             <div v-show="currTab.id === tabs.assign.id " class="tab-panel white z-depth-1">
                 ZUORDNUNG
@@ -197,6 +234,9 @@
         }
     };
 
+    var postLayouts = [0, 1, 2];
+    var previewLayouts = [0, 1, 2];
+
     var app = new Vue({
         el: '#app',
         data: {
@@ -206,6 +246,8 @@
             initialized: false,
             modes: modes,
             tabs: tabs,
+            postLayouts: postLayouts,
+            previewLayouts: previewLayouts,
             currMode: null,
             currTabs: [],
             currTab: null,
@@ -240,47 +282,59 @@
                 }
                 this.currMode = mode;
                 if(!this.initialized) {
-                    this.$nextTick(() => {
-                        M.AutoInit();
-                        $('#post-text-editor').trumbowyg({
-                            semantic: false,
-                            lang: 'de',
-                            btns: [
-                                ['foreColor', 'backColor'],
-                                ['strong', 'em', 'underline', 'del'],
-                                ['formatting', 'fontsize'],
-                                ['superscript', 'subscript'],
-                                ['link'],
-                                ['table'],
-                                ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
-                                ['orderedList'],
-                                ['horizontalRule'],
-                                ['removeformat'],
-                                ['viewHTML'],
-                                ['fullscreen']],
-                            plugins: {
-                                fontsize: {
-                                    sizeList: [
-                                        '10pt',
-                                        '11pt',
-                                        '12pt',
-                                        '14pt',
-                                        '16pt',
-                                        '18pt',
-                                        '24pt'
-                                    ],
-                                    allowCustomSize: false
-                                }
-                            }
-                        });
-                        console.log('post init finished')
-                    });
+                    this.postInit();
                 }
             },
             setTab: function(tab) {
                 if(this.currTab.id === tabs.text.id)
                     this.currPost.text = $('#post-text-editor').trumbowyg('html');
                 this.currTab = tab;
+            },
+            setLayoutPost: function(layout) {
+                this.currPost.layoutPost = layout;
+                M.toast({html: 'Beitrag-Layout '+ (layout+1) + ' ausgewählt'});
+            },
+            setLayoutPreview: function(layout) {
+                this.currPost.layoutPreview = layout;
+                M.toast({html: 'Vorschau-Layout '+ (layout+1) + ' ausgewählt'});
+            },
+            postInit: function() {
+                this.$nextTick(() => {
+                    M.AutoInit();
+                    M.updateTextFields();
+                    $('#post-text-editor').trumbowyg({
+                        semantic: false,
+                        lang: 'de',
+                        btns: [
+                            ['foreColor', 'backColor'],
+                            ['strong', 'em', 'underline', 'del'],
+                            ['formatting', 'fontsize'],
+                            ['superscript', 'subscript'],
+                            ['link'],
+                            ['table'],
+                            ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+                            ['orderedList'],
+                            ['horizontalRule'],
+                            ['removeformat'],
+                            ['viewHTML'],
+                            ['fullscreen']],
+                        plugins: {
+                            fontsize: {
+                                sizeList: [
+                                    '10pt',
+                                    '11pt',
+                                    '12pt',
+                                    '14pt',
+                                    '16pt',
+                                    '18pt',
+                                    '24pt'
+                                ],
+                                allowCustomSize: false
+                            }
+                        }
+                    });
+                    console.log('post init finished')
+                });
             }
         },
         mounted: function () {
@@ -299,7 +353,7 @@
                         if(response.data) {
                             this.user = response.data.user;
                             this.copyright = response.data.copyright;
-                            if(this.user) {
+                            if(this.user && this.user.code.role >= 0) {
                                 this.setMode(modes.create);
                             }
                         } else {
