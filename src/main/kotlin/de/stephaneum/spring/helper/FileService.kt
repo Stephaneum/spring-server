@@ -1,12 +1,15 @@
 package de.stephaneum.spring.helper
 
+import de.stephaneum.spring.database.*
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.io.*
+import java.io.File
 import java.net.MalformedURLException
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -22,9 +25,31 @@ class FileService {
     final val logger = LoggerFactory.getLogger(FileService::class.java)
 
     val formatter = DecimalFormat("#.#")
+    enum class StoreMode(val description: String) {
+        PRIVATE("Privatspeicher"),
+        SCHOOL_CLASS("Klassenspeicher"),
+        PROJECT("Projektspeicher"),
+        CATEGORY("Rubrik"),
+        TEACHER_CHAT("Lehrerchat")
+    }
 
     @Autowired
     private lateinit var configFetcher: ConfigFetcher
+
+    @Autowired
+    private lateinit var fileRepo: FileRepo
+
+    @Autowired
+    private lateinit var folderRepo: FolderRepo
+
+    @Autowired
+    private lateinit var menuRepo: MenuRepo
+
+    @Autowired
+    private lateinit var statsCloudRepo: StatsCloudRepo
+
+    @Autowired
+    private lateinit var logRepo: LogRepo
 
     /**
      * @param content byte array which should be saved
@@ -43,7 +68,87 @@ class FileService {
             logger.error("Storing file failed",ex)
             return null
         }
+    }
 
+    /**
+     * @param user the user saving the file (the owner)
+     * @param filename filename
+     * @param mime mime type
+     * @param content byte array which should be saved
+     * @param folder the folder (if Integer, then used as ID, else used as root folder name)
+     * @param classProjectCategoryID depends on the mode
+     * @param mode will be used to determine where to store and what ID to be used
+     * @return the file if success, else a string representing the error
+     */
+    fun storeFileStephaneum(user: User, filename: String, mime: String, content: ByteArray, folder: Any?, classProjectCategoryID: Int?, mode: StoreMode): Any {
+
+        // check if enough space
+        if(user.storage - fileRepo.calcStorageUsed(user.id) < content.size)
+            return "Nicht genügend Speicher"
+
+        // resolve folder
+        val mainPath = configFetcher.fileLocation ?: return "Interner Fehler"
+        var savingFolder: Folder?
+        if(mode == StoreMode.PRIVATE && folder is String) {
+            savingFolder = folderRepo.findPrivateFolderInRoot(user.id, folder).firstOrNull()
+            if(savingFolder == null) {
+                // create new one
+                savingFolder = folderRepo.save(Folder(0, folder, user, null, null, false, null))
+            }
+        } else if(folder is Int){
+            savingFolder = Folder(folder)
+        } else {
+            savingFolder = null
+        }
+
+        // resolve the additional id
+        var project: Project? = null
+        var schoolClass: SchoolClass? = null
+        if(mode == StoreMode.SCHOOL_CLASS || mode == StoreMode.PROJECT || mode == StoreMode.CATEGORY) {
+            if(classProjectCategoryID == null)
+                return "unknown class/project/category ID"
+
+            if(mode == StoreMode.SCHOOL_CLASS)
+                schoolClass = SchoolClass(classProjectCategoryID)
+            else if(mode == StoreMode.PROJECT)
+                project = Project(classProjectCategoryID)
+        }
+
+        val file = fileRepo.save(de.stephaneum.spring.database.File(
+                id = 0,
+                user = if(mode != StoreMode.CATEGORY) user else null,
+                path = "", // will be set in the next step
+                project = project,
+                schoolClass = schoolClass,
+                timestamp = now(),
+                size = content.size,
+                mime = mime,
+                public = false,
+                teacherChat = mode == StoreMode.TEACHER_CHAT,
+                folder = savingFolder))
+
+        // now set the filename with the id
+        file.path = "$mainPath/${file.id}_$filename"
+        fileRepo.save(file)
+
+        // set category picture
+        if(mode == StoreMode.CATEGORY) {
+            val menu = menuRepo.findByIdOrNull(classProjectCategoryID!!) ?: return "Datei gespeichert, aber Verknüpfung mit Gruppe gescheitert"
+            menu.image = file
+            menuRepo.save(menu)
+        }
+
+        // save file
+        val targetLocation = Paths.get(file.path)
+        Files.copy(ByteArrayInputStream(content), targetLocation, StandardCopyOption.REPLACE_EXISTING)
+
+        // update stats
+        statsCloudRepo.save(StatsCloud(0, now(), file.size))
+
+        // log
+        logRepo.save(Log(0, now(), EventType.UPLOAD.id, "[${mode.description}] ${user.firstName} ${user.lastName} (${user.code.getRoleString()}), $filename"))
+
+        return file
     }
 
     fun loadFileAsResource(path: String): Resource? {

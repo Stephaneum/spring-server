@@ -206,6 +206,7 @@
 <script src="/static/js/materialize.min.js" ></script>
 <script src="/static/js/axios.min.js" ></script>
 <script src="/static/js/vue.min.js" ></script>
+<@loading.render/>
 <script type="text/javascript">
 
     var app = new Vue({
@@ -376,6 +377,5 @@
     M.AutoInit();
 
 </script>
-<@loading.render/>
 </body>
 </html>

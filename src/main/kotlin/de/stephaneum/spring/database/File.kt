@@ -3,6 +3,7 @@ package de.stephaneum.spring.database
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import java.sql.Timestamp
@@ -16,7 +17,7 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                 @JoinColumn(name = "nutzer_id")
-                var user: User = User(),
+                var user: User? = null,
 
                 @Column(nullable = false, name="pfad", length = 1024)
                 var path: String = "",
@@ -46,7 +47,22 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                 @JoinColumn(name = "ordner_id")
-                var folder: Folder? = null)
+                var folder: Folder? = null,
+
+                @JsonInclude
+                @Transient
+                var fileName: String = "",
+
+                @JsonInclude
+                @Transient
+                var fileNameWithID: String = "")
 
 @Repository
-interface FileRepo: CrudRepository<File, Int>
+interface FileRepo: CrudRepository<File, Int> {
+
+    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1")
+    fun calcStorageUsed(userID: Int): Int
+
+    @Query("SELECT f FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE AND f.mime LIKE CONCAT(?2, '%') ORDER BY f.id DESC")
+    fun findMyImages(userID: Int, mime: String): List<File>
+}

@@ -5,7 +5,6 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import javax.persistence.*
 
-const val ROLE_UNDEFINED = -2
 const val ROLE_NO_LOGIN = -1
 const val ROLE_STUDENT = 0
 const val ROLE_TEACHER = 1
@@ -25,7 +24,19 @@ data class Code(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var role: Int = 0,
 
                 @Column(nullable = false, name="benutzt")
-                var used: Boolean = false)
+                var used: Boolean = false) {
+
+    fun getRoleString(): String {
+        return when(role) {
+            ROLE_NO_LOGIN -> "Gast (nicht eingeloggt)"
+            ROLE_STUDENT -> "Schüler/in"
+            ROLE_TEACHER -> "Lehrer/in"
+            ROLE_GUEST -> "Gast (eingeloggt)"
+            ROLE_ADMIN -> "Admin"
+            else -> "?"
+        }
+    }
+}
 
 @Repository
 interface CodeRepo: CrudRepository<Code, Int>

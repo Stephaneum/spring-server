@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/menu")
 class MenuAPI {
 
     @Autowired
     private lateinit var menuRepo: MenuRepo
 
-    @GetMapping("/menu")
+    @GetMapping
     fun get(): List<Menu> {
         val menu = menuRepo.findPublic()
 

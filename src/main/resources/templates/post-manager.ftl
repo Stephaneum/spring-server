@@ -1,5 +1,6 @@
 
 <#import "/spring.ftl" as spring/>
+<#import "components/loading.ftl" as loading/>
 <#import "components/vue-loader.ftl" as vueLoader/>
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
@@ -46,7 +47,9 @@
         }
 
         .tab-btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             vertical-align: bottom;
             padding: 5px 15px 5px 10px;
             margin: 0 5px 0 5px;
@@ -70,6 +73,43 @@
         .tab-panel {
             min-height: 700px;
             padding: 20px;
+        }
+
+        .container-images {
+            flex: 1;
+            white-space: nowrap;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            height: 250px;
+        }
+
+        .container-image {
+            position: relative;
+            display: inline-block;
+            text-align: center;
+            margin: 20px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #f1f8e9;
+        }
+
+        .image-number {
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            width: 25px;
+            height: 25px;
+
+            background-color: #43a047;
+            color: white;
+            border-radius: 50%;
+        }
+
+        .image-time {
+            margin: 0;
+            color: #808080;
+            font-style: italic;
+            font-size: 0.8em;
         }
 
         .layout-btn {
@@ -109,7 +149,7 @@
         </div>
         <div class="col s10 offset-s2">
             <div v-for="(t, index) in currTabs" @click="setTab(t)" class="tab-btn" :class="{ 'tab-btn-active': t.id === currTab.id }">
-                <span style="display: inline-flex; align-items: center; justify-content: center; margin: 0 5px 0 5px;font-size: 0.7em; background-color: #1b5e20; border-radius: 50%; width: 25px; height: 25px">{{index+1}}</span>
+                <i style="font-size: 1em; margin-right: 5px" class="material-icons">{{ t.icon }}</i>
                 <span style="vertical-align: middle">{{ t.name }}</span>
             </div>
         </div>
@@ -120,9 +160,13 @@
             </div>
         </div>
         <div class="col s10">
+
+            <!-- SELECT -->
             <div v-show="currTab.id === tabs.select.id " class="tab-panel white z-depth-1">
                 AUSWAHL
             </div>
+
+            <!-- TEXT -->
             <div v-show="currTab.id === tabs.text.id " class="tab-panel white z-depth-1">
                 <div class="input-field" style="max-width: 600px">
                     <label for="post-title">Titel</label>
@@ -130,9 +174,54 @@
                 </div>
                 <div id="post-text-editor" style="height: 600px"></div>
             </div>
-            <div v-show="currTab.id === tabs.images.id " class="tab-panel white z-depth-1">
-                BILDER
+
+            <!-- IMAGES -->
+            <div v-show="currTab.id === tabs.images.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center;">
+                <div style="width: 100%">
+                    <div style="display: flex; align-items: center">
+                        <div style="flex: 0 0 180px; padding-right: 10px; text-align: right">
+                            <h5 style="margin: 0;">
+                                ausgewählt ({{ currPost.imagesAdded.length }}):
+                            </h5>
+                            <form method="POST" enctype="multipart/form-data" style="margin-top: 30px;">
+                                <input name="file" type="file" id="upload-image" @change="uploadImage($event.currentTarget.files[0])" style="display: none">
+                                <a class="waves-effect waves-light btn" style="background-color: #1b5e20"
+                                   @click="showUpload()">
+                                    <i class="material-icons left">cloud_upload</i>Hochladen
+                                </a>
+                            </form>
+                        </div>
+                        <div id="container-images-added" class="container-images">
+                            <div v-for="(i, index) in currPost.imagesAdded" @click="deselectImage(i)" class="container-image z-depth-1">
+                                <span class="image-number">{{ index+1 }}</span>
+                                <img :src="imageURL(i)" height="150"/>
+                                <p style="margin: 0">{{i.fileName}}</p>
+                                <p class="image-time">{{i.time}} ~ {{i.sizeReadable}}</p>
+                            </div>
+                            <div v-show="currPost.imagesAdded.length === 0" style="height: 100%; display: flex; align-items: center; justify-content: center">
+                                <p class="green-badge-light" style="display: inline-block; font-size: 1em">Keine Bilder ausgewählt.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-top: 50px">
+                        <h5 style="flex: 0 0 180px; padding-right: 10px; margin: 0; text-align: right;">
+                            verfügbar:
+                        </h5>
+                        <div id="container-images-available" class="container-images">
+                            <div v-for="i in currPost.imagesAvailable" @click="selectImage(i)" class="container-image z-depth-1">
+                                <img :src="imageURL(i)" height="150"/>
+                                <p style="margin: 0">{{i.fileName}}</p>
+                                <p class="image-time">{{i.time}} ~ {{i.sizeReadable}}</p>
+                            </div>
+                            <div v-show="currPost.imagesAvailable.length === 0" style="height: 100%; display: flex; align-items: center; justify-content: center">
+                                <p class="green-badge-light" style="display: inline-block; font-size: 1em">Keine Bilder verfügbar.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- LAYOUT -->
             <div v-show="currTab.id === tabs.layout.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center; justify-content: center">
                 <div>
                     <h5>Beitrag</h5>
@@ -150,9 +239,13 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ASSIGN -->
             <div v-show="currTab.id === tabs.assign.id " class="tab-panel white z-depth-1">
                 ZUORDNUNG
             </div>
+
+            <!-- FINALIZE -->
             <div v-show="currTab.id === tabs.finalize.id " class="tab-panel white z-depth-1">
                 FERTIGSTELLUNG
             </div>
@@ -167,6 +260,8 @@
 </div>
 
 <script src="/static/js/jquery.min.js" ></script>
+<script src="/static/js/moment.min.js" ></script>
+<script src="/static/js/moment.de.js" ></script>
 <script src="/static/js/materialize.min.js" ></script>
 <script src="/static/js/axios.min.js" ></script>
 <script src="/static/js/vue.js" ></script>
@@ -177,6 +272,7 @@
 <script src="/static/trumbowyg/langs/de.min.js" ></script>
 <@menu.render/>
 <@footer.render/>
+<@loading.render/>
 <script type="text/javascript">
     M.AutoInit();
 
@@ -210,27 +306,33 @@
     var tabs = {
         select: {
             id: -1,
-            name: "Auswahl"
+            name: "Auswahl",
+            icon: "radio_button_checked"
         },
         text: {
             id: 0,
-            name: "Titel und Text"
+            name: "Titel und Text",
+            icon: "format_align_left"
         },
         images: {
             id: 1,
-            name: "Bilder"
+            name: "Bilder",
+            icon: "camera_alt"
         },
         layout: {
             id: 2,
-            name: "Layout"
+            name: "Layout",
+            icon: "border_inner"
         },
         assign: {
             id: 3,
-            name: "Zuordnung"
+            name: "Zuordnung",
+            icon: "device_hub"
         },
         finalize: {
             id: 4,
-            name: "Fertigstellung"
+            name: "Fertigstellung",
+            icon: "check_circle"
         }
     };
 
@@ -248,13 +350,16 @@
             tabs: tabs,
             postLayouts: postLayouts,
             previewLayouts: previewLayouts,
+            imagesAvailable: [],
+            imagesAvailableLimit: 10,
             currMode: null,
             currTabs: [],
             currTab: null,
             currPost: {
                 title: null,
                 text: null,
-                images: [],
+                imagesAdded: [],
+                imagesAvailable: [],
                 layoutPost: 0,
                 layoutPreview: 0,
                 preview: 200
@@ -286,8 +391,43 @@
                 }
             },
             setTab: function(tab) {
-                if(this.currTab.id === tabs.text.id)
+                // save changes from text editor
+                if (this.currTab.id === tabs.text.id)
                     this.currPost.text = $('#post-text-editor').trumbowyg('html');
+
+                // init scroller and fetch images if not initialized yet
+                if (tab.id === tabs.images.id && this.imagesAvailable.length === 0) {
+                    var instance = this;
+                    this.fetchImages();
+
+                    var containerImagesAdded = document.getElementById('container-images-added');
+                    containerImagesAdded.addEventListener('wheel', function(e) {
+                        if (e.deltaY > 0) {
+                            this.scrollLeft += 50;
+
+                            if(this.scrollLeft < this.scrollLeftMax) e.preventDefault();
+                        } else {
+                            this.scrollLeft -= 50;
+
+                            if(this.scrollLeft > 0) e.preventDefault();
+                        }
+                    });
+
+                    var containerImagesAvailable = document.getElementById('container-images-available');
+                    containerImagesAvailable.addEventListener('wheel', function(e) {
+                        if(instance.currPost.imagesAvailable.length === 0)
+                            return; // this user has no images
+
+                        if (e.deltaY > 0) this.scrollLeft += 50;
+                        else this.scrollLeft -= 50;
+
+                        if(this.scrollLeft >= this.scrollLeftMax) {
+                            instance.increaseImageLimit();
+                        }
+
+                        if(this.scrollLeft > 0) e.preventDefault();
+                    });
+                }
                 this.currTab = tab;
             },
             setLayoutPost: function(layout) {
@@ -297,6 +437,88 @@
             setLayoutPreview: function(layout) {
                 this.currPost.layoutPreview = layout;
                 M.toast({html: 'Vorschau-Layout '+ (layout+1) + ' ausgewählt'});
+            },
+            selectImage: function(image) {
+                this.currPost.imagesAdded.push(image);
+                if(this.currPost.imagesAvailable.length < 8)
+                    this.increaseImageLimit(false);
+                this.updateImagesAvailable();
+            },
+            deselectImage: function(image) {
+                this.currPost.imagesAdded = this.currPost.imagesAdded.filter(i => i.id !== image.id);
+                this.updateImagesAvailable();
+            },
+            showUpload: function() {
+                document.getElementById('upload-image').click();
+            },
+            uploadImage: function(file) {
+                showLoading('Hochladen (0%)');
+                var data = new FormData();
+                data.append('file', file);
+                var config = {
+                    onUploadProgress: function(progressEvent) {
+                        var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
+                        showLoading('Hochladen ('+ percentCompleted +'%)', percentCompleted);
+                    }
+                };
+                var instance = this;
+                axios.post('./api/post/upload-image', data, config)
+                    .then(function (res) {
+                        if(res.data.id) {
+                            instance.resolveImageTime(res.data);
+                            instance.resolveImageSize(res.data);
+                            instance.imagesAvailable.unshift(res.data);
+                            instance.currPost.imagesAdded.push(res.data);
+                            M.toast({ html: 'Datei hochgeladen.' });
+                        } else if(res.data.message) {
+                            M.toast({ html: res.data.message });
+                        }
+                    })
+                    .catch(function (err) {
+                        M.toast({ html: 'Ein Fehler ist aufgetreten.' });
+                        console.log(err);
+                    })
+                    .finally(function () {
+                        hideLoading();
+                    });
+            },
+            resolveImageTime: function(image) {
+                image.time = moment(image.timestamp).format('DD.MM.YYYY');
+            },
+            resolveImageSize: function(image) {
+                if(image.size < 1024)
+                    image.sizeReadable = image.size + ' B';
+                else if(image.size < 1024 *1024)
+                    image.sizeReadable = Math.round(image.size / 1024) + ' KB';
+                else
+                    image.sizeReadable = Math.round(image.size / (1024*1024)) + ' MB';
+            },
+            increaseImageLimit: function(update=true) {
+                this.imagesAvailableLimit += 10;
+                if(update)
+                    this.updateImagesAvailable();
+                console.log("increased limit to " + this.imagesAvailableLimit);
+            },
+            fetchImages: function() {
+                this.$nextTick(() => {
+                    axios.get('./api/post/images-available')
+                        .then((response) => {
+                            if(Array.isArray(response.data)) {
+                                this.imagesAvailable = response.data;
+                                this.imagesAvailable.forEach(i => {
+                                    this.resolveImageTime(i);
+                                    this.resolveImageSize(i);
+                                });
+                                this.updateImagesAvailable();
+                                console.log('images fetched ('+response.data.length+')');
+                            } else {
+                                M.toast({html: 'Interner Fehler.'});
+                            }
+                        });
+                });
+            },
+            updateImagesAvailable: function() {
+                this.currPost.imagesAvailable = this.imagesAvailable.slice(0, this.imagesAvailableLimit).filter(i => !this.currPost.imagesAdded.includes(i));
             },
             postInit: function() {
                 this.$nextTick(() => {
@@ -333,8 +555,14 @@
                             }
                         }
                     });
+                    moment.locale('de');
                     console.log('post init finished')
                 });
+            }
+        },
+        computed: {
+            imageURL: function() {
+                return (image) => '/images/?id='+image.fileNameWithID;
             }
         },
         mounted: function () {

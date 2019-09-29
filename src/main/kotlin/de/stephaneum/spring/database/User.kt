@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository
 import java.sql.Timestamp
 import javax.persistence.*
 
+val EMPTY_USER = User(-1, Code(-1, "", ROLE_NO_LOGIN))
+
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name="nutzer")
