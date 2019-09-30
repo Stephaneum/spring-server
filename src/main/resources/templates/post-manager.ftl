@@ -225,11 +225,11 @@
             <div v-show="currTab.id === tabs.layout.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center; justify-content: center">
                 <div>
                     <h5>Beitrag</h5>
-                    <div v-for="l in postLayouts" @click="setLayoutPost(l)" style="height: 200px" class="layout-btn" :class="{ 'layout-btn-active': l === currPost.layoutPost }">
+                    <div v-for="l in postLayouts" @click="setLayoutPost(l)" style="height: 200px" class="layout-btn z-depth-1" :class="{ 'layout-btn-active': l === currPost.layoutPost }">
                         <img :src="'/static/img/layout-post-'+l+'.png'">
                     </div>
                     <h5>Vorschau</h5>
-                    <div v-for="l in previewLayouts" @click="setLayoutPreview(l)" style="height: 100px" class="layout-btn" :class="{ 'layout-btn-active': l === currPost.layoutPreview }">
+                    <div v-for="l in previewLayouts" @click="setLayoutPreview(l)" style="height: 100px" class="layout-btn z-depth-1" :class="{ 'layout-btn-active': l === currPost.layoutPreview }">
                         <img :src="'/static/img/layout-preview-'+l+'.png'">
                     </div>
                     <div style="margin-top: 30px" class="input-field">
@@ -241,8 +241,18 @@
             </div>
 
             <!-- ASSIGN -->
-            <div v-show="currTab.id === tabs.assign.id " class="tab-panel white z-depth-1">
-                ZUORDNUNG
+            <div v-show="currTab.id === tabs.assign.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center; justify-content: center">
+                <div style="width: 100%">
+                    <div style="text-align: center; font-size: 1.5em; margin-bottom: 50px">
+                        <p>
+                            Zuordnung:
+                            <span v-html="menuAssigned" style="color: #808080; margin-left: 20px"></span>
+                        </p>
+                    </div>
+
+                    <nav-menu :menu="menu" :user="user" minimal="true" @selected="assignMenu"></nav-menu>
+                    <div style="height: 300px"></div>
+                </div>
             </div>
 
             <!-- FINALIZE -->
@@ -362,7 +372,8 @@
                 imagesAvailable: [],
                 layoutPost: 0,
                 layoutPreview: 0,
-                preview: 200
+                preview: 200,
+                menu: null
             }
         },
         methods: {
@@ -520,6 +531,14 @@
             updateImagesAvailable: function() {
                 this.currPost.imagesAvailable = this.imagesAvailable.slice(0, this.imagesAvailableLimit).filter(i => !this.currPost.imagesAdded.includes(i));
             },
+            assignMenu: function (menu) {
+                if(menu.link) {
+                    M.toast({html: 'Keine Links erlaubt'});
+                } else {
+                    this.currPost.menu = menu;
+                    M.toast({html: 'Gruppe ausgewählt'});
+                }
+            },
             postInit: function() {
                 this.$nextTick(() => {
                     M.AutoInit();
@@ -563,6 +582,30 @@
         computed: {
             imageURL: function() {
                 return (image) => '/images/?id='+image.fileNameWithID;
+            },
+            menuAssigned: function() {
+                if(this.currPost.menu) {
+                    // build menu string with all its parents
+                    var s = '<span style="color: black; font-weight: bold;">'+this.currPost.menu.name+'</span>';
+                    var currMenu = this.currPost.menu;
+                    var findParent = (curr, parent, target) => {
+                        if(curr.id === target.id) {
+                            return parent;
+                        } else {
+                            return curr.children.reduce((result, c) => result ? result : findParent(c, curr, target), null);
+                        }
+                    };
+                    do {
+                        var parent = this.menu.reduce((result, curr) => result ? result : findParent(curr, null, currMenu), null);
+                        if(parent) {
+                            s = parent.name + ' / ' + s;
+                            currMenu = parent;
+                        }
+                    } while(parent);
+                    return s;
+                } else {
+                    return 'keine Auswahl';
+                }
             }
         },
         mounted: function () {

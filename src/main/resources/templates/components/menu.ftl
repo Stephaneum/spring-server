@@ -5,40 +5,40 @@
                 <a href="#" data-target="side-nav" class="sidenav-trigger hide-on-large-only">
                     <i class="material-icons" style="color: #1b5e20">menu</i>
                 </a>
-                <a href="./home.xhtml" class="brand-logo">
+                <a :href="minimal ? '#!' : './home.xhtml'" class="brand-logo" :style="minimal ? {'z-index': -1, 'opacity': 0.05 } : {}">
                     <img src="/static/img/logo-banner-green.png" style="height:50px;margin-top:5px;margin-left:10px"/>
                 </a>
                 <ul class="right hide-on-med-and-down">
                     <li v-for="m1 in menu">
-                        <a v-text="m1.name" :href="url(m1)" :target="target(m1)"  style="color: #1b5e20"></a>
+                        <a v-text="m1.name" @click="emit(m1)" :href="url(m1)" :target="target(m1)"  style="color: #1b5e20"></a>
                         <ul v-if="m1.children.length != 0" class="z-depth-1" style="z-index: 200">
                             <li v-for="m2 in m1.children">
-                                <a :href="url(m2)" :target="target(m2)">
-                                            <span>
-                                                <i v-if="m2.link" class="material-icons">arrow_upward</i>
-                                                <i v-else class="material-icons">stop</i>
-                                                {{m2.name}}
-                                            </span>
+                                <a @click="emit(m2)" :href="url(m2)" :target="target(m2)">
+                                    <span>
+                                        <i v-if="m2.link" class="material-icons">arrow_upward</i>
+                                        <i v-else class="material-icons">stop</i>
+                                        {{m2.name}}
+                                    </span>
                                     <i v-if="m2.children.length != 0" class="material-icons">keyboard_arrow_right</i>
                                 </a>
                                 <ul v-if="m2.children.length != 0" class="z-depth-1" style="z-index: 300">
                                     <li v-for="m3 in m2.children">
-                                        <a :href="url(m3)" :target="target(m3)">
-                                                    <span>
-                                                        <i v-if="m3.link" class="material-icons">arrow_upward</i>
-                                                        <i v-else class="material-icons">stop</i>
-                                                        {{m3.name}}
-                                                    </span>
+                                        <a @click="emit(m3)" :href="url(m3)" :target="target(m3)">
+                                            <span>
+                                                <i v-if="m3.link" class="material-icons">arrow_upward</i>
+                                                <i v-else class="material-icons">stop</i>
+                                                {{m3.name}}
+                                            </span>
                                             <i v-if="m3.children.length != 0" class="material-icons">keyboard_arrow_right</i>
                                         </a>
                                         <ul v-if="m3.children.length != 0" class="z-depth-1" style="z-index: 400">
                                             <li v-for="m4 in m3.children">
-                                                <a :href="url(m4)" :target="target(m4)">
-                                                            <span>
-                                                                <i v-if="m4.link" class="material-icons">arrow_upward</i>
-                                                                <i v-else class="material-icons">stop</i>
-                                                                {{m4.name}}
-                                                            </span>
+                                                <a @click="emit(m4)" :href="url(m4)" :target="target(m4)">
+                                                    <span>
+                                                        <i v-if="m4.link" class="material-icons">arrow_upward</i>
+                                                        <i v-else class="material-icons">stop</i>
+                                                        {{m4.name}}
+                                                    </span>
                                                 </a>
                                             </li>
                                         </ul>
@@ -47,7 +47,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li v-if="loggedIn">
+                    <li v-if="!minimal && loggedIn">
                         <a id="internal-btn">Intern</a>
                         <ul id="internal-menu" class="z-depth-1" style="z-index: 200">
                             <li v-if="admin"><a href="admin_konfig.xhtml"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
@@ -74,8 +74,8 @@
                         </div>
                     </li>
                     <li>
-                        <a class="waves-effect waves-dark btn" style="background-color: #1b5e20" :href="loggedIn ? 'logout' : 'login'">
-                            {{ loggedIn ? 'Abmelden' : 'Login' }}
+                        <a class="waves-effect waves-dark btn" style="background-color: #1b5e20" :style="minimal ? {'opacity': 0.1 } : {}" :href="minimal ? '#!' : loggedIn ? 'logout' : 'login'">
+                            {{ loggedIn && !minimal ? 'Abmelden' : 'Login' }}
                             <i class="material-icons right">exit_to_app</i>
                         </a>
                     </li>
@@ -86,7 +86,12 @@
 
     <script type="text/javascript">
         Vue.component('nav-menu', {
-            props: ['menu', 'user'],
+            props: ['menu', 'user', 'minimal'],
+            methods: {
+                emit: function(menu) {
+                    this.$emit('selected', menu);
+                }
+            },
             computed: {
                 loggedIn: function () {
                     return this.user && this.user.code.role >= 0;
@@ -112,10 +117,10 @@
                     return this.user && this.user.createCategories;
                 },
                 url: function () {
-                    return (menu) => menu.link ? menu.link : 'home.xhtml?id='+menu.id;
+                    return (menu) => this.minimal ? null : menu.link ? menu.link : 'home.xhtml?id='+menu.id;
                 },
                 target: function () {
-                    return (menu) => menu.link ? '_blank' : '_self';
+                    return (menu) => this.minimal ? null : menu.link ? '_blank' : '_self';
                 }
             },
             template: '#nav-menu'
