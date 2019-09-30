@@ -21,6 +21,7 @@ class ConfigFetcher {
 
     var fileLocation: String? = null
     var planLocation: String? = null
+    var planInfo: String? = null
     var backupLocation: String? = null
     var copyright: String? = null
 
@@ -28,6 +29,7 @@ class ConfigFetcher {
     fun update() {
         val newLocation = configRepo.findByKey("speicherort")?.value
         val newPlanLocation = configRepo.findByKey("str_vertretung")?.value
+        val newPlanInfo = configRepo.findByKey("str_vertretung_info")?.value
         val newBackupLocation = configRepo.findByKey("backup_dir")?.value
         val newCopyright = configRepo.findByKey("str_bottom")?.value
 
@@ -39,6 +41,11 @@ class ConfigFetcher {
         if(planLocation != newPlanLocation) {
             planLocation = newPlanLocation
             logger.info("PDF Location: $planLocation")
+        }
+
+        if(planInfo != newPlanInfo) {
+            planInfo = newPlanInfo
+            logger.info("PDF Info: $planInfo")
         }
 
         if(backupLocation != newBackupLocation) {

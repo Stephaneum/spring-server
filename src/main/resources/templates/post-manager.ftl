@@ -141,7 +141,7 @@
 
 <@vueLoader.blank/>
 <div id="app">
-    <nav-menu :menu="menu" :user="user"></nav-menu>
+    <nav-menu :menu="menu" :user="user" :plan="plan"></nav-menu>
 
     <div v-if="currMode" id="main-row" class="row" style="min-height: 100vh; margin-top: 50px">
         <div class="col s10 offset-s2">
@@ -250,7 +250,7 @@
                         </p>
                     </div>
 
-                    <nav-menu :menu="menu" :user="user" minimal="true" @selected="assignMenu"></nav-menu>
+                    <nav-menu :menu="menu" minimal="true" @selected="assignMenu"></nav-menu>
                     <div style="height: 300px"></div>
                 </div>
             </div>
@@ -353,6 +353,7 @@
         el: '#app',
         data: {
             menu: [],
+            plan: {},
             user: null,
             copyright: null,
             initialized: false,
@@ -623,6 +624,7 @@
                     .then((response) => {
                         if(response.data) {
                             this.user = response.data.user;
+                            this.plan = response.data.plan;
                             this.copyright = response.data.copyright;
                             if(this.user && this.user.code.role >= 0) {
                                 this.setMode(modes.create);

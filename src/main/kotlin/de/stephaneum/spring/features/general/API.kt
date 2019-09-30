@@ -19,6 +19,7 @@ class API {
     fun get(): Info {
         val user = Session.get().user ?: EMPTY_USER
         val copyright = configFetcher.copyright
-        return Info(user, copyright)
+        val plan = Plan(configFetcher.planLocation != null, configFetcher.planInfo)
+        return Info(user, copyright, plan)
     }
 }

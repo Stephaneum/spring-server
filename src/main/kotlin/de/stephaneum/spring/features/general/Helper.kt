@@ -4,4 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import de.stephaneum.spring.database.User
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class Info(val user: User, val copyright: String?)
+data class Info(val user: User, val copyright: String?, val plan: Plan)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Plan(val exists: Boolean, val info: String?)
