@@ -47,7 +47,6 @@ class PostAPI {
     fun digestFiles(files: List<File>) {
         files.forEach { file ->
             file.fileNameWithID = file.path.substring(file.path.lastIndexOf('/') + 1)
-            file.fileName = file.fileNameWithID.substring(file.fileNameWithID.lastIndexOf('_') + 1)
             file.path = ""
             file.user = EMPTY_USER
             file.folder = null

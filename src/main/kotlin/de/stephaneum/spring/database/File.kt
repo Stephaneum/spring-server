@@ -51,10 +51,6 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                 @JsonInclude
                 @Transient
-                var fileName: String = "",
-
-                @JsonInclude
-                @Transient
                 var fileNameWithID: String = "")
 
 @Repository

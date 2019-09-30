@@ -4,6 +4,8 @@
 <#import "components/vue-loader.ftl" as vueLoader/>
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
+<#import "components/post-preview.ftl" as preview/>
+<#import "components/post.ftl" as post/>
 
 <!DOCTYPE HTML>
 <html lang="de">
@@ -134,6 +136,12 @@
         .layout-btn > img {
             width: 150px;
         }
+
+        .grey-round-border {
+            padding: 20px;
+            border-radius: 20px;
+            background-color: #f5f5f5;
+        }
     </style>
 </head>
 
@@ -250,14 +258,43 @@
                         </p>
                     </div>
 
-                    <nav-menu :menu="menu" minimal="true" @selected="assignMenu"></nav-menu>
+                    <div class="grey-round-border">
+                        <nav-menu :menu="menu" minimal="true" @selected="assignMenu"></nav-menu>
+                    </div>
+
                     <div style="height: 300px"></div>
                 </div>
             </div>
 
             <!-- FINALIZE -->
             <div v-show="currTab.id === tabs.finalize.id " class="tab-panel white z-depth-1">
-                FERTIGSTELLUNG
+                <div style="display: flex;">
+                    <div style="flex: 1">
+                        <div style="border-radius: 20px; margin: 50px; padding: 30px; height: 100px;display: flex;align-items: center" :style="{ background: this.currPost.error.error ? '#ffcdd2' : '#e8f5e9' }">
+                            <i style="font-size: 3em" class="material-icons">{{ this.currPost.error.error ? 'warning' : 'check' }}</i>
+                            <span style="margin-left: 20px; font-size: 1.5em">{{ this.currPost.error.error ? 'gefundene Fehler:' : 'Alles in Ordnung.' }}</span>
+                            <ul v-if="this.currPost.error.error" style="flex: 0 0 130px;margin-left: 20px">
+                                <li v-if="this.currPost.error.titleEmpty"> - Kein Titel</li>
+                                <li v-if="this.currPost.error.missingAssignment"> - Zuordnung fehlt</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div style="flex: 0 0 350px;display: flex; align-items: center">
+                        <a class="waves-effect waves-light btn-large" style="font-size: 1.5em;background-color: #1b5e20;"
+                           @click="showUpload()" :disabled="this.currPost.error.error">
+                            <i class="material-icons left">check_circle</i>
+                            Veröffentlichen
+                        </a>
+                    </div>
+                </div>
+                <h5 style="margin: 0 0 30px 50px">Vorschau (Startseite):</h5>
+                <div class="grey-round-border">
+                    <post-preview postID="-1" :date="currentDate" :title="currPost.title" :text="currPost.text" :preview="parseInt(currPost.preview)" :layout="currPost.layoutPreview" :images="currPost.imagesAdded"></post-preview>
+                </div>
+                <h5 style="margin: 50px 0 30px 50px">Vorschau (Beitrag geöffnet):</h5>
+                <div class="grey-round-border">
+                    <post :date="currentDate" :title="currPost.title" :text="currPost.text" :layout="currPost.layoutPost" :images="currPost.imagesAdded"></post>
+                </div>
             </div>
         </div>
     </div>
@@ -283,6 +320,8 @@
 <@menu.render/>
 <@footer.render/>
 <@loading.render/>
+<@preview.render/>
+<@post.render/>
 <script type="text/javascript">
     M.AutoInit();
 
@@ -357,6 +396,7 @@
             user: null,
             copyright: null,
             initialized: false,
+            currentDate: moment().format('DD.MM.YYYY'),
             modes: modes,
             tabs: tabs,
             postLayouts: postLayouts,
@@ -374,7 +414,12 @@
                 layoutPost: 0,
                 layoutPreview: 0,
                 preview: 200,
-                menu: null
+                menu: null,
+                error: {
+                    error: false,
+                    titleEmpty: false,
+                    missingAssignment: false
+                }
             }
         },
         methods: {
@@ -440,6 +485,25 @@
                         if(this.scrollLeft > 0) e.preventDefault();
                     });
                 }
+
+                // validate, update materialboxed and sliders
+                if(tab.id === tabs.finalize.id) {
+                    this.currPost.error.error = false;
+                    this.currPost.error.titleEmpty = false;
+                    this.currPost.error.missingAssignment = false;
+                    if(!this.currPost.title || !this.currPost.title.trim()) {
+                        this.currPost.error.titleEmpty = true;
+                        this.currPost.error.error = true;
+                    }
+
+                    if(this.admin && !this.currPost.menu) {
+                        this.currPost.error.missingAssignment = true;
+                        this.currPost.error.error = true;
+                    }
+
+                    M.Materialbox.init(document.querySelectorAll('.materialboxed'), {});
+                    M.Slider.init(document.querySelectorAll('.slider'), {});
+                }
                 this.currTab = tab;
             },
             setLayoutPost: function(layout) {
@@ -477,8 +541,7 @@
                 axios.post('./api/post/upload-image', data, config)
                     .then(function (res) {
                         if(res.data.id) {
-                            instance.resolveImageTime(res.data);
-                            instance.resolveImageSize(res.data);
+                            instance.addImageData(res.data);
                             instance.imagesAvailable.unshift(res.data);
                             instance.currPost.imagesAdded.push(res.data);
                             M.toast({ html: 'Datei hochgeladen.' });
@@ -494,16 +557,21 @@
                         hideLoading();
                     });
             },
-            resolveImageTime: function(image) {
+            addImageData: function(image) {
+                // time
                 image.time = moment(image.timestamp).format('DD.MM.YYYY');
-            },
-            resolveImageSize: function(image) {
+
+                // size
                 if(image.size < 1024)
                     image.sizeReadable = image.size + ' B';
                 else if(image.size < 1024 *1024)
                     image.sizeReadable = Math.round(image.size / 1024) + ' KB';
                 else
                     image.sizeReadable = Math.round(image.size / (1024*1024)) + ' MB';
+
+                // filenames
+                image.fileName = image.fileNameWithID.substring(image.fileNameWithID.indexOf('_')+1);
+                image.fileNameNoExtension = image.fileName.substring(0, image.fileName.lastIndexOf('.'))
             },
             increaseImageLimit: function(update=true) {
                 this.imagesAvailableLimit += 10;
@@ -518,8 +586,7 @@
                             if(Array.isArray(response.data)) {
                                 this.imagesAvailable = response.data;
                                 this.imagesAvailable.forEach(i => {
-                                    this.resolveImageTime(i);
-                                    this.resolveImageSize(i);
+                                    this.addImageData(i);
                                 });
                                 this.updateImagesAvailable();
                                 console.log('images fetched ('+response.data.length+')');
@@ -581,6 +648,9 @@
             }
         },
         computed: {
+            admin: function () {
+                return this.user && this.user.code.role === 100;
+            },
             imageURL: function() {
                 return (image) => '/images/?id='+image.fileNameWithID;
             },
