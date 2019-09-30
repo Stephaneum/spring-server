@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest
 
 
 @RestController
-@RequestMapping("/blackboard", "/blackboard/api") // TODO remove the first mapping
+@RequestMapping("/blackboard/api")
 class BlackboardPublicAPI {
 
     @Value("\${blackboard.password}")
