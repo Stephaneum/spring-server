@@ -297,13 +297,18 @@
                         </a>
                     </div>
                 </div>
-                <h5 style="margin: 0 0 30px 50px">Vorschau (Startseite):</h5>
-                <div class="grey-round-border">
-                    <post-preview postID="-1" :date="currentDate" :title="currPost.title" :text="currPost.text" :preview="parseInt(currPost.preview)" :layout="currPost.layoutPreview" :images="currPost.imagesAdded"></post-preview>
+                <div v-if="currPost.error.titleEmpty" style="margin-top: 100px; text-align: center">
+                    <h5>Vorschau nicht verfügbar.</h5>
                 </div>
-                <h5 style="margin: 50px 0 30px 50px">Vorschau (Beitrag geöffnet):</h5>
-                <div class="grey-round-border">
-                    <post :date="currentDate" :title="currPost.title" :text="currPost.text" :layout="currPost.layoutPost" :images="currPost.imagesAdded"></post>
+                <div v-else>
+                    <h5 style="margin: 0 0 30px 50px">Vorschau (Startseite):</h5>
+                    <div class="grey-round-border">
+                        <post-preview postID="-1" :date="currentDate" :title="currPost.title" :text="currPost.text" :preview="parseInt(currPost.preview)" :layout="currPost.layoutPreview" :images="currPost.imagesAdded"></post-preview>
+                    </div>
+                    <h5 style="margin: 50px 0 30px 50px">Vorschau (Beitrag geöffnet):</h5>
+                    <div class="grey-round-border">
+                        <post :date="currentDate" :title="currPost.title" :text="currPost.text" :layout="currPost.layoutPost" :images="currPost.imagesAdded"></post>
+                    </div>
                 </div>
             </div>
         </div>
