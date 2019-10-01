@@ -159,12 +159,14 @@
         <div class="col s10 offset-s2">
             <h4 style="margin: 20px 0 40px 0">{{ currMode.description }}</h4>
         </div>
+        <!-- TABS -->
         <div class="col s10 offset-s2">
             <div v-for="(t, index) in currTabs" @click="setTab(t)" class="tab-btn" :class="{ 'tab-btn-active': t.id === currTab.id }">
                 <i style="font-size: 1em; margin-right: 5px" class="material-icons">{{ t.icon }}</i>
-                <span style="vertical-align: middle">{{ t.name }}</span>
+                <span style="vertical-align: middle">{{ t.name }}{{ t.number ? ' ('+t.number+')' : null }}</span>
             </div>
         </div>
+        <!-- MODES -->
         <div class="col s2">
             <div v-for="m in modes" @click="setMode(m)" class="mode-btn z-depth-1" :class="{ 'mode-btn-active': m.id === currMode.id }">
                 <i style="font-size: 3em" class="material-icons">{{ m.icon }}</i>
@@ -193,7 +195,7 @@
                     <div style="display: flex; align-items: center">
                         <div style="flex: 0 0 180px; padding-right: 10px; text-align: right">
                             <h5 style="margin: 0;">
-                                ausgewählt ({{ currPost.imagesAdded.length }}):
+                                ausgewählt:
                             </h5>
                             <form method="POST" enctype="multipart/form-data" style="margin-top: 30px;">
                                 <input name="file" type="file" id="upload-image" @change="uploadImage($event.currentTarget.files[0])" style="display: none">
@@ -361,32 +363,38 @@
         select: {
             id: -1,
             name: "Auswahl",
-            icon: "radio_button_checked"
+            icon: "radio_button_checked",
+            number: null
         },
         text: {
             id: 0,
             name: "Titel und Text",
-            icon: "format_align_left"
+            icon: "format_align_left",
+            number: null
         },
         images: {
             id: 1,
             name: "Bilder",
-            icon: "camera_alt"
+            icon: "camera_alt",
+            number: null
         },
         layout: {
             id: 2,
             name: "Layout",
-            icon: "border_inner"
+            icon: "border_inner",
+            number: null
         },
         assign: {
             id: 3,
             name: "Zuordnung",
-            icon: "device_hub"
+            icon: "device_hub",
+            number: null
         },
         finalize: {
             id: 4,
             name: "Fertigstellung",
-            icon: "check_circle"
+            icon: "check_circle",
+            number: null
         }
     };
 
@@ -418,7 +426,7 @@
                 imagesAvailable: [],
                 layoutPost: 0,
                 layoutPreview: 0,
-                preview: 200,
+                preview: 300,
                 menu: null,
                 error: {
                     error: false,
@@ -684,6 +692,13 @@
                     return 'keine Auswahl';
                 }
             }
+        },
+        watch: {
+            'currPost.imagesAdded': function (val, oldVal) {
+                this.$nextTick(function () {
+                    tabs.images.number = this.currPost.imagesAdded.length;
+                })
+            },
         },
         mounted: function () {
             this.$nextTick(() => {
