@@ -25,8 +25,8 @@ data class Post(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @Column(nullable = false, name = "titel", length = 128)
                 var title: String = "",
 
-                @Column(nullable = false, name = "text", columnDefinition = "TEXT CHARACTER SET utf8mb4")
-                var content: String = "",
+                @Column(nullable = true, name = "text", columnDefinition = "TEXT CHARACTER SET utf8mb4")
+                var content: String? = null,
 
                 @Column(nullable = false, name = "datum")
                 var timestamp: Timestamp = Timestamp(0),
@@ -35,8 +35,8 @@ data class Post(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @JoinColumn(name = "nutzer_id_update")
                 var userUpdate: User? = null,
 
-                @Column(nullable = false, name = "passwort", length = 32)
-                var password: String = "",
+                @Column(nullable = true, name = "passwort", length = 32)
+                var password: String? = null,
 
                 @Column(nullable = false, name = "genehmigt")
                 var approved: Boolean = false,

@@ -50,4 +50,7 @@ interface MenuRepo: CrudRepository<Menu, Int> {
 
     @Query("SELECT m FROM Menu m WHERE m.user IS NULL OR m.approved = TRUE")
     fun findPublic(): List<Menu>
+
+    @Query("SELECT m FROM Menu m WHERE m.user.id = ?1")
+    fun findCategory(userID: Int): Menu?
 }

@@ -61,4 +61,6 @@ interface FileRepo: CrudRepository<File, Int> {
 
     @Query("SELECT f FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE AND f.mime LIKE CONCAT(?2, '%') ORDER BY f.id DESC")
     fun findMyImages(userID: Int, mime: String): List<File>
+
+    fun findByIdIn(ids: List<Int>): List<File>
 }

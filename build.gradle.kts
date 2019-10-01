@@ -37,6 +37,7 @@ dependencies {
 	// Specific Libraries
 	implementation("org.apache.pdfbox:pdfbox:2.0.15")
 	implementation("commons-io:commons-io:2.6")
+	implementation("org.jsoup:jsoup:1.10.3")
 }
 
 tasks.withType<KotlinCompile> {

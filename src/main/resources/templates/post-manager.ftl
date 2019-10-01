@@ -200,7 +200,7 @@
                             <form method="POST" enctype="multipart/form-data" style="margin-top: 30px;">
                                 <input name="file" type="file" id="upload-image" @change="uploadImage($event.currentTarget.files[0])" style="display: none">
                                 <a class="waves-effect waves-light btn" style="background-color: #1b5e20"
-                                   @click="showUpload()">
+                                   @click="showUpload">
                                     <i class="material-icons left">cloud_upload</i>Hochladen
                                 </a>
                             </form>
@@ -291,7 +291,7 @@
                     </div>
                     <div style="flex: 0 0 350px;display: flex; align-items: center">
                         <a class="waves-effect waves-light btn-large" style="font-size: 1.5em;background-color: #1b5e20;"
-                           @click="showUpload()" :disabled="this.currPost.error.error">
+                           @click="create" :disabled="this.currPost.error.error">
                             <i class="material-icons left">check_circle</i>
                             Veröffentlichen
                         </a>
@@ -611,21 +611,19 @@
                 console.log("increased limit to " + this.imagesAvailableLimit);
             },
             fetchImages: function() {
-                this.$nextTick(() => {
-                    axios.get('./api/post/images-available')
-                        .then((response) => {
-                            if(Array.isArray(response.data)) {
-                                this.imagesAvailable = response.data;
-                                this.imagesAvailable.forEach(i => {
-                                    this.addImageData(i);
-                                });
-                                this.updateImagesAvailable();
-                                console.log('images fetched ('+response.data.length+')');
-                            } else {
-                                M.toast({html: 'Interner Fehler.'});
-                            }
-                        });
-                });
+                axios.get('./api/post/images-available')
+                    .then((res) => {
+                        if(Array.isArray(res.data)) {
+                            this.imagesAvailable = res.data;
+                            this.imagesAvailable.forEach(i => {
+                                this.addImageData(i);
+                            });
+                            this.updateImagesAvailable();
+                            console.log('images fetched ('+res.data.length+')');
+                        } else {
+                            M.toast({html: 'Interner Fehler.'});
+                        }
+                    });
             },
             updateImagesAvailable: function() {
                 this.currPost.imagesAvailable = this.imagesAvailable.slice(0, this.imagesAvailableLimit).filter(i => !this.currPost.imagesAdded.includes(i));
@@ -637,6 +635,26 @@
                     this.currPost.menu = menu;
                     M.toast({html: 'Gruppe ausgewählt'});
                 }
+            },
+            create: function () {
+                showLoading("Verarbeitung...");
+                axios.post('./api/post/create', {
+                    title: this.currPost.title,
+                    text: this.currPost.text,
+                    images: this.currPost.imagesAdded,
+                    layoutPost: this.currPost.layoutPost,
+                    layoutPreview: this.currPost.layoutPreview,
+                    preview: this.currPost.preview,
+                    menuID: this.currPost.menu ? this.currPost.menu.id : null
+                })
+                    .then((res) => {
+                        if(res.data.id) {
+                            window.location = './beitrag.xhtml?id='+res.data.id;
+                        } else if(res.data.message) {
+                            hideLoading();
+                            M.toast({ html: res.data.message });
+                        }
+                    });
             },
             postInit: function() {
                 this.$nextTick(() => {
@@ -740,20 +758,20 @@
         mounted: function () {
             this.$nextTick(() => {
                 axios.get('./api/menu')
-                    .then((response) => {
-                        if(response.data) {
-                            this.menu = response.data;
+                    .then((res) => {
+                        if(res.data) {
+                            this.menu = res.data;
                         } else {
                             M.toast({html: 'Interner Fehler.'});
                         }
                     });
 
                 axios.get('./api/info')
-                    .then((response) => {
-                        if(response.data) {
-                            this.user = response.data.user;
-                            this.plan = response.data.plan;
-                            this.copyright = response.data.copyright;
+                    .then((res) => {
+                        if(res.data) {
+                            this.user = res.data.user;
+                            this.plan = res.data.plan;
+                            this.copyright = res.data.copyright;
                             if(this.user && this.user.code.role >= 0) {
                                 this.setMode(modes.create);
                             }
@@ -763,9 +781,9 @@
                     });
 
                 axios.get('./api/post/info-post-manager')
-                    .then((response) => {
-                        if(response.data) {
-                            this.maxPictureSize = response.data.maxPictureSize;
+                    .then((res) => {
+                        if(res.data) {
+                            this.maxPictureSize = res.data.maxPictureSize;
                         } else {
                             M.toast({html: 'Interner Fehler.'});
                         }
