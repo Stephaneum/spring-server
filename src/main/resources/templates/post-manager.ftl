@@ -138,9 +138,13 @@
         }
 
         .grey-round-border {
-            padding: 20px;
-            border-radius: 20px;
+            padding: 10px;
+            border-radius: 10px;
             background-color: #f5f5f5;
+        }
+
+        .grey-round-border > .card, .grey-round-border > .card-panel {
+            margin: 0;
         }
     </style>
 </head>
@@ -251,11 +255,12 @@
             <!-- ASSIGN -->
             <div v-show="currTab.id === tabs.assign.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center; justify-content: center">
                 <div style="width: 100%">
-                    <div style="text-align: center; font-size: 1.5em; margin-bottom: 50px">
-                        <p>
+                    <div style="text-align: center; font-size: 1.5em; margin-bottom: 80px">
+                        <span :style="{ background: !currPost.menu ? '#ffcdd2' : '#e8f5e9' }"
+                            style="padding: 20px; border-radius: 20px">
                             Zuordnung:
                             <span v-html="menuAssigned" style="color: #808080; margin-left: 20px"></span>
-                        </p>
+                        </span>
                     </div>
 
                     <div class="grey-round-border">
@@ -503,6 +508,7 @@
 
                     M.Materialbox.init(document.querySelectorAll('.materialboxed'), {});
                     M.Slider.init(document.querySelectorAll('.slider'), {});
+                    console.log('update preview');
                 }
                 this.currTab = tab;
             },
@@ -652,7 +658,7 @@
                 return this.user && this.user.code.role === 100;
             },
             imageURL: function() {
-                return (image) => '/images/?id='+image.fileNameWithID;
+                return (image) => './api/images/'+image.fileNameWithID;
             },
             menuAssigned: function() {
                 if(this.currPost.menu) {

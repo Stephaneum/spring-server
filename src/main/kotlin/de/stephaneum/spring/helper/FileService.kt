@@ -316,4 +316,36 @@ class FileService {
         zis.closeEntry()
         zis.close()
     }
+
+    /**
+     * get the mime from the file extension
+     * @param extension the extension of the given file
+     * @return the resulting mime type or 'application/octet-stream' if it cannot be solved
+     */
+    fun getMime(extension: String): String {
+        return when (extension) {
+            "pdf" -> "application/pdf"
+            "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            "pptx" -> "application/mspowerpoint"
+            "xml" -> "application/xml"
+            "png" -> "image/png"
+            "jpg" -> "image/jpeg"
+            "jpeg" -> "image/jpeg"
+            "jpe" -> "image/jpeg"
+            "gif" -> "image/gif"
+            "mp4:" -> "video/mp4"
+            "zip" -> "application/zip"
+            "wav" -> "audio/x-wav"
+            "htm", "html" -> "text/html"
+            "js" -> "text/javascript"
+            "css" -> "text/css"
+            else -> "application/octet-stream"
+        }
+    }
+
+    /**
+     * @return true if the mime type indicates that it is an image
+     */
+    fun isImage(mime: String) = mime.startsWith("image")
 }

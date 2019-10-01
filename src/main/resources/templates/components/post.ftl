@@ -28,7 +28,7 @@
                     <br/>
                     <div class="row">
                         <div id="img-wall" style="text-align: center">
-                            <img v-for="i in images" class="materialboxed" style="width: 100%; padding: 10px"
+                            <img v-for="i in images" class="materialboxed"
                                  :data-caption="i.fileNameNoExtension" :src="imageURL(i)"/>
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                     return this.images.length !== 0;
                 },
                 imageURL: function () {
-                    return (image) => '/images/?id='+image.fileNameWithID;
+                    return (image) => './api/images/'+image.fileNameWithID;
                 }
             },
             template: '#post'
@@ -82,6 +82,11 @@
         #img-wall .material-placeholder {
             display: inline-block !important;
             width: 33%;
+        }
+
+        #img-wall img {
+            width: 100%;
+            padding: 10px;
         }
     </style>
 </#macro>

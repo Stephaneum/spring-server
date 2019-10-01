@@ -49,7 +49,7 @@
             },
             computed: {
                 textPreview: function() {
-                    return this.text ? this.text.replace(/<[^>]*>?/gm, '').slice(0, this.preview) : null;
+                    return this.text ? this.text.replace(/<[^>]*>?/gm, '').slice(0, this.preview) + '...' : null;
                 },
                 imagesSliced: function() {
                     return this.images.slice(0, 5);
@@ -58,7 +58,7 @@
                     return this.images.length !== 0;
                 },
                 imageURL: function () {
-                    return (image) => '/images/?id='+image.fileNameWithID;
+                    return (image) => './api/images/'+image.fileNameWithID;
                 },
                 postURL: function () {
                     if(this.post_id > 1)
