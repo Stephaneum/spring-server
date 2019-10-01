@@ -277,12 +277,15 @@
             <div v-show="currTab.id === tabs.finalize.id " class="tab-panel white z-depth-1">
                 <div style="display: flex;">
                     <div style="flex: 1">
-                        <div style="border-radius: 20px; margin: 50px; padding: 30px; height: 100px;display: flex;align-items: center" :style="{ background: this.currPost.error.error ? '#ffcdd2' : '#e8f5e9' }">
-                            <i style="font-size: 3em" class="material-icons">{{ this.currPost.error.error ? 'warning' : 'check' }}</i>
-                            <span style="margin-left: 20px; font-size: 1.5em">{{ this.currPost.error.error ? 'gefundene Fehler:' : 'Alles in Ordnung.' }}</span>
+                        <div style="border-radius: 20px; margin: 50px; padding: 30px; height: 100px;display: flex;align-items: center" :style="{ background: validationInfoBox.background }">
+                            <i style="font-size: 3em" class="material-icons">{{ validationInfoBox.icon }}</i>
+                            <span style="margin-left: 20px; font-size: 1.5em">{{ validationInfoBox.text }}</span>
                             <ul v-if="this.currPost.error.error" style="flex: 0 0 130px;margin-left: 20px">
                                 <li v-if="this.currPost.error.titleEmpty"> - Kein Titel</li>
                                 <li v-if="this.currPost.error.missingAssignment"> - Zuordnung fehlt</li>
+                            </ul>
+                            <ul v-else-if="this.currPost.warning.warning" style="flex: 0 0 200px;margin-left: 20px">
+                                <li v-if="this.currPost.warning.compressImages"> - Bilder werden komprimiert</li>
                             </ul>
                         </div>
                     </div>
@@ -410,11 +413,12 @@
             copyright: null,
             initialized: false,
             currentDate: moment().format('DD.MM.YYYY'),
+            maxPictureSize: 0, // will be fetched, image will be compressed if larger than this number
             modes: modes,
             tabs: tabs,
             postLayouts: postLayouts,
             previewLayouts: previewLayouts,
-            imagesAvailable: [],
+            imagesAvailable: [], // will be fetched
             imagesAvailableLimit: 10,
             currMode: null,
             currTabs: [],
@@ -432,6 +436,10 @@
                     error: false,
                     titleEmpty: false,
                     missingAssignment: false
+                },
+                warning: {
+                    warning: false,
+                    compressImages: false
                 }
             }
         },
@@ -501,17 +509,26 @@
 
                 // validate, update materialboxed and sliders
                 if(tab.id === tabs.finalize.id) {
-                    this.currPost.error.error = false;
-                    this.currPost.error.titleEmpty = false;
-                    this.currPost.error.missingAssignment = false;
+                    var error = this.currPost.error;
+                    var warning = this.currPost.warning;
+                    error.error = false;
+                    error.titleEmpty = false;
+                    error.missingAssignment = false;
+                    warning.warning = false;
+                    warning.compressImages = false;
                     if(!this.currPost.title || !this.currPost.title.trim()) {
-                        this.currPost.error.titleEmpty = true;
-                        this.currPost.error.error = true;
+                        error.titleEmpty = true;
+                        error.error = true;
                     }
 
                     if(this.admin && !this.currPost.menu) {
-                        this.currPost.error.missingAssignment = true;
-                        this.currPost.error.error = true;
+                        error.missingAssignment = true;
+                        error.error = true;
+                    }
+
+                    if(this.currPost.imagesAdded.some((i) => i.size >= this.maxPictureSize)) {
+                        warning.compressImages = true;
+                        warning.warning = true;
                     }
 
                     M.Materialbox.init(document.querySelectorAll('.materialboxed'), {});
@@ -691,6 +708,26 @@
                 } else {
                     return 'keine Auswahl';
                 }
+            },
+            validationInfoBox: function() {
+                if(this.currPost.error.error)
+                    return {
+                        text: 'gefundene Fehler:',
+                        background: '#ffcdd2',
+                        icon: 'warning'
+                    };
+                else if(this.currPost.warning.warning)
+                    return {
+                        text: 'Hinweise:',
+                        background: '#fff9c4',
+                        icon: 'info'
+                    };
+                else
+                    return {
+                        text: 'Alles in Ordnung.',
+                        background: '#e8f5e9',
+                        icon: 'check'
+                    };
             }
         },
         watch: {
@@ -720,6 +757,15 @@
                             if(this.user && this.user.code.role >= 0) {
                                 this.setMode(modes.create);
                             }
+                        } else {
+                            M.toast({html: 'Interner Fehler.'});
+                        }
+                    });
+
+                axios.get('./api/post/info-post-manager')
+                    .then((response) => {
+                        if(response.data) {
+                            this.maxPictureSize = response.data.maxPictureSize;
                         } else {
                             M.toast({html: 'Interner Fehler.'});
                         }

@@ -25,6 +25,8 @@ class ConfigFetcher {
     var backupLocation: String? = null
     var copyright: String? = null
 
+    var maxPictureSize: Int? = null
+
     @Scheduled(initialDelay=3000, fixedDelay = 10000)
     fun update() {
         val newLocation = configRepo.findByKey("speicherort")?.value
@@ -32,6 +34,7 @@ class ConfigFetcher {
         val newPlanInfo = configRepo.findByKey("str_vertretung_info")?.value
         val newBackupLocation = configRepo.findByKey("backup_dir")?.value
         val newCopyright = configRepo.findByKey("str_bottom")?.value
+        var newMaxPictureSize = configRepo.findByKey("picture_size")?.value?.toInt()
 
         if(fileLocation != newLocation) {
             fileLocation = newLocation
@@ -56,6 +59,11 @@ class ConfigFetcher {
         if(copyright != newCopyright) {
             copyright = newCopyright
             logger.info("Copyright: $copyright")
+        }
+
+        if(maxPictureSize != newMaxPictureSize) {
+            maxPictureSize = newMaxPictureSize;
+            logger.info("max picture size: $maxPictureSize")
         }
     }
 }

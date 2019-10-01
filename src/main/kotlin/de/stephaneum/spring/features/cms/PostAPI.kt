@@ -5,6 +5,7 @@ import de.stephaneum.spring.database.EMPTY_USER
 import de.stephaneum.spring.database.File
 import de.stephaneum.spring.database.FileRepo
 import de.stephaneum.spring.helper.FileService
+import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -18,6 +19,14 @@ class PostAPI {
 
     @Autowired
     private lateinit var fileService: FileService
+
+    @Autowired
+    private lateinit var configFetcher: ConfigFetcher
+
+    @GetMapping("/info-post-manager")
+    fun infoPostManager(): Response.PostManager {
+        return Response.PostManager(configFetcher.maxPictureSize ?: 0)
+    }
 
     @GetMapping("/images-available")
     fun get(): Any {
