@@ -4,13 +4,17 @@ import de.stephaneum.spring.database.File
 import de.stephaneum.spring.database.Menu
 
 object Request {
-    data class CreatePost(val title: String?,
+    data class UpdatePost(val id: Int?,
+                          val title: String?,
                           val text: String?,
                           val images: List<File>,
                           val layoutPost: Int,
                           val layoutPreview: Int,
                           val preview: Int,
                           val menuID: Int?)
+
+    data class UpdatePostPassword(val postID: Int,
+                                  val password: String?)
 }
 
 object Response {

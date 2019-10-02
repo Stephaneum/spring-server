@@ -43,7 +43,17 @@ data class Menu(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                 @JsonInclude
                 @Transient
-                var children: List<Menu> = emptyList())
+                var children: List<Menu> = emptyList()) {
+
+    fun simplify() {
+        parent = null
+        user = null
+        image = null
+        password = null
+        approved = null
+        children.forEach { it.simplify() } // recursive call
+    }
+}
 
 @Repository
 interface MenuRepo: CrudRepository<Menu, Int> {

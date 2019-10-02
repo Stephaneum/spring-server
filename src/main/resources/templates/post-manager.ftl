@@ -6,6 +6,7 @@
 <#import "components/footer.ftl" as footer/>
 <#import "components/post-preview.ftl" as preview/>
 <#import "components/post.ftl" as post/>
+<#import "components/post-list.ftl" as postList/>
 
 <!DOCTYPE HTML>
 <html lang="de">
@@ -157,7 +158,7 @@
 
     <div v-if="currMode" id="main-row" class="row" style="min-height: 100vh; margin-top: 50px">
         <div class="col s10 offset-s2">
-            <h4 style="margin: 20px 0 40px 0">{{ currMode.description }}</h4>
+            <h4 id="post-manager-title" style="margin: 20px 0 40px 0">{{ currMode.description }}</h4>
         </div>
         <!-- TABS -->
         <div class="col s10 offset-s2">
@@ -177,7 +178,18 @@
 
             <!-- SELECT -->
             <div v-show="currTab.id === tabs.select.id " class="tab-panel white z-depth-1">
-                AUSWAHL
+                <h5 style="margin-bottom: 20px">Gruppe auswählen:</h5>
+                <div class="grey-round-border">
+                    <nav-menu :menu="category.length != 0 ? category : menu" minimal="true" @selected="selectMenu"></nav-menu>
+                </div>
+
+                <div v-if="currSelection.posts.length !== 0" style="margin-top: 50px">
+                    <post-list :name="currSelection.menu.name" :posts="currSelection.posts" :selected="currPost.id"
+                               @selected="selectPost" @updated="selectMenu(currSelection.menu)"></post-list>
+                </div>
+                <div v-else style="text-align: center; margin-top: 100px">
+                    <h5>Keine Beiträge verfügbar.</h5>
+                </div>
             </div>
 
             <!-- TEXT -->
@@ -298,16 +310,16 @@
                             </ul>
                         </div>
                     </div>
-                    <div style="flex: 0 0 350px;display: flex; align-items: center">
+                    <div style="flex: 0 0 350px;display: flex; align-items: center; justify-content: center">
                         <a class="waves-effect waves-light btn-large" style="font-size: 1.5em;background-color: #1b5e20;"
-                           @click="create" :disabled="this.currPost.error.error">
+                           @click="sendPost" :disabled="this.currPost.error.error">
                             <i class="material-icons left">check_circle</i>
-                            Veröffentlichen
+                            {{ finalButtonText }}
                         </a>
                     </div>
                 </div>
                 <div v-if="currPost.error.titleEmpty" style="margin-top: 100px; text-align: center">
-                    <h5>Vorschau nicht verfügbar.</h5>
+                    <h5>Vorschau ist nicht verfügbar.</h5>
                 </div>
                 <div v-else>
                     <h5 style="margin: 0 0 30px 50px">Vorschau (Startseite):</h5>
@@ -346,6 +358,7 @@
 <@loading.render/>
 <@preview.render/>
 <@post.render/>
+<@postList.render/>
 <script type="text/javascript">
     M.AutoInit();
 
@@ -438,7 +451,12 @@
             currMode: null,
             currTabs: [],
             currTab: null,
+            currSelection: {
+                menu: null,
+                posts: []
+            },
             currPost: {
+                id: null,
                 title: null,
                 text: null,
                 imagesAdded: [],
@@ -460,6 +478,8 @@
         },
         methods: {
             setMode: function(mode) {
+                this.resetData();
+
                 switch(mode.id) {
                     case modes.create.id:
                         this.currTabs = this.admin || this.user.managePosts || this.category.length !== 0 ?
@@ -482,6 +502,7 @@
                 this.currMode = mode;
                 if(!this.initialized) {
                     this.postInit();
+                    this.initialized = true;
                 }
             },
             setTab: function(tab) {
@@ -552,6 +573,82 @@
                     console.log('update preview');
                 }
                 this.currTab = tab;
+            },
+            resetData: function() {
+                this.currPost.id = null;
+                this.currPost.title = null;
+                this.currPost.text = null;
+                this.currPost.imagesAdded = [];
+                this.currPost.layoutPost = 0;
+                this.currPost.layoutPreview = 0;
+                this.currPost.preview = 300;
+                this.currPost.menu = null;
+                $('#post-text-editor').trumbowyg('empty');
+
+                this.currSelection.menu = null;
+                this.currSelection.posts = [];
+            },
+            selectMenu: function (menu) {
+                showLoading('Lade Beiträge...');
+                axios.get('./api/post?noContent=true&menuID='+menu.id)
+                    .then((res) => {
+                        if(Array.isArray(res.data)) {
+                            this.resetData();
+                            this.currTabs = [tabs.select];
+
+                            res.data.forEach((p, index) => {
+                                p.time = moment(p.timestamp).format('DD.MM.YYYY'); // add time
+                                p.number = res.data.length - index; // add index
+                            });
+                            this.currSelection.posts = res.data;
+                            this.currSelection.menu = menu;
+
+                            this.$nextTick(() => {
+                                M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
+                                M.Modal.init(document.querySelectorAll('.modal'), {});
+                            });
+                            console.log('posts fetched ('+res.data.length+')');
+                        } else {
+                            M.toast({html: 'Interner Fehler.'});
+                        }
+                        hideLoading();
+                    });
+            },
+            selectPost: function(post) {
+                showLoading('Lade Beitrag...');
+                axios.get('./api/post?postID='+post.id)
+                    .then((res) => {
+                        if(res.data.id) {
+                            this.currPost.id = res.data.id;
+                            this.currPost.title = res.data.title;
+                            this.currPost.text = res.data.content;
+                            this.currPost.imagesAdded = res.data.images;
+                            this.currPost.layoutPost = res.data.layoutPost;
+                            this.currPost.layoutPreview = res.data.layoutPreview;
+                            this.currPost.preview = res.data.preview;
+                            this.currPost.menu = res.data.menu;
+                            $('#post-text-editor').trumbowyg('html', res.data.content); // set data for editor
+
+                            // date, size, filenames
+                            this.currPost.imagesAdded.forEach(i => {
+                                this.addImageData(i);
+                            });
+
+                            this.currTabs = this.admin || this.user.managePosts || this.category.length !== 0 ?
+                                [tabs.select, tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize] : [tabs.select, tabs.text, tabs.images, tabs.layout, tabs.finalize];
+                            this.currTab = tabs.text;
+
+                            this.$nextTick(() => {
+                                M.updateTextFields();
+                                window.scrollTo({ top: document.getElementById('post-manager-title').getBoundingClientRect().top + window.scrollY, behavior: 'smooth' });
+                            });
+
+                            console.log('post fetched');
+                        } else {
+                            M.toast({html: 'Interner Fehler.'});
+                        }
+                        hideLoading();
+                    });
             },
             setLayoutPost: function(layout) {
                 this.currPost.layoutPost = layout;
@@ -656,9 +753,10 @@
                     M.toast({html: 'Gruppe ausgewählt'});
                 }
             },
-            create: function () {
+            sendPost: function () {
                 showLoading("Verarbeitung...");
-                axios.post('./api/post/create', {
+                axios.post('./api/post/update', {
+                    id: this.currPost.id,
                     title: this.currPost.title,
                     text: this.currPost.text,
                     images: this.currPost.imagesAdded,
@@ -722,6 +820,16 @@
             },
             imageURL: function() {
                 return (image) => './api/images/'+image.fileNameWithID;
+            },
+            finalButtonText: function() {
+                switch(this.currMode.id) {
+                    case modes.create.id:
+                        return 'Veröffentlichen';
+                    case modes.approve.id:
+                        return 'Genehmigen';
+                    default:
+                        return 'Speichern';
+                }
             },
             menuAssigned: function() {
                 if(this.currPost.menu) {

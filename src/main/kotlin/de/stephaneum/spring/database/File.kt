@@ -51,7 +51,15 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                 @JsonInclude
                 @Transient
-                var fileNameWithID: String = "")
+                var fileNameWithID: String = "") {
+
+    fun simplifyForPosts() {
+        fileNameWithID = path.substring(path.lastIndexOf('/') + 1)
+        path = ""
+        user = EMPTY_USER
+        folder = null
+    }
+}
 
 @Repository
 interface FileRepo: CrudRepository<File, Int> {

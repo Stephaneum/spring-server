@@ -24,7 +24,7 @@ class MenuService {
         rootMenu = sortPriority(rootMenu)
 
         // remove unnecessary information
-        rootMenu.forEach { simplify(it) }
+        rootMenu.forEach { it.simplify() }
 
         return rootMenu
     }
@@ -35,7 +35,7 @@ class MenuService {
 
         addChildren(category, menu)
         sortPriority(listOf(category))
-        simplify(category)
+        category.simplify()
         return listOf(category)
     }
 
@@ -67,14 +67,5 @@ class MenuService {
         val sorted = menu.sortedByDescending { it.priority }
         sorted.forEach { it.children = sortPriority(it.children) }
         return sorted
-    }
-
-    private fun simplify(menu: Menu) {
-        menu.parent = null
-        menu.user = null
-        menu.image = null
-        menu.password = null
-        menu.approved = null
-        menu.children.forEach { simplify(it) } // recursive call
     }
 }

@@ -5,6 +5,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.*
 
 @Entity
@@ -22,4 +23,10 @@ data class FilePost(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                     var post: Post = Post())
 
 @Repository
-interface FilePostRepo: CrudRepository<FilePost, Int>
+interface FilePostRepo: CrudRepository<FilePost, Int> {
+
+    fun findByPostId(postID: Int): List<FilePost>
+
+    @Transactional
+    fun deleteByPostId(postID: Int)
+}

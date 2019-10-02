@@ -51,7 +51,29 @@ data class Post(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var layoutPost: Int = 0,
 
                 @Column(nullable = false, name = "layout_vorschau")
-                var layoutPreview: Int = 0)
+                var layoutPreview: Int = 0,
+
+                @JsonInclude
+                @Transient
+                var images: List<File>? = null) {
+
+    fun simplify() {
+        user?.code?.code = ""
+        user?.password = ""
+        user?.storage = 0
+        user?.email = ""
+        user?.gender = null
+
+        userUpdate?.code?.code = ""
+        userUpdate?.password = ""
+        userUpdate?.storage = 0
+        userUpdate?.email = ""
+        userUpdate?.gender = null
+    }
+}
 
 @Repository
-interface PostRepo: CrudRepository<Post, Int>
+interface PostRepo: CrudRepository<Post, Int> {
+
+    fun findByMenuIdOrderByTimestampDesc(menuID: Int): List<Post>
+}
