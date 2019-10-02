@@ -176,20 +176,37 @@
         </div>
         <div class="col s10">
 
-            <!-- SELECT -->
-            <div v-show="currTab.id === tabs.select.id " class="tab-panel white z-depth-1">
+            <!-- SELECT-EDIT -->
+            <div v-show="currTab.id === tabs.selectEdit.id" class="tab-panel white z-depth-1">
                 <h5 style="margin-bottom: 20px">Gruppe auswählen:</h5>
                 <div class="grey-round-border">
-                    <nav-menu :menu="category.length != 0 ? category : menu" minimal="true" @selected="selectMenu"></nav-menu>
+                    <nav-menu :menu="category.length != 0 ? category : menu" minimal="true" @selected="fetchPosts"></nav-menu>
                 </div>
 
-                <div v-if="currSelection.posts.length !== 0" style="margin-top: 50px">
+                <div v-if="currTab.id === tabs.selectEdit.id && currSelection.posts.length !== 0" style="margin-top: 50px">
                     <post-list :name="currSelection.menu.name" :posts="currSelection.posts" :selected="currPost.id"
-                               @selected="selectPost" @updated="selectMenu(currSelection.menu)"></post-list>
+                               @selected="selectPost" @updated="fetchPosts(currSelection.menu)"></post-list>
                 </div>
                 <div v-else style="text-align: center; margin-top: 100px">
                     <h5>Keine Beiträge verfügbar.</h5>
                 </div>
+            </div>
+
+            <!-- SELECT-APPROVE -->
+            <div v-show="currTab.id === tabs.selectApprove.id" class="tab-panel white z-depth-1">
+                <div v-if="currTab.id === tabs.selectApprove.id && currSelection.posts.length !== 0" style="margin-top: 30px">
+                    <post-list name="Noch nicht genehmigte Beiträge" :posts="currSelection.posts" :selected="currPost.id"
+                               :hide_password="true"
+                               @selected="selectPost" @updated="fetchPosts"></post-list>
+                </div>
+                <div v-else style="text-align: center; margin-top: 100px">
+                    <h5>Keine Beiträge verfügbar.</h5>
+                </div>
+            </div>
+
+            <!-- SELECT-SPECIAL -->
+            <div v-show="currTab.id === tabs.selectSpecial.id" class="tab-panel white z-depth-1">
+                <h5 style="margin-bottom: 20px">Text auswählen:</h5>
             </div>
 
             <!-- TEXT -->
@@ -390,7 +407,19 @@
     };
 
     var tabs = {
-        select: {
+        selectEdit: {
+            id: -3,
+            name: "Auswahl",
+            icon: "radio_button_checked",
+            number: null
+        },
+        selectApprove: {
+            id: -2,
+            name: "Auswahl",
+            icon: "radio_button_checked",
+            number: null
+        },
+        selectSpecial: {
             id: -1,
             name: "Auswahl",
             icon: "radio_button_checked",
@@ -487,16 +516,17 @@
                         this.currTab = tabs.text;
                         break;
                     case modes.edit.id:
-                        this.currTabs = [tabs.select];
-                        this.currTab = tabs.select;
+                        this.currTabs = [tabs.selectEdit];
+                        this.currTab = tabs.selectEdit;
                         break;
                     case modes.approve.id:
-                        this.currTabs = [tabs.select];
-                        this.currTab = tabs.select;
+                        this.currTabs = [tabs.selectApprove];
+                        this.currTab = tabs.selectApprove;
+                        this.fetchPosts(); // load unapproved posts
                         break;
                     case modes.special.id:
-                        this.currTabs = [tabs.select];
-                        this.currTab = tabs.select;
+                        this.currTabs = [tabs.selectSpecial];
+                        this.currTab = tabs.selectSpecial;
                         break;
                 }
                 this.currMode = mode;
@@ -506,6 +536,18 @@
                 }
             },
             setTab: function(tab) {
+
+                // update Materialize
+                if(tab.id === tabs.selectEdit.id || tab.id === tabs.selectApprove.id || tab.id === tabs.selectSpecial.id) {
+                    this.$nextTick(() => {
+                        this.$nextTick(() => {
+                            M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
+                            M.Modal.init(document.querySelectorAll('.modal'), {});
+                            console.log('Materialize update')
+                        });
+                    });
+                }
+
                 // save changes from text editor
                 if (this.currTab.id === tabs.text.id)
                     this.currPost.text = $('#post-text-editor').trumbowyg('html');
@@ -588,17 +630,18 @@
                 this.currSelection.menu = null;
                 this.currSelection.posts = [];
             },
-            selectMenu: function (menu) {
+            fetchPosts: function (menu) {
+                // if menu is null, then fetch unapproved posts
                 showLoading('Lade Beiträge...');
-                axios.get('./api/post?noContent=true&menuID='+menu.id)
+                axios.get(menu ? './api/post?noContent=true&menuID='+menu.id : './api/post?unapproved=true')
                     .then((res) => {
                         if(Array.isArray(res.data)) {
                             this.resetData();
-                            this.currTabs = [tabs.select];
+                            this.currTabs = [this.currTabs[0]]; // hide the other tabs and only show the first tab
 
                             res.data.forEach((p, index) => {
                                 p.time = moment(p.timestamp).format('DD.MM.YYYY'); // add time
-                                p.number = res.data.length - index; // add index
+                                p.number = menu ? res.data.length - index : index + 1; // add index
                             });
                             this.currSelection.posts = res.data;
                             this.currSelection.menu = menu;
@@ -634,8 +677,9 @@
                                 this.addImageData(i);
                             });
 
+                            var selectTab = this.currMode.id === modes.edit.id ? tabs.selectEdit : this.currMode.id === modes.approve.id ? tabs.selectApprove : tabs.selectSpecial;
                             this.currTabs = this.admin || this.user.managePosts || this.category.length !== 0 ?
-                                [tabs.select, tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize] : [tabs.select, tabs.text, tabs.images, tabs.layout, tabs.finalize];
+                                [selectTab, tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize] : [selectTab, tabs.text, tabs.images, tabs.layout, tabs.finalize];
                             this.currTab = tabs.text;
 
                             this.$nextTick(() => {

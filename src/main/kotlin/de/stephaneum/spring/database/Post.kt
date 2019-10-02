@@ -3,6 +3,7 @@ package de.stephaneum.spring.database
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import java.sql.Timestamp
@@ -76,4 +77,7 @@ data class Post(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 interface PostRepo: CrudRepository<Post, Int> {
 
     fun findByMenuIdOrderByTimestampDesc(menuID: Int): List<Post>
+
+    @Query("SELECT p FROM Post p WHERE p.approved = FALSE ORDER BY p.timestamp")
+    fun findUnapproved(): List<Post>
 }

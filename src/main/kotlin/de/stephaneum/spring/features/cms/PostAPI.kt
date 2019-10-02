@@ -44,22 +44,16 @@ class PostAPI {
     private lateinit var logRepo: LogRepo
 
     @GetMapping
-    fun get(@RequestParam(required = false) postID: Int?,
+    fun get(@RequestParam(required = false) unapproved: Boolean?,
+            @RequestParam(required = false) postID: Int?,
             @RequestParam(required = false) menuID: Int?,
             @RequestParam(required = false) noContent: Boolean?): Any {
         when {
-            postID != null -> {
-                val post = postRepo.findByIdOrNull(postID) ?: return Response.Feedback(false, message = "post not found")
-                post.simplify()
-                post.menu?.simplify()
-                post.images = filePostRepo.findByPostId(post.id).map { it.file.apply { simplifyForPosts() } }
-                if(noContent == true)
-                    post.content = null
-                return post
-            }
-            menuID != null -> {
+            unapproved == true || menuID != null -> {
                 Session.get().user ?: return Response.Feedback(false, needLogin = true)
-                return postRepo.findByMenuIdOrderByTimestampDesc(menuID).apply {
+                val posts = if(menuID != null) postRepo.findByMenuIdOrderByTimestampDesc(menuID) else postRepo.findUnapproved()
+
+                return posts.apply {
                     forEach { p ->
                         p.simplify()
                         p.menu?.simplify()
@@ -68,6 +62,15 @@ class PostAPI {
                             p.content = null
                     }
                 }
+            }
+            postID != null -> {
+                val post = postRepo.findByIdOrNull(postID) ?: return Response.Feedback(false, message = "post not found")
+                post.simplify()
+                post.menu?.simplify()
+                post.images = filePostRepo.findByPostId(post.id).map { it.file.apply { simplifyForPosts() } }
+                if(noContent == true)
+                    post.content = null
+                return post
             }
             else -> return Response.Feedback(false, message = "Empty request body")
         }
@@ -80,7 +83,8 @@ class PostAPI {
         val oldPost: Post?
         if(request.id != null) {
             // update post -> check
-            oldPost = postRepo.findByIdOrNull(request.id) ?: return Response.Feedback(false, message = "post not found")
+            // we also create a copy because Repository.save() does modify the old reference
+            oldPost = postRepo.findByIdOrNull(request.id)?.copy() ?: return Response.Feedback(false, message = "post not found")
             if(!hasAccessToPost(user, oldPost))
                 return Response.Feedback(false, message = "You are not allowed to modify this post.")
         } else {

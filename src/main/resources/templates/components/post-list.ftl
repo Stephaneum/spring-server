@@ -16,8 +16,8 @@
                             <span style="margin-left: 20px" class="green-badge-light">{{ p.time }}</span>
 
                         </span>
-                        <span style="flex: 0 0 200px; text-align: right">
-                            <a @click="showPassword(p)" class="tooltipped waves-effect waves-light blue-grey btn margin-1" href="#!" data-tooltip="Passwort" data-position="bottom">
+                        <span style="text-align: right" :style="{ flex: hide_password ? '0 0 140px' : '0 0 200px' }">
+                            <a v-if="!hide_password" @click="showPassword(p)" class="tooltipped waves-effect waves-light blue-grey btn margin-1" href="#!" data-tooltip="Passwort" data-position="bottom">
                                 <i class="material-icons">{{ p.password ? 'lock_open' : 'lock' }}</i>
                             </a>
 
@@ -39,7 +39,7 @@
                 </a>
             </div>
             <!-- set password modal -->
-            <div id="modal-password" class="modal" style="width: 500px">
+            <div v-if="!hide_password" id="modal-password" class="modal" style="width: 500px">
                 <div class="modal-content">
                     <h4>Beitrag-Passwort</h4>
                     <br>
@@ -81,7 +81,7 @@
 
     <script type="text/javascript">
         Vue.component('post-list', {
-            props: ['name', 'posts', 'selected'],
+            props: ['name', 'posts', 'selected', 'hide_password'],
             data: function () {
                 return {
                     postsLimited: [],
