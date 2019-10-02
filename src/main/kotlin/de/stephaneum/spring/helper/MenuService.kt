@@ -36,7 +36,7 @@ class MenuService {
         addChildren(category, menu)
         sortPriority(listOf(category))
         simplify(category)
-        return category.children
+        return listOf(category)
     }
 
     /**

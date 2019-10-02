@@ -263,14 +263,17 @@
             <!-- ASSIGN -->
             <div v-show="currTab.id === tabs.assign.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center; justify-content: center">
                 <div style="width: 100%">
-                    <div style="text-align: center; font-size: 1.5em; margin-bottom: 80px">
+                    <div style="text-align: center; font-size: 1.5em;">
                         <span :style="{ background: !currPost.menu ? '#ffcdd2' : '#e8f5e9' }"
                             style="padding: 20px; border-radius: 20px">
                             Zuordnung:
                             <span v-html="menuAssigned" style="color: #808080; margin-left: 20px"></span>
                         </span>
                     </div>
-
+                    <div v-if="!admin && !user.managePosts" style="text-align: center; margin-top: 40px">
+                        <span>Die Zuordnung ist optional. Der Admin ordnet dann diesen Beitrag zu, falls keine Auswahl getätigt wurde.</span>
+                    </div>
+                    <div style="height: 60px"></div>
                     <div class="grey-round-border">
                         <nav-menu :menu="category.length != 0 ? category : menu" minimal="true" @selected="assignMenu"></nav-menu>
                     </div>
