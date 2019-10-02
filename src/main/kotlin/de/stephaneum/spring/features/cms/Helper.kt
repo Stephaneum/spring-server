@@ -15,5 +15,5 @@ object Request {
 object Response {
     data class Feedback(val success: Boolean, val needLogin: Boolean = false, val message: String? = null)
 
-    data class PostManager(val maxPictureSize: Int)
+    data class PostManager(val maxPictureSize: Int, val hasCategory: Boolean)
 }

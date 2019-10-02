@@ -38,6 +38,9 @@ class PostAPI {
     @Autowired
     private lateinit var logRepo: LogRepo
 
+    @Autowired
+    private lateinit var menuRepo: MenuRepo
+
     @PostMapping("/create")
     fun create(@RequestBody request: Request.CreatePost): Any {
 
@@ -81,8 +84,11 @@ class PostAPI {
     }
 
     @GetMapping("/info-post-manager")
-    fun infoPostManager(): Response.PostManager {
-        return Response.PostManager(configFetcher.maxPictureSize ?: 0)
+    fun infoPostManager(): Any {
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val hasCategory = user.createCategories == true && menuRepo.findCategory(user.id) != null
+
+        return Response.PostManager(configFetcher.maxPictureSize ?: 0, hasCategory)
     }
 
     @GetMapping("/images-available")

@@ -194,15 +194,20 @@
                 <div style="width: 100%">
                     <div style="display: flex; align-items: center; background-color: #e8f5e9; border-radius: 20px; padding: 10px">
                         <div style="flex: 0 0 180px; padding-right: 10px; text-align: center">
-                            <p v-if="currPost.imagesAdded.length != 0" style="font-size: 3em; font-weight: bold; margin: 0">{{ currPost.imagesAdded.length }}</p>
+                            <p style="font-size: 3em; font-weight: bold; margin: 0">{{ currPost.imagesAdded.length }}</p>
                             <h5 style="margin: 0;">
                                 Ausgewählt
                             </h5>
                             <form method="POST" enctype="multipart/form-data" style="margin-top: 30px;">
                                 <input name="file" type="file" id="upload-image" @change="uploadImage($event.currentTarget.files[0])" style="display: none">
-                                <a class="waves-effect waves-light btn" style="background-color: #1b5e20"
-                                   @click="showUpload">
-                                    <i class="material-icons left">cloud_upload</i>Hochladen
+
+                                <a class="waves-effect waves-light tooltipped btn" style="background-color: #607d8b"
+                                   @click="deselectAllImages" :disabled="currPost.imagesAdded.length === 0" data-tooltip="Zurücksetzen" data-position="bottom">
+                                    <i class="material-icons">block</i>
+                                </a>
+                                <a class="waves-effect waves-light tooltipped btn" style="background-color: #1b5e20; margin-left: 10px"
+                                   @click="showUpload" data-tooltip="Hochladen" data-position="bottom">
+                                    <i class="material-icons">cloud_upload</i>
                                 </a>
                             </form>
                         </div>
@@ -420,6 +425,7 @@
             initialized: false,
             currentDate: moment().format('DD.MM.YYYY'),
             maxPictureSize: 0, // will be fetched, image will be compressed if larger than this number
+            hasCategory: false, // will be fetched
             modes: modes,
             tabs: tabs,
             postLayouts: postLayouts,
@@ -453,7 +459,8 @@
             setMode: function(mode) {
                 switch(mode.id) {
                     case modes.create.id:
-                        this.currTabs = [tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize];
+                        this.currTabs = this.admin || this.user.createPosts || this.hasCategory ?
+                            [tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize] : [tabs.text, tabs.images, tabs.layout, tabs.finalize];
                         this.currTab = tabs.text;
                         break;
                     case modes.edit.id:
@@ -527,7 +534,7 @@
                         error.error = true;
                     }
 
-                    if(this.admin && !this.currPost.menu) {
+                    if((this.admin || this.user.createPosts) && !this.currPost.menu) {
                         error.missingAssignment = true;
                         error.error = true;
                     }
@@ -559,6 +566,10 @@
             },
             deselectImage: function(image) {
                 this.currPost.imagesAdded = this.currPost.imagesAdded.filter(i => i.id !== image.id);
+                this.updateImagesAvailable();
+            },
+            deselectAllImages: function() {
+                this.currPost.imagesAdded = [];
                 this.updateImagesAvailable();
             },
             showUpload: function() {
@@ -778,18 +789,19 @@
                             this.user = res.data.user;
                             this.plan = res.data.plan;
                             this.copyright = res.data.copyright;
-                            if(this.user && this.user.code.role >= 0) {
-                                this.setMode(modes.create);
-                            }
-                        } else {
-                            M.toast({html: 'Interner Fehler.'});
-                        }
-                    });
 
-                axios.get('./api/post/info-post-manager')
-                    .then((res) => {
-                        if(res.data) {
-                            this.maxPictureSize = res.data.maxPictureSize;
+                            axios.get('./api/post/info-post-manager')
+                                .then((res) => {
+                                    if(res.data) {
+                                        this.maxPictureSize = res.data.maxPictureSize;
+                                        this.hasCategory = res.data.hasCategory;
+                                        if(this.user && this.user.code.role >= 0) {
+                                            this.setMode(modes.create);
+                                        }
+                                    } else {
+                                        M.toast({html: 'Interner Fehler.'});
+                                    }
+                                });
                         } else {
                             M.toast({html: 'Interner Fehler.'});
                         }
