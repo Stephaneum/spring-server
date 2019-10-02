@@ -192,10 +192,11 @@
             <!-- IMAGES -->
             <div v-show="currTab.id === tabs.images.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center;">
                 <div style="width: 100%">
-                    <div style="display: flex; align-items: center">
-                        <div style="flex: 0 0 180px; padding-right: 10px; text-align: right">
+                    <div style="display: flex; align-items: center; background-color: #e8f5e9; border-radius: 20px; padding: 10px">
+                        <div style="flex: 0 0 180px; padding-right: 10px; text-align: center">
+                            <p v-if="currPost.imagesAdded.length != 0" style="font-size: 3em; font-weight: bold; margin: 0">{{ currPost.imagesAdded.length }}</p>
                             <h5 style="margin: 0;">
-                                ausgewählt:
+                                Ausgewählt
                             </h5>
                             <form method="POST" enctype="multipart/form-data" style="margin-top: 30px;">
                                 <input name="file" type="file" id="upload-image" @change="uploadImage($event.currentTarget.files[0])" style="display: none">
@@ -218,8 +219,8 @@
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; margin-top: 50px">
-                        <h5 style="flex: 0 0 180px; padding-right: 10px; margin: 0; text-align: right;">
-                            verfügbar:
+                        <h5 style="flex: 0 0 180px; padding-right: 10px; margin: 0; text-align: center;">
+                            Verfügbar
                         </h5>
                         <div id="container-images-available" class="container-images">
                             <div v-for="i in currPost.imagesAvailable" @click="selectImage(i)" class="container-image z-depth-1">
