@@ -46,10 +46,9 @@ class PostAPI {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
 
-        println(request)
         // validate menuID
         if(request.menuID != null) {
-            val allowed = user.code.role == ROLE_ADMIN || user.createPosts == true || (user.createCategories == true && menuService.ownsCategory(user.id, request.menuID))
+            val allowed = user.code.role == ROLE_ADMIN || user.managePosts == true || (user.createCategories == true && menuService.ownsCategory(user.id, request.menuID))
             if(!allowed)
                 return Response.Feedback(false, message = "You are not allowed to specify a menu")
         }
@@ -59,7 +58,7 @@ class PostAPI {
             return Response.Feedback(false, message = "Empty title.")
 
         // validate assignment
-        if((user.code.role == ROLE_ADMIN || user.createPosts == true) && request.menuID == null)
+        if((user.code.role == ROLE_ADMIN || user.managePosts == true) && request.menuID == null)
             return Response.Feedback(false, message = "Missing assignment.")
 
         // save the post
@@ -86,9 +85,8 @@ class PostAPI {
     @GetMapping("/info-post-manager")
     fun infoPostManager(): Any {
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        val hasCategory = user.createCategories == true && menuRepo.findCategory(user.id) != null
 
-        return Response.PostManager(configFetcher.maxPictureSize ?: 0, hasCategory)
+        return Response.PostManager(configFetcher.maxPictureSize ?: 0, menuService.getCategory(user.id))
     }
 
     @GetMapping("/images-available")

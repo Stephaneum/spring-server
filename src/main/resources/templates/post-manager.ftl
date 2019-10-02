@@ -272,7 +272,7 @@
                     </div>
 
                     <div class="grey-round-border">
-                        <nav-menu :menu="menu" minimal="true" @selected="assignMenu"></nav-menu>
+                        <nav-menu :menu="category.length != 0 ? category : menu" minimal="true" @selected="assignMenu"></nav-menu>
                     </div>
 
                     <div style="height: 300px"></div>
@@ -425,7 +425,7 @@
             initialized: false,
             currentDate: moment().format('DD.MM.YYYY'),
             maxPictureSize: 0, // will be fetched, image will be compressed if larger than this number
-            hasCategory: false, // will be fetched
+            category: [], // will be fetched
             modes: modes,
             tabs: tabs,
             postLayouts: postLayouts,
@@ -459,7 +459,7 @@
             setMode: function(mode) {
                 switch(mode.id) {
                     case modes.create.id:
-                        this.currTabs = this.admin || this.user.createPosts || this.hasCategory ?
+                        this.currTabs = this.admin || this.user.managePosts || this.category.length !== 0 ?
                             [tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize] : [tabs.text, tabs.images, tabs.layout, tabs.finalize];
                         this.currTab = tabs.text;
                         break;
@@ -534,7 +534,7 @@
                         error.error = true;
                     }
 
-                    if((this.admin || this.user.createPosts) && !this.currPost.menu) {
+                    if((this.admin || this.user.managePosts) && !this.currPost.menu) {
                         error.missingAssignment = true;
                         error.error = true;
                     }
@@ -794,7 +794,7 @@
                                 .then((res) => {
                                     if(res.data) {
                                         this.maxPictureSize = res.data.maxPictureSize;
-                                        this.hasCategory = res.data.hasCategory;
+                                        this.category = res.data.category;
                                         if(this.user && this.user.code.role >= 0) {
                                             this.setMode(modes.create);
                                         }

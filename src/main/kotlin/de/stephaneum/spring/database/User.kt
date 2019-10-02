@@ -51,7 +51,7 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var managePosts: Boolean? = false,
 
                 @Column(nullable = true, name = "projekt_erstellen")
-                var createPosts: Boolean? = false,
+                var createProjects: Boolean? = false,
 
                 @Column(nullable = true, name = "rubrik_erstellen")
                 var createCategories: Boolean? = false,
