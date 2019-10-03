@@ -57,11 +57,15 @@ class PostAPI {
                     else -> postRepo.findUnapproved(user.id) // get only unapproved posts from the current user
                 }
 
+                if(posts.isEmpty())
+                    return emptyList<Post>()
+
+                val images = filePostRepo.findImagesByPostIdIn(posts.map { it.id })
                 return posts.apply {
                     forEach { p ->
                         p.simplify()
                         p.menu?.simplify()
-                        p.images = filePostRepo.findByPostId(p.id).map { it.file.apply { simplifyForPosts() } }
+                        p.images = images.filter { it.postID == p.id }.map { it.file.apply { simplifyForPosts() } }
                         if(noContent == true)
                             p.content = null
                     }
