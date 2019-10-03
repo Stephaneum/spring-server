@@ -31,7 +31,7 @@ class BackupController {
             return REDIRECT_ADMIN
 
         model["title"] = "Backup"
-        return "login"
+        return "login-generic"
     }
 
     @GetMapping("/admin")

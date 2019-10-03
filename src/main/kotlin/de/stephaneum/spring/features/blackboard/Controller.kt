@@ -48,7 +48,7 @@ class BlackboardController {
             return REDIRECT_ADMIN
 
         model["title"] = "Blackboard"
-        return "login"
+        return "login-generic"
     }
 
     @GetMapping("/admin")
