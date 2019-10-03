@@ -359,14 +359,19 @@
                     <h5>Vorschau ist nicht verfügbar.</h5>
                 </div>
                 <div v-else>
-                    <h5 style="margin: 0 0 30px 50px">Vorschau (Startseite):</h5>
-                    <div class="grey-round-border">
-                        <post-preview postID="-1" :date="currentDate" :title="currPost.title" :text="currPost.text" :preview="parseInt(currPost.preview)" :layout="currPost.layoutPreview" :images="currPost.imagesAdded"></post-preview>
+                    <div style="margin: auto; max-width: 1100px">
+                        <h5 style="margin: 0 0 30px 50px">Vorschau (Startseite):</h5>
+                        <div class="grey-round-border">
+                            <post-preview postID="-1" :date="currentDate" :title="currPost.title" :text="currPost.text" :preview="parseInt(currPost.preview)" :layout="currPost.layoutPreview" :images="currPost.imagesAdded"></post-preview>
+                        </div>
                     </div>
-                    <h5 style="margin: 50px 0 30px 50px">Vorschau (Beitrag geöffnet):</h5>
-                    <div class="grey-round-border">
-                        <post :date="currentDate" :title="currPost.title" :text="currPost.text" :layout="currPost.layoutPost" :images="currPost.imagesAdded"></post>
+                    <div style="margin: auto; max-width: 1050px">
+                        <h5 style="margin: 50px 0 30px 50px">Vorschau (Beitrag geöffnet):</h5>
+                        <div class="grey-round-border">
+                            <post :date="currentDate" :title="currPost.title" :text="currPost.text" :layout="currPost.layoutPost" :images="currPost.imagesAdded"></post>
+                        </div>
                     </div>
+                    <div style="height: 50px"></div>
                 </div>
             </div>
         </div>
@@ -955,19 +960,11 @@
         },
         mounted: function () {
             this.$nextTick(() => {
-                axios.get('./api/menu')
-                    .then((res) => {
-                        if(res.data) {
-                            this.menu = res.data;
-                        } else {
-                            M.toast({html: 'Interner Fehler.'});
-                        }
-                    });
-
                 axios.get('./api/info')
                     .then((res) => {
                         if(res.data) {
                             this.user = res.data.user;
+                            this.menu = res.data.menu;
                             this.plan = res.data.plan;
                             this.copyright = res.data.copyright;
                             this.unapproved = res.data.unapproved;

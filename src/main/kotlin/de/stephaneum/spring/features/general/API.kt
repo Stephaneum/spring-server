@@ -4,8 +4,11 @@ import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.EMPTY_USER
 import de.stephaneum.spring.database.PostRepo
 import de.stephaneum.spring.database.ROLE_ADMIN
+import de.stephaneum.spring.database.UserRepo
 import de.stephaneum.spring.helper.FileService
+import de.stephaneum.spring.helper.MenuService
 import de.stephaneum.spring.scheduler.ConfigFetcher
+import de.stephaneum.spring.security.CryptoService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
@@ -15,6 +18,8 @@ import javax.servlet.http.HttpServletRequest
 @RequestMapping("/api")
 class API {
 
+    private val PEPPER = "A43w8pa0M245qga4293zt9o4mc3z98TA3nQ9mzvTa943cta43mTaoz47tz3loIhbiKh"
+
     @Autowired
     private lateinit var configFetcher: ConfigFetcher
 
@@ -22,15 +27,38 @@ class API {
     private lateinit var fileService: FileService
 
     @Autowired
+    private lateinit var menuService: MenuService
+
+    @Autowired
+    private lateinit var cryptoService: CryptoService
+
+    @Autowired
     private lateinit var postRepo: PostRepo
 
+    @Autowired
+    private lateinit var userRepo: UserRepo
+
     @GetMapping("/info")
-    fun get(): Info {
+    fun get(): Response.Info {
         val user = Session.get().user ?: EMPTY_USER
         val copyright = configFetcher.copyright
-        val plan = Plan(configFetcher.planLocation != null, configFetcher.planInfo)
+        val plan = Response.Plan(configFetcher.planLocation != null, configFetcher.planInfo)
         val unapproved = if(user.code.role == ROLE_ADMIN || user.managePosts == true) postRepo.countByApproved(false) else null
-        return Info(user, copyright, plan, unapproved)
+        return Response.Info(user, menuService.getPublic(), copyright, plan, unapproved)
+    }
+
+    @ExperimentalUnsignedTypes
+    @PostMapping("/login")
+    fun login(@RequestBody request: Request.Login): Response.Feedback {
+        val user = userRepo.findByEmail(request.email) ?: return Response.Feedback(false)
+        val salt = user.password.substring(32)
+        if(user.password == cryptoService.hashMD5(request.password+salt+PEPPER)+salt) {
+            Session.get().user = user;
+            return Response.Feedback(true)
+        } else {
+            Thread.sleep(2000)
+            return Response.Feedback(false)
+        }
     }
 
     @PostMapping("/logout")

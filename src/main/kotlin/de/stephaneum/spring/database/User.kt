@@ -63,4 +63,7 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var teacherChatLastOnline: Timestamp = Timestamp(0))
 
 @Repository
-interface UserRepo: CrudRepository<User, Int>
+interface UserRepo: CrudRepository<User, Int> {
+
+    fun findByEmail(email: String): User?
+}

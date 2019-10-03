@@ -49,7 +49,7 @@
             },
             computed: {
                 textPreview: function() {
-                    return this.text ? this.text.replace(/<[^>]*>?/gm, '').slice(0, this.preview) + '...' : null;
+                    return this.text ? this.text.replace(/<[^>]*>?/gm, '').replace('&nbsp;',' ').slice(0, this.preview) + '...' : null;
                 },
                 imagesSliced: function() {
                     return this.images.slice(0, 5);

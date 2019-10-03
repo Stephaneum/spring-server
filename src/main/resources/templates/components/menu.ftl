@@ -1,6 +1,6 @@
 <#macro render>
     <template id="nav-menu">
-        <div>
+        <div style="width: 100%">
             <nav>
                 <div class="nav-wrapper" style="z-index: 100; background-color: white">
                     <a href="#" data-target="sidenav" class="sidenav-trigger hide-on-large-only">
@@ -162,10 +162,20 @@
             },
             mounted: function() {
                 if(!this.minimal) {
-                    $(document).ready(function(){
-                        $('.sidenav').sidenav();
+                    var callback = function(){
+                        // Handler when the DOM is fully loaded
+                        M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
                         console.log('menu init');
-                    });
+                    };
+
+                    if (
+                        document.readyState === "complete" ||
+                        (document.readyState !== "loading" && !document.documentElement.doScroll)
+                    ) {
+                        callback();
+                    } else {
+                        document.addEventListener("DOMContentLoaded", callback);
+                    }
                 }
             },
             template: '#nav-menu'
