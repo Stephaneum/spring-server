@@ -2,6 +2,8 @@ package de.stephaneum.spring.features.general
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.EMPTY_USER
+import de.stephaneum.spring.database.PostRepo
+import de.stephaneum.spring.database.ROLE_ADMIN
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,12 +24,16 @@ class API {
     @Autowired
     private lateinit var fileService: FileService
 
+    @Autowired
+    private lateinit var postRepo: PostRepo
+
     @GetMapping("/info")
     fun get(): Info {
         val user = Session.get().user ?: EMPTY_USER
         val copyright = configFetcher.copyright
         val plan = Plan(configFetcher.planLocation != null, configFetcher.planInfo)
-        return Info(user, copyright, plan)
+        val unapproved = if(user.code.role == ROLE_ADMIN || user.managePosts == true) postRepo.countByApproved(false) else null
+        return Info(user, copyright, plan, unapproved)
     }
 
     @GetMapping("/images/{fileName}")

@@ -73,6 +73,19 @@
             height: 45px !important;
         }
 
+        .tab-btn-special {
+            background-color: #009688;
+        }
+
+        .tab-btn-special:hover {
+            background-color: #26a69a;
+        }
+
+        .tab-btn-special-active {
+            background-color: #00897b !important;
+            height: 45px !important;
+        }
+
         .tab-panel {
             min-height: 700px;
             padding: 20px;
@@ -154,7 +167,7 @@
 
 <@vueLoader.blank/>
 <div id="app">
-    <nav-menu :menu="menu" :user="user" :plan="plan"></nav-menu>
+    <nav-menu :menu="menu" :user="user" :plan="plan" :unapproved="unapproved"></nav-menu>
 
     <div v-if="currMode" id="main-row" class="row" style="min-height: 100vh; margin-top: 50px">
         <div class="col s10 offset-s2">
@@ -162,7 +175,7 @@
         </div>
         <!-- TABS -->
         <div class="col s10 offset-s2">
-            <div v-for="(t, index) in currTabs" @click="setTab(t)" class="tab-btn" :class="{ 'tab-btn-active': t.id === currTab.id }">
+            <div v-for="(t, index) in currTabs" @click="setTab(t)" class="tab-btn" :class="{ 'tab-btn-special': t.special, 'tab-btn-active': !t.special && t.id === currTab.id, 'tab-btn-special-active': t.special && t.id === currTab.id }">
                 <i style="font-size: 1em; margin-right: 5px" class="material-icons">{{ t.icon }}</i>
                 <span style="vertical-align: middle">{{ t.name }}{{ t.number ? ' ('+t.number+')' : null }}</span>
             </div>
@@ -178,14 +191,21 @@
 
             <!-- SELECT-EDIT -->
             <div v-show="currTab.id === tabs.selectEdit.id" class="tab-panel white z-depth-1">
-                <h5 style="margin-bottom: 20px">Gruppe auswählen:</h5>
-                <div class="grey-round-border">
-                    <nav-menu :menu="category.length != 0 ? category : menu" minimal="true" @selected="fetchPosts"></nav-menu>
+                <div v-if="admin || user.managePosts || category.length !== 0">
+                    <h5 style="margin-bottom: 20px">Gruppe auswählen:</h5>
+                    <div class="grey-round-border">
+                        <nav-menu :menu="category.length !== 0 ? category : menu" minimal="true" @selected="fetchPosts"></nav-menu>
+                    </div>
                 </div>
 
-                <div v-if="currTab.id === tabs.selectEdit.id && currSelection.posts.length !== 0" style="margin-top: 50px">
+                <div v-if="currTab.id === tabs.selectEdit.id && currSelection.menu && currSelection.posts.length !== 0" style="margin-top: 50px">
                     <post-list :name="currSelection.menu.name" :posts="currSelection.posts" :selected="currPost.id"
                                @selected="selectPost" @updated="fetchPosts(currSelection.menu)"></post-list>
+                </div>
+                <div v-else-if="currTab.id === tabs.selectEdit.id && !currSelection.menu && currSelection.posts.length !== 0" style="margin-top: 50px">
+                    <post-list name="Noch nicht genehmigte Beiträge" :posts="currSelection.posts" :selected="currPost.id"
+                               :hide_password="true"
+                               @selected="selectPost" @updated="fetchPosts"></post-list>
                 </div>
                 <div v-else style="text-align: center; margin-top: 100px">
                     <h5>Keine Beiträge verfügbar.</h5>
@@ -211,7 +231,7 @@
 
             <!-- TEXT -->
             <div v-show="currTab.id === tabs.text.id " class="tab-panel white z-depth-1">
-                <div class="input-field" style="max-width: 600px">
+                <div class="input-field" style="max-width: 700px">
                     <label for="post-title">Titel</label>
                     <input v-model:value="currPost.title" type="text" id="post-title" style="font-weight: bold"/>
                 </div>
@@ -304,7 +324,7 @@
                     </div>
                     <div style="height: 60px"></div>
                     <div class="grey-round-border">
-                        <nav-menu :menu="category.length != 0 ? category : menu" minimal="true" @selected="assignMenu"></nav-menu>
+                        <nav-menu :menu="category.length !== 0 ? category : menu" minimal="true" @selected="assignMenu"></nav-menu>
                     </div>
 
                     <div style="height: 300px"></div>
@@ -411,18 +431,21 @@
             id: -3,
             name: "Auswahl",
             icon: "radio_button_checked",
+            special: true,
             number: null
         },
         selectApprove: {
             id: -2,
             name: "Auswahl",
             icon: "radio_button_checked",
+            special: true,
             number: null
         },
         selectSpecial: {
             id: -1,
             name: "Auswahl",
             icon: "radio_button_checked",
+            special: true,
             number: null
         },
         text: {
@@ -467,10 +490,11 @@
             plan: {},
             user: null,
             copyright: null,
+            unapproved: null, // amount of unapproved posts (admin only)
             initialized: false,
             currentDate: moment().format('DD.MM.YYYY'),
             maxPictureSize: 0, // will be fetched, image will be compressed if larger than this number
-            category: [], // will be fetched
+            category: [], // will be fetched (like menu but only a part of it)
             modes: modes,
             tabs: tabs,
             postLayouts: postLayouts,
@@ -518,6 +542,8 @@
                     case modes.edit.id:
                         this.currTabs = [tabs.selectEdit];
                         this.currTab = tabs.selectEdit;
+                        if(!this.admin && !this.user.managePosts)
+                            this.fetchPosts(); // load unapproved posts for non-admins
                         break;
                     case modes.approve.id:
                         this.currTabs = [tabs.selectApprove];
@@ -826,8 +852,8 @@
                         semantic: false,
                         lang: 'de',
                         btns: [
-                            ['foreColor', 'backColor'],
                             ['strong', 'em', 'underline', 'del'],
+                            ['foreColor', 'backColor'],
                             ['formatting', 'fontsize'],
                             ['superscript', 'subscript'],
                             ['link'],
@@ -944,6 +970,9 @@
                             this.user = res.data.user;
                             this.plan = res.data.plan;
                             this.copyright = res.data.copyright;
+                            this.unapproved = res.data.unapproved;
+                            if(this.unapproved)
+                                this.modes.approve.name = this.modes.approve.name + ' (' + this.unapproved + ')';
 
                             axios.get('./api/post/info-post-manager')
                                 .then((res) => {
@@ -951,6 +980,11 @@
                                         this.maxPictureSize = res.data.maxPictureSize;
                                         this.category = res.data.category;
                                         if(this.user && this.user.code.role >= 0) {
+                                            // set one time the modes available
+                                            if(this.user.code.role !== 100)
+                                                this.modes = [modes.create, modes.edit, modes.approve];
+                                            if(this.user.code.role !== 100 && !this.user.managePosts)
+                                                this.modes = [modes.create, modes.edit];
                                             this.setMode(modes.create);
                                         }
                                     } else {

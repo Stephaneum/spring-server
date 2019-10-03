@@ -50,8 +50,12 @@ class PostAPI {
             @RequestParam(required = false) noContent: Boolean?): Any {
         when {
             unapproved == true || menuID != null -> {
-                Session.get().user ?: return Response.Feedback(false, needLogin = true)
-                val posts = if(menuID != null) postRepo.findByMenuIdOrderByTimestampDesc(menuID) else postRepo.findUnapproved()
+                val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+                val posts = when {
+                    menuID != null -> postRepo.findByMenuIdOrderByTimestampDesc(menuID) // get posts from a menu
+                    user.code.role == ROLE_ADMIN || user.managePosts == true -> postRepo.findUnapproved() // get all unapproved posts
+                    else -> postRepo.findUnapproved(user.id) // get only unapproved posts from the current user
+                }
 
                 return posts.apply {
                     forEach { p ->

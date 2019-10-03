@@ -76,8 +76,13 @@ data class Post(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Repository
 interface PostRepo: CrudRepository<Post, Int> {
 
+    fun countByApproved(approved: Boolean): Int
+
     fun findByMenuIdOrderByTimestampDesc(menuID: Int): List<Post>
 
     @Query("SELECT p FROM Post p WHERE p.approved = FALSE ORDER BY p.timestamp")
     fun findUnapproved(): List<Post>
+
+    @Query("SELECT p FROM Post p WHERE p.approved = FALSE AND p.user.id = ?1 ORDER BY p.timestamp")
+    fun findUnapproved(userID: Int): List<Post>
 }
