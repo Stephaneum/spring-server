@@ -8,10 +8,7 @@ import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.*
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletRequest
 
 @RestController
@@ -34,6 +31,11 @@ class API {
         val plan = Plan(configFetcher.planLocation != null, configFetcher.planInfo)
         val unapproved = if(user.code.role == ROLE_ADMIN || user.managePosts == true) postRepo.countByApproved(false) else null
         return Info(user, copyright, plan, unapproved)
+    }
+
+    @PostMapping("/logout")
+    fun logout() {
+        Session.logout()
     }
 
     @GetMapping("/images/{fileName}")

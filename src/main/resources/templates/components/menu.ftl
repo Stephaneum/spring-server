@@ -75,7 +75,7 @@
                             </div>
                         </li>
                         <li>
-                            <a class="waves-effect waves-dark btn" style="background-color: #1b5e20" :style="minimal ? {'opacity': 0.1 } : {}" :href="minimal ? '#!' : loggedIn ? 'logout' : 'login'">
+                            <a class="waves-effect waves-dark btn" style="background-color: #1b5e20" :style="minimal ? {'opacity': 0.1 } : {}" @click="toggleAuth">
                                 {{ loggedIn && !minimal ? 'Abmelden' : 'Login' }}
                                 <i class="material-icons right">exit_to_app</i>
                             </a>
@@ -116,6 +116,17 @@
             methods: {
                 emit: function(menu) {
                     this.$emit('selected', menu);
+                },
+                toggleAuth: function() {
+                    if(this.loggedIn) {
+                        showLoading("Abmelden...");
+                        axios.post('./api/logout')
+                            .then((response) => {
+                                window.location = '/logout.xhtml'; // continue with jsf
+                            });
+                    } else {
+                        window.location = 'login';
+                    }
                 }
             },
             computed: {

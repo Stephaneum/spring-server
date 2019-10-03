@@ -38,6 +38,11 @@ dependencies {
 	implementation("org.apache.pdfbox:pdfbox:2.0.15")
 	implementation("commons-io:commons-io:2.6")
 	implementation("org.jsoup:jsoup:1.10.3")
+
+	// JWT
+	implementation("io.jsonwebtoken:jjwt-api:0.10.7")
+	runtime("io.jsonwebtoken:jjwt-impl:0.10.7")
+	runtime("io.jsonwebtoken:jjwt-jackson:0.10.7")
 }
 
 tasks.withType<KotlinCompile> {

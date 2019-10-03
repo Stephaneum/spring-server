@@ -32,6 +32,7 @@ object Session {
     fun logout() {
         val session = get()
         session.permission = Permission.NONE
+        session.user = null
     }
 
     fun addToast(title: String) = addToast(title, null)
