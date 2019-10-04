@@ -6,6 +6,26 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
+enum class Element(val code: String, var value: String? = null) {
+    fileLocation("speicherort"),
+    planLocation("str_vertretung"),
+    planInfo("str_vertretung_info"),
+    backupLocation("backup_dir"),
+    maxPictureSize("picture_size"),
+
+    // special
+    contact("str_kontakt"),
+    imprint("str_impressum"),
+    history("str_history"),
+    euSa("str_eu_sa"),
+    copyright("str_bottom"),
+    dev("str_entwickler"),
+    liveticker("str_liveticker"),
+    events("str_termine"),
+    coop("str_koop"),
+    coopURL("str_koop_url")
+}
+
 @Service
 class ConfigFetcher {
 
@@ -19,51 +39,24 @@ class ConfigFetcher {
     @Autowired
     private lateinit var configRepo: ConfigRepo
 
-    var fileLocation: String? = null
-    var planLocation: String? = null
-    var planInfo: String? = null
-    var backupLocation: String? = null
-    var copyright: String? = null
-
-    var maxPictureSize: Int? = null
+    private val configs = Element.values().toList()
 
     @Scheduled(initialDelay=3000, fixedDelay = 10000)
     fun update() {
-        val newLocation = configRepo.findByKey("speicherort")?.value
-        val newPlanLocation = configRepo.findByKey("str_vertretung")?.value
-        val newPlanInfo = configRepo.findByKey("str_vertretung_info")?.value
-        val newBackupLocation = configRepo.findByKey("backup_dir")?.value
-        val newCopyright = configRepo.findByKey("str_bottom")?.value
-        var newMaxPictureSize = configRepo.findByKey("picture_size")?.value?.toInt()
-
-        if(fileLocation != newLocation) {
-            fileLocation = newLocation
-            logger.info("Main Location: $fileLocation")
+        val db = configRepo.findAll()
+        configs.forEach { c ->
+            val dbConfig = db.first { it.key == c.code }
+            if(c.value != dbConfig.value) {
+                if(dbConfig.value?.length ?: 0 <= 200)
+                    logger.info("${c.name}: ${c.value} -> ${dbConfig.value}")
+                else
+                    logger.info("${c.name} updated")
+                c.value = dbConfig.value
+            }
         }
+    }
 
-        if(planLocation != newPlanLocation) {
-            planLocation = newPlanLocation
-            logger.info("PDF Location: $planLocation")
-        }
-
-        if(planInfo != newPlanInfo) {
-            planInfo = newPlanInfo
-            logger.info("PDF Info: $planInfo")
-        }
-
-        if(backupLocation != newBackupLocation) {
-            backupLocation = newBackupLocation
-            logger.info("Backup Location: $backupLocation")
-        }
-
-        if(copyright != newCopyright) {
-            copyright = newCopyright
-            logger.info("Copyright: $copyright")
-        }
-
-        if(maxPictureSize != newMaxPictureSize) {
-            maxPictureSize = newMaxPictureSize;
-            logger.info("max picture size: $maxPictureSize")
-        }
+    fun get(element: Element): String? {
+        return configs.first { it == element }.value
     }
 }

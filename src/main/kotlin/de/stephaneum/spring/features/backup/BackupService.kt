@@ -6,6 +6,7 @@ import de.stephaneum.spring.helper.DBHelper
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.cmd
 import de.stephaneum.spring.helper.windows
+import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -118,11 +119,11 @@ class BackupService {
         error = false
         BackupLogger.clear()
         Thread {
-            val filePath = "${configFetcher.backupLocation}/${type.code}/$file"
+            val filePath = "${configFetcher.get(Element.backupLocation)}/${type.code}/$file"
             val result = when(type) {
                 ModuleType.HOMEPAGE -> {
                     BackupLogger.addLine("Homepage wird wiederhergestellt. ($file)")
-                    homepageRestore(filePath, configFetcher.backupLocation!!, configFetcher.fileLocation!!)
+                    homepageRestore(filePath, configFetcher.get(Element.backupLocation)!!, configFetcher.get(Element.fileLocation)!!)
                 }
                 ModuleType.MOODLE -> {
                     BackupLogger.addLine("Moodle wird wiederhergestellt. ($file)")
@@ -149,8 +150,8 @@ class BackupService {
      * @return empty string if it was successful, non-empty else when an error occurs
      */
     private fun homepageBackup(): String? {
-        val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
-        val filePath = configFetcher.fileLocation ?: return "Datei-Pfad ist leer."
+        val backupPath = configFetcher.get(Element.backupLocation) ?: return "Backup-Pfad ist leer."
+        val filePath = configFetcher.get(Element.fileLocation) ?: return "Datei-Pfad ist leer."
         Thread.sleep(2000)
 
         val tempPath = "$backupPath/tmp"
@@ -261,8 +262,8 @@ class BackupService {
 
         Thread.sleep(1000)
 
-        val oldFilePath = configFetcher.fileLocation!!
-        val oldBackupPath = configFetcher.backupLocation!!
+        val oldFilePath = configFetcher.get(Element.fileLocation)!!
+        val oldBackupPath = configFetcher.get(Element.backupLocation)!!
 
         // adjust paths
         BackupLogger.addLine("[6/7] Speicherort und Backup-Ordner werden gesetzt.")
@@ -288,7 +289,7 @@ class BackupService {
             return "Moodle wird auf Windows nicht unterstützt."
 
         sudoPassword?.let { password ->
-            val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
+            val backupPath = configFetcher.get(Element.backupLocation) ?: return "Backup-Pfad ist leer."
             val tempPath = "$backupPath/tmp"
             val moodlePath = File("$tempPath/moodle")
             val moodleDataPath = File("$tempPath/moodledata")
@@ -365,7 +366,7 @@ class BackupService {
             return "Moodle wird auf Windows nicht unterstützt."
 
         sudoPassword?.let { password ->
-            val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
+            val backupPath = configFetcher.get(Element.backupLocation) ?: return "Backup-Pfad ist leer."
             val tempPath = "$backupPath/tmp"
 
             // create temporary folders
@@ -453,7 +454,7 @@ class BackupService {
     }
 
     fun arBackup(): String? {
-        val backupPath = configFetcher.backupLocation ?: return "Backup-Pfad ist leer."
+        val backupPath = configFetcher.get(Element.backupLocation) ?: return "Backup-Pfad ist leer."
         BackupLogger.addLine("[1/1] Datenbank wird gesichert.")
         val time = LocalDateTime.now().format(dateTimeFormat)
         var destination = "$backupPath/ar/ar_$time.sql"

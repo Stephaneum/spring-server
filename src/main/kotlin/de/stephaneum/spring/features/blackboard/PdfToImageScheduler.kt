@@ -4,6 +4,7 @@ import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.database.now
+import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,7 +52,7 @@ class PdfToImageScheduler {
         boards.forEach { board ->
             when(board.type) {
                 Type.PLAN -> {
-                    val pdfLocation = configFetcher.planLocation
+                    val pdfLocation = configFetcher.get(Element.planLocation)
                     if(pdfLocation != null) {
                         val file = File(pdfLocation) // the pdf file
                         var instance = instances.find { it.boardId == board.id } ?: PdfImages(board.id)
@@ -117,7 +118,7 @@ class PdfToImageScheduler {
         for (page in 0 until document.numberOfPages) {
             val image = pdfRenderer.renderImageWithDPI(page, 300f, ImageType.RGB)
             val trimmed = imageService.trimImage(image)
-            val resized = imageService.reduceSize(trimmed, 1600, 9999)
+            val resized = imageService.reduceSizeBuffered(trimmed, 1600, 9999)
             images.add(imageService.convertToJPG(resized))
         }
         document.close()

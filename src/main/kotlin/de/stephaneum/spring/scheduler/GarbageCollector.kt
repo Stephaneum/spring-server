@@ -31,7 +31,7 @@ class GarbageCollector {
     @Scheduled(initialDelay=10000, fixedDelay = 1000*60)
     fun update() {
 
-        val blackboardPath = configFetcher.fileLocation + "/blackboard"
+        val blackboardPath = configFetcher.get(Element.fileLocation) + "/blackboard"
         val boards = blackboardRepo.findAll()
         fileService.listFiles(blackboardPath)?.forEach { file ->
             val notInDatabase = boards.none { board -> (board.type == Type.IMG || board.type == Type.PDF) && board.value == file.absolutePath.replace("\\", "/") }

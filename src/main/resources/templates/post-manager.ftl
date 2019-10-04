@@ -830,7 +830,7 @@
             },
             sendPost: function () {
                 showLoading("Verarbeitung...");
-                axios.post('./api/post/update', {
+                axios.post('./api/post', {
                     id: this.currPost.id,
                     title: this.currPost.title,
                     text: this.currPost.text,

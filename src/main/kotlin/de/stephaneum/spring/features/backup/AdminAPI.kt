@@ -4,6 +4,7 @@ import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import de.stephaneum.spring.helper.FileService
+import de.stephaneum.spring.scheduler.Element
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -36,7 +37,7 @@ class BackupAdminAPI {
 
         var modules = listOf<Module>()
         var totalSize = 0L
-        configFetcher.backupLocation?.let { backupLocation ->
+        configFetcher.get(Element.backupLocation)?.let { backupLocation ->
             modules = MODULES.map { module ->
                 val backups = fileService.listFiles("$backupLocation/${module.code}")?.map { file ->
                     totalSize += file.length()
@@ -48,7 +49,7 @@ class BackupAdminAPI {
 
         return Response.AdminData(
                 modules = modules,
-                backupLocation = configFetcher.backupLocation ?: "?",
+                backupLocation = configFetcher.get(Element.backupLocation) ?: "?",
                 totalSize = fileService.convertSizeToString(totalSize),
                 nextBackup = backupScheduler.getNextBackup())
     }
@@ -129,7 +130,7 @@ class BackupAdminAPI {
             else -> return Response.Feedback(false, message = "$module existiert nicht")
         }
 
-        val path = fileService.storeFile(file.bytes, "${configFetcher.backupLocation}/$module/$fileName")
+        val path = fileService.storeFile(file.bytes, "${configFetcher.get(Element.backupLocation)}/$module/$fileName")
         if(path != null) {
             return Response.Feedback(true)
         } else {
@@ -143,7 +144,7 @@ class BackupAdminAPI {
         if(Session.get().permission != Permission.BACKUP)
             return REDIRECT_LOGIN
 
-        val resource = configFetcher.backupLocation?.let { location ->
+        val resource = configFetcher.get(Element.backupLocation)?.let { location ->
             fileService.loadFileAsResource("$location/$folder/$file")
         }
 
@@ -164,7 +165,7 @@ class BackupAdminAPI {
             return Response.Feedback(false, needLogin = true)
 
         var success = true
-        configFetcher.backupLocation?.let { location ->
+        configFetcher.get(Element.backupLocation)?.let { location ->
             success = fileService.deleteFile("$location/$folder/$file")
         }
 

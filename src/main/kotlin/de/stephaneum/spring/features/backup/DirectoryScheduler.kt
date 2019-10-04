@@ -1,5 +1,6 @@
 package de.stephaneum.spring.features.backup
 
+import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,7 +22,7 @@ class DirectoryScheduler {
 
     @Scheduled(initialDelay=5000, fixedDelay = 10000)
     fun update() {
-        configFetcher.backupLocation?.let {
+        configFetcher.get(Element.backupLocation)?.let {
             MODULES.forEach { module ->
                 val file = File("$it/${module.code}")
                 if(!file.exists()) {

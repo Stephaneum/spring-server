@@ -1,6 +1,7 @@
 package de.stephaneum.spring.helper
 
 import de.stephaneum.spring.database.*
+import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -87,7 +88,7 @@ class FileService {
             return "Nicht genügend Speicher"
 
         // resolve folder
-        val mainPath = configFetcher.fileLocation ?: return "Interner Fehler"
+        val mainPath = configFetcher.get(Element.fileLocation) ?: return "Interner Fehler"
         var savingFolder: Folder?
         if(mode == StoreMode.PRIVATE && folder is String) {
             savingFolder = folderRepo.findPrivateFolderInRoot(user.id, folder).firstOrNull()

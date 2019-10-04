@@ -3,7 +3,9 @@ package de.stephaneum.spring.features.cms
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.FileService
+import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.helper.MenuService
+import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import de.stephaneum.spring.security.CryptoService
 import org.jsoup.Jsoup
@@ -11,6 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+
+enum class SpecialType {
+    CONTACT, IMPRINT, HISTORY, EU_SA, // sites
+    COPYRIGHT, DEV, LIVE_TICKER, EVENTS, COOP, COOP_URL // fragments
+}
 
 @RestController
 @RequestMapping("/api/post")
@@ -26,7 +33,7 @@ class PostAPI {
     private lateinit var postRepo: PostRepo
 
     @Autowired
-    private lateinit var postService: PostService
+    private lateinit var imageService: ImageService
 
     @Autowired
     private lateinit var fileService: FileService
@@ -49,7 +56,18 @@ class PostAPI {
             @RequestParam(required = false) menuID: Int?,
             @RequestParam(required = false) noContent: Boolean?): Any {
         when {
+            postID != null -> {
+                // single post
+                val post = postRepo.findByIdOrNull(postID) ?: return Response.Feedback(false, message = "post not found")
+                post.simplify()
+                post.menu?.simplify()
+                post.images = filePostRepo.findByPostId(post.id).map { it.file.apply { simplifyForPosts() } }
+                if(noContent == true)
+                    post.content = null
+                return post
+            }
             unapproved == true || menuID != null -> {
+                // multiple posts
                 val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
                 val posts = when {
                     menuID != null -> postRepo.findByMenuIdOrderByTimestampDesc(menuID) // get posts from a menu
@@ -71,20 +89,11 @@ class PostAPI {
                     }
                 }
             }
-            postID != null -> {
-                val post = postRepo.findByIdOrNull(postID) ?: return Response.Feedback(false, message = "post not found")
-                post.simplify()
-                post.menu?.simplify()
-                post.images = filePostRepo.findByPostId(post.id).map { it.file.apply { simplifyForPosts() } }
-                if(noContent == true)
-                    post.content = null
-                return post
-            }
             else -> return Response.Feedback(false, message = "Empty request body")
         }
     }
 
-    @PostMapping("/update")
+    @PostMapping
     fun update(@RequestBody request: Request.UpdatePost): Any {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
@@ -120,11 +129,11 @@ class PostAPI {
         val savedPost = postRepo.save(Post(request.id ?: 0, oldPost?.user ?: user, menu, request.title, text, now(), if(oldPost != null) user else null, null, request.menuID != null, request.preview, false, request.layoutPost, request.layoutPreview))
 
         // compress images
-        val maxPictureSize = configFetcher.maxPictureSize ?: 0
+        val maxPictureSize = configFetcher.get(Element.maxPictureSize)?.toInt() ?: 0
         val imagesFull = fileRepo.findByIdIn(request.images.map { it.id }) // get the full data because it was simplified for security reasons
         imagesFull.forEach { i ->
             if(i.size >= maxPictureSize) {
-                postService.compress(i)
+                imageService.reduceSizeOfFile(i)
             }
         }
         val images = imagesFull.map { i -> FilePost(0, i, savedPost) }
@@ -175,7 +184,7 @@ class PostAPI {
     fun infoPostManager(): Any {
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
 
-        return Response.PostManager(configFetcher.maxPictureSize ?: 0, menuService.getCategory(user.id))
+        return Response.PostManager(configFetcher.get(Element.maxPictureSize)?.toInt() ?: 0, menuService.getCategory(user.id))
     }
 
     @GetMapping("/images-available")
@@ -212,5 +221,12 @@ class PostAPI {
             // unapproved
             return user.code.role == ROLE_ADMIN || user.managePosts == true || user.id == (post.user?.id ?: 0)
         }
+    }
+
+    // special
+
+    @GetMapping("/special")
+    fun getSpecial(@RequestParam type: SpecialType): Any {
+        TODO()
     }
 }

@@ -7,6 +7,7 @@ import de.stephaneum.spring.database.ROLE_ADMIN
 import de.stephaneum.spring.database.UserRepo
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.MenuService
+import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import de.stephaneum.spring.security.CryptoService
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,8 +42,8 @@ class API {
     @GetMapping("/info")
     fun get(): Response.Info {
         val user = Session.get().user ?: EMPTY_USER
-        val copyright = configFetcher.copyright
-        val plan = Response.Plan(configFetcher.planLocation != null, configFetcher.planInfo)
+        val copyright = configFetcher.get(Element.copyright)
+        val plan = Response.Plan(configFetcher.get(Element.planLocation) != null, configFetcher.get(Element.planInfo))
         val unapproved = if(user.code.role == ROLE_ADMIN || user.managePosts == true) postRepo.countByApproved(false) else null
         return Response.Info(user, menuService.getPublic(), copyright, plan, unapproved)
     }
@@ -70,7 +71,7 @@ class API {
     fun image(@PathVariable fileName: String, request: HttpServletRequest): Any {
 
         // get file content
-        val resource = configFetcher.fileLocation?.let { location ->
+        val resource = configFetcher.get(Element.fileLocation)?.let { location ->
             fileService.loadFileAsResource("$location/$fileName")
         } ?: return ResponseEntity.status(HttpStatus.BAD_REQUEST).build<Void>()
 
