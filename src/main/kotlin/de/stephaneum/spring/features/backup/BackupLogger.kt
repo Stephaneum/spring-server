@@ -3,9 +3,9 @@ package de.stephaneum.spring.features.backup
 import org.slf4j.LoggerFactory
 import java.lang.StringBuilder
 
-object BackupLogs {
+object BackupLogger {
 
-    val logger = LoggerFactory.getLogger(BackupLogs::class.java)
+    val logger = LoggerFactory.getLogger(BackupLogger::class.java)
 
     private val logsHTML = StringBuilder()
 

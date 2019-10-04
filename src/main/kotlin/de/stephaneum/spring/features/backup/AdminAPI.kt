@@ -186,6 +186,6 @@ class BackupAdminAPI {
         if(Session.get().permission != Permission.BACKUP)
             return Response.Feedback(false, needLogin = true)
         else
-            return Log(BackupLogs.getLogsHTML(), backupService.running, backupService.error)
+            return Log(BackupLogger.getLogsHTML(), backupService.running, backupService.error)
     }
 }

@@ -2,6 +2,7 @@ package de.stephaneum.spring.security
 
 import de.stephaneum.spring.database.User
 import de.stephaneum.spring.database.UserRepo
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
@@ -34,6 +35,20 @@ class JwtService {
         jwtKey = SecretKeySpec(jwtKeyBytes, 0, jwtKeyBytes.size, "HmacSHA256")
     }
 
+    fun generateToken(map: Map<String, String>): String {
+        val now = Date()
+        val validity = Date(now.time + validityInMilliseconds)
+        val builder = Jwts.builder()
+        map.forEach { (key, value) ->
+            builder.claim(key, value)
+        }
+        return builder
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(jwtKey)
+                .compact()
+    }
+
     fun generateToken(userID: Int): String {
         val now = Date()
         val validity = Date(now.time + validityInMilliseconds)
@@ -47,17 +62,30 @@ class JwtService {
     }
 
     fun getUser(token: String): User? {
-        val userID: Int
         try {
-            userID = Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(token).body["userID"] as Int
+            if(isValid(token)) {
+                val userID = Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(token).body["userID"] as Int
+                return userRepo.findByIdOrNull(userID) ?: return null
+            } else {
+                return null
+            }
         } catch (e: Exception) {
             return null
         }
-
-        return userRepo.findByIdOrNull(userID) ?: return null
     }
 
-    fun validateToken(token: String): Boolean {
+    fun getData(token: String): Claims? {
+        try {
+            if(isValid(token))
+                return Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(token).body
+            else
+                return null
+        } catch (e: Exception) {
+            return null
+        }
+    }
+
+    fun isValid(token: String): Boolean {
         try {
             val claims = Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(token)
             return !claims.body.expiration.before(Date())
