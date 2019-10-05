@@ -61,7 +61,7 @@
                                 <li class="internal-divider"></li>
                                 <li v-if="admin || managePlans"><a href="konfig_vertretung.xhtml"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
                                 <li v-if="createCategories"><a href="nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
-                                <li><a href="nutzer_beitrag.xhtml"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
+                                <li><a href="beitrag-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
                                 <li><a href="klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
                                 <li><a href="projekt_all.xhtml"><span><i class="material-icons">flag</i>Projekte</span></a></li>
                                 <li class="internal-divider"></li>
