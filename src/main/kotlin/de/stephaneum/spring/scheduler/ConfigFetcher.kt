@@ -23,11 +23,7 @@ enum class Element(val code: String, var value: String? = null) {
     liveticker("str_liveticker"),
     events("str_termine"),
     coop("str_koop"),
-    coopURL("str_koop_url");
-
-    fun fromString(s: String): Element? {
-        return Element.values().firstOrNull { e -> e.name == s }
-    }
+    coopURL("str_koop_url")
 }
 
 @Service

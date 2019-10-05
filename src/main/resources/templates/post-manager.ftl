@@ -432,7 +432,7 @@
                     <h5>Vorschau ist nicht verfügbar.</h5>
                 </div>
                 <div v-else>
-                    <div style="margin: auto; max-width: 1100px">
+                    <div style="margin: auto; max-width: 1050px">
                         <h5 style="margin: 0 0 30px 50px">Vorschau (Startseite):</h5>
                         <div class="grey-round-border">
                             <post-preview postID="-1" :date="currentDate" :title="currPost.title" :text="currPost.text" :preview="parseInt(currPost.preview)" :layout="currPost.layoutPreview" :images="currPost.imagesAdded"></post-preview>
@@ -823,6 +823,20 @@
                                 M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
                                 M.Modal.init(document.querySelectorAll('.modal'), {});
                             });
+
+                            if(this.admin || this.user.managePosts) {
+                                // for admin and post manager
+                                if(this.currMode.id === this.modes.approve.id) {
+                                    this.unapproved = res.data.length;
+                                    this.modes.approve.name = this.approvedModeText(this.unapproved); // update button text
+                                }
+                            } else {
+                                // for everybody else
+                                if(this.currMode.id === this.modes.edit.id) {
+                                    this.unapproved = res.data.length;
+                                    this.modes.edit.name = this.editModeText(this.unapproved); // update button text
+                                }
+                            }
                             console.log('posts fetched ('+res.data.length+')');
                         } else {
                             M.toast({html: 'Interner Fehler.'});
@@ -1006,6 +1020,17 @@
                         if(res.data.id) {
                             if(res.data.menu)
                                 window.location = './beitrag.xhtml?id='+res.data.id;
+                            else {
+                                // this post is unapproved
+                                if(this.currMode.id === this.modes.create.id) {
+                                    // user has created a new unapproved post
+                                    this.unapproved++;
+                                    this.modes.edit.name = this.editModeText(this.unapproved);
+                                }
+                                hideLoading();
+                                M.toast({ html: 'Fertig!' });
+                                this.setMode(this.currMode);
+                            }
                         } else if(res.data.message) {
                             hideLoading();
                             M.toast({ html: res.data.message });
@@ -1076,6 +1101,12 @@
             },
             imageURL: function() {
                 return (image) => './api/images/'+image.fileNameWithID;
+            },
+            editModeText: function() {
+                return (unapproved) => unapproved ? 'Bearbeiten (' + unapproved + ')' : 'Bearbeiten';
+            },
+            approvedModeText: function() {
+                return (unapproved) => unapproved ? 'Genehmigen (' + unapproved + ')' : 'Genehmigen';
             },
             specialObj: function() {
                 for(var prop in this.specialAll) {
@@ -1167,8 +1198,12 @@
                             this.plan = res.data.plan;
                             this.copyright = res.data.copyright;
                             this.unapproved = res.data.unapproved;
-                            if(this.unapproved)
-                                this.modes.approve.name = this.modes.approve.name + ' (' + this.unapproved + ')';
+
+                            // update button text
+                            if(this.admin || this.user.managePosts)
+                                this.modes.approve.name = this.approvedModeText(this.unapproved);
+                            else
+                                this.modes.edit.name = this.editModeText(this.unapproved);
 
                             axios.get('./api/post/info-post-manager')
                                 .then((res) => {
@@ -1178,9 +1213,9 @@
                                         if(this.user && this.user.code.role >= 0) {
                                             // set one time the modes available
                                             if(this.user.code.role !== 100)
-                                                this.modes = [modes.create, modes.edit, modes.approve];
+                                                this.modes = { create: modes.create, edit: modes.edit, approve: modes.approve };
                                             if(this.user.code.role !== 100 && !this.user.managePosts)
-                                                this.modes = [modes.create, modes.edit];
+                                                this.modes = { create: modes.create, edit: modes.edit };
                                             this.setMode(modes.create);
                                         }
                                     } else {

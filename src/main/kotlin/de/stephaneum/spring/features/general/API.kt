@@ -44,14 +44,14 @@ class API {
         val user = Session.get().user ?: EMPTY_USER
         val copyright = configFetcher.get(Element.copyright)
         val plan = Response.Plan(configFetcher.get(Element.planLocation) != null, configFetcher.get(Element.planInfo))
-        val unapproved = if(user.code.role == ROLE_ADMIN || user.managePosts == true) postRepo.countByApproved(false) else null
+        val unapproved = if(user.code.role == ROLE_ADMIN || user.managePosts == true) postRepo.countByApproved(false) else postRepo.countByApprovedAndUser(false, user)
         return Response.Info(user, menuService.getPublic(), copyright, plan, unapproved)
     }
 
     @ExperimentalUnsignedTypes
     @PostMapping("/login")
     fun login(@RequestBody request: Request.Login): Response.Feedback {
-        val user = userRepo.findByEmail(request.email) ?: return Response.Feedback(false)
+        val user = userRepo.findByEmail(request.email ?: "") ?: return Response.Feedback(false)
         val salt = user.password.substring(32)
         if(user.password == cryptoService.hashMD5(request.password+salt+PEPPER)+salt) {
             Session.get().user = user;

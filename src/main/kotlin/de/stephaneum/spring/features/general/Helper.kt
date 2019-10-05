@@ -5,7 +5,7 @@ import de.stephaneum.spring.database.Menu
 import de.stephaneum.spring.database.User
 
 object Request {
-    data class Login(val email: String, val password: String)
+    data class Login(val email: String?, val password: String?)
 }
 
 object Response {

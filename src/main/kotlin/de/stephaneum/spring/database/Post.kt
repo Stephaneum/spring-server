@@ -77,6 +77,7 @@ data class Post(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 interface PostRepo: CrudRepository<Post, Int> {
 
     fun countByApproved(approved: Boolean): Int
+    fun countByApprovedAndUser(approved: Boolean, user: User): Int
 
     fun findByMenuIdOrderByTimestampDesc(menuID: Int): List<Post>
 
