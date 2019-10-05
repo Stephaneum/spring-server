@@ -176,12 +176,15 @@
             margin-bottom: 20px;
         }
 
-        /* buttons */
-        .special-container > div > a {
+        .special-btn {
             width: 240px;
             margin: 10px;
             font-size: 1em;
             background-color: #2e7d32 !important;
+        }
+
+        .special-btn-active {
+            background-color: #4caf50 !important;
         }
     </style>
 </head>
@@ -250,13 +253,13 @@
             <!-- SELECT-SPECIAL -->
             <div v-show="currTab.id === tabs.selectSpecial.id" class="tab-panel white z-depth-1" style="padding: 100px 0 0 0">
 
-                <div style="display: flex; align-items: center; justify-content: space-around;">
+                <div style="display: flex; align-items: center; justify-content: space-evenly;">
 
                     <div class="special-container">
-                        <i class="material-icons">subject</i>
+                        <i class="material-icons">code</i>
                         <h5>Daten</h5>
                         <div v-for="s in specialData">
-                            <a @click="selectSpecial(s)" class="waves-effect waves-light btn-large">
+                            <a @click="selectSpecial(s)" :class="s.id === currPost.id ? ['special-btn-active'] : []" class="special-btn waves-effect waves-light btn-large">
                                 {{ s.name }}
                             </a>
                         </div>
@@ -266,7 +269,7 @@
                         <i class="material-icons">dashboard</i>
                         <h5>Fragmente</h5>
                         <div v-for="s in specialFragments">
-                            <a @click="selectSpecial(s)" class="waves-effect waves-light btn-large">
+                            <a @click="selectSpecial(s)" :class="s.id === currPost.id ? ['special-btn-active'] : []" class="special-btn waves-effect waves-light btn-large">
                                 {{ s.name }}
                             </a>
                         </div>
@@ -276,7 +279,7 @@
                         <i class="material-icons">description</i>
                         <h5>Seiten</h5>
                         <div v-for="s in specialSites">
-                            <a @click="selectSpecial(s)" class="waves-effect waves-light btn-large">
+                            <a @click="selectSpecial(s)" :class="s.id === currPost.id ? ['special-btn-active'] : []" class="special-btn waves-effect waves-light btn-large">
                                 {{ s.name }}
                             </a>
                         </div>
@@ -1046,6 +1049,7 @@
                     .then((res) => {
                         if(res.data.success) {
                             M.toast({ html: 'Änderungen gespeichert<br>'+this.specialObj.name });
+                            this.setMode(this.currMode);
                         } else if(res.data.message) {
                             M.toast({ html: res.data.message });
                         }
