@@ -452,7 +452,7 @@
             </div>
         </div>
     </div>
-    <div v-else style="min-height: 100vh;">
+    <div v-else style="min-height: calc(100vh - 300px);">
     </div>
 
     <div style="height: 100px"></div>
@@ -885,7 +885,7 @@
                     });
             },
             selectSpecial: function(type) {
-                showLoading('Lade Inhalt...');
+                showLoadingInvisible();
                 axios.get('./api/post/special?type='+this.specialCode(type.id))
                     .then((res) => {
                         if(res.data) {
