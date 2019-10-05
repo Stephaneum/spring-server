@@ -15,10 +15,13 @@ object Request {
 
     data class UpdatePostPassword(val postID: Int,
                                   val password: String?)
+
+    data class UpdateSpecial(val type: String, val text: String?)
 }
 
 object Response {
     data class Feedback(val success: Boolean, val needLogin: Boolean = false, val message: String? = null)
 
     data class PostManager(val maxPictureSize: Int, val category: List<Menu>)
+    data class Text(val text: String?)
 }

@@ -2,6 +2,8 @@ package de.stephaneum.spring.features.cms
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
+import de.stephaneum.spring.features.jsf.JsfCommunication
+import de.stephaneum.spring.features.jsf.JsfEvent
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.helper.MenuService
@@ -14,14 +16,13 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
-enum class SpecialType {
-    CONTACT, IMPRINT, HISTORY, EU_SA, // sites
-    COPYRIGHT, DEV, LIVE_TICKER, EVENTS, COOP, COOP_URL // fragments
-}
 
 @RestController
 @RequestMapping("/api/post")
 class PostAPI {
+
+    @Autowired
+    private lateinit var jsfCommunication: JsfCommunication
 
     @Autowired
     private lateinit var cryptoService: CryptoService
@@ -226,7 +227,41 @@ class PostAPI {
     // special
 
     @GetMapping("/special")
-    fun getSpecial(@RequestParam type: SpecialType): Any {
-        TODO()
+    fun getSpecial(@RequestParam type: String): Any {
+
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        if(user.code.role == ROLE_ADMIN) {
+            return Response.Text(configFetcher.get(Element.valueOf(type)))
+        } else {
+            return Response.Feedback(false, message = "only admin")
+        }
+    }
+
+    @PostMapping("/special")
+    fun updateSpecial(@RequestBody request: Request.UpdateSpecial): Any {
+
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        if(user.code.role == ROLE_ADMIN) {
+            val type = Element.valueOf(request.type)
+            val plainText = Jsoup.parse(request.text ?: "").text()
+            val finalText = when(type) {
+                Element.liveticker, Element.coop, Element.coopURL -> plainText
+                Element.contact, Element.imprint, Element.copyright, Element.dev -> request.text
+                Element.history, Element.euSa -> {
+                    if(plainText.startsWith("http")) {
+                        plainText.replace("\u00A0", "").trim();
+                    } else {
+                        request.text
+                    }
+                }
+                Element.events -> request.text?.replace("&nbsp;", " ")?.replace("&quot;", "\"")?.replace("&amp;", "&")
+                else -> return Response.Feedback(false, message = "invalid type")
+            }
+            configFetcher.save(type, finalText)
+            jsfCommunication.send(JsfEvent.SYNC_SPECIAL_TEXT)
+            return Response.Feedback(true)
+        } else {
+            return Response.Feedback(false, message = "only admin")
+        }
     }
 }

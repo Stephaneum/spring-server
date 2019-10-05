@@ -23,7 +23,11 @@ enum class Element(val code: String, var value: String? = null) {
     liveticker("str_liveticker"),
     events("str_termine"),
     coop("str_koop"),
-    coopURL("str_koop_url")
+    coopURL("str_koop_url");
+
+    fun fromString(s: String): Element? {
+        return Element.values().firstOrNull { e -> e.name == s }
+    }
 }
 
 @Service
@@ -58,5 +62,11 @@ class ConfigFetcher {
 
     fun get(element: Element): String? {
         return configs.first { it == element }.value
+    }
+
+    fun save(element: Element, value: String?) {
+        val config = configRepo.findByKey(element.code) ?: return
+        config.value = value
+        configRepo.save(config)
     }
 }

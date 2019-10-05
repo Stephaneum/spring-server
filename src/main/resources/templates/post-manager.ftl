@@ -160,6 +160,29 @@
         .grey-round-border > .card, .grey-round-border > .card-panel {
             margin: 0;
         }
+
+        .special-container {
+            text-align: center !important;
+            background-color: #e8f5e9;
+            padding: 30px 20px 20px 20px;
+            border-radius: 20px
+        }
+
+        .special-container > i {
+            font-size: 4em;
+        }
+
+        .special-container > h5 {
+            margin-bottom: 20px;
+        }
+
+        /* buttons */
+        .special-container > div > a {
+            width: 240px;
+            margin: 10px;
+            font-size: 1em;
+            background-color: #2e7d32 !important;
+        }
     </style>
 </head>
 
@@ -225,8 +248,58 @@
             </div>
 
             <!-- SELECT-SPECIAL -->
-            <div v-show="currTab.id === tabs.selectSpecial.id" class="tab-panel white z-depth-1">
-                <h5 style="margin-bottom: 20px">Text auswählen:</h5>
+            <div v-show="currTab.id === tabs.selectSpecial.id" class="tab-panel white z-depth-1" style="padding: 100px 0 0 0">
+
+                <div style="display: flex; align-items: center; justify-content: space-around;">
+
+                    <div class="special-container">
+                        <i class="material-icons">subject</i>
+                        <h5>Daten</h5>
+                        <div v-for="s in specialData">
+                            <a @click="selectSpecial(s)" class="waves-effect waves-light btn-large">
+                                {{ s.name }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="special-container">
+                        <i class="material-icons">dashboard</i>
+                        <h5>Fragmente</h5>
+                        <div v-for="s in specialFragments">
+                            <a @click="selectSpecial(s)" class="waves-effect waves-light btn-large">
+                                {{ s.name }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="special-container">
+                        <i class="material-icons">description</i>
+                        <h5>Seiten</h5>
+                        <div v-for="s in specialSites">
+                            <a @click="selectSpecial(s)" class="waves-effect waves-light btn-large">
+                                {{ s.name }}
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- TEXT SPECIAL -->
+            <div v-show="currTab.id === tabs.textSpecial.id " class="tab-panel white z-depth-1">
+                <div style="display: flex; align-items: center; justify-content: space-between">
+                    <div>
+                        <h5>{{ specialObj.name }}</h5>
+                        <span v-html="specialObj.info"></span>
+                    </div>
+                    <a class="waves-effect waves-light btn-large" style="font-size: 1.5em;background-color: #1b5e20;"
+                       @click="sendSpecial">
+                        <i class="material-icons left">save</i>
+                        Speichern
+                    </a>
+                </div>
+
+                <div id="post-text-editor-special" style="height: 600px"></div>
             </div>
 
             <!-- TEXT -->
@@ -453,32 +526,38 @@
             special: true,
             number: null
         },
-        text: {
+        textSpecial: {
             id: 0,
+            name: "Inhalt",
+            icon: "format_align_left",
+            number: null
+        },
+        text: {
+            id: 1,
             name: "Titel und Text",
             icon: "format_align_left",
             number: null
         },
         images: {
-            id: 1,
+            id: 2,
             name: "Bilder",
             icon: "camera_alt",
             number: null
         },
         layout: {
-            id: 2,
+            id: 3,
             name: "Layout",
             icon: "border_inner",
             number: null
         },
         assign: {
-            id: 3,
+            id: 4,
             name: "Zuordnung",
             icon: "device_hub",
             number: null
         },
         finalize: {
-            id: 4,
+            id: 5,
             name: "Fertigstellung",
             icon: "check_circle",
             number: null
@@ -487,6 +566,65 @@
 
     var postLayouts = [0, 1, 2];
     var previewLayouts = [0, 1, 2];
+
+    var specialData = {
+        events: {
+            id: 0,
+            name: "Termine",
+            info: "Hier können Sie Termine eintragen.<br><b>Format: Von - Bis, Beschreibung URL</b><br>Beispiel 1: 25.03.2019, Fest<br>Beispiel 2: 25.03.2019 19:30, Fest https://www.stephaneum.de<br>Beispiel 3: 25.03.2019 - 27.03.2019, Fest<br><b>Nullen z.B. bei '07' müssen mitgeschrieben werden!</b>"
+        },
+        coop: {
+            id: 1,
+            name: "Koop.-partner",
+            info: "Mehrere Kooperationspartner mit Semikolon (;) trennen<br>Tooltips können mit runden Klammern und Links mit eckigen Klammern gekennzeichnet werden<br>Falls keine Partner angegeben, wird der Bereich versteckt.<br><b>Beispiel: Partner(Briefkontakte)[http://google.de]</b>"
+        },
+        coopURL: {
+            id: 2,
+            name: "Koop.-partner (URL)",
+            info: "Bitte URL eingeben. Relative Links sind erlaubt.<br>Falls keine URL angegeben, wird der Button versteckt."
+        }
+    };
+
+    var specialFragments = {
+        copyright: {
+            id: 3,
+            name: "Copyright",
+            info: "Der Copyright-Text wird unterhalb von 'Kontakt | Impressum | Sitemap' angezeigt."
+        },
+        dev: {
+            id: 4,
+            name: "Entwicklung",
+            info: "Dieser Text wird in 'Informationen' unter 'Über die Entwicklung' angezeigt.<br>Es wird ausgeblendet, wenn der Inhalt leer ist."
+        },
+        liveticker: {
+            id: 5,
+            name: "Live-Ticker",
+            info: "Der Live-Ticker wird auf der Homepage über den Beiträgen angezeigt.<br>Es wird ausgeblendet, wenn der Inhalt leer ist. Es wird nur der unformatierte Text gespeichert."
+        },
+    };
+
+    var specialSites = {
+        contact: {
+            id: 6,
+            name: "Kontakt",
+            info: "Der Titel \"Kontakt\" ist vorgegeben."
+        },
+        imprint: {
+            id: 7,
+            name: "Impressum",
+            info: "Der Titel \"Impressum\" ist vorgegeben."
+        },
+        history: {
+            id: 8,
+            name: "Geschichte",
+            info: "Die Geschichte erreicht man über das Klicken auf das Stephaneum-Logo auf der linken Seite.<br>a) Link, dann bitte mit 'http' anfangen<br>b) (sonst) interne Lösung"
+        },
+        euSa: {
+            id: 9,
+            name: "EU und S.-A.",
+            info: "Die Seite erreicht man über das Klicken auf das Stephaneum-Logo auf der linken Seite.<br>a) Link, dann bitte mit 'http' anfangen<br>b) (sonst) interne Lösung"
+        },
+    };
 
     var app = new Vue({
         el: '#app',
@@ -504,6 +642,10 @@
             tabs: tabs,
             postLayouts: postLayouts,
             previewLayouts: previewLayouts,
+            specialData: specialData,
+            specialFragments: specialFragments,
+            specialSites: specialSites,
+            specialAll: { ...specialData, ...specialFragments, ...specialSites },
             imagesAvailable: [], // will be fetched
             imagesAvailableLimit: 10,
             currMode: null,
@@ -725,6 +867,26 @@
                         hideLoading();
                     });
             },
+            selectSpecial: function(type) {
+                showLoading('Lade Inhalt...');
+                axios.get('./api/post/special?type='+this.specialCode(type.id))
+                    .then((res) => {
+                        if(res.data) {
+                            this.currPost.id = type.id; // just for front end calculations
+                            this.currPost.text = res.data.text;
+                            $('#post-text-editor-special').trumbowyg('html', res.data.text); // set data for editor
+                            this.currTabs = [tabs.selectSpecial, tabs.textSpecial];
+                            this.currTab = tabs.textSpecial;
+                            this.$nextTick(() => {
+                                window.scrollTo({ top: document.getElementById('post-manager-title').getBoundingClientRect().top + window.scrollY, behavior: 'smooth' });
+                            });
+                            console.log('text fetched');
+                        } else {
+                            M.toast({html: 'Interner Fehler.'});
+                        }
+                        hideLoading();
+                    });
+            },
             setLayoutPost: function(layout) {
                 this.currPost.layoutPost = layout;
                 M.toast({html: 'Beitrag-Layout '+ (layout+1) + ' ausgewählt'});
@@ -842,18 +1004,34 @@
                 })
                     .then((res) => {
                         if(res.data.id) {
-                            window.location = './beitrag.xhtml?id='+res.data.id;
+                            if(res.data.menu)
+                                window.location = './beitrag.xhtml?id='+res.data.id;
                         } else if(res.data.message) {
                             hideLoading();
                             M.toast({ html: res.data.message });
                         }
                     });
             },
+            sendSpecial: function () {
+                showLoading("Verarbeitung...");
+                axios.post('./api/post/special', {
+                    type: this.specialCode(this.currPost.id),
+                    text: $('#post-text-editor-special').trumbowyg('html')
+                })
+                    .then((res) => {
+                        if(res.data.success) {
+                            M.toast({ html: 'Änderungen gespeichert<br>'+this.specialObj.name });
+                        } else if(res.data.message) {
+                            M.toast({ html: res.data.message });
+                        }
+                        hideLoading();
+                    });
+            },
             postInit: function() {
                 this.$nextTick(() => {
                     M.AutoInit();
                     M.updateTextFields();
-                    $('#post-text-editor').trumbowyg({
+                    var config = {
                         semantic: false,
                         lang: 'de',
                         btns: [
@@ -883,7 +1061,10 @@
                                 allowCustomSize: false
                             }
                         }
-                    });
+                    };
+                    $('#post-text-editor').trumbowyg(config);
+                    if(this.admin)
+                        $('#post-text-editor-special').trumbowyg(config);
                     moment.locale('de');
                     console.log('post init finished')
                 });
@@ -895,6 +1076,24 @@
             },
             imageURL: function() {
                 return (image) => './api/images/'+image.fileNameWithID;
+            },
+            specialObj: function() {
+                for(var prop in this.specialAll) {
+                    if(this.specialAll.hasOwnProperty(prop) && this.specialAll[prop].id === this.currPost.id) {
+                        return this.specialAll[prop];
+                    }
+                }
+                return {};
+            },
+            specialCode: function() {
+                return (id) => {
+                    for(var prop in this.specialAll) {
+                        if(this.specialAll.hasOwnProperty(prop) && this.specialAll[prop].id === id) {
+                            return prop
+                        }
+                    }
+                    return null;
+                };
             },
             finalButtonText: function() {
                 switch(this.currMode.id) {
