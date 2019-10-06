@@ -1,10 +1,7 @@
 package de.stephaneum.spring.features.general
 
 import de.stephaneum.spring.Session
-import de.stephaneum.spring.database.EMPTY_USER
-import de.stephaneum.spring.database.PostRepo
-import de.stephaneum.spring.database.ROLE_ADMIN
-import de.stephaneum.spring.database.UserRepo
+import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.MenuService
 import de.stephaneum.spring.scheduler.Element
@@ -44,7 +41,11 @@ class API {
         val user = Session.get().user ?: EMPTY_USER
         val copyright = configFetcher.get(Element.copyright)
         val plan = Response.Plan(configFetcher.get(Element.planLocation) != null, configFetcher.get(Element.planInfo))
-        val unapproved = if(user.code.role == ROLE_ADMIN || user.managePosts == true) postRepo.countByApproved(false) else postRepo.countByApprovedAndUser(false, user)
+        val unapproved = when {
+            user.code.role == ROLE_ADMIN || user.managePosts == true    -> postRepo.countByApproved(false)
+            user.code.role != ROLE_NO_LOGIN                             -> postRepo.countByApprovedAndUser(false, user)
+            else                                                        -> null
+        }
         return Response.Info(user, menuService.getPublic(), copyright, plan, unapproved)
     }
 

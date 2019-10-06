@@ -8,7 +8,7 @@
 <!DOCTYPE HTML>
 <html lang="de">
 <head>
-    <title>Anmelden - Stephaneum</title>
+    <title>Vertretungsplan - Stephaneum</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="<@spring.url '/static/img/favicon.png' />" />
@@ -67,7 +67,7 @@
 
 <script src="/static/js/materialize.min.js" ></script>
 <script src="/static/js/axios.min.js" ></script>
-<script src="/static/js/vue.min.js" ></script>
+<script src="/static/js/vue.js" ></script>
 <@menu.render/>
 <@footer.render/>
 <script type="text/javascript">

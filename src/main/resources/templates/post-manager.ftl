@@ -193,7 +193,7 @@
 
 <@vueLoader.blank/>
 <div id="app">
-    <nav-menu :menu="menu" :user="user" :plan="plan" :unapproved="unapproved"></nav-menu>
+    <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
 
     <div v-if="currMode" id="main-row" class="row" style="min-height: 100vh; margin-top: 50px">
         <div class="col s10 offset-s2">
@@ -217,10 +217,10 @@
 
             <!-- SELECT-EDIT -->
             <div v-show="currTab.id === tabs.selectEdit.id" class="tab-panel white z-depth-1">
-                <div v-if="admin || user.managePosts || category.length !== 0">
+                <div v-if="admin || info.user.managePosts || category.length !== 0">
                     <h5 style="margin-bottom: 20px">Gruppe auswählen:</h5>
                     <div class="grey-round-border">
-                        <nav-menu :menu="category.length !== 0 ? category : menu" minimal="true" @selected="fetchPosts"></nav-menu>
+                        <nav-menu :menu="category.length !== 0 ? category : info.menu" minimal="true" @selected="fetchPosts"></nav-menu>
                     </div>
                 </div>
 
@@ -395,12 +395,12 @@
                             <span v-html="menuAssigned" style="color: #808080; margin-left: 20px"></span>
                         </span>
                     </div>
-                    <div v-if="!admin && !user.managePosts" style="text-align: center; margin-top: 40px">
+                    <div v-if="!admin && !info.user.managePosts" style="text-align: center; margin-top: 40px">
                         <span>Die Zuordnung ist optional. Der Admin ordnet dann diesen Beitrag zu, falls keine Auswahl getätigt wurde.</span>
                     </div>
                     <div style="height: 60px"></div>
                     <div class="grey-round-border">
-                        <nav-menu :menu="category.length !== 0 ? category : menu" minimal="true" @selected="assignMenu"></nav-menu>
+                        <nav-menu :menu="category.length !== 0 ? category : info.menu" minimal="true" @selected="assignMenu"></nav-menu>
                     </div>
 
                     <div style="height: 300px"></div>
@@ -457,7 +457,7 @@
 
     <div style="height: 100px"></div>
 
-    <stephaneum-footer :copyright="copyright"></stephaneum-footer>
+    <stephaneum-footer :copyright="info.copyright"></stephaneum-footer>
 </div>
 
 <script src="/static/js/jquery.min.js" ></script>
@@ -632,11 +632,7 @@
     var app = new Vue({
         el: '#app',
         data: {
-            menu: [],
-            plan: {},
-            user: null,
-            copyright: null,
-            unapproved: null, // amount of unapproved posts (admin only)
+            info: { user: null, menu: null, plan: null, copyright: null, unapproved: null },
             initialized: false,
             currentDate: moment().format('DD.MM.YYYY'),
             maxPictureSize: 0, // will be fetched, image will be compressed if larger than this number
@@ -685,14 +681,14 @@
 
                 switch(mode.id) {
                     case modes.create.id:
-                        this.currTabs = this.admin || this.user.managePosts || this.category.length !== 0 ?
+                        this.currTabs = this.admin || this.info.user.managePosts || this.category.length !== 0 ?
                             [tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize] : [tabs.text, tabs.images, tabs.layout, tabs.finalize];
                         this.currTab = tabs.text;
                         break;
                     case modes.edit.id:
                         this.currTabs = [tabs.selectEdit];
                         this.currTab = tabs.selectEdit;
-                        if(!this.admin && !this.user.managePosts)
+                        if(!this.admin && !this.info.user.managePosts)
                             this.fetchPosts(); // load unapproved posts for non-admins
                         break;
                     case modes.approve.id:
@@ -776,7 +772,7 @@
                         error.error = true;
                     }
 
-                    if((this.admin || this.user.managePosts) && !this.currPost.menu) {
+                    if((this.admin || this.info.user.managePosts) && !this.currPost.menu) {
                         error.missingAssignment = true;
                         error.error = true;
                     }
@@ -827,17 +823,17 @@
                                 M.Modal.init(document.querySelectorAll('.modal'), {});
                             });
 
-                            if(this.admin || this.user.managePosts) {
+                            if(this.admin || this.info.user.managePosts) {
                                 // for admin and post manager
                                 if(this.currMode.id === this.modes.approve.id) {
-                                    this.unapproved = res.data.length;
-                                    this.modes.approve.name = this.approvedModeText(this.unapproved); // update button text
+                                    this.info.unapproved = res.data.length;
+                                    this.modes.approve.name = this.approvedModeText(this.info.unapproved); // update button text
                                 }
                             } else {
                                 // for everybody else
                                 if(this.currMode.id === this.modes.edit.id) {
-                                    this.unapproved = res.data.length;
-                                    this.modes.edit.name = this.editModeText(this.unapproved); // update button text
+                                    this.info.unapproved = res.data.length;
+                                    this.modes.edit.name = this.editModeText(this.info.unapproved); // update button text
                                 }
                             }
                             console.log('posts fetched ('+res.data.length+')');
@@ -868,7 +864,7 @@
                             });
 
                             var selectTab = this.currMode.id === modes.edit.id ? tabs.selectEdit : this.currMode.id === modes.approve.id ? tabs.selectApprove : tabs.selectSpecial;
-                            this.currTabs = this.admin || this.user.managePosts || this.category.length !== 0 ?
+                            this.currTabs = this.admin || this.info.user.managePosts || this.category.length !== 0 ?
                                 [selectTab, tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize] : [selectTab, tabs.text, tabs.images, tabs.layout, tabs.finalize];
                             this.currTab = tabs.text;
 
@@ -1027,8 +1023,8 @@
                                 // this post is unapproved
                                 if(this.currMode.id === this.modes.create.id) {
                                     // user has created a new unapproved post
-                                    this.unapproved++;
-                                    this.modes.edit.name = this.editModeText(this.unapproved);
+                                    this.info.unapproved++;
+                                    this.modes.edit.name = this.editModeText(this.info.unapproved);
                                 }
                                 hideLoading();
                                 M.toast({ html: 'Fertig!' });
@@ -1101,7 +1097,7 @@
         },
         computed: {
             admin: function () {
-                return this.user && this.user.code.role === 100;
+                return this.info.user && this.info.user.code.role === 100;
             },
             imageURL: function() {
                 return (image) => './api/images/'+image.fileNameWithID;
@@ -1153,7 +1149,7 @@
                         }
                     };
                     do {
-                        var parent = this.menu.reduce((result, curr) => result ? result : findParent(curr, null, currMenu), null);
+                        var parent = this.info.menu.reduce((result, curr) => result ? result : findParent(curr, null, currMenu), null);
                         if(parent) {
                             s = parent.name + ' / ' + s;
                             currMenu = parent;
@@ -1197,28 +1193,24 @@
                 axios.get('./api/info')
                     .then((res) => {
                         if(res.data) {
-                            this.user = res.data.user;
-                            this.menu = res.data.menu;
-                            this.plan = res.data.plan;
-                            this.copyright = res.data.copyright;
-                            this.unapproved = res.data.unapproved;
+                            this.info = res.data;
 
                             // update button text
-                            if(this.admin || this.user.managePosts)
-                                this.modes.approve.name = this.approvedModeText(this.unapproved);
+                            if(this.admin || this.info.user.managePosts)
+                                this.modes.approve.name = this.approvedModeText(this.info.unapproved);
                             else
-                                this.modes.edit.name = this.editModeText(this.unapproved);
+                                this.modes.edit.name = this.editModeText(this.info.unapproved);
 
                             axios.get('./api/post/info-post-manager')
                                 .then((res) => {
                                     if(res.data) {
                                         this.maxPictureSize = res.data.maxPictureSize;
                                         this.category = res.data.category;
-                                        if(this.user && this.user.code.role >= 0) {
+                                        if(this.info.user && this.info.user.code.role >= 0) {
                                             // set one time the modes available
-                                            if(this.user.code.role !== 100)
+                                            if(this.info.user.code.role !== 100)
                                                 this.modes = { create: modes.create, edit: modes.edit, approve: modes.approve };
-                                            if(this.user.code.role !== 100 && !this.user.managePosts)
+                                            if(this.info.user.code.role !== 100 && !this.info.user.managePosts)
                                                 this.modes = { create: modes.create, edit: modes.edit };
                                             this.setMode(modes.create);
                                         }

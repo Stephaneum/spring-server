@@ -27,6 +27,11 @@ class JsfCommunication {
     @Autowired
     private lateinit var jwtService: JwtService
 
+    /**
+     * sends a POST request to the jsf server
+     * this server will do the actions needed for this event
+     * @param event the event
+     */
     fun send(event: JsfEvent) {
         val token = jwtService.generateToken(mapOf("event" to event.toString()))
         try {
