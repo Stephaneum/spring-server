@@ -64,5 +64,6 @@ class ConfigFetcher {
         val config = configRepo.findByKey(element.code) ?: return
         config.value = value
         configRepo.save(config)
+        element.value = value // also set the locally stored one
     }
 }
