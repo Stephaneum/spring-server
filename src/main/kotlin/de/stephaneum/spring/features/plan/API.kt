@@ -22,6 +22,7 @@ import java.util.*
 class PlanAPI {
 
     private val lastModifiedFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm (EEEE)", Locale.GERMANY).withZone(ZoneId.systemDefault());
+    private val finalFileName = "vertretungsplan.pdf"
 
     @Autowired
     private lateinit var jsfCommunication: JsfCommunication
@@ -75,14 +76,14 @@ class PlanAPI {
         if(!fileName.toLowerCase().endsWith(".pdf"))
             return Response.Feedback(false, message = "Nur PDF-Dateien erlaubt")
 
-        val path = fileService.storeFile(file.bytes, "${configFetcher.get(Element.fileLocation)}/vertretungsplan.pdf")
+        val path = fileService.storeFile(file.bytes, "${configFetcher.get(Element.fileLocation)}/$finalFileName")
         if(path != null) {
             val info = planService.resolveDate(File(path))
             if(info != null)
                 configFetcher.save(Element.planInfo, info)
             configFetcher.save(Element.planLocation, path)
             jsfCommunication.send(JsfEvent.SYNC_PLAN)
-            logRepo.save(Log(0, now(), EventType.UPLOAD.id, "${user.firstName} ${user.lastName} (${user.code.getRoleString()})"))
+            logRepo.save(Log(0, now(), EventType.UPLOAD.id, "[Vertretungsplan] ${user.firstName} ${user.lastName} (${user.code.getRoleString()})"))
             return Response.Feedback(true, message = if(info != null) "Änderungen gespeichert.<br>Datum wurde erkannt und aktualisiert." else "Änderungen gespeichert.")
         } else {
             return Response.Feedback(false, message = "Ein Fehler ist aufgetreten")
