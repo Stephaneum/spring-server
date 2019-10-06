@@ -35,7 +35,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
 	// Specific Libraries
-	implementation("org.apache.pdfbox:pdfbox:2.0.15")
+	implementation("org.apache.pdfbox:pdfbox:2.0.17")
 	implementation("commons-io:commons-io:2.6")
 	implementation("org.jsoup:jsoup:1.10.3")
 

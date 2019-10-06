@@ -4,6 +4,7 @@ import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.database.now
+import de.stephaneum.spring.features.plan.PlanService
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
@@ -13,8 +14,6 @@ import java.io.File
 import org.apache.pdfbox.rendering.PDFRenderer
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.rendering.ImageType
-import java.io.IOException
-import org.apache.pdfbox.text.PDFTextStripper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -37,6 +36,9 @@ class PdfToImageScheduler {
 
     @Autowired
     private lateinit var imageService: ImageService
+
+    @Autowired
+    private lateinit var planService: PlanService
 
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
@@ -70,7 +72,7 @@ class PdfToImageScheduler {
                             }
                             if(changed) {
                                 val images = generateImages(file)
-                                val title = resolveDate(file)
+                                val title = planService.resolveDate(file)
                                 val lastModified = updateTimestamp(board.id) // also update database
                                 instance = PdfImages(board.id, images, lastModified, title)
                             }
@@ -110,8 +112,6 @@ class PdfToImageScheduler {
     }
 
     private fun generateImages(file: File): List<ByteArray> {
-        logger.info("")
-        logger.info("--- updating images ---")
         val images = mutableListOf<ByteArray>()
         val document = PDDocument.load(file)
         val pdfRenderer = PDFRenderer(document)
@@ -122,8 +122,7 @@ class PdfToImageScheduler {
             images.add(imageService.convertToJPG(resized))
         }
         document.close()
-        logger.info("--- images generated ---")
-        logger.info("")
+        logger.info("images generated")
         return images
     }
 
@@ -131,84 +130,5 @@ class PdfToImageScheduler {
         val now = now()
         blackboardRepo.findByIdOrNull(blackboardId)?.apply { lastUpdate = now }?.also { blackboardRepo.save(it) }
         return now.time
-    }
-
-    private val days = arrayOf("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag")
-    private val months = arrayOf("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember")
-
-    private fun resolveDate(file: File): String? {
-        java.util.logging.Logger.getLogger("org.apache.pdfbox").level = java.util.logging.Level.SEVERE
-
-        var result: String? = null
-        try {
-            val document = PDDocument.load(file)
-            val pdfStripper = PDFTextStripper()
-            val text = pdfStripper.getText(document)
-
-            val splitted = text.split(System.lineSeparator().toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-
-            for (line in splitted) {
-                var weekDay: String?
-                var month: String?
-                var day: String? = null
-                var year: String? = null
-
-                for (i in 0 until days.size) {
-
-                    val occurenceAt = line.indexOf(days[i])
-                    if (occurenceAt != -1) {
-                        //Wochentag gefunden
-                        logger.info("[Vertretungsplan-Analyse] " + days[i])
-                        weekDay = days[i]
-
-                        for (x in 0 until months.size) {
-
-                            val occurenceMonatAt = line.indexOf(months[x])
-                            if (occurenceMonatAt != -1) {
-
-                                //Monat gefunden
-                                logger.info("[Vertretungsplan-Analyse] " + months[x])
-
-                                month = if (x >= 9) (x + 1).toString() else "0" + (x + 1)
-
-                                val indexTagBegin = occurenceAt + days[i].length + 2
-                                val indexTagEnd = occurenceMonatAt - 2
-                                logger.info("[Vertretungsplan-Analyse] tag: $indexTagBegin bis $indexTagEnd")
-
-                                if (indexTagEnd > indexTagBegin && indexTagEnd < line.length)
-                                    day = line.substring(indexTagBegin, indexTagEnd)
-
-                                if (day!!.length == 1)
-                                    day = "0$day"
-
-                                val indexJahrBegin = occurenceMonatAt + months[x].length + 1
-                                val indexJahrEnd = occurenceMonatAt + months[x].length + 1 + 4
-                                logger.info("[Vertretungsplan-Analyse] jahr: $indexJahrBegin bis $indexJahrEnd")
-
-                                if (indexJahrEnd > indexJahrBegin && indexJahrEnd < line.length)
-                                    year = line.substring(indexJahrBegin, indexJahrEnd)
-
-                                if (year != null) {
-                                    logger.info("\"$line\" >> $weekDay, $day.$month.$year")
-                                    result = "$weekDay, $day.$month.$year"
-                                }
-
-                                break
-                            }
-                        }
-                        break
-                    }
-                }
-
-                if (result != null)
-                    break
-            }
-
-            document.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
-        return result
     }
 }

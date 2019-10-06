@@ -1,6 +1,7 @@
 <#-- @ftlvariable name="title" type="java.lang.String" -->
 
 <#import "/spring.ftl" as spring/>
+<#import "components/loading.ftl" as loading/>
 <#import "components/vue-loader.ftl" as vueLoader/>
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
@@ -33,34 +34,16 @@
 <@vueLoader.blank/>
 <div id="app" style="display: flex; align-items: center; flex-direction: column; min-height: 100vh" v-cloak>
     <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
-    <div style="flex: 1; display: flex; align-items: center; justify-content: center">
-        <div style="max-width: 500px">
-            <div class="card" style="margin-top: 100px; padding: 5px 20px 40px 20px">
-                <h5 class="center-align" style="padding: 10px; margin-bottom: 30px">Login</h5>
-                <div class="input-field">
-                    <i class="material-icons prefix">person</i>
-                    <label for="email">E-Mail</label>
-                    <input @keyup.enter="login" v-model:value="email" :disabled="loggingIn" type="text" id="email"/>
-                </div>
-                <div class="input-field">
-                    <i class="material-icons prefix">vpn_key</i>
-                    <label for="password">Passwort</label>
-                    <input @keyup.enter="login" v-model:value="password" :disabled="loggingIn" type="password" id="password"/>
-                </div>
-                <div style="text-align: right">
-                    <button @click="login" type="button" value="Login" class="btn waves-effect waves-light green darken-3" :class="{ disabled: loggingIn }">
-                        Login
-                        <i class="material-icons right">send</i>
-                    </button>
-                </div>
-            </div>
-            <div style="text-align: center">
-                <p class="info" v-show="!loggingIn && !loginFailed" style="visibility: hidden">placeholder</p>
-                <p class="info" v-show="loggingIn" style="display: none">Authentifizierung</p>
-                <p class="info red-text" v-show="!loggingIn && loginFailed" style="display: none">Login fehlgeschlagen</p>
+    <div v-if="allowed" style="flex: 1; display: flex; align-items: center; justify-content: center">
+        <div style="width: 800px">
+            <h5>Vertretungsplan</h5>
+            <div class="card-panel">
+                <h5>PDF-Datei:</h5>
+                <h5>Zusatzinformation:</h5>
             </div>
         </div>
     </div>
+    <div v-else style="flex: 1"></div>
 
     <stephaneum-footer :copyright="info.copyright"></stephaneum-footer>
 </div>
@@ -68,6 +51,7 @@
 <script src="/static/js/materialize.min.js" ></script>
 <script src="/static/js/axios.min.js" ></script>
 <script src="/static/js/vue.js" ></script>
+<@loading.render/>
 <@menu.render/>
 <@footer.render/>
 <script type="text/javascript">
@@ -77,25 +61,13 @@
         el: '#app',
         data: {
             info: { user: null, menu: null, plan: null, copyright: null, unapproved: null },
-            email: null,
-            password: null,
-            loginFailed: false,
-            loggingIn: false
         },
         methods: {
-            login: function() {
-                this.loggingIn = true;
-                axios.post('./api/login', { email: this.email, password: this.password })
-                    .then((response) => {
-                    if(response.data.success) {
-                        this.loginFailed = false;
-                        window.location = 'beitrag-manager';
-                    } else {
-                        this.loginFailed = true;
-                        this.loggingIn = false;
-                        M.toast({html: 'Login fehlgeschlagen.'});
-                    }
-                });
+
+        },
+        computed: {
+            allowed: function() {
+                return this.info.user && (this.info.user.code.role === 100 || this.info.user.managePlans)
             }
         },
         mounted: function() {
