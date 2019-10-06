@@ -84,6 +84,14 @@
         },
         methods: {
             login: function() {
+                if(!this.email) {
+                    document.getElementById("email").focus();
+                    return;
+                } else if(!this.password) {
+                    document.getElementById("password").focus();
+                    return;
+                }
+
                 this.loggingIn = true;
                 axios.post('./api/login', { email: this.email, password: this.password })
                     .then((response) => {
