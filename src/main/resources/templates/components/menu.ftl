@@ -2,11 +2,11 @@
     <template id="nav-menu">
         <div style="width: 100%">
             <nav>
-                <div class="nav-wrapper" style="z-index: 100; background-color: white">
+                <div class="nav-wrapper" :style="{ 'z-index': minimal ? 'auto' : 100 }" style="background-color: white">
                     <a href="#" data-target="sidenav" class="sidenav-trigger hide-on-large-only">
                         <i class="material-icons" style="color: #1b5e20">menu</i>
                     </a>
-                    <a :href="minimal ? '#!' : './home.xhtml'" class="brand-logo" :style="minimal ? {'z-index': -1, 'opacity': 0.05 } : {}">
+                    <a :href="minimal ? '#!' : './home.xhtml'" class="brand-logo" :style="minimal ? { 'opacity': 0.05 } : {}">
                         <img src="/static/img/logo-banner-green.png" style="height:50px;margin-top:5px;margin-left:10px"/>
                     </a>
                     <ul class="right hide-on-med-and-down">
