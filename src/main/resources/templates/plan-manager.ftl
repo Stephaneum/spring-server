@@ -57,7 +57,7 @@
     <div v-if="allowed" style="flex: 1; display: flex; align-items: center; justify-content: center">
         <div style="width: 900px;">
             <h4 style="text-align: center; margin-bottom: 30px">Vertretungsplan</h4>
-            <div class="card-panel row">
+            <div class="card-panel row" style="padding: 30px 0 30px 30px">
                 <div class="col m6">
                     <div class="round-area">
                         <i class="material-icons">description</i>
@@ -96,8 +96,8 @@
                 </div>
                 <div class="col m6">
                     <div style="height: 300px; display: flex; align-items: center; justify-content: center; flex-direction: column">
-                        <h5 style="text-align: center; margin-bottom: 40px">Vorschau</h5>
-                        <div v-if="info.plan.exists" style="width: 320px">
+                        <h5 style="text-align: center; margin-bottom: 30px">Vorschau</h5>
+                        <div v-if="info.plan.exists" style="width: 330px">
                             <a href="vertretungsplan.pdf" target="_blank">
                                 <div class="quick-button card">
                                     <div class="card-content white-text">

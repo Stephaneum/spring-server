@@ -59,7 +59,7 @@
                                 <li v-if="admin"><a href="admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
                                 <li v-if="admin"><a href="admin_logs.xhtml"><span><i class="material-icons">history</i>Logbuch</span></a></li>
                                 <li class="internal-divider"></li>
-                                <li v-if="admin || managePlans"><a href="konfig_vertretung.xhtml"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
+                                <li v-if="admin || managePlans"><a href="vertretungsplan-manager"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
                                 <li v-if="createCategories"><a href="nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
                                 <li><a href="beitrag-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
                                 <li><a href="klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
