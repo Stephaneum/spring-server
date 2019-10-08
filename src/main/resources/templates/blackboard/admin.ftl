@@ -34,16 +34,23 @@
 
             <div class="row">
                 <div class="col m6 left-align">
-                    <a class="waves-effect waves-light btn green darken-3" href="<@spring.url './' />" target="_blank">
+                    <a class="waves-effect waves-light btn teal darken-3" href="<@spring.url './' />" target="_blank">
                         <i class="material-icons right">star</i>Live-Version</a>
                 </div>
                 <div class="col m6 right-align">
-                    <a @click="logout" class="waves-effect waves-light btn green darken-3">
+                    <a @click="logout" class="waves-effect waves-light btn teal darken-3">
                         <i class="material-icons right">exit_to_app</i>Abmelden</a>
                 </div>
             </div>
             <div class="card" style="width: 1250px; min-height: 500px; margin: 15px 0 15px 0; padding: 5px 20px 20px 20px">
-                <h4 style="margin-bottom: 20px">Blackboard</h4>
+
+                <div style="display: flex; align-items: center; justify-content: space-between">
+                    <h4 style="margin-bottom: 20px">Blackboard</h4>
+                    <a @click="togglePause" class="waves-effect waves-light btn green darken-3" :class="{ disabled: waitingForData, green: !paused, grey: paused}">
+                        <i class="material-icons left">{{ paused ? 'pause' : 'play_arrow' }}</i>
+                        {{ paused ? 'Pausiert' : 'Läuft' }}
+                    </a>
+                </div>
 
                 <ul class="collection">
                     <li v-for="(b, index) in boards" class="collection-item" :class="b.visible ? [] : ['grey', 'lighten-3']">
@@ -81,19 +88,19 @@
                             <div class="col m3 right-align">
 
                                 <a class="tooltipped waves-effect waves-light btn darken-4 margin-1" :class="{disabled: index === 0 || waitingForData}"
-                                   @click="moveUp(b.id)" href="#!" data-tooltip="Reihenfolge: nach oben" data-position="top">
+                                   @click="moveUp(b.id)" href="#!" data-tooltip="Reihenfolge: nach oben" data-position="bottom">
                                     <i class="material-icons">arrow_upward</i></a>
 
                                 <a class="tooltipped waves-effect waves-light btn darken-4 margin-1" :class="{disabled: index === boards.length -1 || waitingForData}"
-                                   @click="moveDown(b.id)" href="#!" data-tooltip="Reihenfolge: nach unten" data-position="top">
+                                   @click="moveDown(b.id)" href="#!" data-tooltip="Reihenfolge: nach unten" data-position="bottom">
                                     <i class="material-icons">arrow_downward</i></a>
 
                                 <a class="tooltipped waves-effect waves-light btn green darken-4 margin-1" :class="{disabled: waitingForData}"
-                                   @click="toggleVisibility(b.id)" href="#!" data-tooltip="Sichtbar: ja/nein" data-position="top">
+                                   @click="toggleVisibility(b.id)" href="#!" data-tooltip="Sichtbar: ja/nein" data-position="bottom">
                                     <i class="material-icons">{{ b.visible ? 'visibility' : 'visibility_off' }}</i></a>
 
                                 <a class="tooltipped waves-effect waves-light btn red darken-4 margin-1" :class="{disabled: waitingForData}"
-                                   @click="showDelete(b.id, typeReadable(b.type))" data-tooltip="Löschen" data-position="top">
+                                   @click="showDelete(b.id, typeReadable(b.type))" data-tooltip="Löschen" data-position="bottom">
                                     <i class="material-icons">delete</i></a>
 
                             </div>
@@ -190,6 +197,7 @@
             boardValue: null,
             duration: 0,
 
+            paused: null,
             activeID: null,
             activeSeconds: null,
             activeClients: null,
@@ -327,6 +335,19 @@
                         fetchData(this);
                     });
             },
+            togglePause: function() {
+                this.waitingForData = true;
+                var pause = !this.paused;
+                axios.post( './api/pause?paused='+pause)
+                    .then((response) => {
+                        if(response.data.success) {
+                            M.toast({ html: pause ? 'Pausiert' : 'Blackboard aktiv' });
+                        } else {
+                            M.toast({ html: 'Änderung fehlgeschlagen.' });
+                        }
+                        fetchData(this);
+                    });
+            },
             showUpload: function(boardID) {
                 document.getElementById('upload-file-'+boardID).click();
             },
@@ -432,6 +453,7 @@
         axios.get('./api/info')
             .then((response) => {
                 if(response.data) {
+                    instance.paused = response.data.paused;
                     instance.activeID = response.data.activeID;
                     instance.activeSeconds = response.data.activeSeconds;
                     instance.activeClients = response.data.activeClients;

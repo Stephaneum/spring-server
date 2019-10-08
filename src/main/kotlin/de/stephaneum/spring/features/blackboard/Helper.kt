@@ -14,8 +14,10 @@ object Request {
 }
 
 object Response {
+
+    data class Timestamp(val timestamp: Long?)
+
     data class Feedback(val success: Boolean, val needLogin: Boolean = false, val message: String? = null)
-    data class Timestamp(val timestamp: Long)
     data class AdminData(val types: List<Type>, val boards: List<Blackboard>)
-    data class AdminInfo(val activeID: Int, val activeSeconds: Int, val activeClients: Int, val timeToRefresh: Int)
+    data class AdminInfo(val paused: Boolean, val activeID: Int, val activeSeconds: Int, val activeClients: Int, val timeToRefresh: Int)
 }

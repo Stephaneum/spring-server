@@ -11,7 +11,7 @@ function fetchBlackboard() {
             url: url,
             timeout: 10000, // timeout 10s
             success: function (data) {
-                if (currentTimestamp !== data.timestamp) {
+                if (data.timestamp && currentTimestamp !== data.timestamp) {
                     location.reload();
                     return;
                 }
@@ -28,7 +28,7 @@ function fetchBlackboard() {
 
 function updateBlackboard() {
     if(requestFetchBlackboard) {
-        updateBlackboard = false;
+        requestFetchBlackboard = false;
         fetchBlackboard();
     }
 }

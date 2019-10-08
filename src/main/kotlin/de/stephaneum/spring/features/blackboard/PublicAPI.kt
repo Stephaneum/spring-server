@@ -47,7 +47,10 @@ class BlackboardPublicAPI {
         val ip = resolveIP(forwardedIP, request)
         activeClientsScheduler.activeClients[ip] = System.currentTimeMillis()
 
-        return Response.Timestamp(blackboardScheduler.active.lastUpdate.time)
+        if(blackboardScheduler.paused)
+            return Response.Timestamp(null)
+        else
+            return Response.Timestamp(blackboardScheduler.active.lastUpdate.time)
     }
 
     private fun resolveIP(forwardedIP: String?, request: HttpServletRequest): String {

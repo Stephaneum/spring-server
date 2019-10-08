@@ -64,7 +64,12 @@ class BlackboardAdminAPI {
             return Response.Feedback(false, needLogin = true)
 
         val activeSec = (System.currentTimeMillis()-blackboardScheduler.activeSince) / 1000 + 1
-        return Response.AdminInfo(blackboardScheduler.active.id, activeSec.toInt(), activeClientsScheduler.activeClients.size, blackboardScheduler.timeToNextRefreshSec().toInt())
+        return Response.AdminInfo(
+                paused = blackboardScheduler.paused,
+                activeID = blackboardScheduler.active.id,
+                activeSeconds = activeSec.toInt(),
+                activeClients = activeClientsScheduler.activeClients.size,
+                timeToRefresh = blackboardScheduler.timeToNextRefreshSec().toInt())
     }
 
     // Mutations
@@ -223,6 +228,15 @@ class BlackboardAdminAPI {
 
         blackboardRepo.deleteById(id)
         repairOrder()
+        return Response.Feedback(true)
+    }
+
+    @PostMapping("/pause")
+    fun pause(@RequestParam paused: Boolean): Response.Feedback {
+        if(Session.get().permission != Permission.BLACKBOARD)
+            return Response.Feedback(false, needLogin = true)
+
+        blackboardScheduler.paused = paused
         return Response.Feedback(true)
     }
 

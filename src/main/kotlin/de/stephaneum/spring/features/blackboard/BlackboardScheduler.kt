@@ -4,7 +4,6 @@ import de.stephaneum.spring.database.Blackboard
 import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.database.now
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -18,7 +17,6 @@ class BlackboardScheduler {
      * every 10min a refresh is forced by updating all the timestamps
      */
 
-    private final val logger = LoggerFactory.getLogger(BlackboardScheduler::class.java)
     private final val EMPTY_BLACKBOARD = Blackboard(-1, Type.TEXT, "Leere Konfiguration")
     private final val FETCH_DELAY = 10000 // sync every 10s with the database
     private final val REFRESH_DELAY = 10*60*1000 // force refresh every 10min
@@ -34,9 +32,13 @@ class BlackboardScheduler {
     // only these variables should be accessed from outside
     var active = EMPTY_BLACKBOARD
     var activeSince = System.currentTimeMillis()
+    var paused = false
 
     @Scheduled(initialDelay=10000, fixedDelay = 1000)
     fun update() {
+
+        if(paused)
+            return
 
         if(System.currentTimeMillis() > nextFetch) {
             // fetch new data from database
