@@ -10,11 +10,11 @@
     <title>Backup</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="<@spring.url '/static/img/favicon.png' />"/>
-    <link rel="apple-touch-icon" sizes="196x196" href="<@spring.url '/static/img/favicon.png' />">
-    <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/materialize.min.css' />">
-    <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/material-icons.css' />">
-    <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/style.css' />">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png"/>
+    <link rel="apple-touch-icon" sizes="196x196" href="/static/img/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/material-icons.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
     <style>
         .backup-card {
             flex-basis: 400px;
@@ -60,7 +60,7 @@
             <!-- title -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 50px 0 50px">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <img src="<@spring.url '/static/img/favicon.png' />" style="width: 50px"/>
+                    <img src="/static/img/favicon.png" style="width: 50px"/>
                     <h4 style="color: #396e3a; margin-left: 10px; padding-bottom: 5px">Backup-System</h4>
                 </div>
 

@@ -10,11 +10,11 @@
     <title>Blackboard</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="<@spring.url '/static/img/favicon.png' />"/>
-    <link rel="apple-touch-icon" sizes="196x196" href="<@spring.url '/static/img/favicon.png' />">
-    <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/materialize.min.css' />">
-    <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/material-icons.css' />">
-    <link rel="stylesheet" type="text/css" href="<@spring.url '/static/css/style.css' />">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png"/>
+    <link rel="apple-touch-icon" sizes="196x196" href="/static/img/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/material-icons.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
     <style>
         [v-cloak] {
             display: none;
@@ -29,12 +29,12 @@
     <div class="valign-wrapper" style="height: 100vh">
         <div style="margin: auto">
             <div class="center-align" style="max-width: 400px; margin: auto; margin-top: 50px">
-                <img src="<@spring.url '/static/img/logo-banner-green.png' />" style="width: 100%"/>
+                <img src="/static/img/logo-banner-green.png" style="width: 100%"/>
             </div>
 
             <div class="row">
                 <div class="col m6 left-align">
-                    <a class="waves-effect waves-light btn teal darken-3" href="<@spring.url './' />" target="_blank">
+                    <a class="waves-effect waves-light btn teal darken-3" href="./" target="_blank">
                         <i class="material-icons right">star</i>Live-Version</a>
                 </div>
                 <div class="col m6 right-align">
@@ -438,6 +438,7 @@
                         return;
                     }
 
+                    instance.paused = response.data.paused;
                     instance.types = response.data.types;
                     instance.boards = response.data.boards;
                     instance.waitingForData = false;
@@ -453,7 +454,6 @@
         axios.get('./api/info')
             .then((response) => {
                 if(response.data) {
-                    instance.paused = response.data.paused;
                     instance.activeID = response.data.activeID;
                     instance.activeSeconds = response.data.activeSeconds;
                     instance.activeClients = response.data.activeClients;

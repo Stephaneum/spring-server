@@ -71,8 +71,7 @@ class BlackboardScheduler {
 
         // force refresh
         if(System.currentTimeMillis() > nextRefresh) {
-            blackboardRepo.saveAll(updateTimestamps(blackboardRepo.findAll())) // update db
-            updateTimestamps(boards) // update local cache
+            boards = blackboardRepo.saveAll(updateTimestamps(blackboardRepo.findAll())).toList() // update db and cache
             nextRefresh = System.currentTimeMillis() + REFRESH_DELAY
         }
     }
@@ -80,8 +79,8 @@ class BlackboardScheduler {
     fun timeToNextRefreshSec() = (nextRefresh - System.currentTimeMillis()) / 1000
 
     private fun updateTimestamps(boards: Iterable<Blackboard>): Iterable<Blackboard> {
-        return boards.map { board ->
-            board.lastUpdate = now()
+        return boards.mapIndexed{ index, board ->
+            board.lastUpdate = now(index*2000) // we are adding a delta to the timestamp to have unique timestamps
             board
         }
     }

@@ -54,7 +54,7 @@ class BlackboardAdminAPI {
         if(Session.get().permission != Permission.BLACKBOARD)
             return Response.Feedback(false, needLogin = true)
 
-        return Response.AdminData(Type.values().toList(), blackboardRepo.findByOrderByOrder())
+        return Response.AdminData(blackboardScheduler.paused, Type.values().toList(), blackboardRepo.findByOrderByOrder())
     }
 
     @GetMapping("/info")
@@ -65,7 +65,6 @@ class BlackboardAdminAPI {
 
         val activeSec = (System.currentTimeMillis()-blackboardScheduler.activeSince) / 1000 + 1
         return Response.AdminInfo(
-                paused = blackboardScheduler.paused,
                 activeID = blackboardScheduler.active.id,
                 activeSeconds = activeSec.toInt(),
                 activeClients = activeClientsScheduler.activeClients.size,
