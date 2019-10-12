@@ -39,6 +39,12 @@
             margin-right: 20px;
         }
 
+        .info-text {
+            display: inline-block;
+            font-style: italic;
+            margin-top: 10px
+        }
+
         .quick-button {
             background: #1b5e20;
         }
@@ -75,7 +81,8 @@
                                     <i class="material-icons">delete</i>
                                 </a>
                             </form>
-                            <span v-if="lastModified" style="display: inline-block; font-style: italic; margin-top: 10px">Stand: {{ lastModified }}</span>
+                            <span v-if="lastModified" class="info-text">Stand: {{ lastModified }}</span>
+                            <span v-else class="info-text">(keine Datei bereitgestellt)</span>
                         </div>
                     </div>
                     <div class="round-area" style="margin-top: 30px">
