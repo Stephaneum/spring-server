@@ -62,7 +62,11 @@
     <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
     <div v-if="allowed" style="flex: 1; display: flex; align-items: center; justify-content: center">
         <div style="width: 900px;">
-            <h4 style="text-align: center; margin-bottom: 30px">Vertretungsplan</h4>
+            <div style="text-align: center; margin-bottom: 40px">
+                <i class="material-icons" style="font-size: 4em">description</i>
+                <h4 style="margin: 5px 0 0 0">Vertretungsplan</h4>
+            </div>
+
             <div class="card-panel" style="display: flex; padding: 30px 0 30px 30px">
                 <div style="flex: 50%">
                     <div class="round-area">

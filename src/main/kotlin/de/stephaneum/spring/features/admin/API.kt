@@ -16,7 +16,7 @@ class AdminAPI {
     @Autowired
     private lateinit var logRepo: LogRepo
 
-    private val dateFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss (EEEE)", Locale.GERMANY).withZone(ZoneId.systemDefault())
+    private val dateFormat = DateTimeFormatter.ofPattern("EEEE, dd.MM.yyyy, HH:mm:ss", Locale.GERMANY).withZone(ZoneId.systemDefault())
     private val updateInterval = 30*1000 // 30 sec
     private var logs: List<Response.Log> = emptyList()
     private var lastUpdate = 0L

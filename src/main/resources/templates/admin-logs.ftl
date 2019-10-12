@@ -37,7 +37,8 @@
 
         .date-span {
             flex: 0 0 250px;
-            text-align: right
+            text-align: right;
+            color: #808080;
         }
 
         .auth-badge {
@@ -102,7 +103,7 @@
                         </span>
                         <span class="info-span">{{ l.info }}</span>
                         <span class="date-span">
-                            <span class="green-badge-light">{{ l.date }}</span>
+                            {{ l.date }}
                         </span>
                     </div>
                 </li>
@@ -140,7 +141,8 @@
             logsLowerCase: [],
             search: null,
             currAmount: 200,
-            waitingForData: true
+            waitingForData: true,
+            firstFetch: true,
         },
         methods: {
             setAmount: function(amount) {
@@ -168,6 +170,9 @@
                                     });
                                     this.logsLowerCase = [ ...this.logsRawLowerCase ];
                                     this.waitingForData = false;
+                                    if(!this.firstFetch)
+                                        M.toast({ html: 'Logdaten geladen.<br>'+this.logs.length+' Einträge' });
+                                    this.firstFetch = false;
                                 }
                             });
                     });
