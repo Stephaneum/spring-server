@@ -180,7 +180,7 @@
         },
         watch: {
             search: function(newVal, oldVal) {
-                if(newVal === '') {
+                if(!newVal) {
                     this.logs = [ ...this.logsRaw ];
                     this.logsLowerCase = [ ...this.logsRawLowerCase ];
                 } else {
