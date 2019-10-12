@@ -57,8 +57,8 @@
     <div v-if="allowed" style="flex: 1; display: flex; align-items: center; justify-content: center">
         <div style="width: 900px;">
             <h4 style="text-align: center; margin-bottom: 30px">Vertretungsplan</h4>
-            <div class="card-panel row" style="padding: 30px 0 30px 30px">
-                <div class="col m6">
+            <div class="card-panel" style="display: flex; padding: 30px 0 30px 30px">
+                <div style="flex: 50%">
                     <div class="round-area">
                         <i class="material-icons">description</i>
                         <div>
@@ -71,11 +71,11 @@
                                     <i class="material-icons">cloud_upload</i>
                                 </a>
                                 <a class="waves-effect waves-light tooltipped red darken-3 btn" style="margin-left: 10px"
-                                   @click="remove" :disabled="!info.plan.exists" data-tooltip="Löschen" data-position="bottom">
+                                   @click="showDelete" :disabled="!info.plan.exists" data-tooltip="Löschen" data-position="bottom">
                                     <i class="material-icons">delete</i>
                                 </a>
                             </form>
-                            <span style="display: inline-block; font-style: italic; margin-top: 10px">Stand: {{ lastModified }}</span>
+                            <span v-if="lastModified" style="display: inline-block; font-style: italic; margin-top: 10px">Stand: {{ lastModified }}</span>
                         </div>
                     </div>
                     <div class="round-area" style="margin-top: 30px">
@@ -94,28 +94,26 @@
                         </div>
                     </div>
                 </div>
-                <div class="col m6">
-                    <div style="height: 300px; display: flex; align-items: center; justify-content: center; flex-direction: column">
-                        <h5 style="text-align: center; margin-bottom: 30px">Vorschau</h5>
-                        <div v-if="info.plan.exists" style="width: 330px">
-                            <a href="vertretungsplan.pdf" target="_blank">
-                                <div class="quick-button card">
-                                    <div class="card-content white-text">
-                                        <div class="row" style="margin-bottom:0">
-                                            <div class="col s12 m12 l8">
-                                                <span class="card-title">Vertretungsplan</span>
-                                                <p>{{ planInfo }}</p>
-                                            </div>
-                                            <div class="col l4 right-align hide-on-med-and-down">
-                                                <i id="quick-icon" class="material-icons" style="font-size:50pt">description</i>
-                                            </div>
+                <div style="flex: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column">
+                    <h5 style="text-align: center; margin-bottom: 30px">Vorschau</h5>
+                    <div v-if="info.plan.exists" style="width: 330px">
+                        <a href="vertretungsplan.pdf" target="_blank">
+                            <div class="quick-button card">
+                                <div class="card-content white-text">
+                                    <div class="row" style="margin-bottom:0">
+                                        <div class="col s12 m12 l8">
+                                            <span class="card-title">Vertretungsplan</span>
+                                            <p>{{ planInfo }}</p>
+                                        </div>
+                                        <div class="col l4 right-align hide-on-med-and-down">
+                                            <i id="quick-icon" class="material-icons" style="font-size:50pt">description</i>
                                         </div>
                                     </div>
                                 </div>
-                            </a>
-                        </div>
-                        <span class="green-badge-light" style="font-size: 1em; margin-top: 20px" v-else>ausgeblendet</span>
+                            </div>
+                        </a>
                     </div>
+                    <span class="green-badge-light" style="font-size: 1em; margin-top: 20px" v-else>ausgeblendet</span>
                 </div>
 
 
@@ -125,6 +123,21 @@
     <div v-else style="flex: 1"></div>
 
     <stephaneum-footer :copyright="info.copyright"></stephaneum-footer>
+
+    <!-- delete modal -->
+    <div id="modal-delete" class="modal">
+        <div class="modal-content">
+            <h4>PDF-Datei wirklich löschen?</h4>
+            <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
+        </div>
+        <div class="modal-footer">
+            <a @click="closeDelete" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a @click="doDelete" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
+                <i class="material-icons left">delete</i>
+                Löschen
+            </a>
+        </div>
+    </div>
 </div>
 
 <script src="/static/js/materialize.min.js" ></script>
@@ -134,8 +147,6 @@
 <@menu.render/>
 <@footer.render/>
 <script type="text/javascript">
-    M.AutoInit();
-
     var app = new Vue({
         el: '#app',
         data: {
@@ -177,9 +188,16 @@
                         hideLoading();
                     });
             },
-            remove: function() {
+            showDelete: function(boardID, boardType) {
+                this.boardDelete = { boardID, boardType };
+                M.Modal.getInstance(document.getElementById('modal-delete')).open();
+            },
+            closeDelete: function() {
+                M.Modal.getInstance(document.getElementById('modal-delete')).close();
+            },
+            doDelete: function() {
                 showLoadingInvisible();
-                axios.post('./api/plan/remove',)
+                axios.post('./api/plan/delete',)
                     .then((res) => {
                         if(res.data.success) {
                             M.toast({ html: 'Gelöscht.' });
@@ -217,9 +235,7 @@
                             this.planInfo = res.data.plan.info; // update text field
                             axios.get('./api/plan/last-modified',)
                                 .then((res) => {
-                                    if(res.data.success) {
-                                        this.lastModified = res.data.message;
-                                    }
+                                    this.lastModified = res.data.message;
                                     hideLoading();
                                     this.$nextTick(() => M.Tooltip.init(document.querySelectorAll('.tooltipped'), {}));
                                 });
@@ -235,6 +251,7 @@
             }
         },
         mounted: function() {
+            M.AutoInit();
             this.fetchData();
         }
     });

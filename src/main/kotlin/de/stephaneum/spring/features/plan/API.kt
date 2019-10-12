@@ -90,8 +90,8 @@ class PlanAPI {
         }
     }
 
-    @PostMapping("/remove")
-    fun remove(): Response.Feedback {
+    @PostMapping("/delete")
+    fun delete(): Response.Feedback {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         if(user.code.role != ROLE_ADMIN && user.managePlans != true)
