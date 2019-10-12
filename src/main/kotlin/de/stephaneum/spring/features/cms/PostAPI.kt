@@ -145,8 +145,8 @@ class PostAPI {
         // log
         val eventType = when {
             oldPost == null -> EventType.CREATE_POST.id
-            oldPost.menu != null -> EventType.EDIT_POST.id
-            else -> EventType.APPROVE_POST.id
+            oldPost.menu == null && menu != null -> EventType.APPROVE_POST.id
+            else -> EventType.EDIT_POST.id
         }
         logRepo.save(Log(0, now(), eventType, "${user.firstName} ${user.lastName} (${user.code.getRoleString()}), ${request.title}"))
         return savedPost
