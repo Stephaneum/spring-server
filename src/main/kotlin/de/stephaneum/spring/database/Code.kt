@@ -28,10 +28,10 @@ data class Code(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     fun getRoleString(): String {
         return when(role) {
-            ROLE_NO_LOGIN -> "Gast (nicht eingeloggt)"
+            ROLE_NO_LOGIN -> "öffentlicher Gast"
             ROLE_STUDENT -> "Schüler/in"
             ROLE_TEACHER -> "Lehrer/in"
-            ROLE_GUEST -> "Gast (eingeloggt)"
+            ROLE_GUEST -> "eingeloggter Gast"
             ROLE_ADMIN -> "Admin"
             else -> "?"
         }

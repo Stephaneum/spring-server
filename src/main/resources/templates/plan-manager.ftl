@@ -233,7 +233,7 @@
                         if(res.data) {
                             this.info = res.data;
                             this.planInfo = res.data.plan.info; // update text field
-                            axios.get('./api/plan/last-modified',)
+                            axios.get('./api/plan/last-modified')
                                 .then((res) => {
                                     this.lastModified = res.data.message;
                                     hideLoading();

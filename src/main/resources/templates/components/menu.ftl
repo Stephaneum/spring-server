@@ -57,7 +57,7 @@
                                 <li v-if="admin"><a href="admin_backup.xhtml"><span><i class="material-icons">save</i>Backup</span></a></li>
                                 <li v-if="admin"><a href="admin_zugangscode.xhtml"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
                                 <li v-if="admin"><a href="admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
-                                <li v-if="admin"><a href="admin_logs.xhtml"><span><i class="material-icons">history</i>Logbuch</span></a></li>
+                                <li v-if="admin"><a href="logs"><span><i class="material-icons">history</i>Logdaten</span></a></li>
                                 <li class="internal-divider"></li>
                                 <li v-if="admin || managePlans"><a href="vertretungsplan-manager"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
                                 <li v-if="createCategories"><a href="nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
