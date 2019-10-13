@@ -324,7 +324,7 @@
                                 Ausgewählt
                             </h5>
                             <form method="POST" enctype="multipart/form-data" style="margin-top: 30px;">
-                                <input name="file" type="file" id="upload-image" @change="uploadImage($event.currentTarget.files[0])" style="display: none">
+                                <input name="file" type="file" id="upload-image" @change="uploadImage($event.currentTarget.files)" style="display: none" multiple>
 
                                 <a class="waves-effect waves-light tooltipped btn" style="background-color: #607d8b"
                                    @click="deselectAllImages" :disabled="currPost.imagesAdded.length === 0" data-tooltip="Zurücksetzen" data-position="bottom">
@@ -925,34 +925,42 @@
             showUpload: function() {
                 document.getElementById('upload-image').click();
             },
-            uploadImage: function(file) {
-                showLoading('Hochladen (0%)');
+            uploadImage: function(files, index = 0) {
+                var infoStart = files.length === 1 ? 'Hochladen (0%)' : '[' + (index+1) + '/' + files.length + '] [0%]' + files[index].name;
+                showLoading(infoStart);
                 var data = new FormData();
-                data.append('file', file);
+                data.append('file', files[index]);
                 var config = {
                     onUploadProgress: function(progressEvent) {
                         var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
-                        showLoading('Hochladen ('+ percentCompleted +'%)', percentCompleted);
+                        var infoProcess = files.length === 1 ?
+                            'Hochladen ('+ percentCompleted +'%)' :
+                            '[' + (index+1) + '/' + files.length + '] [' + percentCompleted + '%] ' + files[index].name;
+                        showLoading(infoProcess, percentCompleted);
                     }
                 };
-                var instance = this;
                 axios.post('./api/post/upload-image', data, config)
-                    .then(function (res) {
+                    .then((res) => {
                         if(res.data.id) {
-                            instance.addImageData(res.data);
-                            instance.imagesAvailable.unshift(res.data);
-                            instance.currPost.imagesAdded.push(res.data);
-                            M.toast({ html: 'Datei hochgeladen.' });
+                            this.addImageData(res.data);
+                            this.imagesAvailable.unshift(res.data);
+                            this.currPost.imagesAdded.push(res.data);
+                            if(index < files.length-1)
+                                this.uploadImage(files, index+1);
+                            else {
+                                if(files.length === 1) M.toast({ html: 'Datei hochgeladen.' });
+                                else M.toast({ html: 'Dateien hochgeladen.' });
+                                hideLoading(); // finished successfully
+                            }
                         } else if(res.data.message) {
                             M.toast({ html: res.data.message });
+                            hideLoading(); // backend error
                         }
                     })
                     .catch(function (err) {
                         M.toast({ html: 'Ein Fehler ist aufgetreten.' });
                         console.log(err);
-                    })
-                    .finally(function () {
-                        hideLoading();
+                        hideLoading(); // frontend error
                     });
             },
             addImageData: function(image) {
