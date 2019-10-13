@@ -317,14 +317,14 @@
             <!-- IMAGES -->
             <div v-show="currTab.id === tabs.images.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center;">
                 <div style="width: 100%">
-                    <div style="display: flex; align-items: center; background-color: #e8f5e9; border-radius: 20px; padding: 10px">
-                        <div style="flex: 0 0 180px; padding-right: 10px; text-align: center">
+                    <div @drop="uploadImages" @dragover="imageDragEnter" @dragleave="imageDragExit" style="display: flex; align-items: center; background-color: #e8f5e9; border-radius: 20px; padding: 10px" :style="imageDragging ? {'border': '5px dashed #4caf50' } : {}">
+                        <div v-show="!imageDragging" style="flex: 0 0 180px; padding-right: 10px; text-align: center">
                             <p style="font-size: 3em; font-weight: bold; margin: 0">{{ currPost.imagesAdded.length }}</p>
                             <h5 style="margin: 0;">
                                 Ausgewählt
                             </h5>
                             <form method="POST" enctype="multipart/form-data" style="margin-top: 30px;">
-                                <input name="file" type="file" id="upload-image" @change="uploadImage($event.currentTarget.files)" style="display: none" multiple>
+                                <input name="file" type="file" id="upload-image" @change="uploadImages" style="display: none" multiple>
 
                                 <a class="waves-effect waves-light tooltipped btn" style="background-color: #607d8b"
                                    @click="deselectAllImages" :disabled="currPost.imagesAdded.length === 0" data-tooltip="Zurücksetzen" data-position="bottom">
@@ -336,7 +336,7 @@
                                 </a>
                             </form>
                         </div>
-                        <div id="container-images-added" class="container-images">
+                        <div v-if="!imageDragging" id="container-images-added" class="container-images">
                             <div v-for="(i, index) in currPost.imagesAdded" @click="deselectImage(i)" class="container-image z-depth-1">
                                 <span class="image-number">{{ index+1 }}</span>
                                 <img :src="imageURL(i)" height="150"/>
@@ -346,6 +346,9 @@
                             <div v-show="currPost.imagesAdded.length === 0" style="height: 100%; display: flex; align-items: center; justify-content: center">
                                 <p class="green-badge-light" style="display: inline-block; font-size: 1em">Keine Bilder ausgewählt.</p>
                             </div>
+                        </div>
+                        <div v-else style="flex: 1; height: 240px; display: flex; align-items: center; justify-content: center; font-size: 2em; pointer-events: none;">
+                            Hier Dateien ablegen
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; margin-top: 50px">
@@ -647,6 +650,7 @@
             specialAll: { ...specialData, ...specialFragments, ...specialSites },
             imagesAvailable: [], // will be fetched
             imagesAvailableLimit: 10,
+            imageDragging: 0, // whether or not the drag-and-drop file is over the div
             currMode: null,
             currTabs: [],
             currTab: null,
@@ -925,7 +929,20 @@
             showUpload: function() {
                 document.getElementById('upload-image').click();
             },
-            uploadImage: function(files, index = 0) {
+            imageDragEnter: function(event) {
+                event.preventDefault();
+                this.imageDragging = true;
+            },
+            imageDragExit: function() {
+                this.imageDragging = false;
+            },
+            uploadImages: function(event, files = null, index = 0) {
+                event.preventDefault();
+                this.imageDragging = false;
+
+                // get the files, store the files to the parameter and use it in the next function call (bugfix)
+                files = files ? files : event.dataTransfer ? event.dataTransfer.files : event.currentTarget.files;
+
                 var infoStart = files.length === 1 ? 'Hochladen (0%)' : '[' + (index+1) + '/' + files.length + '] [0%]' + files[index].name;
                 showLoading(infoStart);
                 var data = new FormData();
@@ -946,7 +963,7 @@
                             this.imagesAvailable.unshift(res.data);
                             this.currPost.imagesAdded.push(res.data);
                             if(index < files.length-1)
-                                this.uploadImage(files, index+1);
+                                this.uploadImages(event, files, index+1);
                             else {
                                 if(files.length === 1) M.toast({ html: 'Datei hochgeladen.' });
                                 else M.toast({ html: 'Dateien hochgeladen.' });
