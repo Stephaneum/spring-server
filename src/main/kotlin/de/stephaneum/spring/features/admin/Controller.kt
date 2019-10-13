@@ -14,7 +14,7 @@ class AdminController {
     private lateinit var jwtService: JwtService
 
     @GetMapping("/logs")
-    fun get(@RequestParam(required = false) key: String?): String {
+    fun logs(@RequestParam(required = false) key: String?): String {
 
         // login
         if(key != null) {
@@ -25,6 +25,20 @@ class AdminController {
         }
 
         return "admin-logs"
+    }
+
+    @GetMapping("/codes")
+    fun codes(@RequestParam(required = false) key: String?): String {
+
+        // login
+        if(key != null) {
+            Session.get().user = jwtService.getUser(key)
+            if(Session.get().user != null) {
+                return "redirect:codes"
+            }
+        }
+
+        return "admin-codes"
     }
 
 }

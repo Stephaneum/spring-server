@@ -208,7 +208,7 @@
             },
             doDelete: function() {
                 showLoadingInvisible();
-                axios.post('./api/plan/delete',)
+                axios.post('./api/plan/delete')
                     .then((res) => {
                         if(res.data.success) {
                             M.toast({ html: 'Gelöscht.' });
@@ -239,7 +239,7 @@
                     });
             },
             fetchData: function() {
-                axios.get('./api/info',)
+                axios.get('./api/info')
                     .then((res) => {
                         if(res.data) {
                             this.info = res.data;

@@ -39,4 +39,7 @@ data class Code(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 }
 
 @Repository
-interface CodeRepo: CrudRepository<Code, Int>
+interface CodeRepo: CrudRepository<Code, Int> {
+
+    fun findByUsed(used: Boolean): List<Code>
+}
