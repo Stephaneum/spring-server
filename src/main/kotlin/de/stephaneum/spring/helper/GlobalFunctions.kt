@@ -29,7 +29,7 @@ fun cmd(command: String, workingDir: String = if(windows) "C:/" else "/", sudoPa
  *  @return true if client is using IE, otherwise false
  */
 fun checkIE(request: HttpServletRequest): Boolean {
-    val userAgent = request.getHeader("user-agent") ?: return false
+    val userAgent = request.getHeader("user-agent")?.toLowerCase() ?: return false
     return userAgent.contains("msie") || userAgent.contains("trident")
 }
 
