@@ -35,6 +35,7 @@ class JsfCommunication {
     fun send(event: JsfEvent) {
         val token = jwtService.generateToken(mapOf("event" to event.toString()))
         try {
+            logger.info("send event to JSF: $event")
             RestClient.post("$jsfURL?event=$token", "")
         } catch (e: Exception) {
             logger.error(e.toString())
