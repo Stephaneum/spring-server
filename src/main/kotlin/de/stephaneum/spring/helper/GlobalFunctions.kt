@@ -3,6 +3,7 @@ package de.stephaneum.spring.helper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
+import javax.servlet.http.HttpServletRequest
 
 val windows = System.getProperty("os.name").toLowerCase().contains("windows")
 
@@ -22,6 +23,14 @@ fun cmd(command: String, workingDir: String = if(windows) "C:/" else "/", sudoPa
             .redirectError(ProcessBuilder.Redirect.INHERIT)
             .start()
             .waitFor()
+}
+
+/**
+ *  @return true if client is using IE, otherwise false
+ */
+fun checkIE(request: HttpServletRequest): Boolean {
+    val userAgent = request.getHeader("user-agent") ?: return false
+    return userAgent.contains("msie") || userAgent.contains("trident")
 }
 
 val mapper = jacksonObjectMapper()

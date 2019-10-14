@@ -4,6 +4,7 @@ import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.Type
+import de.stephaneum.spring.helper.checkIE
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Controller
@@ -43,7 +44,11 @@ class BlackboardController {
     }
 
     @GetMapping("/login")
-    fun login(model: Model, @RequestParam error: Boolean = false): String {
+    fun login(model: Model, @RequestParam error: Boolean = false, request: HttpServletRequest): String {
+
+        if(checkIE(request))
+            return "forward:/static/no-support-ie.html"
+
         if(Session.get().permission == Permission.BLACKBOARD)
             return REDIRECT_ADMIN
 
