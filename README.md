@@ -52,11 +52,11 @@ Gemeinschaft|Projekt-Cloud|X|
 Nutzer|Nutzer-Cloud|X|N
 Nutzer|Account-Einstellungen|X|
 
-### Kommunikation JSF nach Spring
+#### Kommunikation JSF nach Spring
 
 Authorisierung über `?key=<JWT>`. Zum Beispiel `https://stephaneum.de/beitrag-manager?key=eyJhbG....`
 
-### Kommunikation Spring nach JSF
+#### Kommunikation Spring nach JSF
 
 Falls Modifikationen an der Datenbank durchgeführt wurde, dann müssen die Änderungen JSF mitgeteilt werden, da JSF vieles im Cache speichert.
 
@@ -70,19 +70,28 @@ Logout erfolgt in 2 Schritten:
 
 ## Routen (GET)
 
-Modul|Route|Info
----|---|---
-Homepage|`/login`|Login (wird momentan nicht genutzt)
-Homepage|`/beitrag-manager`|Beitrag-Manager
-Homepage|`/codes`|Verwaltung der Zugangscodes
-Homepage|`/logs`|Logdaten
-Homepage|`/vertretungsplan-manager`|Verwaltung des Vertretungsplans
- | |
-Blackboard|`/blackboard`|Diese Seite wird vom Blackboard aufgerufen
-Blackboard|`/blackboard/admin`|Administration des Blackboards
-Blackboard|`/blackboard/login`|Blackboard-Login
- | |
-Backup|`/backup`|Weiterleitung nach `/backup/login` bzw. `/backup/admin`
-Backup|`/backup/admin`|Administration der Backups
-Backup|`/backup/login`|Backup-Login
-Backup|`/backup/logs`|Konsolenausgaben (der letzten Aktion)
+Hier werden Adressen (Routen) aufgeführt, wo der Server mit einer HTML-Datei antwortet.
+
+### Homepage
+Route|Info
+---|---
+`/login`|Login (wird momentan nicht genutzt)
+`/beitrag-manager`|Beitrag-Manager
+`/codes`|Verwaltung der Zugangscodes
+`/logs`|Logdaten
+`/vertretungsplan-manager`|Verwaltung des Vertretungsplans
+
+### Blackboard
+Route|Info
+---|---
+`/blackboard`|Diese Seite wird vom Blackboard aufgerufen
+`/blackboard/admin`|Administration des Blackboards
+`/blackboard/login`|Blackboard-Login
+
+### Backup
+Route|Info
+---|---
+`/backup`|Weiterleitung nach `/backup/login` bzw. `/backup/admin`
+`/backup/admin`|Administration der Backups
+`/backup/login`|Backup-Login
+`/backup/logs`|Konsolenausgaben (der letzten Aktion)
