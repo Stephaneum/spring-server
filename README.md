@@ -67,3 +67,22 @@ Im JWT-Token ist das Event einkodiert.
 Logout erfolgt in 2 Schritten:
 1. `/api/logout` Logout in Spring
 2. `/logout.xhtml` Logout in JSF und Weiterleitung zur Startseite
+
+## Routen (GET)
+
+Modul|Route|Info
+---|---|---
+Homepage|`/login`|Login (wird momentan nicht genutzt)
+Homepage|`/beitrag-manager`|Beitrag-Manager
+Homepage|`/codes`|Verwaltung der Zugangscodes
+Homepage|`/logs`|Logdaten
+Homepage|`/vertretungsplan-manager`|Verwaltung des Vertretungsplans
+ | |
+Blackboard|`/blackboard`|Diese Seite wird vom Blackboard aufgerufen
+Blackboard|`/blackboard/admin`|Administration des Blackboards
+Blackboard|`/blackboard/login`|Blackboard-Login
+ | |
+Backup|`/backup`|Weiterleitung nach `/backup/login` bzw. `/backup/admin`
+Backup|`/backup/admin`|Administration der Backups
+Backup|`/backup/login`|Backup-Login
+Backup|`/backup/logs`|Konsolenausgaben (der letzten Aktion)
