@@ -2,7 +2,7 @@ package de.stephaneum.spring.features.backup
 
 import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session
-import de.stephaneum.spring.scheduler.ConfigFetcher
+import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.scheduler.Element
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse
 class BackupAdminAPI {
 
     @Autowired
-    private lateinit var configFetcher: ConfigFetcher
+    private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
     private lateinit var fileService: FileService
@@ -37,9 +37,9 @@ class BackupAdminAPI {
 
         var modules = listOf<Module>()
         var totalSize = 0L
-        configFetcher.get(Element.backupLocation)?.let { backupLocation ->
+        configScheduler.get(Element.backupLocation)?.let { backupLocation ->
             modules = MODULES.map { module ->
-                val backups = fileService.listFiles("$backupLocation/${module.code}")?.map { file ->
+                val backups = fileService.listFiles("$backupLocation/${module.code}").map { file ->
                     totalSize += file.length()
                     Backup(file.name, fileService.convertSizeToString(file.length()))
                 }?.sortedBy { it.name }
@@ -49,7 +49,7 @@ class BackupAdminAPI {
 
         return Response.AdminData(
                 modules = modules,
-                backupLocation = configFetcher.get(Element.backupLocation) ?: "?",
+                backupLocation = configScheduler.get(Element.backupLocation) ?: "?",
                 totalSize = fileService.convertSizeToString(totalSize),
                 nextBackup = backupScheduler.getNextBackup())
     }
@@ -130,7 +130,7 @@ class BackupAdminAPI {
             else -> return Response.Feedback(false, message = "$module existiert nicht")
         }
 
-        val path = fileService.storeFile(file.bytes, "${configFetcher.get(Element.backupLocation)}/$module/$fileName")
+        val path = fileService.storeFile(file.bytes, "${configScheduler.get(Element.backupLocation)}/$module/$fileName")
         if(path != null) {
             return Response.Feedback(true)
         } else {
@@ -144,7 +144,7 @@ class BackupAdminAPI {
         if(Session.get().permission != Permission.BACKUP)
             return REDIRECT_LOGIN
 
-        val resource = configFetcher.get(Element.backupLocation)?.let { location ->
+        val resource = configScheduler.get(Element.backupLocation)?.let { location ->
             fileService.loadFileAsResource("$location/$folder/$file")
         }
 
@@ -165,7 +165,7 @@ class BackupAdminAPI {
             return Response.Feedback(false, needLogin = true)
 
         var success = true
-        configFetcher.get(Element.backupLocation)?.let { location ->
+        configScheduler.get(Element.backupLocation)?.let { location ->
             success = fileService.deleteFile("$location/$folder/$file")
         }
 

@@ -6,7 +6,7 @@
                     <a href="#" data-target="sidenav" class="sidenav-trigger hide-on-large-only">
                         <i class="material-icons" style="color: #1b5e20">menu</i>
                     </a>
-                    <a :href="minimal ? '#!' : './home.xhtml'" class="brand-logo" :style="minimal ? { 'opacity': 0.05 } : {}">
+                    <a :href="minimal ? '#!' : '/home.xhtml'" class="brand-logo" :style="minimal ? { 'opacity': 0.05 } : {}">
                         <img src="/static/img/logo-banner-green.png" style="height:50px;margin-top:5px;margin-left:10px"/>
                     </a>
                     <ul class="right hide-on-med-and-down">
@@ -51,22 +51,22 @@
                         <li v-if="!minimal && loggedIn">
                             <a id="internal-btn">Intern</a>
                             <ul id="internal-menu" class="z-depth-1" style="z-index: 200">
-                                <li v-if="admin"><a href="admin_konfig.xhtml"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
-                                <li v-if="admin"><a href="admin_static.xhtml"><span><i class="material-icons">brush</i>Benutzerdefinierte Seiten</span></a></li>
-                                <li v-if="admin"><a href="admin_rubriken.xhtml"><span><i class="material-icons">bookmark</i>Rubriken</span></a></li>
-                                <li v-if="admin"><a href="admin_backup.xhtml"><span><i class="material-icons">save</i>Backup</span></a></li>
-                                <li v-if="admin"><a href="codes"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
-                                <li v-if="admin"><a href="admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
-                                <li v-if="admin"><a href="logs"><span><i class="material-icons">history</i>Logdaten</span></a></li>
+                                <li v-if="admin"><a href="/admin_konfig.xhtml"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
+                                <li v-if="admin"><a href="/admin-static"><span><i class="material-icons">brush</i>Benutzerdefinierte Seiten</span></a></li>
+                                <li v-if="admin"><a href="/admin_rubriken.xhtml"><span><i class="material-icons">bookmark</i>Rubriken</span></a></li>
+                                <li v-if="admin"><a href="/admin_backup.xhtml"><span><i class="material-icons">save</i>Backup</span></a></li>
+                                <li v-if="admin"><a href="/codes"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
+                                <li v-if="admin"><a href="/admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
+                                <li v-if="admin"><a href="/logs"><span><i class="material-icons">history</i>Logdaten</span></a></li>
                                 <li class="internal-divider"></li>
-                                <li v-if="admin || managePlans"><a href="vertretungsplan-manager"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
-                                <li v-if="createCategories"><a href="nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
-                                <li><a href="beitrag-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
-                                <li><a href="klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
-                                <li><a href="projekt_all.xhtml"><span><i class="material-icons">flag</i>Projekte</span></a></li>
+                                <li v-if="admin || managePlans"><a href="/vertretungsplan-manager"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
+                                <li v-if="createCategories"><a href="/nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
+                                <li><a href="/beitrag-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
+                                <li><a href="/klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
+                                <li><a href="/projekt_all.xhtml"><span><i class="material-icons">flag</i>Projekte</span></a></li>
                                 <li class="internal-divider"></li>
-                                <li><a href="nutzer_dateien.xhtml"><span><i class="material-icons">folder</i>Dateien</span></a></li>
-                                <li><a href="nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>
+                                <li><a href="/nutzer_dateien.xhtml"><span><i class="material-icons">folder</i>Dateien</span></a></li>
+                                <li><a href="/nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>
                             </ul>
                             <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: -190px; display: none; overflow: hidden;text-align: center; width: 200px; height: 160px; background-color: #f1f8e9; color: #1b5e20; line-height: normal;" class="z-depth-1">
                                 <i style="font-size: 4em; margin-top: 10px" class="material-icons">person</i>
@@ -120,12 +120,12 @@
                 toggleAuth: function() {
                     if(this.loggedIn) {
                         showLoading("Abmelden...");
-                        axios.post('./api/logout')
+                        axios.post('/api/logout')
                             .then((response) => {
                                 window.location = '/logout.xhtml'; // continue with jsf
                             });
                     } else {
-                        window.location = 'login';
+                        window.location = '/login';
                     }
                 }
             },
@@ -154,7 +154,7 @@
                     return this.user && this.user.createCategories;
                 },
                 url: function () {
-                    return (menu) => this.minimal ? null : menu.link ? menu.link : 'home.xhtml?id='+menu.id;
+                    return (menu) => this.minimal ? null : menu.link ? menu.link : '/home.xhtml?id='+menu.id;
                 },
                 target: function () {
                     return (menu) => this.minimal ? null : menu.link ? '_blank' : '_self';

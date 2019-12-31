@@ -27,14 +27,14 @@ enum class Element(val code: String, var value: String? = null) {
 }
 
 @Service
-class ConfigFetcher {
+class ConfigScheduler {
 
     /**
      * instead of fetching every time in the repo,
      * we should access these variables to reduce database calls
      */
 
-    val logger = LoggerFactory.getLogger(ConfigFetcher::class.java)
+    val logger = LoggerFactory.getLogger(ConfigScheduler::class.java)
 
     @Autowired
     private lateinit var configRepo: ConfigRepo

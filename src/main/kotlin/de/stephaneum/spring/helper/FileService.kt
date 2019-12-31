@@ -1,8 +1,8 @@
 package de.stephaneum.spring.helper
 
 import de.stephaneum.spring.database.*
+import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
-import de.stephaneum.spring.scheduler.ConfigFetcher
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
@@ -20,6 +20,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
+
 @Service
 class FileService {
 
@@ -35,7 +36,7 @@ class FileService {
     }
 
     @Autowired
-    private lateinit var configFetcher: ConfigFetcher
+    private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
     private lateinit var fileRepo: FileRepo
@@ -88,7 +89,7 @@ class FileService {
             return "Nicht genügend Speicher"
 
         // resolve folder
-        val mainPath = configFetcher.get(Element.fileLocation) ?: return "Interner Fehler"
+        val mainPath = configScheduler.get(Element.fileLocation) ?: return "Interner Fehler"
         var savingFolder: Folder?
         if(mode == StoreMode.PRIVATE && folder is String) {
             savingFolder = folderRepo.findPrivateFolderInRoot(user.id, folder).firstOrNull()
@@ -163,7 +164,15 @@ class FileService {
         } catch (ex: MalformedURLException) {
             null
         }
+    }
 
+    fun loadFileAsString(path: String): String? {
+        return try {
+            String(Files.readAllBytes(Paths.get(path)))
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
     }
 
     /**
@@ -184,9 +193,26 @@ class FileService {
      * @param path the path to the folder containing the listed files
      * @return list of all files
      */
-    fun listFiles(path: String): List<File>? {
+    fun listFiles(path: String): List<File> {
         val folder = File(path)
-        return folder.listFiles()?.toList()?.filter { it.isFile }
+        return folder.listFiles()?.toList()?.filter { it.isFile } ?: emptyList()
+    }
+
+    /**
+     * @param path the path to the folder containing the listed files
+     * @return list of all files recursively
+     */
+    fun listFilesRecursive(path: String): List<File> {
+        val folder = File(path)
+        val files: MutableList<File> = mutableListOf()
+        val entities = folder.listFiles()?.toList() ?: emptyList();
+        for(entity in entities) {
+            if(entity.isFile)
+                files.add(entity)
+            else if(entity.isDirectory)
+                files.addAll(listFilesRecursive(entity.absolutePath))
+        }
+        return files
     }
 
     /**
@@ -316,6 +342,18 @@ class FileService {
         }
         zis.closeEntry()
         zis.close()
+    }
+
+    fun getExtension(path: String): String {
+        val index = path.lastIndexOf('.')+1
+        return if(index != -1)
+            path.substring(index)
+        else
+            ""
+    }
+
+    fun getMimeFromPath(path: String): String {
+        return getMime(getExtension(path))
     }
 
     /**

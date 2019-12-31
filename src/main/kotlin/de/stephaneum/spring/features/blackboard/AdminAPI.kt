@@ -9,7 +9,7 @@ import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.database.now
 import de.stephaneum.spring.scheduler.Element
-import de.stephaneum.spring.scheduler.ConfigFetcher
+import de.stephaneum.spring.scheduler.ConfigScheduler
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
@@ -41,7 +41,7 @@ class BlackboardAdminAPI {
     private lateinit var blackboardScheduler: BlackboardScheduler
 
     @Autowired
-    private lateinit var configFetcher: ConfigFetcher
+    private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
     private lateinit var activeClientsScheduler: ActiveClientsScheduler
@@ -115,11 +115,11 @@ class BlackboardAdminAPI {
         }
 
         // create missing blackboard folder
-        val folder = File("${configFetcher.get(Element.fileLocation)}/blackboard")
+        val folder = File("${configScheduler.get(Element.fileLocation)}/blackboard")
         if (!folder.exists())
             folder.mkdirs()
 
-        val path = fileService.storeFile(bytes, "${configFetcher.get(Element.fileLocation)}/blackboard/$finalFileName")
+        val path = fileService.storeFile(bytes, "${configScheduler.get(Element.fileLocation)}/blackboard/$finalFileName")
         if(path != null) {
             board.value = path
             board.lastUpdate = now()

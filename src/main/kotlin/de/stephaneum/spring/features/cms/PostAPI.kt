@@ -8,7 +8,7 @@ import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.helper.MenuService
 import de.stephaneum.spring.scheduler.Element
-import de.stephaneum.spring.scheduler.ConfigFetcher
+import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.security.CryptoService
 import org.jsoup.Jsoup
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,7 +40,7 @@ class PostAPI {
     private lateinit var fileService: FileService
 
     @Autowired
-    private lateinit var configFetcher: ConfigFetcher
+    private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
     private lateinit var menuService: MenuService
@@ -130,7 +130,7 @@ class PostAPI {
         val savedPost = postRepo.save(Post(request.id ?: 0, oldPost?.user ?: user, menu, request.title, text, now(), if(oldPost != null) user else null, null, request.menuID != null, request.preview, false, request.layoutPost, request.layoutPreview))
 
         // compress images
-        val maxPictureSize = configFetcher.get(Element.maxPictureSize)?.toInt() ?: 0
+        val maxPictureSize = configScheduler.get(Element.maxPictureSize)?.toInt() ?: 0
         val imagesFull = fileRepo.findByIdIn(request.images.map { it.id }) // get the full data because it was simplified for security reasons
         imagesFull.forEach { i ->
             if(i.size >= maxPictureSize) {
@@ -185,7 +185,7 @@ class PostAPI {
     fun infoPostManager(): Any {
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
 
-        return Response.PostManager(configFetcher.get(Element.maxPictureSize)?.toInt() ?: 0, menuService.getCategory(user.id))
+        return Response.PostManager(configScheduler.get(Element.maxPictureSize)?.toInt() ?: 0, menuService.getCategory(user.id))
     }
 
     @GetMapping("/images-available")
@@ -231,7 +231,7 @@ class PostAPI {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         if(user.code.role == ROLE_ADMIN) {
-            return Response.Text(configFetcher.get(Element.valueOf(type)))
+            return Response.Text(configScheduler.get(Element.valueOf(type)))
         } else {
             return Response.Feedback(false, message = "only admin")
         }
@@ -257,7 +257,7 @@ class PostAPI {
                 Element.events -> request.text?.replace("&nbsp;", " ")?.replace("&quot;", "\"")?.replace("&amp;", "&")
                 else -> return Response.Feedback(false, message = "invalid type")
             }
-            configFetcher.save(type, finalText)
+            configScheduler.save(type, finalText)
             jsfCommunication.send(JsfEvent.SYNC_SPECIAL_TEXT)
             return Response.Feedback(true)
         } else {

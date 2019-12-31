@@ -20,7 +20,7 @@ class GarbageCollector {
     private val logger = LoggerFactory.getLogger(GarbageCollector::class.java)
 
     @Autowired
-    private lateinit var configFetcher: ConfigFetcher
+    private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
@@ -31,9 +31,9 @@ class GarbageCollector {
     @Scheduled(initialDelay=10000, fixedDelay = 1000*60)
     fun update() {
 
-        val blackboardPath = configFetcher.get(Element.fileLocation) + "/blackboard"
+        val blackboardPath = configScheduler.get(Element.fileLocation) + "/blackboard"
         val boards = blackboardRepo.findAll()
-        fileService.listFiles(blackboardPath)?.forEach { file ->
+        fileService.listFiles(blackboardPath).forEach { file ->
             val notInDatabase = boards.none { board -> (board.type == Type.IMG || board.type == Type.PDF) && board.value == file.absolutePath.replace("\\", "/") }
             if(notInDatabase) {
                 try {

@@ -6,7 +6,7 @@ import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.database.now
 import de.stephaneum.spring.features.plan.PlanService
 import de.stephaneum.spring.scheduler.Element
-import de.stephaneum.spring.scheduler.ConfigFetcher
+import de.stephaneum.spring.scheduler.ConfigScheduler
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -32,7 +32,7 @@ class PdfToImageScheduler {
     private val logger = LoggerFactory.getLogger(PdfToImageScheduler::class.java)
 
     @Autowired
-    private lateinit var configFetcher: ConfigFetcher
+    private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
     private lateinit var imageService: ImageService
@@ -54,7 +54,7 @@ class PdfToImageScheduler {
         boards.forEach { board ->
             when(board.type) {
                 Type.PLAN -> {
-                    val pdfLocation = configFetcher.get(Element.planLocation)
+                    val pdfLocation = configScheduler.get(Element.planLocation)
                     if(pdfLocation != null) {
                         val file = File(pdfLocation) // the pdf file
                         var instance = instances.find { it.boardId == board.id } ?: PdfImages(board.id)

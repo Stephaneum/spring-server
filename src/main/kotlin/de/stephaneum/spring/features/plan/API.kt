@@ -6,7 +6,7 @@ import de.stephaneum.spring.features.jsf.JsfCommunication
 import de.stephaneum.spring.features.jsf.JsfEvent
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.Response
-import de.stephaneum.spring.scheduler.ConfigFetcher
+import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -31,7 +31,7 @@ class PlanAPI {
     private lateinit var planService: PlanService
 
     @Autowired
-    private lateinit var configFetcher: ConfigFetcher
+    private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
     private lateinit var fileService: FileService
@@ -41,7 +41,7 @@ class PlanAPI {
 
     @GetMapping("/last-modified")
     fun lastModified(): Response.Feedback {
-        val path = configFetcher.get(Element.planLocation)
+        val path = configScheduler.get(Element.planLocation)
         if(path != null) {
             val file = File(path)
             if(file.exists()) {
@@ -58,7 +58,7 @@ class PlanAPI {
         if(user.code.role != ROLE_ADMIN && user.managePlans != true)
             return Response.Feedback(false, message = "not allowed")
 
-        configFetcher.save(Element.planInfo, text)
+        configScheduler.save(Element.planInfo, text)
         jsfCommunication.send(JsfEvent.SYNC_PLAN)
 
         return Response.Feedback(true)
@@ -76,12 +76,12 @@ class PlanAPI {
         if(!fileName.toLowerCase().endsWith(".pdf"))
             return Response.Feedback(false, message = "Nur PDF-Dateien erlaubt")
 
-        val path = fileService.storeFile(file.bytes, "${configFetcher.get(Element.fileLocation)}/$finalFileName")
+        val path = fileService.storeFile(file.bytes, "${configScheduler.get(Element.fileLocation)}/$finalFileName")
         if(path != null) {
             val info = planService.resolveDate(File(path))
             if(info != null)
-                configFetcher.save(Element.planInfo, info)
-            configFetcher.save(Element.planLocation, path)
+                configScheduler.save(Element.planInfo, info)
+            configScheduler.save(Element.planLocation, path)
             jsfCommunication.send(JsfEvent.SYNC_PLAN)
             logRepo.save(Log(0, now(), EventType.UPLOAD.id, "[Vertretungsplan] ${user.firstName} ${user.lastName} (${user.code.getRoleString()})"))
             return Response.Feedback(true, message = if(info != null) "Änderungen gespeichert.<br>Datum wurde erkannt und aktualisiert." else "Änderungen gespeichert.")
@@ -97,11 +97,11 @@ class PlanAPI {
         if(user.code.role != ROLE_ADMIN && user.managePlans != true)
             return Response.Feedback(false, message = "not allowed")
 
-        val path = configFetcher.get(Element.planLocation)
+        val path = configScheduler.get(Element.planLocation)
         if(path != null) {
             val success = fileService.deleteFile(path)
             if(success) {
-                configFetcher.save(Element.planLocation, null)
+                configScheduler.save(Element.planLocation, null)
                 jsfCommunication.send(JsfEvent.SYNC_PLAN)
                 return Response.Feedback(true)
             }
