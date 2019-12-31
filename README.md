@@ -39,7 +39,7 @@ Bereich | Seite(n) | JSF | Spring
 Öffentlich|Login/Registrierung|X|
 Öffentlich|Impressum, Kontakt, etc.|X|
 Admin|Konfiguration|X|
-Admin|Benutzerdefinierte Seiten|X|N
+Admin|Benutzerdefinierte Seiten| |X
 Admin|Rubriken|X|
 Admin|Backup (wird gelöscht)|X|
 Admin|Zugangscodes| |X
@@ -77,8 +77,9 @@ Route|Info
 ---|---
 `/login`|Login (wird momentan nicht genutzt)
 `/beitrag-manager`|Beitrag-Manager
-`/codes`|Verwaltung der Zugangscodes
-`/logs`|Logdaten
+`/admin-static`|Verwaltung der benutzerdefinierten Seiten
+`/admin-codes`|Verwaltung der Zugangscodes
+`/admin-logs`|Logdaten
 `/vertretungsplan-manager`|Verwaltung des Vertretungsplans
 
 ### Blackboard

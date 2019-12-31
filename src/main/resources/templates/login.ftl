@@ -97,7 +97,7 @@
                     .then((response) => {
                     if(response.data.success) {
                         this.loginFailed = false;
-                        window.location = 'logs';
+                        window.location = '/admin-logs';
                     } else {
                         this.loginFailed = true;
                         this.loggingIn = false;

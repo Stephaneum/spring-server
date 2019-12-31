@@ -15,7 +15,7 @@ class AdminController {
     @Autowired
     private lateinit var jwtService: JwtService
 
-    @GetMapping("/logs")
+    @GetMapping("/admin-logs")
     fun logs(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
 
         if(checkIE(request))
@@ -25,14 +25,14 @@ class AdminController {
         if(key != null) {
             Session.get().user = jwtService.getUser(key)
             if(Session.get().user != null) {
-                return "redirect:logs"
+                return "redirect:admin-logs"
             }
         }
 
         return "admin-logs"
     }
 
-    @GetMapping("/codes")
+    @GetMapping("/admin-codes")
     fun codes(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
 
         if(checkIE(request))
@@ -42,7 +42,7 @@ class AdminController {
         if(key != null) {
             Session.get().user = jwtService.getUser(key)
             if(Session.get().user != null) {
-                return "redirect:codes"
+                return "redirect:admin-codes"
             }
         }
 
