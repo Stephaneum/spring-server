@@ -42,7 +42,7 @@ class StaticController {
         if(checkIE(request))
             return "forward:/static/no-support-ie.html"
 
-        val path = request.requestURI.replace("/s/","")
+        val path = request.requestURI.replace("${request.contextPath}/s/","")
         val mainPath = configScheduler.get(Element.fileLocation) ?: return "500"
         if(path.endsWith(".html") || path.endsWith(".htm")) {
 
