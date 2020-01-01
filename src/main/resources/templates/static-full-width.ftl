@@ -27,7 +27,9 @@
 <div id="app" style="display: flex; align-items: center; flex-direction: column; min-height: 100vh" v-cloak>
     <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
 
-    ${body}
+    <div id="main-row" style="margin-top: 30px;min-height: 100vh">
+        ${body}
+    </div>
 
     <stephaneum-footer :copyright="info.copyright"></stephaneum-footer>
 </div>
