@@ -4,8 +4,8 @@
 
 - JSF-Projekt (Authentifizierung läuft noch darüber)
 - Java 8
-- Tomcat 8.5
-- MariaDB 10.1
+- Tomcat 8.5+
+- MariaDB oder MySQL
 - IntelliJ CE / UE (empfohlen)
 
 ## Projekt starten
@@ -41,7 +41,6 @@ Bereich | Seite(n) | JSF | Spring
 Admin|Konfiguration|X|
 Admin|Benutzerdefinierte Seiten| |X
 Admin|Rubriken|X|
-Admin|Backup (wird gelöscht)|X|
 Admin|Zugangscodes| |X
 Admin|Nutzerdaten-Manager|X|
 Admin|Logdaten| |X
