@@ -175,6 +175,7 @@ class PostAPI {
 
         if(hasAccessToPost(user, post)) {
             postRepo.deleteById(postID)
+            logRepo.save(Log(0, now(), EventType.DELETE_POST.id, "${user.firstName} ${user.lastName} (${user.code.getRoleString()}), ${post.title}"))
             return Response.Feedback(true)
         } else {
             return Response.Feedback(false, message = "not allowed")
@@ -258,6 +259,7 @@ class PostAPI {
                 else -> return Response.Feedback(false, message = "invalid type")
             }
             configScheduler.save(type, finalText)
+            logRepo.save(Log(0, now(), EventType.EDIT_POST.id, "${user.firstName} ${user.lastName} (${user.code.getRoleString()}), ${type.info} (spezieller Text)"))
             jsfCommunication.send(JsfEvent.SYNC_SPECIAL_TEXT)
             return Response.Feedback(true)
         } else {

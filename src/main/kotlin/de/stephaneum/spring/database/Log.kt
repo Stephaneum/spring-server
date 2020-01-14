@@ -21,7 +21,8 @@ enum class EventType(val id: Int, val description: String, val className: String
     QUIT_CLASS(10, "Klasse verlassen", "other-badge"),
     DELETE_FILE(11, "Datei gelöscht", "file-badge"),
     APPROVE_POST(12, "Beitrag genehmigt", "post-badge"),
-    CREATE_CHAT_ROOM(13, "Chatraum erstellt", "other-badge");
+    CREATE_CHAT_ROOM(13, "Chatraum erstellt", "other-badge"),
+    DELETE_POST(14,"Beitrag gelöscht", "post-badge");
 
     companion object {
         fun valueOf(id: Int): EventType {

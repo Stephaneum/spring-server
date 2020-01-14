@@ -6,24 +6,24 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
-enum class Element(val code: String, var value: String? = null) {
-    fileLocation("speicherort"),
-    planLocation("str_vertretung"),
-    planInfo("str_vertretung_info"),
-    backupLocation("backup_dir"),
-    maxPictureSize("picture_size"),
+enum class Element(val code: String, val info: String, var value: String? = null) {
+    fileLocation("speicherort", "Speicherort"),
+    planLocation("str_vertretung", "Vertretungsplan"),
+    planInfo("str_vertretung_info", "Vertretungsplan-Info"),
+    backupLocation("backup_dir", "Backup-Ort"),
+    maxPictureSize("picture_size", "Max. Bildgröße in Beiträgen"),
 
     // special
-    contact("str_kontakt"),
-    imprint("str_impressum"),
-    history("str_history"),
-    euSa("str_eu_sa"),
-    copyright("str_bottom"),
-    dev("str_entwickler"),
-    liveticker("str_liveticker"),
-    events("str_termine"),
-    coop("str_koop"),
-    coopURL("str_koop_url")
+    contact("str_kontakt", "Kontakt"),
+    imprint("str_impressum", "Impressum"),
+    history("str_history", "Geschichte"),
+    euSa("str_eu_sa", "EU und S.-A."),
+    copyright("str_bottom", "Copyright"),
+    dev("str_entwickler", "Entwicklung"),
+    liveticker("str_liveticker", "Live-Ticker"),
+    events("str_termine", "Termine"),
+    coop("str_koop", "Koop.-partner"),
+    coopURL("str_koop_url", "Koop.-partner (URL)")
 }
 
 @Service
