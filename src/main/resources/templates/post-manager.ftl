@@ -1112,8 +1112,10 @@
                             }
                         }
                     };
+
+                    // init text input editor
                     $('#post-text-editor').trumbowyg(config);
-                    if(this.admin)
+                    if(this.admin || this.info.user.managePosts)
                         $('#post-text-editor-special').trumbowyg(config);
                     moment.locale('de');
                     console.log('post init finished')
@@ -1222,9 +1224,9 @@
 
                             // update button text
                             if(this.admin || this.info.user.managePosts)
-                                this.modes.approve.name = this.approvedModeText(this.info.unapproved);
+                                modes.approve.name = this.approvedModeText(this.info.unapproved);
                             else
-                                this.modes.edit.name = this.editModeText(this.info.unapproved);
+                                modes.edit.name = this.editModeText(this.info.unapproved);
 
                             axios.get('./api/post/info-post-manager')
                                 .then((res) => {
@@ -1233,9 +1235,9 @@
                                         this.category = res.data.category;
                                         if(this.info.user && this.info.user.code.role >= 0) {
                                             // set one time the modes available
-                                            if(this.info.user.code.role !== 100)
-                                                this.modes = { create: modes.create, edit: modes.edit, approve: modes.approve };
-                                            if(this.info.user.code.role !== 100 && !this.info.user.managePosts)
+                                            if(this.info.user.code.role === 100 || this.info.user.managePosts)
+                                                this.modes = { create: modes.create, edit: modes.edit, approve: modes.approve, special: modes.special };
+                                            else
                                                 this.modes = { create: modes.create, edit: modes.edit };
                                             this.setMode(modes.create);
                                         }

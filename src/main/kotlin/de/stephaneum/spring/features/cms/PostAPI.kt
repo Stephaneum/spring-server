@@ -230,10 +230,10 @@ class PostAPI {
     fun getSpecial(@RequestParam type: String): Any {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        if(user.code.role == ROLE_ADMIN) {
+        if(user.code.role == ROLE_ADMIN || user.managePosts == true) {
             return Response.Text(configScheduler.get(Element.valueOf(type)))
         } else {
-            return Response.Feedback(false, message = "only admin")
+            return Response.Feedback(false, message = "only admin or post manager")
         }
     }
 
@@ -241,7 +241,7 @@ class PostAPI {
     fun updateSpecial(@RequestBody request: Request.UpdateSpecial): Any {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        if(user.code.role == ROLE_ADMIN) {
+        if(user.code.role == ROLE_ADMIN || user.managePosts == true) {
             val type = Element.valueOf(request.type)
             val plainText = Jsoup.parse(request.text ?: "").text()
             val finalText = when(type) {
@@ -261,7 +261,7 @@ class PostAPI {
             jsfCommunication.send(JsfEvent.SYNC_SPECIAL_TEXT)
             return Response.Feedback(true)
         } else {
-            return Response.Feedback(false, message = "only admin")
+            return Response.Feedback(false, message = "only admin or post manager")
         }
     }
 }
