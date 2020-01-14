@@ -57,6 +57,10 @@
             background-color: #e1bee7;
         }
 
+        .menu-badge {
+            background-color: #cfd8dc;
+        }
+
         .other-badge {
             background-color: lightgrey;
         }
