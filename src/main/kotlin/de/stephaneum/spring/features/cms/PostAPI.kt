@@ -7,14 +7,16 @@ import de.stephaneum.spring.features.jsf.JsfEvent
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.helper.MenuService
-import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigScheduler
+import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.security.CryptoService
 import org.jsoup.Jsoup
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import java.nio.file.Files
+import java.nio.file.Paths
 
 
 @RestController
@@ -203,11 +205,20 @@ class PostAPI {
     fun uploadImage(@RequestParam("file") file: MultipartFile): Any {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        val fileName = file.originalFilename ?: return Response.Feedback(false, message = "Dateiname unbekannt")
-        if(file.contentType == null || !file.contentType!!.startsWith("image"))
+        var fileName = file.originalFilename ?: return Response.Feedback(false, message = "Dateiname unbekannt")
+        var contentType = file.contentType ?: return Response.Feedback(false, message = "Dateityp unbekannt")
+
+        if(!contentType.startsWith("image"))
             return Response.Feedback(false, message = "Nur Bilder erlaubt")
 
-        val result = fileService.storeFileStephaneum(user, fileName, file.contentType!!, file.bytes, "Beiträge", -1, FileService.StoreMode.PRIVATE)
+        // ensure that the image is rotated properly
+        val bytes = imageService.digestImageRotation(file.bytes)
+        if(bytes != null) {
+            fileName = fileService.getPathWithNewExtension(fileName, "jpg")
+            contentType = Files.probeContentType(Paths.get(fileName))
+        }
+
+        val result = fileService.storeFileStephaneum(user, fileName, contentType, bytes ?: file.bytes, "Beiträge", -1, FileService.StoreMode.PRIVATE)
         if(result is File)
             result.simplifyForPosts()
 

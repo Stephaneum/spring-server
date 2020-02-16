@@ -1,17 +1,20 @@
 package de.stephaneum.spring.helper
 
+import com.drew.imaging.ImageMetadataReader
+import com.drew.metadata.exif.ExifIFD0Directory
 import de.stephaneum.spring.database.File
 import de.stephaneum.spring.database.FileRepo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.awt.Color
+import java.awt.Image
+import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
-import java.awt.Image
 import java.nio.file.Files
 import java.nio.file.Paths
+import javax.imageio.ImageIO
 
 
 @Service
@@ -40,6 +43,39 @@ class ImageService {
         file.path = newPath
         file.size = java.io.File(newPath).length().toInt()
         fileRepo.save(file)
+    }
+
+    /**
+     * returns a byte array with a proper rotation based on meta data of the image
+     * alpha channel will get lost if rotation is applied using (JPEG)
+     * @return byte array containing the new image if rotation is applied, null otherwise
+     */
+    fun digestImageRotation(bytes: ByteArray): ByteArray? {
+        val metadata = ImageMetadataReader.readMetadata(bytes.inputStream())
+        val exifIFD0: ExifIFD0Directory? = metadata.getFirstDirectoryOfType(ExifIFD0Directory::class.java)
+        val orientation = exifIFD0?.getInt(ExifIFD0Directory.TAG_ORIENTATION)
+
+        val rotation = when (orientation) {
+            1 -> null
+            6 -> 90.0 // CW 90
+            3 -> 180.0 // CW 180
+            8 -> 270.0 // CW 270
+            else -> null // should not happen
+        }
+
+        if(rotation != null) {
+            val image = ImageIO.read(bytes.inputStream())
+            val rotated = rotate(image, rotation)
+            val outputStream = ByteArrayOutputStream()
+            ImageIO.write(rotated, "jpg", outputStream)
+            outputStream.flush()
+            val result = outputStream.toByteArray()
+            outputStream.close()
+            return result
+        } else {
+            // no rotation
+            return null
+        }
     }
 
     /**
@@ -170,5 +206,26 @@ class ImageService {
         }
 
         return top
+    }
+
+    fun rotate(img: BufferedImage, angle: Double): BufferedImage {
+        val rads = Math.toRadians(angle)
+        val sin = Math.abs(Math.sin(rads))
+        val cos = Math.abs(Math.cos(rads))
+        val w = img.width
+        val h = img.height
+        val newWidth = Math.floor(w * cos + h * sin).toInt()
+        val newHeight = Math.floor(h * cos + w * sin).toInt()
+        val rotated = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB)
+        val g2d = rotated.createGraphics()
+        val at = AffineTransform()
+        at.translate((newWidth - w) / 2.toDouble(), (newHeight - h) / 2.toDouble())
+        val x = w / 2
+        val y = h / 2
+        at.rotate(rads, x.toDouble(), y.toDouble())
+        g2d.transform = at
+        g2d.drawImage(img, 0, 0, null)
+        g2d.dispose()
+        return rotated
     }
 }
