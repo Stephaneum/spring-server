@@ -308,7 +308,7 @@
 
                 <div v-show="specialObj.plain">
                     <br>
-                    <textarea v-model:value="currPost.text" style="height: 600px;border:solid 1px #e0e0e0;font-family: Consolas, monospace"></textarea>
+                    <textarea v-model:value="currPost.text" style="height: 600px; padding: 10px; border:solid 1px #c9c9c9; resize: none; font-family: Consolas, monospace" placeholder="(leer)" ></textarea>
                 </div>
             </div>
 
