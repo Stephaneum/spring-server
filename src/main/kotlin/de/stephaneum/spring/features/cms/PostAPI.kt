@@ -243,12 +243,7 @@ class PostAPI {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         if(user.code.role == ROLE_ADMIN || user.managePosts == true) {
-            val configType = Element.valueOf(type)
-            var content = configScheduler.get(configType)
-            if(configType == Element.events)
-                // legacy migration
-                content = content?.replace("<p>", "")?.replace("</p>","\n")?.replace("<br>", "\n")
-            return Response.Text(content)
+            return Response.Text(configScheduler.get(Element.valueOf(type)))
         } else {
             return Response.Feedback(false, message = "only admin or post manager")
         }
