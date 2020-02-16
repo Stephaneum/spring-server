@@ -42,6 +42,7 @@ class ImageService {
         // update path and size in database
         file.path = newPath
         file.size = java.io.File(newPath).length().toInt()
+        file.mime = Files.probeContentType(Paths.get(newPath))
         fileRepo.save(file)
     }
 
