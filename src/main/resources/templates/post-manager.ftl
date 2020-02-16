@@ -302,7 +302,14 @@
                     </a>
                 </div>
 
-                <div id="post-text-editor-special" style="height: 600px"></div>
+                <div v-show="!specialObj.plain">
+                    <div id="post-text-editor-special" style="height: 600px"></div>
+                </div>
+
+                <div v-show="specialObj.plain">
+                    <br>
+                    <textarea v-model:value="currPost.text" style="height: 600px;border:solid 1px #e0e0e0;font-family: Consolas, monospace"></textarea>
+                </div>
             </div>
 
             <!-- TEXT -->
@@ -577,17 +584,20 @@
         events: {
             id: 0,
             name: "Termine",
-            info: "Hier können Sie Termine eintragen.<br><b>Format: Von - Bis, Beschreibung URL</b><br>Beispiel 1: 25.03.2019, Fest<br>Beispiel 2: 25.03.2019 19:30, Fest https://www.stephaneum.de<br>Beispiel 3: 25.03.2019 - 27.03.2019, Fest<br><b>Nullen z.B. bei '07' müssen mitgeschrieben werden!</b>"
+            info: "Hier können Sie Termine eintragen.<br><b>Format: Von - Bis, Beschreibung URL</b><br>Beispiel 1: 25.03.2019, Fest<br>Beispiel 2: 25.03.2019 19:30, Fest https://www.stephaneum.de<br>Beispiel 3: 25.03.2019 - 27.03.2019, Fest<br><b>Nullen z.B. bei '07' müssen mitgeschrieben werden!</b>",
+            plain: true
         },
         coop: {
             id: 1,
             name: "Koop.-partner",
-            info: "Mehrere Kooperationspartner mit Semikolon (;) trennen<br>Tooltips können mit runden Klammern und Links mit eckigen Klammern gekennzeichnet werden<br>Falls keine Partner angegeben, wird der Bereich versteckt.<br><b>Beispiel: Partner(Briefkontakte)[http://google.de]</b>"
+            info: "Mehrere Kooperationspartner mit Semikolon (;) trennen<br>Tooltips können mit runden Klammern und Links mit eckigen Klammern gekennzeichnet werden<br>Falls keine Partner angegeben, wird der Bereich versteckt.<br><b>Beispiel: Partner(Briefkontakte)[http://google.de]</b>",
+            plain: true
         },
         coopURL: {
             id: 2,
             name: "Koop.-partner (URL)",
-            info: "Bitte URL eingeben. Relative Links sind erlaubt.<br>Falls keine URL angegeben, wird der Button versteckt."
+            info: "Bitte URL eingeben. Relative Links sind erlaubt.<br>Falls keine URL angegeben, wird der Button versteckt.",
+            plain: true
         }
     };
 
@@ -595,17 +605,20 @@
         copyright: {
             id: 3,
             name: "Copyright",
-            info: "Der Copyright-Text wird unterhalb von 'Kontakt | Impressum | Sitemap' angezeigt."
+            info: "Der Copyright-Text wird unterhalb von 'Kontakt | Impressum | Sitemap' angezeigt.",
+            plain: false
         },
         dev: {
             id: 4,
             name: "Entwicklung",
-            info: "Dieser Text wird in 'Informationen' unter 'Über die Entwicklung' angezeigt.<br>Es wird ausgeblendet, wenn der Inhalt leer ist."
+            info: "Dieser Text wird in 'Informationen' unter 'Über die Entwicklung' angezeigt.<br>Es wird ausgeblendet, wenn der Inhalt leer ist.",
+            plain: false
         },
         liveticker: {
             id: 5,
             name: "Live-Ticker",
-            info: "Der Live-Ticker wird auf der Homepage über den Beiträgen angezeigt.<br>Es wird ausgeblendet, wenn der Inhalt leer ist. Es wird nur der unformatierte Text gespeichert."
+            info: "Der Live-Ticker wird auf der Homepage über den Beiträgen angezeigt.<br>Es wird ausgeblendet, wenn der Inhalt leer ist. Es wird nur der unformatierte Text gespeichert.",
+            plain: true
         },
     };
 
@@ -613,22 +626,26 @@
         contact: {
             id: 6,
             name: "Kontakt",
-            info: "Der Titel \"Kontakt\" ist vorgegeben."
+            info: "Der Titel \"Kontakt\" ist vorgegeben.",
+            plain: false
         },
         imprint: {
             id: 7,
             name: "Impressum",
-            info: "Der Titel \"Impressum\" ist vorgegeben."
+            info: "Der Titel \"Impressum\" ist vorgegeben.",
+            plain: false
         },
         history: {
             id: 8,
             name: "Geschichte",
-            info: "Die Geschichte erreicht man über das Klicken auf das Stephaneum-Logo auf der linken Seite.<br>a) Link, dann bitte mit 'http' anfangen<br>b) (sonst) interne Lösung"
+            info: "Die Geschichte erreicht man über das Klicken auf das Stephaneum-Logo auf der linken Seite.<br>a) Link, dann bitte mit 'http' anfangen<br>b) (sonst) interne Lösung",
+            plain: false
         },
         euSa: {
             id: 9,
             name: "EU und S.-A.",
-            info: "Die Seite erreicht man über das Klicken auf das Stephaneum-Logo auf der linken Seite.<br>a) Link, dann bitte mit 'http' anfangen<br>b) (sonst) interne Lösung"
+            info: "Die Seite erreicht man über das Klicken auf das Stephaneum-Logo auf der linken Seite.<br>a) Link, dann bitte mit 'http' anfangen<br>b) (sonst) interne Lösung",
+            plain: false
         },
     };
 
@@ -1063,9 +1080,10 @@
             },
             sendSpecial: function () {
                 showLoading("Verarbeitung...");
+                var text = this.specialObj.plain ? this.currPost.text : $('#post-text-editor-special').trumbowyg('html');
                 axios.post('./api/post/special', {
                     type: this.specialCode(this.currPost.id),
-                    text: $('#post-text-editor-special').trumbowyg('html')
+                    text: text
                 })
                     .then((res) => {
                         if(res.data.success) {

@@ -243,7 +243,12 @@ class PostAPI {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         if(user.code.role == ROLE_ADMIN || user.managePosts == true) {
-            return Response.Text(configScheduler.get(Element.valueOf(type)))
+            val configType = Element.valueOf(type)
+            var content = configScheduler.get(configType)
+            if(configType == Element.events)
+                // legacy migration
+                content = content?.replace("<p>", "")?.replace("</p>","\n")?.replace("<br>", "\n")
+            return Response.Text(content)
         } else {
             return Response.Feedback(false, message = "only admin or post manager")
         }
@@ -257,16 +262,14 @@ class PostAPI {
             val type = Element.valueOf(request.type)
             val plainText = Jsoup.parse(request.text ?: "").text()
             val finalText = when(type) {
-                Element.liveticker, Element.coop, Element.coopURL -> plainText
-                Element.contact, Element.imprint, Element.copyright, Element.dev -> request.text
+                Element.events, Element.coop, Element.coopURL, Element.liveticker, Element.contact, Element.imprint, Element.copyright, Element.dev -> request.text
                 Element.history, Element.euSa -> {
                     if(plainText.startsWith("http")) {
-                        plainText.replace("\u00A0", "").trim();
+                        plainText.replace("\u00A0", "").trim()
                     } else {
                         request.text
                     }
                 }
-                Element.events -> request.text?.replace("&nbsp;", " ")?.replace("&quot;", "\"")?.replace("&amp;", "&")
                 else -> return Response.Feedback(false, message = "invalid type")
             }
             configScheduler.save(type, finalText)
