@@ -1,3 +1,6 @@
+
+<#-- nav menu shown on every page -->
+
 <#macro render>
     <template id="nav-menu">
         <div style="width: 100%">

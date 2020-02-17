@@ -1,6 +1,8 @@
+
+<#-- links on the left for plan and events -->
+
 <#macro render>
     <template id="quick-links">
-
         <div>
             <span v-if="plan && plan.exists">
                 <a href="/vertretungsplan.pdf" target="_blank">
@@ -20,7 +22,6 @@
                 </div>
             </a>
         </div>
-
     </template>
 
     <script type="text/javascript">

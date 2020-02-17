@@ -1,3 +1,6 @@
+
+<#-- footer of every page -->
+
 <#macro render>
     <template id="template-footer">
         <footer class="page-footer" style="background-color: #2a4c2c; width: 100%">

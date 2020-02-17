@@ -1,3 +1,6 @@
+
+<#-- show a post -->
+
 <#macro render>
     <template id="post">
         <div class="card-panel white">

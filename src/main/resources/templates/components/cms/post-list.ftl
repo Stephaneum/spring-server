@@ -1,3 +1,6 @@
+
+<#-- list of posts -->
+
 <#macro render>
     <template id="post-list">
         <div>

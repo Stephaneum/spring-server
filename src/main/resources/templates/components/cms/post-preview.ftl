@@ -1,3 +1,6 @@
+
+<#-- preview for a post -->
+
 <#macro render>
     <template id="post-preview">
         <div class="card">

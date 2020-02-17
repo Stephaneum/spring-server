@@ -4,9 +4,9 @@
 <#import "components/vue-loader.ftl" as vueLoader/>
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
-<#import "components/post-preview.ftl" as preview/>
-<#import "components/post.ftl" as post/>
-<#import "components/post-list.ftl" as postList/>
+<#import "components/cms/post-preview.ftl" as preview/>
+<#import "components/cms/post.ftl" as post/>
+<#import "components/cms/post-list.ftl" as postList/>
 
 <!DOCTYPE HTML>
 <html lang="de">

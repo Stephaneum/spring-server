@@ -1,3 +1,6 @@
+
+<#-- logos on the right -->
+
 <#macro render>
     <template id="logos">
         <div style="text-align: center">
