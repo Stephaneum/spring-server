@@ -29,9 +29,9 @@
 <@vueLoader.blank/>
 <div id="app" v-cloak>
     <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
-    <div v-if="allowed" style="flex: 1; display: flex; align-items: center; justify-content: center">
+    <div v-if="allowed" style="flex: 1; display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 100px)">
     </div>
-    <div v-else style="flex: 1"></div>
+    <div v-else style="flex: 1; min-height: calc(100vh - 100px)"></div>
 
     <stephaneum-footer :copyright="info.copyright"></stephaneum-footer>
 </div>
