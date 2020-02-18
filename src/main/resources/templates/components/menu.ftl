@@ -67,7 +67,7 @@
                                 <li><a href="/klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
                                 <li><a href="/projekt_all.xhtml"><span><i class="material-icons">flag</i>Projekte</span></a></li>
                                 <li class="internal-divider"></li>
-                                <li><a href="/nutzer_dateien.xhtml"><span><i class="material-icons">folder</i>Dateien</span></a></li>
+                                <li><a href="/cloud"><span><i class="material-icons">folder</i>Dateien</span></a></li>
                                 <li><a href="/nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>
                             </ul>
                             <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: -190px; display: none; overflow: hidden;text-align: center; width: 200px; height: 160px; background-color: #f1f8e9; color: #1b5e20; line-height: normal;" class="z-depth-1">

@@ -76,6 +76,7 @@ Route|Info
 ---|---
 `/login`|Login (wird momentan nicht genutzt)
 `/beitrag-manager`|Beitrag-Manager
+`/cloud`|Nutzer-Cloud
 `/admin-static`|Verwaltung der benutzerdefinierten Seiten
 `/admin-codes`|Verwaltung der Zugangscodes
 `/admin-logs`|Logdaten

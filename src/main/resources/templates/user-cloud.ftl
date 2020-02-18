@@ -5,6 +5,7 @@
 <#import "components/vue-loader.ftl" as vueLoader/>
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
+<#import "components/cloud/cloud-view.ftl" as cloudView/>
 
 <!DOCTYPE HTML>
 <html lang="de">
@@ -29,19 +30,32 @@
 <@vueLoader.blank/>
 <div id="app" v-cloak>
     <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
-    <div v-if="allowed" style="flex: 1; display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 100px)">
+    <div v-if="allowed" id="main-row" style="margin: 50px auto 0 auto; min-height: calc(100vh - 100px)">
+
+        <div class="row">
+            <div class="col s10 offset-s2">
+                <h4 style="margin: 20px 0 20px 0">Deine persönliche Cloud</h4>
+            </div>
+        </div>
+
+        <cloud-view></cloud-view>
     </div>
     <div v-else style="flex: 1; min-height: calc(100vh - 100px)"></div>
+
+    <div style="height: 100px"></div>
 
     <stephaneum-footer :copyright="info.copyright"></stephaneum-footer>
 </div>
 
+<script src="/static/js/moment.min.js" ></script>
+<script src="/static/js/moment.de.js" ></script>
 <script src="/static/js/materialize.min.js" ></script>
 <script src="/static/js/axios.min.js" ></script>
 <script src="/static/js/vue.js" ></script>
 <@loading.render/>
 <@menu.render/>
 <@footer.render/>
+<@cloudView.render/>
 <script type="text/javascript">
     var app = new Vue({
         el: '#app',
@@ -67,6 +81,7 @@
         },
         mounted: function() {
             M.AutoInit();
+            moment.locale('de');
             this.fetchData();
         }
     });
