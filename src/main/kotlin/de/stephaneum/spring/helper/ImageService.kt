@@ -53,8 +53,10 @@ class ImageService {
      */
     fun digestImageRotation(bytes: ByteArray): ByteArray? {
         val metadata = ImageMetadataReader.readMetadata(bytes.inputStream())
-        val exifIFD0: ExifIFD0Directory? = metadata.getFirstDirectoryOfType(ExifIFD0Directory::class.java)
-        val orientation = exifIFD0?.getInt(ExifIFD0Directory.TAG_ORIENTATION)
+        val exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory::class.java) ?: return null
+        if(!exifIFD0.containsTag(ExifIFD0Directory.TAG_ORIENTATION))
+            return null
+        val orientation =  exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION)
 
         val rotation = when (orientation) {
             1 -> null
