@@ -1,6 +1,12 @@
 package de.stephaneum.spring.features.cloud
 
 object Request {
+
+    data class UpdatePublic(val fileID: Int?, val isPublic: Boolean?)
+
+    data class MoveFile(val fileID: Int?, val parentFolderID: Int?)
+
+    data class MoveFolder(val folderID: Int?, val parentFolderID: Int?)
 }
 
 object Response {

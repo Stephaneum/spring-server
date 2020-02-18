@@ -32,7 +32,7 @@
                         <span style="font-size: 1.5em">{{ a.name }}</span>
                     </template>
                     <template v-else>
-                        <div class="progress" style="width: 70%; height: 20px">
+                        <div id="storage-bar" class="progress" style="width: 70%; height: 20px">
                             <div class="determinate white" :style="{ width: (storage.percentage*100)+'%' }"></div>
                         </div>
                         <span style="font-size: 1.5em">{{ storage.used }} / {{ storage.total }}</span>
@@ -59,25 +59,83 @@
                                 </span>
 
                                 <span style="flex: 0 0 270px; text-align: right">
-                                    <a :href="downloadLink(f)" class="tooltipped waves-effect waves-light green darken-3 btn margin-1" data-tooltip="Download" data-position="bottom">
+                                    <a :href="downloadLink(f)" class="tooltipped waves-effect waves-light green darken-3 btn margin-1" :class="{ disabled: f.isFolder }" data-tooltip="Download" data-position="bottom">
                                         <i class="material-icons">arrow_downward</i>
                                     </a>
 
-                                    <a @click="emitSelected(p)" class="tooltipped waves-effect waves-light teal darken-2 btn margin-1" href="#!" data-tooltip="Link" data-position="bottom">
+                                    <a @click="showPublic(f)" class="tooltipped waves-effect waves-light teal btn margin-1" :class="{ disabled: f.isFolder, 'darken-2': !f.public, 'lighten-2': f.public }" href="#!" data-tooltip="Link" data-position="bottom">
                                         <i class="material-icons">language</i>
                                     </a>
 
-                                    <a @click="emitSelected(p)" class="tooltipped waves-effect waves-light teal darken-2 btn margin-1" href="#!" data-tooltip="Bearbeiten" data-position="bottom">
+                                    <a @click="showEdit(f)" class="tooltipped waves-effect waves-light teal darken-2 btn margin-1" href="#!" data-tooltip="Bearbeiten" data-position="bottom">
                                         <i class="material-icons">edit</i>
                                     </a>
 
-                                    <a @click="showDelete(p)" class="tooltipped waves-effect waves-light btn red darken-4 margin-1" href="#!" data-tooltip="Löschen" data-position="bottom">
+                                    <a @click="showDelete(f)" class="tooltipped waves-effect waves-light btn red darken-4 margin-1" href="#!" data-tooltip="Löschen" data-position="bottom">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </span>
                             </div>
                         </li>
                     </ul>
+                </div>
+            </div>
+
+            <!-- public modal -->
+            <div id="modal-public" class="modal">
+                <div class="modal-content">
+                    <h4>{{ selected.fileName }}</h4>
+                    <br>
+                    <a @click="updatePublic(false)" href="#!" class="waves-effect waves-light teal btn margin-1" :class="selected.public ? ['darken-3'] : []">
+                        <i class="material-icons left">lock</i>
+                        Privat
+                    </a>
+
+                    <a @click="updatePublic(true)" href="#!" class="waves-effect waves-light teal btn margin-1" :class="selected.public ? [] : ['darken-3']">
+                        <i class="material-icons left">lock_open</i>
+                        Öffentlich
+                    </a>
+
+                    <div v-if="selected.public" style="margin-top: 40px">
+                        Link:
+                        <div class="green lighten-4" style="margin-top: 10px; padding: 10px">
+                            {{ publicLink(selected) }}
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <a @click="closePublic" href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+                </div>
+            </div>
+
+            <!-- edit modal -->
+            <div id="modal-edit" class="modal">
+                <div class="modal-content">
+                    <h4>{{ selected.fileName || selected.name }}</h4>
+                    <br>
+                    In Arbeit
+
+                </div>
+                <div class="modal-footer">
+                    <a @click="closeEdit" href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+                </div>
+            </div>
+
+            <!-- delete modal -->
+            <div id="modal-delete" class="modal">
+                <div class="modal-content">
+                    <h4>Löschen fortfahren?</h4>
+                    <br>
+                    <p><b>{{ selected.fileName }}</b> wird gelöscht.</p>
+                    <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
+                </div>
+                <div class="modal-footer">
+                    <a @click="closeDelete" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+                    <a @click="deleteFile" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
+                        <i class="material-icons left">delete</i>
+                        Löschen
+                    </a>
                 </div>
             </div>
         </div>
@@ -113,6 +171,11 @@
                         used: '',
                         total: '',
                         percentage: 0
+                    },
+                    selected: {
+                        fileName: null,
+                        name: null, // for folders
+                        public: false
                     }
                 }
             },
@@ -159,6 +222,60 @@
                             this.fileCount++;
                     });
                 },
+                showPublic: function(f) {
+                    this.selected = f;
+                    M.Modal.getInstance(document.getElementById('modal-public')).open();
+                },
+                closePublic: function() {
+                    M.Modal.getInstance(document.getElementById('modal-public')).close();
+                    showLoadingInvisible();
+                    this.fetchData();
+                },
+                updatePublic: function(isPublic) {
+                    showLoadingInvisible();
+                    axios.post( './api/cloud/update-public-file', { fileID: this.selected.id, isPublic })
+                        .then((response) => {
+                            if(response.data.success) {
+                                this.selected.public = isPublic;
+                            } else if(response.data.message) {
+                                M.toast({html: 'Fehlgeschlagen.<br>'+response.data.message});
+                            } else {
+                                M.toast({html: 'Fehlgeschlagen.<br>'+this.selected.fileName});
+                            }
+                            this.fetchData();
+                        });
+                },
+                showEdit: function(f) {
+                    this.selected = f;
+                    M.Modal.getInstance(document.getElementById('modal-edit')).open();
+                },
+                closeEdit: function() {
+                    M.Modal.getInstance(document.getElementById('modal-edit')).close();
+                    showLoadingInvisible();
+                    this.fetchData();
+                },
+                showDelete: function(f) {
+                    this.selected = f;
+                    M.Modal.getInstance(document.getElementById('modal-delete')).open();
+                },
+                closeDelete: function() {
+                    M.Modal.getInstance(document.getElementById('modal-delete')).close();
+                },
+                deleteFile: function() {
+                    M.Modal.getInstance(document.getElementById('modal-delete')).close();
+                    showLoading('Datei löschen...');
+                    axios.post( './api/cloud/delete-file/'+this.selected.id)
+                        .then((response) => {
+                            if(response.data.success) {
+                                M.toast({html: 'Datei gelöscht.<br>'+this.selected.fileName});
+                            } else if(response.data.message) {
+                                M.toast({html: 'Löschen fehlgeschlagen.<br>'+response.data.message});
+                            } else {
+                                M.toast({html: 'Löschen fehlgeschlagen.<br>'+this.selected.fileName});
+                            }
+                            this.fetchData();
+                        });
+                },
                 fetchData: async function () {
                     var url = this.folderID ? './api/cloud/user/' + this.folderID : './api/cloud/user';
                     var res = await axios.get(url);
@@ -170,7 +287,7 @@
                     this.storage.total = storageReadable(this.storage.total);
                     M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
                     hideLoading();
-                }
+                },
             },
             computed: {
                 downloadLink: function () {
@@ -181,6 +298,11 @@
                             return './api/cloud/download/file/'+file.id;
                     };
                 },
+                publicLink: function () {
+                    return (file) => {
+                        return window.location.origin + '/public/?file='+ file.id +'_' + encodeURI(file.fileName)
+                    };
+                }
             },
             mounted: function() {
                 M.AutoInit();
@@ -227,7 +349,7 @@
             cursor: pointer;
         }
 
-        .progress {
+        #storage-bar {
             background-color: transparent !important;
             border: 2px solid white;
         }

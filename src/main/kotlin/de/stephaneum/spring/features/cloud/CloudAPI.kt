@@ -3,10 +3,8 @@ package de.stephaneum.spring.features.cloud
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/cloud")
@@ -47,6 +45,65 @@ class CloudAPI {
         val files = fileRepo.findByUserAndFolderOrderByIdDesc(user, folderObj)
 
         return digestResults(folders, files)
+    }
+
+    @PostMapping("/update-public-file")
+    fun updatePublic(@RequestBody request: Request.UpdatePublic): Response.Feedback {
+
+        if(request.fileID == null || request.isPublic == null)
+            return Response.Feedback(false, message = "Missing Arguments")
+
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val file = fileRepo.findByIdOrNull(request.fileID) ?: return Response.Feedback(false, message = "file not found")
+
+        if(!hasAccessToFile(user, file))
+            return Response.Feedback(false, message = "no access to this file")
+
+        file.public = request.isPublic
+        fileRepo.save(file)
+
+        return Response.Feedback(true)
+    }
+
+    @PostMapping("/delete-file/{fileID}")
+    fun deleteFile(@PathVariable fileID: Int): Response.Feedback {
+
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val file = fileRepo.findByIdOrNull(fileID) ?: return Response.Feedback(false, message = "file not found")
+
+        if(!hasAccessToFile(user, file))
+            return Response.Feedback(false, message = "no access to this file")
+
+        fileRepo.delete(file)
+
+        return Response.Feedback(true)
+    }
+
+    @PostMapping("/move-file")
+    fun moveFile(@RequestBody request: Request.MoveFile): Response.Feedback {
+
+        if(request.fileID == null || request.parentFolderID == null)
+            return Response.Feedback(false, message = "Missing Arguments")
+
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val file = fileRepo.findByIdOrNull(request.fileID) ?: return Response.Feedback(false, message = "file not found")
+        val folder = folderRepo.findByIdOrNull(request.parentFolderID) ?: return Response.Feedback(false, message = "file not found")
+
+        if(!hasAccessToFile(user, file))
+            return Response.Feedback(false, message = "no access to this file")
+
+        file.folder = folder
+        fileRepo.save(file)
+
+        return Response.Feedback(true)
+    }
+
+    private fun hasAccessToFile(user: User, file: File): Boolean {
+        return when {
+            file.user?.id == user.id -> true // user owns this file
+            user.code.role == ROLE_ADMIN -> true // user is admin
+            else -> false
+        }
     }
 
     private fun calcSizeRecursive(folder: Folder): Int {
