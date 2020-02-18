@@ -61,17 +61,20 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var isFolder: Boolean = false) {
 
     fun simplifyForPosts() {
-        val fileNameWithID = path.substring(path.lastIndexOf('/') + 1)
-        fileName = fileNameWithID.substring(fileNameWithID.indexOf('_')+1)
+        fileName = generateFileName()
         user = null
         folder = null
     }
 
     fun simplifyForCloud() {
-        val fileNameWithID = path.substring(path.lastIndexOf('/') + 1)
-        fileName = fileNameWithID.substring(fileNameWithID.indexOf('_')+1)
+        fileName = generateFileName()
         user = null
         folder = null
+    }
+
+    fun generateFileName(): String {
+        val fileNameWithID = path.substring(path.lastIndexOf('/') + 1)
+        return fileNameWithID.substring(fileNameWithID.indexOf('_')+1)
     }
 }
 

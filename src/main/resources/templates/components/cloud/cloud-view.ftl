@@ -53,12 +53,21 @@
                                 </span>
 
                                 <span style="flex: 0 0 320px; text-align: right;">
-                                    <span class="green-badge-light">{{ f.sizeReadable }}</span>
+                                    <span v-if="f.public" class="green-badge-light">öffentlich</span>
+                                    <span style="margin-left: 20px" class="green-badge-light">{{ f.sizeReadable }}</span>
                                     <span v-if="f.time" style="margin-left: 20px" class="green-badge-light">{{ f.time }}</span>
                                 </span>
 
-                                <span style="flex: 0 0 140px; text-align: right">
-                                    <a @click="emitSelected(p)" class="tooltipped waves-effect waves-light green darken-3 btn margin-1" href="#!" data-tooltip="Bearbeiten" data-position="bottom">
+                                <span style="flex: 0 0 270px; text-align: right">
+                                    <a :href="downloadLink(f)" class="tooltipped waves-effect waves-light green darken-3 btn margin-1" data-tooltip="Download" data-position="bottom">
+                                        <i class="material-icons">arrow_downward</i>
+                                    </a>
+
+                                    <a @click="emitSelected(p)" class="tooltipped waves-effect waves-light teal darken-2 btn margin-1" href="#!" data-tooltip="Link" data-position="bottom">
+                                        <i class="material-icons">language</i>
+                                    </a>
+
+                                    <a @click="emitSelected(p)" class="tooltipped waves-effect waves-light teal darken-2 btn margin-1" href="#!" data-tooltip="Bearbeiten" data-position="bottom">
                                         <i class="material-icons">edit</i>
                                     </a>
 
@@ -159,10 +168,19 @@
                     this.storage.percentage = this.storage.used / (this.storage.total ? this.storage.total : 1);
                     this.storage.used = storageReadable(this.storage.used);
                     this.storage.total = storageReadable(this.storage.total);
+                    M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
                     hideLoading();
                 }
             },
             computed: {
+                downloadLink: function () {
+                    return (file) => {
+                        if(file.isFolder)
+                            return './api/cloud/download/folder/'+file.id;
+                        else
+                            return './api/cloud/download/file/'+file.id;
+                    };
+                },
             },
             mounted: function() {
                 M.AutoInit();

@@ -362,18 +362,16 @@ class FileService {
      * @return the resulting mime type or 'application/octet-stream' if it cannot be solved
      */
     fun getMime(extension: String): String {
-        return when (extension) {
+        return when (extension.toLowerCase()) {
             "pdf" -> "application/pdf"
             "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             "pptx" -> "application/mspowerpoint"
             "xml" -> "application/xml"
             "png" -> "image/png"
-            "jpg" -> "image/jpeg"
-            "jpeg" -> "image/jpeg"
-            "jpe" -> "image/jpeg"
+            "jpg", "jpeg" -> "image/jpeg"
             "gif" -> "image/gif"
-            "mp4:" -> "video/mp4"
+            "mp4" -> "video/mp4"
             "zip" -> "application/zip"
             "wav" -> "audio/x-wav"
             "htm", "html" -> "text/html"

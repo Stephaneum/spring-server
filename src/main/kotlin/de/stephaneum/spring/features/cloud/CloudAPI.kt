@@ -1,10 +1,7 @@
 package de.stephaneum.spring.features.cloud
 
 import de.stephaneum.spring.Session
-import de.stephaneum.spring.database.File
-import de.stephaneum.spring.database.FileRepo
-import de.stephaneum.spring.database.Folder
-import de.stephaneum.spring.database.FolderRepo
+import de.stephaneum.spring.database.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

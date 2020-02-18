@@ -31,7 +31,7 @@
 <@vueLoader.blank/>
 <div id="app" v-cloak>
     <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
-    <div v-if="allowed" id="main-row" style="margin: 50px auto 0 auto; min-height: calc(100vh - 100px)">
+    <div v-if="allowed" id="main-row" style="margin: 50px auto 0 auto;">
 
         <div class="row">
             <div class="col s10 offset-s2">
