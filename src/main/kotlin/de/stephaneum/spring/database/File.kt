@@ -1,5 +1,6 @@
 package de.stephaneum.spring.database
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
@@ -20,6 +21,7 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var user: User? = null,
 
                 @Column(nullable = false, name="pfad", length = 1024)
+                @JsonIgnore
                 var path: String = "",
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
@@ -43,6 +45,7 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var public: Boolean = false,
 
                 @Column(nullable = false, name = "lehrerchat")
+                @JsonIgnore
                 var teacherChat: Boolean = false,
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
@@ -51,12 +54,23 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                 @JsonInclude
                 @Transient
-                var fileNameWithID: String = "") {
+                var fileName: String = "",
+
+                @JsonInclude
+                @Transient
+                var isFolder: Boolean = false) {
 
     fun simplifyForPosts() {
-        fileNameWithID = path.substring(path.lastIndexOf('/') + 1)
-        path = ""
-        user = EMPTY_USER
+        val fileNameWithID = path.substring(path.lastIndexOf('/') + 1)
+        fileName = fileNameWithID.substring(fileNameWithID.indexOf('_')+1)
+        user = null
+        folder = null
+    }
+
+    fun simplifyForCloud() {
+        val fileNameWithID = path.substring(path.lastIndexOf('/') + 1)
+        fileName = fileNameWithID.substring(fileNameWithID.indexOf('_')+1)
+        user = null
         folder = null
     }
 }
@@ -70,5 +84,8 @@ interface FileRepo: CrudRepository<File, Int> {
     @Query("SELECT f FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE AND f.mime LIKE CONCAT(?2, '%') ORDER BY f.id DESC")
     fun findMyImages(userID: Int, mime: String): List<File>
 
+    // map file ids to full file objects
     fun findByIdIn(ids: List<Int>): List<File>
+
+    fun findByUserAndFolderOrderByIdDesc(user: User, folder: Folder?): List<File>
 }

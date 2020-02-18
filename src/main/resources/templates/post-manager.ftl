@@ -853,7 +853,6 @@
                     image.sizeReadable = Math.round(image.size / (1024*1024)) + ' MB';
 
                 // filenames
-                image.fileName = image.fileNameWithID.substring(image.fileNameWithID.indexOf('_')+1);
                 image.fileNameNoExtension = image.fileName.substring(0, image.fileName.lastIndexOf('.'))
             },
             increaseImageLimit: function(update=true) {
@@ -988,7 +987,7 @@
                 return this.info.user && this.info.user.code.role === 100;
             },
             imageURL: function() {
-                return (image) => './api/images/'+image.fileNameWithID;
+                return (image) => './api/images/'+image.id+'_'+image.fileName;
             },
             editModeText: function() {
                 return (unapproved) => unapproved ? 'Bearbeiten (' + unapproved + ')' : 'Bearbeiten';

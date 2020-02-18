@@ -34,11 +34,22 @@ data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                   @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                   @JoinColumn(name = "parent")
-                  var parent: Folder? = null)
+                  var parent: Folder? = null,
+
+                  @JsonInclude
+                  @Transient
+                  var isFolder: Boolean = true) {
+
+    fun simplifyForCloud() {
+        user = null
+    }
+}
 
 @Repository
 interface FolderRepo: CrudRepository<Folder, Int> {
 
     @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user.id = ?1 AND f.name = ?2 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
     fun findPrivateFolderInRoot(userID: Int, folderName: String): List<Folder>
+
+    fun findByUserAndParentAndProjectAndSchoolClassAndTeacherChatOrderByName(user: User, parent: Folder?, project: Project?, schoolClass: SchoolClass?, teacherChat: Boolean): List<Folder>
 }
