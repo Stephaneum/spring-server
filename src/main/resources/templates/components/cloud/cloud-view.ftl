@@ -5,7 +5,7 @@
     <template id="cloud-view">
         <div class="row">
             <!-- PATH -->
-            <div class="col s10 offset-s2" style="display: flex; justify-content: space-between; padding-bottom: 15px">
+            <div class="col s10 offset-s2" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px">
                 <div style="display: flex;">
                     <div style="margin-left: 10px" class="path-item" @click="toHomeFolder">
                         Home
@@ -27,14 +27,22 @@
             <!-- ACTIONS -->
             <div class="col s2">
                 <div v-for="a in actions" @click="action(a)" class="action-btn z-depth-1">
-                    <i style="font-size: 3em" class="material-icons">{{ a.icon }}</i>
-                    <span style="font-size: 1.5em">{{ a.name }}</span>
+                    <template v-if="a.icon">
+                        <i style="font-size: 3em" class="material-icons">{{ a.icon }}</i>
+                        <span style="font-size: 1.5em">{{ a.name }}</span>
+                    </template>
+                    <template v-else>
+                        <div class="progress" style="width: 70%; height: 20px">
+                            <div class="determinate white" :style="{ width: (storage.percentage*100)+'%' }"></div>
+                        </div>
+                        <span style="font-size: 1.5em">{{ storage.used }} / {{ storage.total }}</span>
+                    </template>
                 </div>
             </div>
 
             <!-- MAIN CONTENT -->
             <div class="col s10">
-                <div class="tab-panel white z-depth-1" style="margin: 0; min-height: 400px;padding: 10px">
+                <div class="tab-panel white z-depth-1" style="margin: 0; min-height: 450px;padding: 10px">
                     <ul class="collection" style="margin: 0">
                         <li v-for="f in files" class="collection-item">
                             <div style="display: flex; align-items: center;">
@@ -75,7 +83,7 @@
             },
             createFolder: {
                 id: 1,
-                name: "Ordner",
+                name: "Neuer Ordner",
                 icon: "create_new_folder"
             },
             stats: {
@@ -91,7 +99,12 @@
                     files: [],
                     folderStack: [],
                     fileCount: 0,
-                    folderCount: 0
+                    folderCount: 0,
+                    storage: {
+                        used: '',
+                        total: '',
+                        percentage: 0
+                    }
                 }
             },
             methods: {
@@ -123,13 +136,7 @@
                       if(f.timestamp)
                         f.time = moment(f.timestamp).format('DD.MM.YYYY');
 
-                      // size
-                      if(f.size < 1024)
-                          f.sizeReadable = f.size + ' B';
-                      else if(f.size < 1024 *1024)
-                          f.sizeReadable = Math.round(f.size / 1024) + ' KB';
-                      else
-                          f.sizeReadable = Math.round(f.size / (1024*1024)) + ' MB';
+                      f.sizeReadable = storageReadable(f.size);
                   });
                   return files;
                 },
@@ -143,14 +150,16 @@
                             this.fileCount++;
                     });
                 },
-                fetchData: function() {
+                fetchData: async function () {
                     var url = this.folderID ? './api/cloud/user/' + this.folderID : './api/cloud/user';
-                    axios.get(url)
-                        .then((res) => {
-                            this.files = this.digestFiles(res.data);
-                            this.count();
-                            hideLoading();
-                        });
+                    var res = await axios.get(url);
+                    this.files = this.digestFiles(res.data);
+                    this.count();
+                    this.storage = (await axios.get('./api/cloud/info')).data;
+                    this.storage.percentage = this.storage.used / (this.storage.total ? this.storage.total : 1);
+                    this.storage.used = storageReadable(this.storage.used);
+                    this.storage.total = storageReadable(this.storage.total);
+                    hideLoading();
                 }
             },
             computed: {
@@ -198,6 +207,11 @@
             color: #2e7d32;
             text-decoration: underline;
             cursor: pointer;
+        }
+
+        .progress {
+            background-color: transparent !important;
+            border: 2px solid white;
         }
     </style>
 </#macro>

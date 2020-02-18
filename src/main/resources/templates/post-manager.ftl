@@ -4,6 +4,7 @@
 <#import "components/vue-loader.ftl" as vueLoader/>
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
+<#import "components/utils.ftl" as utils/>
 <#import "components/cms/post-preview.ftl" as preview/>
 <#import "components/cms/post.ftl" as post/>
 <#import "components/cms/post-list.ftl" as postList/>
@@ -482,6 +483,7 @@
 <script src="/static/trumbowyg/plugins/colors/trumbowyg.colors.min.js"></script>
 <script src="/static/trumbowyg/plugins/fontSize/trumbowyg.fontsize.min.js"></script>
 <script src="/static/trumbowyg/langs/de.min.js" ></script>
+<@utils.render/>
 <@menu.render/>
 <@footer.render/>
 <@loading.render/>
@@ -845,12 +847,7 @@
                 image.time = moment(image.timestamp).format('DD.MM.YYYY');
 
                 // size
-                if(image.size < 1024)
-                    image.sizeReadable = image.size + ' B';
-                else if(image.size < 1024 *1024)
-                    image.sizeReadable = Math.round(image.size / 1024) + ' KB';
-                else
-                    image.sizeReadable = Math.round(image.size / (1024*1024)) + ' MB';
+                image.sizeReadable = storageReadable(image.size);
 
                 // filenames
                 image.fileNameNoExtension = image.fileName.substring(0, image.fileName.lastIndexOf('.'))

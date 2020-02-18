@@ -5,6 +5,7 @@
 <#import "components/vue-loader.ftl" as vueLoader/>
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
+<#import "components/utils.ftl" as utils/>
 <#import "components/cloud/cloud-view.ftl" as cloudView/>
 
 <!DOCTYPE HTML>
@@ -52,6 +53,7 @@
 <script src="/static/js/materialize.min.js" ></script>
 <script src="/static/js/axios.min.js" ></script>
 <script src="/static/js/vue.js" ></script>
+<@utils.render/>
 <@loading.render/>
 <@menu.render/>
 <@footer.render/>

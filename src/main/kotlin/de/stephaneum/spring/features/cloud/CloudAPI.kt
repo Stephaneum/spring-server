@@ -21,6 +21,16 @@ class CloudAPI {
     @Autowired
     private lateinit var folderRepo: FolderRepo
 
+    @GetMapping("/info")
+    fun getInfo(): Any {
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+
+        val used = fileRepo.calcStorageUsed(user.id)
+        val total = user.storage
+
+        return Response.CloudInfo(used, total)
+    }
+
     @GetMapping("/user")
     fun getCloudUserRoot(): Any {
 
