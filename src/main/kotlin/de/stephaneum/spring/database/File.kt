@@ -87,5 +87,8 @@ interface FileRepo: CrudRepository<File, Int> {
     // map file ids to full file objects
     fun findByIdIn(ids: List<Int>): List<File>
 
+    // root directory
     fun findByUserAndFolderOrderByIdDesc(user: User, folder: Folder?): List<File>
+
+    fun findByFolderOrderByIdDesc(folder: Folder): List<File>
 }

@@ -92,7 +92,7 @@ class FileService {
         val mainPath = configScheduler.get(Element.fileLocation) ?: return "Interner Fehler"
         var savingFolder: Folder?
         if(mode == StoreMode.PRIVATE && folder is String) {
-            savingFolder = folderRepo.findPrivateFolderInRoot(user.id, folder).firstOrNull()
+            savingFolder = folderRepo.findPrivateFolderInRoot(user, folder).firstOrNull()
             if(savingFolder == null) {
                 // create new one
                 savingFolder = folderRepo.save(Folder(0, folder, user, null, null, false, null))

@@ -26,7 +26,7 @@ class CloudAPI {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
 
-        val folders = folderRepo.findByUserAndParentAndProjectAndSchoolClassAndTeacherChatOrderByName(user, null, null, null, false)
+        val folders = folderRepo.findFolderInRoot(user, null, null, false)
         val files = fileRepo.findByUserAndFolderOrderByIdDesc(user, null)
 
         return digestResults(folders, files)
@@ -36,15 +36,27 @@ class CloudAPI {
     fun getCloudUser(@PathVariable folder: Int): Any {
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         val folderObj = Folder(folder)
-        val folders = folderRepo.findByUserAndParentAndProjectAndSchoolClassAndTeacherChatOrderByName(user, folderObj, null, null, false)
+        val folders = folderRepo.findByParent(folderObj)
         val files = fileRepo.findByUserAndFolderOrderByIdDesc(user, folderObj)
 
         return digestResults(folders, files)
     }
 
+    private fun calcSizeRecursive(folder: Folder): Int {
+        val fileSize = fileRepo.findByFolderOrderByIdDesc(folder).sumBy { it.size }
+        folder.size = fileSize
+        folderRepo.findByParent(folder).forEach { f ->
+            folder.size += calcSizeRecursive(f)
+        }
+        return folder.size
+    }
+
     private fun digestResults(folders: List<Folder>, files: List<File>): List<Any> {
-        folders.forEach { it.simplifyForCloud() }
-        files.forEach { it.simplifyForCloud() }
+        for (f in folders) {
+            f.simplifyForCloud()
+            calcSizeRecursive(f)
+        }
+        files.forEach { f -> f.simplifyForCloud() }
 
         return List<Any>(folders.size + files.size) { i ->
             if(i < folders.size)

@@ -5,16 +5,22 @@
     <template id="cloud-view">
         <div class="row">
             <!-- PATH -->
-            <div class="col s10 offset-s2" style="display: flex; padding-bottom: 15px">
-                <div style="margin-left: 10px" class="path-item" @click="toHomeFolder">
-                    Home
-                </div>
+            <div class="col s10 offset-s2" style="display: flex; justify-content: space-between; padding-bottom: 15px">
+                <div style="display: flex;">
+                    <div style="margin-left: 10px" class="path-item" @click="toHomeFolder">
+                        Home
+                    </div>
 
-                <div v-for="f in folderStack" style="display: flex; align-items: center">
-                    <i style="font-size: 2em; margin: 0" class="material-icons">chevron_right</i>
-                    <span class="path-item" @click="openFolder(f)">
+                    <div v-for="f in folderStack" style="display: flex; align-items: center">
+                        <i style="font-size: 2em; margin: 0" class="material-icons">chevron_right</i>
+                        <span class="path-item" @click="openFolder(f)">
                         {{ f.name }}
                     </span>
+                    </div>
+                </div>
+
+                <div style="padding-right: 20px">
+                    {{ folderCount }} Ordner / {{ fileCount }} Dateien
                 </div>
             </div>
 
@@ -40,7 +46,7 @@
 
                                 <span style="flex: 0 0 320px; text-align: right;">
                                     <span class="green-badge-light">{{ f.sizeReadable }}</span>
-                                    <span style="margin-left: 20px" class="green-badge-light">{{ f.time }}</span>
+                                    <span v-if="f.time" style="margin-left: 20px" class="green-badge-light">{{ f.time }}</span>
                                 </span>
 
                                 <span style="flex: 0 0 140px; text-align: right">
@@ -83,7 +89,9 @@
                     folderID: null,
                     actions: actions,
                     files: [],
-                    folderStack: []
+                    folderStack: [],
+                    fileCount: 0,
+                    folderCount: 0
                 }
             },
             methods: {
@@ -125,11 +133,22 @@
                   });
                   return files;
                 },
+                count: function() {
+                    this.fileCount = 0;
+                    this.folderCount = 0;
+                    this.files.forEach((f) => {
+                        if(f.isFolder)
+                            this.folderCount++;
+                        else
+                            this.fileCount++;
+                    });
+                },
                 fetchData: function() {
                     var url = this.folderID ? './api/cloud/user/' + this.folderID : './api/cloud/user';
                     axios.get(url)
                         .then((res) => {
                             this.files = this.digestFiles(res.data);
+                            this.count();
                             hideLoading();
                         });
                 }
