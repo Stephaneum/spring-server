@@ -12,6 +12,10 @@
                         <object v-else-if="pdf(file)" :data="file.link" type="application/pdf" style="width: 100%; height: 100%">
                             Ihr Browser unterstützt kein PDF.
                         </object>
+                        <iframe v-else-if="docx(file)" :src="officeLink(file)" style="width: 100%; height: 100%; border:none">
+                            This is an embedded <a target='_blank' href='http://office.com'>Microsoft Office</a> document, powered by
+                            <a target='_blank' href='http://office.com/webapps'>Office Online</a>.
+                        </iframe>
                         <div v-else style="background-color: white; border-radius: 20px; padding: 20px; text-align: center">
                             Keine Vorschau verfügbar.
                         </div>
@@ -107,6 +111,17 @@
                         return !file.isFolder && (file.mime === 'application/pdf' || file.fileName.toLowerCase().endsWith('.pdf'));
                     }
                 },
+                docx: function() {
+                    return (file) => {
+                        return !file.isFolder && (file.fileName.toLowerCase().endsWith('.docx') || file.fileName.toLowerCase().endsWith('.doc'));
+                    }
+                },
+                officeLink: function() {
+                    // TODO make it temporary
+                    return (file) => {
+                        return 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURI(window.location.origin + '/api/cloud/download/file/'+ file.id);
+                    }
+                }
             },
             mounted: function() {
                 var instance = this;
