@@ -53,7 +53,7 @@ class CloudAPI {
     }
 
     @GetMapping("/view/user/", "/view/user/{folder}")
-    fun getCloudUser(@PathVariable(required = false) folder: Int?): Any {
+    fun getViewUser(@PathVariable(required = false) folder: Int?): Any {
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
 
         val folders: List<Folder>
@@ -71,7 +71,7 @@ class CloudAPI {
     }
 
     @PostMapping("/upload/user/", "/upload/user/{folder}")
-    fun uploadImage(@PathVariable(required = false) folder: Int?, @RequestParam("file") file: MultipartFile): Any {
+    fun uploadUser(@PathVariable(required = false) folder: Int?, @RequestParam("file") file: MultipartFile): Any {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         var fileName = file.originalFilename ?: return Response.Feedback(false, message = "Dateiname unbekannt")
