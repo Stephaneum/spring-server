@@ -1,5 +1,10 @@
 <#macro render>
     <script type="text/javascript">
+
+        function initTooltips() {
+            M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
+        }
+
         function storageReadable(size) {
             if(size < 1024)
                 return size + ' B';

@@ -1,5 +1,6 @@
 <#import "file-grid.ftl" as fileGrid/>
 <#import "file-list.ftl" as fileList/>
+<#import "file-popup.ftl" as filePopup/>
 <#import "cloud-stats.ftl" as cloudStats/>
 
 <#-- cloud view -->
@@ -7,6 +8,7 @@
 <#macro render>
     <@fileGrid.render/>
     <@fileList.render/>
+    <@filePopup.render/>
     <@cloudStats.render/>
     <template id="cloud-view">
         <div class="row">
@@ -59,8 +61,8 @@
             <!-- MAIN CONTENT -->
             <div class="col s10">
                 <div class="tab-panel white z-depth-1" style="margin: 0; min-height: 450px;padding: 10px">
-                    <file-grid v-if="!statsMode && gridView" :files="files" @onselect="openFolder"></file-grid>
-                    <file-list v-else-if="!statsMode && !gridView" :files="files" @onselect="openFolder" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
+                    <file-grid v-if="!statsMode && gridView" :files="files" @onselect="select"></file-grid>
+                    <file-list v-else-if="!statsMode && !gridView" :files="files" @onselect="select" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
                     <cloud-stats v-else :info="storage" :teacherchat="teacherchat" @onexit="toggleStatsMode"></cloud-stats>
                 </div>
             </div>
@@ -150,6 +152,8 @@
                     </a>
                 </div>
             </div>
+
+            <file-popup v-if="file" :file="file" @onexit="closeFilePopup" @onpublic="showPublic(file)" @onedit="showEdit(file)" @ondelete="showDelete(file)"></file-popup>
         </div>
     </template>
 
@@ -180,7 +184,8 @@
                         name: null, // for folders
                         public: false
                     },
-                    createFolderName: null
+                    createFolderName: null,
+                    file: null // for the file popup
                 }
             },
             methods: {
@@ -194,18 +199,30 @@
 
                     this.gridView = grid;
                     this.$nextTick(() => {
-                        M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
+                        initTooltips();
                     });
                 },
                 action: function(action) {
                     console.log(action);
                 },
+                select: function(file) {
+                    if(file.isFolder) {
+                        this.openFolder(file);
+                    } else {
+                        this.file = file;
+                        document.body.style.overflow = "hidden";
+                        this.$nextTick(() => {
+                            initTooltips();
+                        });
+                    }
+                },
+                closeFilePopup: function() {
+                    this.file = null;
+                    document.body.style.overflow = "visible";
+                },
                 openFolder: function(folder) {
 
                     if(this.statsMode)
-                        return;
-
-                    if(!folder.isFolder)
                         return;
 
                     showLoadingInvisible();
@@ -343,6 +360,7 @@
                             } else {
                                 M.toast({html: 'Löschen fehlgeschlagen.<br>'+this.selected.fileName});
                             }
+                            this.closeFilePopup();
                             this.fetchData();
                         });
                 },
@@ -365,7 +383,7 @@
                     this.storage.project = storageReadable(this.storage.project);
                     this.storage.schoolClass = storageReadable(this.storage.schoolClass);
                     this.storage.teacherChat = storageReadable(this.storage.teacherChat);
-                    M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
+                    initTooltips();
                     hideLoading();
                 },
             },
@@ -412,12 +430,6 @@
 
         .path-item:hover {
             background-color: #689f38;
-            cursor: pointer;
-        }
-
-        .folder-link:hover {
-            color: #2e7d32;
-            text-decoration: underline;
             cursor: pointer;
         }
 

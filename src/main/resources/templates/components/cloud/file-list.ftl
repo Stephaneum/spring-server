@@ -8,7 +8,7 @@
                 <div style="display: flex; align-items: center;">
                     <span style="flex-grow: 1; display: flex; align-items: center; ">
                         <i v-if="f.isFolder" style="font-size: 1.5em; margin-right: 10px" class="material-icons">folder</i>
-                        <span :class="{ 'folder-link': f.isFolder }" @click="select(f)">{{ f.isFolder ? f.name : f.fileName }}</span>
+                        <span class="file-link" @click="select(f)">{{ f.isFolder ? f.name : f.fileName }}</span>
                     </span>
 
                     <span style="flex: 0 0 320px; text-align: right;">
@@ -18,7 +18,7 @@
                     </span>
 
                     <span style="flex: 0 0 270px; text-align: right">
-                        <a :href="f.link" class="tooltipped waves-effect waves-light green darken-3 btn margin-1" :class="{ disabled: f.isFolder }" data-tooltip="Download" data-position="bottom">
+                        <a :href="f.link + '?download=true'" class="tooltipped waves-effect waves-light green darken-3 btn margin-1" :class="{ disabled: f.isFolder }" data-tooltip="Download" data-position="bottom">
                             <i class="material-icons">arrow_downward</i>
                         </a>
 
@@ -54,9 +54,17 @@
                 },
                 onDelete: function(f) {
                     this.$emit('ondelete', f);
-                },
+                }
             },
             template: '#file-list'
         });
     </script>
+
+    <style>
+        .file-link:hover {
+            color: #2e7d32;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
 </#macro>

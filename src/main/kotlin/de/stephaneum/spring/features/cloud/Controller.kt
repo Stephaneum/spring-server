@@ -45,7 +45,7 @@ class UserCloudController {
     }
 
     @GetMapping("/api/cloud/download/file/{fileID}")
-    fun download(@PathVariable fileID: Int): Any {
+    fun download(@PathVariable fileID: Int, @RequestParam(required = false) download: Boolean?): Any {
         // TODO: check if this file is accessible from the user
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         val file = fileRepo.findByIdOrNull(fileID) ?: return "404"
@@ -53,7 +53,10 @@ class UserCloudController {
         return ResponseEntity.ok()
                 .contentLength(resource.contentLength())
                 .contentType(MediaType.parseMediaType(fileService.getMimeFromPath(file.path)))
-                .header("Content-Disposition", "attachment; filename=\"" + file.generateFileName() + "\"")
+                .apply {
+                    if(download == true)
+                        header("Content-Disposition", "attachment; filename=\"" + file.generateFileName() + "\"")
+                }
                 .body(resource)
     }
 
