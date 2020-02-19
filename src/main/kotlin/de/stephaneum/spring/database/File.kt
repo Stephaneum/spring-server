@@ -107,5 +107,9 @@ interface FileRepo: CrudRepository<File, Int> {
     // root directory
     fun findByUserAndFolderOrderByIdDesc(user: User, folder: Folder?): List<File>
 
+    fun findByFolder(folder: Folder): List<File>
     fun findByFolderOrderByIdDesc(folder: Folder): List<File>
+
+    @Query("SELECT f FROM File f WHERE f.user IS NULL AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
+    fun findPotentialUnusedFiles(): List<File>
 }

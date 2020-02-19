@@ -31,6 +31,8 @@ interface FilePostRepo: CrudRepository<FilePost, Int> {
 
     fun findByPostId(postID: Int): List<FilePost>
 
+    fun countByFile(file: File): Int
+
     @Query("SELECT NEW de.stephaneum.spring.database.FilePostSimple(fp.id, fp.file, fp.post.id) FROM FilePost fp WHERE fp.file.id IN ?1")
     fun findImagesByPostIdIn(postID: List<Int>): List<FilePostSimple>
 

@@ -63,4 +63,6 @@ interface MenuRepo: CrudRepository<Menu, Int> {
 
     @Query("SELECT m FROM Menu m WHERE m.user.id = ?1")
     fun findCategory(userID: Int): Menu?
+
+    fun countByImage(image: File): Int
 }

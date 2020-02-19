@@ -1,6 +1,7 @@
 package de.stephaneum.spring.scheduler
 
 import de.stephaneum.spring.database.BlackboardRepo
+import de.stephaneum.spring.database.FileRepo
 import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.helper.FileService
 import org.slf4j.LoggerFactory
@@ -28,6 +29,9 @@ class GarbageCollector {
     @Autowired
     private lateinit var fileService: FileService
 
+    @Autowired
+    private lateinit var fileRepo: FileRepo
+
     @Scheduled(initialDelay=10000, fixedDelay = 1000*60)
     fun update() {
 
@@ -45,5 +49,14 @@ class GarbageCollector {
             }
         }
 
+        val files = fileRepo.findPotentialUnusedFiles()
+        for(f in files) {
+            val hasConnections = fileService.hasConnections(f)
+
+            if(!hasConnections) {
+                logger.info("Delete file due to no connections: '${f.generateFileName()}'")
+                fileService.deleteFileStephaneumFinal(f)
+            }
+        }
     }
 }

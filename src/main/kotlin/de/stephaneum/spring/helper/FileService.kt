@@ -42,6 +42,9 @@ class FileService {
     private lateinit var fileRepo: FileRepo
 
     @Autowired
+    private lateinit var filePostRepo: FilePostRepo
+
+    @Autowired
     private lateinit var folderRepo: FolderRepo
 
     @Autowired
@@ -73,6 +76,9 @@ class FileService {
     }
 
     /**
+     * saves file to database and hard drive
+     * logs the actions
+     * updates the statistics
      * @param user the user saving the file (the owner)
      * @param filename filename
      * @param mime mime type
@@ -151,6 +157,84 @@ class FileService {
         logRepo.save(Log(0, now(), EventType.UPLOAD.id, "[${mode.description}] ${user.firstName} ${user.lastName} (${user.code.getRoleString()}), $filename"))
 
         return file
+    }
+
+    /**
+     * deletes the folder and its children (e.g. child folders, files)
+     * regarding the files: those are deleted according to [FileService.deleteFileStephaneum]
+     * @param user the user who is deleting the folder
+     * @param folder the folder to be deleted
+     */
+    fun deleteFolderStephaneum(user: User, folder: Folder) {
+
+        val children = folderRepo.findByParent(folder)
+        for(f in children) {
+            deleteFolderStephaneum(user, f) // delete child folders
+        }
+
+        val files = fileRepo.findByFolder(folder)
+        for(f in files) {
+            deleteFileStephaneum(user, f) // delete files of the current folder
+        }
+
+        folderRepo.deleteById(folder.id)
+    }
+
+    /**
+     * deletes the file (in the perspective of the user)
+     *
+     * but in reality:
+     * deletes the file if it has no connections, otherwise just removes the other connections (user, project, class, teacherChat)
+     * @param user the user who is deleting this file
+     * @param file the file to be deleted
+     */
+    fun deleteFileStephaneum(user: User, file: de.stephaneum.spring.database.File) {
+
+        val mode = when {
+            file.project != null -> StoreMode.PROJECT
+            file.schoolClass != null -> StoreMode.SCHOOL_CLASS
+            file.teacherChat -> StoreMode.TEACHER_CHAT
+            else -> StoreMode.PRIVATE
+        }
+
+        if(hasConnections(file)) {
+            // has connections just remove the other connections
+            file.user = null
+            file.schoolClass = null
+            file.project = null
+            file.teacherChat = false
+            fileRepo.save(file)
+            logger.info("Connections to the file '${file.generateFileName()}' has been deleted but still exists due to connections to posts / menus")
+        } else {
+            deleteFileStephaneumFinal(file)
+        }
+
+        // log
+        logRepo.save(Log(0, now(), EventType.DELETE_FILE.id, "[${mode.description}] ${user.firstName} ${user.lastName} (${user.code.getRoleString()}), ${file.generateFileName()}"))
+    }
+
+    fun deleteFileStephaneumFinal(file: de.stephaneum.spring.database.File) {
+        // delete file (db and hard drive)
+        fileRepo.delete(file)
+        deleteFile(file.path)
+
+        // update stats
+        statsCloudRepo.save(StatsCloud(0, now(), -file.size))
+
+        logger.info("File deleted: '${file.generateFileName()}'")
+    }
+
+    /**
+     * @return true if this file is used for a post, menu (section),
+     */
+    fun hasConnections(file: de.stephaneum.spring.database.File): Boolean {
+        if(filePostRepo.countByFile(file) != 0)
+            return true
+
+        if(menuRepo.countByImage(file) != 0)
+            return true
+
+        return false
     }
 
     fun loadFileAsResource(path: String): Resource? {

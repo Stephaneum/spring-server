@@ -141,12 +141,12 @@
                 <div class="modal-content">
                     <h4>Löschen fortfahren?</h4>
                     <br>
-                    <p><b>{{ selected.fileName }}</b> wird gelöscht.</p>
+                    <p><b>{{ selected.name || selected.fileName }}</b> wird gelöscht.</p>
                     <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
                 </div>
                 <div class="modal-footer">
                     <a @click="closeDelete" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
-                    <a @click="deleteFile" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
+                    <a @click="deleteItem" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
                         <i class="material-icons left">delete</i>
                         Löschen
                     </a>
@@ -343,17 +343,21 @@
                 closeDelete: function() {
                     M.Modal.getInstance(document.getElementById('modal-delete')).close();
                 },
-                deleteFile: function() {
+                deleteItem: function() {
                     M.Modal.getInstance(document.getElementById('modal-delete')).close();
-                    showLoading('Datei löschen...');
-                    axios.post( './api/cloud/delete-file/'+this.selected.id)
+                    var isFolder = this.selected.isFolder;
+                    var typeString = isFolder ? 'Ordner' : 'Datei';
+                    var name = this.selected.fileName || this.selected.name;
+                    var route = isFolder ? './api/cloud/delete-folder/' : './api/cloud/delete-file/';
+                    showLoading(typeString + ' löschen...');
+                    axios.post( route + this.selected.id)
                         .then((response) => {
                             if(response.data.success) {
-                                M.toast({html: 'Datei gelöscht.<br>'+this.selected.fileName});
+                                M.toast({html: typeString + ' gelöscht.<br>'+name});
                             } else if(response.data.message) {
                                 M.toast({html: 'Löschen fehlgeschlagen.<br>'+response.data.message});
                             } else {
-                                M.toast({html: 'Löschen fehlgeschlagen.<br>'+this.selected.fileName});
+                                M.toast({html: 'Löschen fehlgeschlagen.<br>'+name});
                             }
                             this.closeFilePopup();
                             this.fetchData();

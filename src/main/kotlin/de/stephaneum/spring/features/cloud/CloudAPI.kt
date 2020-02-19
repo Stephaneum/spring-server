@@ -149,17 +149,20 @@ class CloudAPI {
         if(!hasAccessToFile(user, file))
             return Response.Feedback(false, message = "no access to this file")
 
-        fileRepo.delete(file)
+        fileService.deleteFileStephaneum(user, file)
 
-        val mode = when {
-            file.project != null -> FileService.StoreMode.PROJECT
-            file.schoolClass != null -> FileService.StoreMode.SCHOOL_CLASS
-            file.teacherChat -> FileService.StoreMode.TEACHER_CHAT
-            else -> FileService.StoreMode.PRIVATE
-        }
+        return Response.Feedback(true)
+    }
 
-        // log
-        logRepo.save(Log(0, now(), EventType.DELETE_FILE.id, "[${mode.description}] ${user.firstName} ${user.lastName} (${user.code.getRoleString()}), ${file.generateFileName()}"))
+    @PostMapping("/delete-folder/{folderID}")
+    fun deleteFolder(@PathVariable folderID: Int): Response.Feedback {
+
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val folder = folderRepo.findByIdOrNull(folderID) ?: return Response.Feedback(false, message = "folder not found")
+
+        // TODO: check permissions
+
+        fileService.deleteFolderStephaneum(user, folder)
 
         return Response.Feedback(true)
     }
