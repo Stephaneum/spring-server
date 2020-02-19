@@ -15,4 +15,6 @@ object Response {
     data class Feedback(val success: Boolean, val needLogin: Boolean = false, val message: String? = null)
 
     data class CloudInfo(val used: Int, val total: Int, val count: Int, val private: Int, val project: Int, val schoolClass: Int, val teacherChat: Int)
+
+    data class FileKey(val key: String)
 }

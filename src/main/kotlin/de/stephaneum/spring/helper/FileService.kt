@@ -237,6 +237,18 @@ class FileService {
         return false
     }
 
+    /**
+     * @return true if the user has access to the file
+     */
+    fun hasAccessToFile(user: User, file: de.stephaneum.spring.database.File): Boolean {
+        // TODO: project, class, teacherChat
+        return when {
+            file.user?.id == user.id -> true // user owns this file
+            user.code.role == ROLE_ADMIN -> true // user is admin
+            else -> false
+        }
+    }
+
     fun loadFileAsResource(path: String): Resource? {
         return try {
             val resource = UrlResource(Paths.get(path).toUri())

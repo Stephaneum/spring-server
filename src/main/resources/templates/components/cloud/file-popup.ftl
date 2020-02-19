@@ -86,6 +86,11 @@
     <script type="text/javascript">
         Vue.component('file-popup', {
             props: ['file'],
+            data: function () {
+                return {
+                    key: null // used for office documents
+                }
+            },
             methods: {
                 exit: function() {
                     this.$emit('onexit');
@@ -117,9 +122,11 @@
                     }
                 },
                 officeLink: function() {
-                    // TODO make it temporary
                     return (file) => {
-                        return 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(window.location.origin + '/api/cloud/download/file/'+ file.id);
+                        if(this.key)
+                            return 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(window.location.origin + '/api/cloud/download/file/'+ file.id+'?download=true&key='+this.key);
+                        else
+                            return '';
                     }
                 }
             },
@@ -139,6 +146,15 @@
                         instance.exit();
                     }
                 };
+
+                axios.get('./api/cloud/key/' + this.file.id)
+                    .then((res) => {
+                        if(res.data) {
+                            this.key = res.data.key;
+                        } else {
+                            M.toast({html: 'Interner Fehler.'});
+                        }
+                    });
             },
             destroyed: function() {
                 document.onkeydown = null;

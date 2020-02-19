@@ -45,10 +45,22 @@ class UserCloudController {
     }
 
     @GetMapping("/api/cloud/download/file/{fileID}")
-    fun download(@PathVariable fileID: Int, @RequestParam(required = false) download: Boolean?): Any {
-        // TODO: check if this file is accessible from the user
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+    fun download(@PathVariable fileID: Int, @RequestParam(required = false) download: Boolean?, @RequestParam(required = false) key: String?): Any {
+
         val file = fileRepo.findByIdOrNull(fileID) ?: return "404"
+
+        if(key != null) {
+            // for office documents
+            val data = jwtService.getData(key)
+            if(data?.get("fileID") != fileID.toString()) {
+                return "403"
+            }
+        } else {
+            val user = Session.get().user ?: return "403"
+            if(!fileService.hasAccessToFile(user, file))
+                return "403"
+        }
+
         val resource = fileService.loadFileAsResource(file.path) ?: return "404"
         return ResponseEntity.ok()
                 .contentLength(resource.contentLength())
@@ -59,5 +71,4 @@ class UserCloudController {
                 }
                 .body(resource)
     }
-
 }

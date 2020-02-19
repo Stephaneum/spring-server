@@ -4,6 +4,7 @@ import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.ImageService
+import de.stephaneum.spring.security.JwtService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
@@ -19,7 +20,7 @@ class CloudAPI {
     private lateinit var fileService: FileService
 
     @Autowired
-    private lateinit var logRepo: LogRepo
+    private lateinit var jwtService: JwtService
 
     @Autowired
     private lateinit var imageService: ImageService
@@ -131,7 +132,7 @@ class CloudAPI {
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         val file = fileRepo.findByIdOrNull(request.fileID) ?: return Response.Feedback(false, message = "file not found")
 
-        if(!hasAccessToFile(user, file))
+        if(!fileService.hasAccessToFile(user, file))
             return Response.Feedback(false, message = "no access to this file")
 
         file.public = request.isPublic
@@ -146,7 +147,7 @@ class CloudAPI {
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         val file = fileRepo.findByIdOrNull(fileID) ?: return Response.Feedback(false, message = "file not found")
 
-        if(!hasAccessToFile(user, file))
+        if(!fileService.hasAccessToFile(user, file))
             return Response.Feedback(false, message = "no access to this file")
 
         fileService.deleteFileStephaneum(user, file)
@@ -177,7 +178,7 @@ class CloudAPI {
         val file = fileRepo.findByIdOrNull(request.fileID) ?: return Response.Feedback(false, message = "file not found")
         val folder = folderRepo.findByIdOrNull(request.parentFolderID) ?: return Response.Feedback(false, message = "file not found")
 
-        if(!hasAccessToFile(user, file))
+        if(!fileService.hasAccessToFile(user, file))
             return Response.Feedback(false, message = "no access to this file")
 
         file.folder = folder
@@ -186,12 +187,16 @@ class CloudAPI {
         return Response.Feedback(true)
     }
 
-    private fun hasAccessToFile(user: User, file: File): Boolean {
-        return when {
-            file.user?.id == user.id -> true // user owns this file
-            user.code.role == ROLE_ADMIN -> true // user is admin
-            else -> false
-        }
+    @GetMapping("/key/{fileID}")
+    fun getKey(@PathVariable fileID: Int): Any {
+
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val file = fileRepo.findByIdOrNull(fileID) ?: return Response.Feedback(false, message = "file not found")
+
+        if(!fileService.hasAccessToFile(user, file))
+            return Response.Feedback(false, message = "no access to this file")
+
+        return Response.FileKey(jwtService.generateToken(mapOf("fileID" to fileID.toString())))
     }
 
     private fun calcSizeRecursive(folder: Folder): Int {
