@@ -119,7 +119,7 @@
                 officeLink: function() {
                     // TODO make it temporary
                     return (file) => {
-                        return 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURI(window.location.origin + '/api/cloud/download/file/'+ file.id);
+                        return 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(window.location.origin + '/api/cloud/download/file/'+ file.id);
                     }
                 }
             },
