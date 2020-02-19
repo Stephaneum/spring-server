@@ -84,6 +84,20 @@ interface FileRepo: CrudRepository<File, Int> {
     @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1")
     fun calcStorageUsed(userID: Int): Int
 
+    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
+    fun calcStorageUsedPrivate(userID: Int): Int
+
+    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.project IS NOT NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
+    fun calcStorageUsedProject(userID: Int): Int
+
+    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NOT NULL AND f.teacherChat = FALSE")
+    fun calcStorageUsedClass(userID: Int): Int
+
+    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = TRUE")
+    fun calcStorageUsedTeacherChat(userID: Int): Int
+
+    fun countByUserId(userID: Int): Int
+
     @Query("SELECT f FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE AND f.mime LIKE CONCAT(?2, '%') ORDER BY f.id DESC")
     fun findMyImages(userID: Int, mime: String): List<File>
 

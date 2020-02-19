@@ -39,8 +39,13 @@ class CloudAPI {
 
         val used = fileRepo.calcStorageUsed(user.id)
         val total = user.storage
+        val count = fileRepo.countByUserId(user.id)
+        val privateUsage = fileRepo.calcStorageUsedPrivate(user.id)
+        val projectUsage = fileRepo.calcStorageUsedProject(user.id)
+        val classUsage = fileRepo.calcStorageUsedClass(user.id)
+        val teacherChatUsage = fileRepo.calcStorageUsedTeacherChat(user.id)
 
-        return Response.CloudInfo(used, total)
+        return Response.CloudInfo(used, total, count, privateUsage, projectUsage, classUsage, teacherChatUsage)
     }
 
     @GetMapping("/view/user/", "/view/user/{folder}")

@@ -39,7 +39,7 @@
             </div>
         </div>
 
-        <cloud-view></cloud-view>
+        <cloud-view :teacherchat="hasTeacherChat"></cloud-view>
     </div>
     <div v-else style="flex: 1; min-height: calc(100vh - 100px)"></div>
 
@@ -78,7 +78,10 @@
         },
         computed: {
             allowed: function() {
-                return this.info.user && (this.info.user.code.role >= 10)
+                return this.info.user && this.info.user.code.role >= 0;
+            },
+            hasTeacherChat: function() {
+                return this.allowed && (this.info.user.code.role === 1 || this.info.user.code.role === 100);
             }
         },
         mounted: function() {

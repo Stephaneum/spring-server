@@ -1,31 +1,33 @@
 <#import "file-grid.ftl" as fileGrid/>
 <#import "file-list.ftl" as fileList/>
+<#import "cloud-stats.ftl" as cloudStats/>
 
 <#-- cloud view -->
 
 <#macro render>
     <@fileGrid.render/>
     <@fileList.render/>
+    <@cloudStats.render/>
     <template id="cloud-view">
         <div class="row">
             <!-- PATH -->
             <div class="col s10 offset-s2" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px">
                 <div style="display: flex;">
-                    <div style="margin-left: 10px" class="path-item" @click="toHomeFolder">
+                    <div style="margin-left: 10px" class="path-item" @click="toHomeFolder" :style="{ 'background-color': statsMode ? 'grey !important' : null }">
                         Home
                     </div>
 
                     <div v-for="f in folderStack" style="display: flex; align-items: center">
                         <i style="font-size: 2em; margin: 0" class="material-icons">chevron_right</i>
-                        <span class="path-item" @click="openFolder(f)">
+                        <span class="path-item" @click="openFolder(f)" :style="{ 'background-color': statsMode ? 'grey !important' : null }">
                         {{ f.name }}
                     </span>
                     </div>
                 </div>
 
                 <div style="padding-right: 20px">
-                    <i @click="setGridView(true)" style="font-size: 2em; margin: 0; padding: 5px; border-radius: 5px; user-select: none; cursor: pointer" class="material-icons" :class="gridView ? ['green', 'darken-2', 'white-text'] : []">apps</i>
-                    <i @click="setGridView(false)" style="font-size: 2em; margin: 0; padding: 5px; border-radius: 5px; user-select: none; cursor: pointer" class="material-icons" :class="!gridView ? ['green', 'darken-2', 'white-text'] : []">menu</i>
+                    <i @click="setGridView(true)" style="font-size: 2em; margin: 0; padding: 5px; border-radius: 5px; user-select: none; cursor: pointer" class="material-icons" :class="!statsMode && gridView ? ['green', 'darken-2', 'white-text'] : []">apps</i>
+                    <i @click="setGridView(false)" style="font-size: 2em; margin: 0; padding: 5px; border-radius: 5px; user-select: none; cursor: pointer" class="material-icons" :class="!statsMode && !gridView ? ['green', 'darken-2', 'white-text'] : []">menu</i>
                 </div>
             </div>
 
@@ -47,7 +49,7 @@
                 </div>
 
                 <div @click="toggleStatsMode" class="action-btn z-depth-1">
-                    <div id="storage-bar" style="width: 70%; height: 20px">
+                    <div class="storage-bar" style="width: 70%; height: 20px">
                         <div :style="{ width: (storage.percentage*100)+'%' }"></div>
                     </div>
                     <span style="font-size: 1.5em">{{ storage.used }} / {{ storage.total }}</span>
@@ -57,12 +59,13 @@
             <!-- MAIN CONTENT -->
             <div class="col s10">
                 <div class="tab-panel white z-depth-1" style="margin: 0; min-height: 450px;padding: 10px">
-                    <file-grid v-if="gridView" :files="files" @onselect="openFolder"></file-grid>
-                    <file-list v-else :files="files" @onselect="openFolder" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
+                    <file-grid v-if="!statsMode && gridView" :files="files" @onselect="openFolder"></file-grid>
+                    <file-list v-else-if="!statsMode && !gridView" :files="files" @onselect="openFolder" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
+                    <cloud-stats v-else :info="storage" :teacherchat="teacherchat" @onexit="toggleStatsMode"></cloud-stats>
                 </div>
             </div>
 
-            <div class="col s12" style="text-align: right; padding: 15px 25px 0 0">
+            <div v-if="!statsMode" class="col s12" style="text-align: right; padding: 15px 25px 0 0">
                 {{ folderCount }} Ordner / {{ fileCount }} Dateien
             </div>
 
@@ -152,7 +155,7 @@
 
     <script type="text/javascript">
         Vue.component('cloud-view', {
-            props: ['mode', 'id'],
+            props: ['mode', 'id', 'teacherchat'],
             data: function () {
                 return {
                     statsMode: false,
@@ -165,7 +168,12 @@
                     storage: {
                         used: '-',
                         total: '-',
-                        percentage: 0
+                        percentage: 0,
+                        count: 0,
+                        privatePercentage: 0,
+                        projectPercentage: 0,
+                        classPercentage: 0,
+                        teacherPercentage: 0
                     },
                     selected: {
                         fileName: null,
@@ -180,6 +188,10 @@
                     this.statsMode = !this.statsMode;
                 },
                 setGridView: function(grid) {
+
+                    if(this.statsMode)
+                        return;
+
                     this.gridView = grid;
                     this.$nextTick(() => {
                         M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
@@ -189,6 +201,10 @@
                     console.log(action);
                 },
                 openFolder: function(folder) {
+
+                    if(this.statsMode)
+                        return;
+
                     if(!folder.isFolder)
                         return;
 
@@ -203,6 +219,9 @@
                     this.fetchData();
                 },
                 toHomeFolder: function() {
+                    if(this.statsMode)
+                        return;
+
                     showLoadingInvisible();
                     this.folderStack = [];
                     this.folderID = null;
@@ -335,8 +354,17 @@
                     this.storage = (await axios.get('./api/cloud/info')).data;
                     this.storage.percentage = this.storage.used / (this.storage.total ? this.storage.total : 1);
                     this.storage.percentage = Math.min(Math.max(this.storage.percentage, 0.05), 0.95);
+                    this.storage.privatePercentage = this.storage.private / this.storage.used;
+                    this.storage.projectPercentage = this.storage.project / this.storage.used;
+                    this.storage.classPercentage = this.storage.schoolClass / this.storage.used;
+                    this.storage.teacherPercentage = this.storage.teacherChat / this.storage.used;
+                    this.storage.free = storageReadable(this.storage.total - this.storage.used);
                     this.storage.used = storageReadable(this.storage.used);
                     this.storage.total = storageReadable(this.storage.total);
+                    this.storage.private = storageReadable(this.storage.private);
+                    this.storage.project = storageReadable(this.storage.project);
+                    this.storage.schoolClass = storageReadable(this.storage.schoolClass);
+                    this.storage.teacherChat = storageReadable(this.storage.teacherChat);
                     M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
                     hideLoading();
                 },
@@ -393,7 +421,7 @@
             cursor: pointer;
         }
 
-        #storage-bar {
+        .storage-bar {
             background-color: rgba(255,255,255,0.2) !important;
             border: 2px solid white;
             border-radius: 20px;
@@ -401,7 +429,7 @@
             margin: 10px 0 10px 0;
         }
 
-        #storage-bar > div {
+        .storage-bar > div {
             position: absolute;
             left: -1px;
             top: 0;

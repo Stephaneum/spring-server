@@ -1,5 +1,5 @@
 
-<#-- cloud view -->
+<#-- view files and folders as grid -->
 
 <#macro render>
     <template id="file-grid">
