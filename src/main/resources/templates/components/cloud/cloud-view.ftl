@@ -41,7 +41,7 @@
                     <span style="font-size: 1.5em">Hochladen</span>
                 </div>
 
-                <div @click="showNewFolder" class="action-btn z-depth-1">
+                <div @click="showCreateFolder" class="action-btn z-depth-1">
                     <i style="font-size: 3em" class="material-icons">create_new_folder</i>
                     <span style="font-size: 1.5em">Neuer Ordner</span>
                 </div>
@@ -64,6 +64,30 @@
 
             <div class="col s12" style="text-align: right; padding: 15px 25px 0 0">
                 {{ folderCount }} Ordner / {{ fileCount }} Dateien
+            </div>
+
+            <!-- create folder modal -->
+            <div id="modal-folder" class="modal" style="width: 500px">
+                <div class="modal-content">
+                    <h4>Neuer Ordner</h4>
+                    <br>
+                    <p>Es sind alle Zeichen erlaubt außer "/" und "\".</p>
+                    <p>Wird erstellt in: <b>{{ folderStack.length != 0 ? folderStack.slice(-1)[0].name : 'Homeverzeichnis' }}</b></p>
+                    <br>
+                    <div class="input-field">
+                        <i class="material-icons prefix">folder</i>
+                        <label for="create-folder-name">Name</label>
+                        <input v-model:value="createFolderName" type="text" id="create-folder-name"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a @click="closeCreateFolder" href="#!"
+                       class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+                    <button @click="createFolder" type="button" class="btn waves-effect waves-light green darken-3">
+                        <i class="material-icons left">save</i>
+                        Erstellen
+                    </button>
+                </div>
             </div>
 
             <!-- public modal -->
@@ -147,7 +171,8 @@
                         fileName: null,
                         name: null, // for folders
                         public: false
-                    }
+                    },
+                    createFolderName: null
                 }
             },
             methods: {
@@ -221,8 +246,32 @@
                         }
                     });
                 },
-                showNewFolder: function() {
+                showCreateFolder: function() {
+                    this.createFolderName = null;
+                    M.Modal.getInstance(document.getElementById('modal-folder')).open();
+                },
+                closeCreateFolder: function() {
+                    M.Modal.getInstance(document.getElementById('modal-folder')).close();
+                },
+                createFolder: function() {
+                    if(!this.createFolderName) {
+                        M.toast({html: 'Fehler<br>Bitte gib dem Ordner einen Namen.'});
+                        return;
+                    }
 
+                    showLoadingInvisible();
+                    M.Modal.getInstance(document.getElementById('modal-folder')).close();
+                    axios.post( './api/cloud/create-folder', { name: this.createFolderName, parentID: this.folderID })
+                        .then((response) => {
+                            if(response.data.success) {
+                                M.toast({html: 'Ordner erstellt<br>'+this.createFolderName});
+                            } else if(response.data.message) {
+                                M.toast({html: 'Fehlgeschlagen.<br>'+response.data.message});
+                            } else {
+                                M.toast({html: 'Fehlgeschlagen.<br>'+this.selected.fileName});
+                            }
+                            this.fetchData();
+                        });
                 },
                 showPublic: function(f) {
                     this.selected = f;

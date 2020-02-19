@@ -27,6 +27,12 @@ class CloudAPI {
     @Autowired
     private lateinit var folderRepo: FolderRepo
 
+    @Autowired
+    private lateinit var projectRepo: ProjectRepo
+
+    @Autowired
+    private lateinit var classRepo: SchoolClassRepo
+
     @GetMapping("/info")
     fun getInfo(): Any {
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
@@ -78,6 +84,34 @@ class CloudAPI {
             result.simplifyForPosts()
 
         return if(result is String) Response.Feedback(false, message = result) else result
+    }
+
+    @PostMapping("/create-folder")
+    fun createFolder(@RequestBody request: Request.CreateFolder): Response.Feedback {
+
+        if(request.name.isNullOrBlank())
+            return Response.Feedback(false, message = "Missing Name")
+
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        var folder: Folder? = null
+        var project: Project? = null
+        var schoolClass: SchoolClass? = null
+
+        if(request.parentID != null) {
+            folder = folderRepo.findByIdOrNull(request.parentID) ?: return Response.Feedback(false, message = "folder not found")
+        }
+
+        if(request.projectID != null) {
+            project = projectRepo.findByIdOrNull(request.projectID) ?: return Response.Feedback(false, message = "project not found")
+        }
+
+        if(request.classID != null) {
+            schoolClass = classRepo.findByIdOrNull(request.classID) ?: return Response.Feedback(false, message = "class not found")
+        }
+
+        folderRepo.save(Folder(0, request.name.trim(), user, project, schoolClass, request.teacherChat ?: false, folder))
+
+        return Response.Feedback(true)
     }
 
     @PostMapping("/update-public-file")
