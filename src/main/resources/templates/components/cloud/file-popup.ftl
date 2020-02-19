@@ -16,6 +16,20 @@
                             This is an embedded <a target='_blank' href='http://office.com'>Microsoft Office</a> document, powered by
                             <a target='_blank' href='http://office.com/webapps'>Office Online</a>.
                         </iframe>
+                        <object v-else-if="text(file)" :data="file.link + '?txt=true'" type="text/plain" style="width: 100%; height: 100%; background-color: white">
+                            Ihr Browser unterstützt dies nicht.
+                        </object>
+                        <video v-else-if="video(file)" controls="controls" style="width: 100%; height: 100%">
+                            <source :src="file.link" />
+                        </video>
+                        <div v-else-if="audio(file)" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center">
+                            <i style="font-size: 10vw; color: white" class="material-icons">audiotrack</i>
+                            <div style="height: 100px"></div>
+                            <audio controls="controls" style="width: 100%; max-width: 800px">
+                                <source :src="file.link" />
+                            </audio>
+                        </div>
+
                         <div v-else style="background-color: white; border-radius: 20px; padding: 20px; text-align: center">
                             Keine Vorschau verfügbar.
                         </div>
@@ -119,6 +133,24 @@
                 docx: function() {
                     return (file) => {
                         return !file.isFolder && (file.fileName.toLowerCase().endsWith('.docx') || file.fileName.toLowerCase().endsWith('.doc'));
+                    }
+                },
+                text: function() {
+                    return (file) => {
+                        var lowerCase = file.fileName.toLowerCase();
+                        return !file.isFolder && (file.mime.startsWith('text') || lowerCase.endsWith('.txt') || lowerCase.endsWith('.html') || lowerCase.endsWith('.htm') || lowerCase.endsWith('.js'));
+                    }
+                },
+                video: function() {
+                    return (file) => {
+                        var lowerCase = file.fileName.toLowerCase();
+                        return !file.isFolder && (file.mime.startsWith('video') || lowerCase.endsWith('.mpeg') || lowerCase.endsWith('.mp4') || lowerCase.endsWith('.avi') || lowerCase.endsWith('.webm'));
+                    }
+                },
+                audio: function() {
+                    return (file) => {
+                        var lowerCase = file.fileName.toLowerCase();
+                        return !file.isFolder && (file.mime.startsWith('audio') || lowerCase.endsWith('.mp3') || lowerCase.endsWith('.ogg') || lowerCase.endsWith('.wav'));
                     }
                 },
                 officeLink: function() {
