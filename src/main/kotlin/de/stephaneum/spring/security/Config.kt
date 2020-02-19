@@ -26,6 +26,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         http.csrf().disable()
         http.authorizeRequests().anyRequest().permitAll()
         http.headers().frameOptions().disable()
+        http.headers().xssProtection().disable()
 
         http.addFilterAfter(corsFilter, BasicAuthenticationFilter::class.java)
     }
