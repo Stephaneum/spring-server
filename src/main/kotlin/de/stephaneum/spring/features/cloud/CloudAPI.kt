@@ -61,10 +61,10 @@ class CloudAPI {
         if(folder != null) {
             val folderObj = Folder(folder)
             folders = folderRepo.findByParent(folderObj)
-            files = fileRepo.findByUserAndFolderOrderByIdDesc(user, folderObj)
+            files = fileRepo.findByUserAndFolderAndProjectAndSchoolClassAndTeacherChatOrderByIdDesc(user, folderObj, null, null, false)
         } else {
             folders = folderRepo.findFolderInRoot(user, null, null, false)
-            files = fileRepo.findByUserAndFolderOrderByIdDesc(user, null)
+            files = fileRepo.findByUserAndFolderAndProjectAndSchoolClassAndTeacherChatOrderByIdDesc(user, null, null, null, false)
         }
 
         return digestResults(folders, files)

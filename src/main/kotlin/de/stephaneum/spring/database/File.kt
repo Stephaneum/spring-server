@@ -105,7 +105,7 @@ interface FileRepo: CrudRepository<File, Int> {
     fun findByIdIn(ids: List<Int>): List<File>
 
     // root directory
-    fun findByUserAndFolderOrderByIdDesc(user: User, folder: Folder?): List<File>
+    fun findByUserAndFolderAndProjectAndSchoolClassAndTeacherChatOrderByIdDesc(user: User, folder: Folder?, project: Project?, schoolClass: SchoolClass?, teacherChat: Boolean): List<File>
 
     fun findByFolder(folder: Folder): List<File>
     fun findByFolderOrderByIdDesc(folder: Folder): List<File>
