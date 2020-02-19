@@ -31,17 +31,26 @@
 
             <!-- ACTIONS -->
             <div class="col s2">
-                <div v-for="a in actions" @click="action(a)" class="action-btn z-depth-1">
-                    <template v-if="a.icon">
-                        <i style="font-size: 3em" class="material-icons">{{ a.icon }}</i>
-                        <span style="font-size: 1.5em">{{ a.name }}</span>
-                    </template>
-                    <template v-else>
-                        <div id="storage-bar" style="width: 70%; height: 20px">
-                            <div :style="{ width: (storage.percentage*100)+'%' }"></div>
-                        </div>
-                        <span style="font-size: 1.5em">{{ storage.used }} / {{ storage.total }}</span>
-                    </template>
+
+                <form method="POST" enctype="multipart/form-data" style="display: none">
+                    <input name="file" type="file" id="upload-files" @change="uploadFiles" multiple>
+                </form>
+
+                <div @click="showUpload" class="action-btn z-depth-1">
+                    <i style="font-size: 3em" class="material-icons">cloud_upload</i>
+                    <span style="font-size: 1.5em">Hochladen</span>
+                </div>
+
+                <div @click="showNewFolder" class="action-btn z-depth-1">
+                    <i style="font-size: 3em" class="material-icons">create_new_folder</i>
+                    <span style="font-size: 1.5em">Neuer Ordner</span>
+                </div>
+
+                <div @click="toggleStatsMode" class="action-btn z-depth-1">
+                    <div id="storage-bar" style="width: 70%; height: 20px">
+                        <div :style="{ width: (storage.percentage*100)+'%' }"></div>
+                    </div>
+                    <span style="font-size: 1.5em">{{ storage.used }} / {{ storage.total }}</span>
                 </div>
             </div>
 
@@ -118,28 +127,13 @@
     </template>
 
     <script type="text/javascript">
-        var actions = {
-            upload: {
-                id: 0,
-                name: "Hochladen",
-                icon: "cloud_upload"
-            },
-            createFolder: {
-                id: 1,
-                name: "Neuer Ordner",
-                icon: "create_new_folder"
-            },
-            stats: {
-                id: 2
-            },
-        };
         Vue.component('cloud-view', {
             props: ['mode', 'id'],
             data: function () {
                 return {
+                    statsMode: false,
                     gridView: true,
                     folderID: null,
-                    actions: actions,
                     files: [],
                     folderStack: [],
                     fileCount: 0,
@@ -157,9 +151,14 @@
                 }
             },
             methods: {
+                toggleStatsMode: function() {
+                    this.statsMode = !this.statsMode;
+                },
                 setGridView: function(grid) {
                     this.gridView = grid;
-                    M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
+                    this.$nextTick(() => {
+                        M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
+                    });
                 },
                 action: function(action) {
                     console.log(action);
@@ -207,6 +206,23 @@
                         else
                             this.fileCount++;
                     });
+                },
+                showUpload: function() {
+                    document.getElementById('upload-files').click();
+                },
+                uploadFiles: function(event) {
+                    event.preventDefault();
+                    this.filesDragging = false; // TODO: drag and drop
+                    var files = event.dataTransfer ? event.dataTransfer.files : event.currentTarget.files;
+                    uploadMultipleFiles('./api/cloud/upload/user/' + (this.folderID ? this.folderID : ''), files, {
+                        uploaded: (file) => {},
+                        finished: () => {
+                            this.fetchData();
+                        }
+                    });
+                },
+                showNewFolder: function() {
+
                 },
                 showPublic: function(f) {
                     this.selected = f;
@@ -263,7 +279,7 @@
                         });
                 },
                 fetchData: async function () {
-                    var url = this.folderID ? './api/cloud/user/' + this.folderID : './api/cloud/user';
+                    var url = './api/cloud/view/user/' + (this.folderID ? this.folderID : '');
                     var res = await axios.get(url);
                     this.files = this.digestFiles(res.data);
                     this.count();

@@ -2,13 +2,24 @@ package de.stephaneum.spring.features.cloud
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
+import de.stephaneum.spring.helper.FileService
+import de.stephaneum.spring.helper.ImageService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import java.nio.file.Files
+import java.nio.file.Paths
 
 @RestController
 @RequestMapping("/api/cloud")
 class CloudAPI {
+
+    @Autowired
+    private lateinit var fileService: FileService
+
+    @Autowired
+    private lateinit var imageService: ImageService
 
     @Autowired
     private lateinit var fileRepo: FileRepo
@@ -26,25 +37,47 @@ class CloudAPI {
         return Response.CloudInfo(used, total)
     }
 
-    @GetMapping("/user")
-    fun getCloudUserRoot(): Any {
-
+    @GetMapping("/view/user/", "/view/user/{folder}")
+    fun getCloudUser(@PathVariable(required = false) folder: Int?): Any {
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
 
-        val folders = folderRepo.findFolderInRoot(user, null, null, false)
-        val files = fileRepo.findByUserAndFolderOrderByIdDesc(user, null)
+        val folders: List<Folder>
+        val files: List<File>
+        if(folder != null) {
+            val folderObj = Folder(folder)
+            folders = folderRepo.findByParent(folderObj)
+            files = fileRepo.findByUserAndFolderOrderByIdDesc(user, folderObj)
+        } else {
+            folders = folderRepo.findFolderInRoot(user, null, null, false)
+            files = fileRepo.findByUserAndFolderOrderByIdDesc(user, null)
+        }
 
         return digestResults(folders, files)
     }
 
-    @GetMapping("/user/{folder}")
-    fun getCloudUser(@PathVariable folder: Int): Any {
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        val folderObj = Folder(folder)
-        val folders = folderRepo.findByParent(folderObj)
-        val files = fileRepo.findByUserAndFolderOrderByIdDesc(user, folderObj)
+    @PostMapping("/upload/user/", "/upload/user/{folder}")
+    fun uploadImage(@PathVariable(required = false) folder: Int?, @RequestParam("file") file: MultipartFile): Any {
 
-        return digestResults(folders, files)
+        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        var fileName = file.originalFilename ?: return Response.Feedback(false, message = "Dateiname unbekannt")
+        var contentType = file.contentType ?: return Response.Feedback(false, message = "Dateityp unbekannt")
+
+        // ensure that the image is rotated properly
+        var bytes = file.bytes
+        if(contentType.startsWith("image")) {
+            val rotatedBytes = imageService.digestImageRotation(file.bytes)
+            if (rotatedBytes != null) {
+                bytes = rotatedBytes
+                fileName = fileService.getPathWithNewExtension(fileName, "jpg")
+                contentType = Files.probeContentType(Paths.get(fileName))
+            }
+        }
+
+        val result = fileService.storeFileStephaneum(user, fileName, contentType, bytes, folder, -1, FileService.StoreMode.PRIVATE)
+        if(result is File)
+            result.simplifyForPosts()
+
+        return if(result is String) Response.Feedback(false, message = result) else result
     }
 
     @PostMapping("/update-public-file")

@@ -798,49 +798,18 @@
             imageDragExit: function() {
                 this.imageDragging = false;
             },
-            uploadImages: function(event, files = null, index = 0) {
+            uploadImages: function(event) {
                 event.preventDefault();
                 this.imageDragging = false;
-
-                // get the files, store the files to the parameter and use it in the next function call (bugfix)
-                files = files ? files : event.dataTransfer ? event.dataTransfer.files : event.currentTarget.files;
-
-                var infoStart = files.length === 1 ? 'Hochladen (0%)' : '[' + (index+1) + '/' + files.length + '] [0%]' + files[index].name;
-                showLoading(infoStart);
-                var data = new FormData();
-                data.append('file', files[index]);
-                var config = {
-                    onUploadProgress: function(progressEvent) {
-                        var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
-                        var infoProcess = files.length === 1 ?
-                            'Hochladen ('+ percentCompleted +'%)' :
-                            '[' + (index+1) + '/' + files.length + '] [' + percentCompleted + '%] ' + files[index].name;
-                        showLoading(infoProcess, percentCompleted);
-                    }
-                };
-                axios.post('./api/post/upload-image', data, config)
-                    .then((res) => {
-                        if(res.data.id) {
-                            this.addImageData(res.data);
-                            this.imagesAvailable.unshift(res.data);
-                            this.currPost.imagesAdded.push(res.data);
-                            if(index < files.length-1)
-                                this.uploadImages(event, files, index+1);
-                            else {
-                                if(files.length === 1) M.toast({ html: 'Datei hochgeladen.' });
-                                else M.toast({ html: 'Dateien hochgeladen.' });
-                                hideLoading(); // finished successfully
-                            }
-                        } else if(res.data.message) {
-                            M.toast({ html: res.data.message });
-                            hideLoading(); // backend error
-                        }
-                    })
-                    .catch(function (err) {
-                        M.toast({ html: 'Ein Fehler ist aufgetreten.' });
-                        console.log(err);
-                        hideLoading(); // frontend error
-                    });
+                var files = event.dataTransfer ? event.dataTransfer.files : event.currentTarget.files;
+                uploadMultipleFiles('./api/post/upload-image', files, {
+                    uploaded: (file) => {
+                        this.addImageData(file);
+                        this.imagesAvailable.unshift(file);
+                        this.currPost.imagesAdded.push(file);
+                    },
+                    finished: () => {}
+                });
             },
             addImageData: function(image) {
                 // time
