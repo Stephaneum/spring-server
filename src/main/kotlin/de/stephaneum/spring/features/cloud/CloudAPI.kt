@@ -19,6 +19,9 @@ class CloudAPI {
     private lateinit var fileService: FileService
 
     @Autowired
+    private lateinit var logRepo: LogRepo
+
+    @Autowired
     private lateinit var imageService: ImageService
 
     @Autowired
@@ -147,6 +150,16 @@ class CloudAPI {
             return Response.Feedback(false, message = "no access to this file")
 
         fileRepo.delete(file)
+
+        val mode = when {
+            file.project != null -> FileService.StoreMode.PROJECT
+            file.schoolClass != null -> FileService.StoreMode.SCHOOL_CLASS
+            file.teacherChat -> FileService.StoreMode.TEACHER_CHAT
+            else -> FileService.StoreMode.PRIVATE
+        }
+
+        // log
+        logRepo.save(Log(0, now(), EventType.DELETE_FILE.id, "[${mode.description}] ${user.firstName} ${user.lastName} (${user.code.getRoleString()}), ${file.generateFileName()}"))
 
         return Response.Feedback(true)
     }

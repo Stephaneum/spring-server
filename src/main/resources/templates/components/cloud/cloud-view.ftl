@@ -210,15 +210,10 @@
                         this.openFolder(file);
                     } else {
                         this.file = file;
-                        document.body.style.overflow = "hidden";
-                        this.$nextTick(() => {
-                            initTooltips();
-                        });
                     }
                 },
                 closeFilePopup: function() {
                     this.file = null;
-                    document.body.style.overflow = "visible";
                 },
                 openFolder: function(folder) {
 
