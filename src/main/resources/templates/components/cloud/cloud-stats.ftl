@@ -4,14 +4,13 @@
 <#macro render>
     <template id="cloud-stats">
         <div>
-            <div style="display: flex; justify-content: space-between">
-                <h5 style="margin: 10px 0 0 10px">Speicherverbrauch</h5>
-
-                <a @click="exit" class="waves-effect waves-light green darken-4 btn margin-1" href="#!" style="margin: 10px 10px 0 0">
-                    Schließen
-                    <i class="material-icons right">close</i>
+            <div style="text-align: right">
+                <a @click="exit" class="waves-effect btn-flat" href="#!" style="margin: 10px 10px 0 0">
+                    <i class="material-icons">close</i>
                 </a>
             </div>
+
+            <h5 style="text-align: center">Speicherverbrauch</h5>
 
             <div class="stats-storage-bar" style="margin: 70px 20px 20px 20px; height: 20px">
                 <div style="background-color: #a5d6a7; left: 0" :style="{ width: (info.percentage*100)+'%' }"></div>
