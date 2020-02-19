@@ -1,7 +1,11 @@
+<#import "file-grid.ftl" as fileGrid/>
+<#import "file-list.ftl" as fileList/>
 
 <#-- cloud view -->
 
 <#macro render>
+    <@fileGrid.render/>
+    <@fileList.render/>
     <template id="cloud-view">
         <div class="row">
             <!-- PATH -->
@@ -20,7 +24,8 @@
                 </div>
 
                 <div style="padding-right: 20px">
-                    {{ folderCount }} Ordner / {{ fileCount }} Dateien
+                    <i @click="setGridView(true)" style="font-size: 2em; margin: 0; padding: 5px; border-radius: 5px; user-select: none; cursor: pointer" class="material-icons" :class="gridView ? ['green', 'darken-2', 'white-text'] : []">apps</i>
+                    <i @click="setGridView(false)" style="font-size: 2em; margin: 0; padding: 5px; border-radius: 5px; user-select: none; cursor: pointer" class="material-icons" :class="!gridView ? ['green', 'darken-2', 'white-text'] : []">menu</i>
                 </div>
             </div>
 
@@ -32,8 +37,8 @@
                         <span style="font-size: 1.5em">{{ a.name }}</span>
                     </template>
                     <template v-else>
-                        <div id="storage-bar" class="progress" style="width: 70%; height: 20px">
-                            <div class="determinate white" :style="{ width: (storage.percentage*100)+'%' }"></div>
+                        <div id="storage-bar" style="width: 70%; height: 20px">
+                            <div :style="{ width: (storage.percentage*100)+'%' }"></div>
                         </div>
                         <span style="font-size: 1.5em">{{ storage.used }} / {{ storage.total }}</span>
                     </template>
@@ -43,42 +48,13 @@
             <!-- MAIN CONTENT -->
             <div class="col s10">
                 <div class="tab-panel white z-depth-1" style="margin: 0; min-height: 450px;padding: 10px">
-                    <ul class="collection" style="margin: 0">
-                        <li v-for="f in files" class="collection-item">
-                            <div style="display: flex; align-items: center;">
-
-                                <span style="flex-grow: 1; display: flex; align-items: center; ">
-                                    <i v-if="f.isFolder" style="font-size: 1.5em; margin-right: 10px" class="material-icons">folder</i>
-                                    <span :class="{ 'folder-link': f.isFolder }" @click="openFolder(f)">{{ f.isFolder ? f.name : f.fileName }}</span>
-                                </span>
-
-                                <span style="flex: 0 0 320px; text-align: right;">
-                                    <span v-if="f.public" class="green-badge-light">öffentlich</span>
-                                    <span style="margin-left: 20px" class="green-badge-light">{{ f.sizeReadable }}</span>
-                                    <span v-if="f.time" style="margin-left: 20px" class="green-badge-light">{{ f.time }}</span>
-                                </span>
-
-                                <span style="flex: 0 0 270px; text-align: right">
-                                    <a :href="downloadLink(f)" class="tooltipped waves-effect waves-light green darken-3 btn margin-1" :class="{ disabled: f.isFolder }" data-tooltip="Download" data-position="bottom">
-                                        <i class="material-icons">arrow_downward</i>
-                                    </a>
-
-                                    <a @click="showPublic(f)" class="tooltipped waves-effect waves-light teal btn margin-1" :class="{ disabled: f.isFolder, 'darken-2': !f.public, 'lighten-2': f.public }" href="#!" data-tooltip="Link" data-position="bottom">
-                                        <i class="material-icons">language</i>
-                                    </a>
-
-                                    <a @click="showEdit(f)" class="tooltipped waves-effect waves-light teal darken-2 btn margin-1" href="#!" data-tooltip="Bearbeiten" data-position="bottom">
-                                        <i class="material-icons">edit</i>
-                                    </a>
-
-                                    <a @click="showDelete(f)" class="tooltipped waves-effect waves-light btn red darken-4 margin-1" href="#!" data-tooltip="Löschen" data-position="bottom">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </span>
-                            </div>
-                        </li>
-                    </ul>
+                    <file-grid v-if="gridView" :files="files" @onselect="openFolder"></file-grid>
+                    <file-list v-else :files="files" @onselect="openFolder" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
                 </div>
+            </div>
+
+            <div class="col s12" style="text-align: right; padding: 15px 25px 0 0">
+                {{ folderCount }} Ordner / {{ fileCount }} Dateien
             </div>
 
             <!-- public modal -->
@@ -161,6 +137,7 @@
             props: ['mode', 'id'],
             data: function () {
                 return {
+                    gridView: true,
                     folderID: null,
                     actions: actions,
                     files: [],
@@ -168,8 +145,8 @@
                     fileCount: 0,
                     folderCount: 0,
                     storage: {
-                        used: '',
-                        total: '',
+                        used: '-',
+                        total: '-',
                         percentage: 0
                     },
                     selected: {
@@ -180,6 +157,10 @@
                 }
             },
             methods: {
+                setGridView: function(grid) {
+                    this.gridView = grid;
+                    M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
+                },
                 action: function(action) {
                     console.log(action);
                 },
@@ -209,6 +190,11 @@
                         f.time = moment(f.timestamp).format('DD.MM.YYYY');
 
                       f.sizeReadable = storageReadable(f.size);
+
+                      if(f.isFolder)
+                          f.link = './api/cloud/download/folder/'+f.id;
+                      else
+                          f.link = './api/cloud/download/file/'+f.id;
                   });
                   return files;
                 },
@@ -283,6 +269,7 @@
                     this.count();
                     this.storage = (await axios.get('./api/cloud/info')).data;
                     this.storage.percentage = this.storage.used / (this.storage.total ? this.storage.total : 1);
+                    this.storage.percentage = Math.min(Math.max(this.storage.percentage, 0.05), 0.95);
                     this.storage.used = storageReadable(this.storage.used);
                     this.storage.total = storageReadable(this.storage.total);
                     M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
@@ -290,14 +277,6 @@
                 },
             },
             computed: {
-                downloadLink: function () {
-                    return (file) => {
-                        if(file.isFolder)
-                            return './api/cloud/download/folder/'+file.id;
-                        else
-                            return './api/cloud/download/file/'+file.id;
-                    };
-                },
                 publicLink: function () {
                     return (file) => {
                         return window.location.origin + '/public/?file='+ file.id +'_' + encodeURI(file.fileName)
@@ -350,8 +329,20 @@
         }
 
         #storage-bar {
-            background-color: transparent !important;
+            background-color: rgba(255,255,255,0.2) !important;
             border: 2px solid white;
+            border-radius: 20px;
+            position: relative;
+            margin: 10px 0 10px 0;
+        }
+
+        #storage-bar > div {
+            position: absolute;
+            left: -1px;
+            top: 0;
+            height: 100%;
+            background-color: white;
+            border-radius: 20px 0 0 20px;
         }
     </style>
 </#macro>
