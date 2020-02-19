@@ -10,16 +10,16 @@
                 </a>
             </div>
 
-            <h5 style="text-align: center">Speicherverbrauch</h5>
+            <p style="text-align: center; font-size: 1.8em; font-weight: bold">Speicherverbrauch</p>
 
             <div class="stats-storage-bar" style="margin: 70px 20px 20px 20px; height: 20px">
                 <div style="background-color: #a5d6a7; left: 0" :style="{ width: (info.percentage*100)+'%' }"></div>
             </div>
 
             <div style="display: flex; justify-content: space-evenly">
-                <span><span class="color-block" style="background-color: #a5d6a7"></span>Beansprucht: {{ info.used }}</span>
-                <span>Verfügbar: {{ info.free }}</span>
-                <span>Insgesamt: {{ info.total }}</span>
+                <span><span class="color-block" style="background-color: #a5d6a7"></span>Beansprucht: <b>{{ info.used }}</b></span>
+                <span>Verfügbar: <b>{{ info.free }}</b></span>
+                <span>Insgesamt: <b>{{ info.total }}</b></span>
             </div>
 
             <div class="stats-storage-bar" style="margin: 100px 20px 20px 20px; height: 20px">
@@ -30,14 +30,14 @@
             </div>
 
             <div style="display: flex; justify-content: space-evenly">
-                <span><span class="color-block" style="background-color: #a5d6a7"></span>Nutzerspeicher: {{ info.private }}</span>
-                <span><span class="color-block" style="background-color: #81d4fa"></span>Projektspeicher: {{ info.project }}</span>
-                <span><span class="color-block" style="background-color: #ffcc80"></span>Klassenspeicher: {{ info.schoolClass }}</span>
-                <span v-if="teacherchat"><span class="color-block" style="background-color: #80cbc4"></span>Lehrerchat: {{ info.teacherChat }}</span>
+                <span><span class="color-block" style="background-color: #a5d6a7"></span>Nutzerspeicher: <b>{{ info.private }}</b></span>
+                <span><span class="color-block" style="background-color: #81d4fa"></span>Projektspeicher: <b>{{ info.project }}</b></span>
+                <span><span class="color-block" style="background-color: #ffcc80"></span>Klassenspeicher: <b>{{ info.schoolClass }}</b></span>
+                <span v-if="teacherchat"><span class="color-block" style="background-color: #80cbc4"></span>Lehrerchat: <b>{{ info.teacherChat }}</b></span>
             </div>
 
             <div style="margin: 70px 0 50px 0; text-align: center">
-                Insgesamt {{ info.count }} Dateien wurden hochgeladen.
+                Insgesamt <b>{{ info.count }}</b> Dateien wurden hochgeladen.
             </div>
         </div>
     </template>
