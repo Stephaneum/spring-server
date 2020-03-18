@@ -26,7 +26,7 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                 @JoinColumn(name = "projekt_id")
-                var project: Project? = null,
+                var group: Group? = null,
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                 @JoinColumn(name = "klasse_id")
@@ -84,32 +84,32 @@ interface FileRepo: CrudRepository<File, Int> {
     @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1")
     fun calcStorageUsed(userID: Int): Int
 
-    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
+    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
     fun calcStorageUsedPrivate(userID: Int): Int
 
-    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.project IS NOT NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
+    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.group IS NOT NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
     fun calcStorageUsedProject(userID: Int): Int
 
-    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NOT NULL AND f.teacherChat = FALSE")
+    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.group IS NULL AND f.schoolClass IS NOT NULL AND f.teacherChat = FALSE")
     fun calcStorageUsedClass(userID: Int): Int
 
-    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = TRUE")
+    @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = TRUE")
     fun calcStorageUsedTeacherChat(userID: Int): Int
 
     fun countByUserId(userID: Int): Int
 
-    @Query("SELECT f FROM File f WHERE f.user.id = ?1 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE AND f.mime LIKE CONCAT(?2, '%') ORDER BY f.id DESC")
+    @Query("SELECT f FROM File f WHERE f.user.id = ?1 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE AND f.mime LIKE CONCAT(?2, '%') ORDER BY f.id DESC")
     fun findMyImages(userID: Int, mime: String): List<File>
 
     // map file ids to full file objects
     fun findByIdIn(ids: List<Int>): List<File>
 
     // root directory
-    fun findByUserAndFolderAndProjectAndSchoolClassAndTeacherChatOrderByIdDesc(user: User, folder: Folder?, project: Project?, schoolClass: SchoolClass?, teacherChat: Boolean): List<File>
+    fun findByUserAndFolderAndGroupAndSchoolClassAndTeacherChatOrderByIdDesc(user: User, folder: Folder?, group: Group?, schoolClass: SchoolClass?, teacherChat: Boolean): List<File>
 
     fun findByFolder(folder: Folder): List<File>
     fun findByFolderOrderByIdDesc(folder: Folder): List<File>
 
-    @Query("SELECT f FROM File f WHERE f.user IS NULL AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
+    @Query("SELECT f FROM File f WHERE f.user IS NULL AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
     fun findPotentialUnusedFiles(): List<File>
 }

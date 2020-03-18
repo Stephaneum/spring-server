@@ -42,7 +42,7 @@ class UserCloudController {
         if(key != null) {
             Session.get().user = jwtService.getUser(key)
             if(Session.get().user != null) {
-                return "redirect:cloud"
+                return "redirect:${request.requestURL}"
             }
         }
 

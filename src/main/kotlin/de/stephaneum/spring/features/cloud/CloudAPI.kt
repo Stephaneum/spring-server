@@ -32,7 +32,7 @@ class CloudAPI {
     private lateinit var folderRepo: FolderRepo
 
     @Autowired
-    private lateinit var projectRepo: ProjectRepo
+    private lateinit var groupRepo: GroupRepo
 
     @Autowired
     private lateinit var classRepo: SchoolClassRepo
@@ -61,10 +61,10 @@ class CloudAPI {
         if(folder != null) {
             val folderObj = Folder(folder)
             folders = folderRepo.findByParent(folderObj)
-            files = fileRepo.findByUserAndFolderAndProjectAndSchoolClassAndTeacherChatOrderByIdDesc(user, folderObj, null, null, false)
+            files = fileRepo.findByUserAndFolderAndGroupAndSchoolClassAndTeacherChatOrderByIdDesc(user, folderObj, null, null, false)
         } else {
             folders = folderRepo.findFolderInRoot(user, null, null, false)
-            files = fileRepo.findByUserAndFolderAndProjectAndSchoolClassAndTeacherChatOrderByIdDesc(user, null, null, null, false)
+            files = fileRepo.findByUserAndFolderAndGroupAndSchoolClassAndTeacherChatOrderByIdDesc(user, null, null, null, false)
         }
 
         return digestResults(folders, files)
@@ -103,7 +103,7 @@ class CloudAPI {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         var folder: Folder? = null
-        var project: Project? = null
+        var group: Group? = null
         var schoolClass: SchoolClass? = null
 
         if(request.parentID != null) {
@@ -111,14 +111,14 @@ class CloudAPI {
         }
 
         if(request.projectID != null) {
-            project = projectRepo.findByIdOrNull(request.projectID) ?: return Response.Feedback(false, message = "project not found")
+            group = groupRepo.findByIdOrNull(request.projectID) ?: return Response.Feedback(false, message = "project not found")
         }
 
         if(request.classID != null) {
             schoolClass = classRepo.findByIdOrNull(request.classID) ?: return Response.Feedback(false, message = "class not found")
         }
 
-        folderRepo.save(Folder(0, request.name.trim(), user, project, schoolClass, request.teacherChat ?: false, folder))
+        folderRepo.save(Folder(0, request.name.trim(), user, group, schoolClass, request.teacherChat ?: false, folder))
 
         return Response.Feedback(true)
     }

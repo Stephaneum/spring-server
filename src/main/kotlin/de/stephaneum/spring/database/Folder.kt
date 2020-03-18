@@ -23,7 +23,7 @@ data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                   @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                   @JoinColumn(name = "projekt_id")
-                  var project: Project? = null,
+                  var group: Group? = null,
 
                   @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                   @JoinColumn(name = "klasse_id")
@@ -52,11 +52,11 @@ data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Repository
 interface FolderRepo: CrudRepository<Folder, Int> {
 
-    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND f.name = ?2 AND f.project IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND f.name = ?2 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
     fun findPrivateFolderInRoot(user: User, folderName: String): List<Folder>
 
-    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND (f.project = ?2 OR ?2 IS NULL) AND (f.schoolClass = ?3 OR ?3 IS NULL) AND f.teacherChat = ?4 ORDER BY f.name")
-    fun findFolderInRoot(user: User, project: Project?, schoolClass: SchoolClass?, teacherChat: Boolean): List<Folder>
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND (f.group = ?2 OR ?2 IS NULL) AND (f.schoolClass = ?3 OR ?3 IS NULL) AND f.teacherChat = ?4 ORDER BY f.name")
+    fun findFolderInRoot(user: User, group: Group?, schoolClass: SchoolClass?, teacherChat: Boolean): List<Folder>
 
     fun findByParent(parent: Folder): List<Folder>
 }

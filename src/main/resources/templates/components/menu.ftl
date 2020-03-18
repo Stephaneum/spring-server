@@ -61,11 +61,11 @@
                                 <li v-if="admin"><a href="/admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
                                 <li v-if="admin"><a href="/admin-logs"><span><i class="material-icons">history</i>Logdaten</span></a></li>
                                 <li class="internal-divider"></li>
-                                <li v-if="admin || managePlans"><a href="/vertretungsplan-manager"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
+                                <li v-if="admin || managePlans"><a href="/plan-manager"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
                                 <li v-if="createCategories"><a href="/nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
-                                <li><a href="/beitrag-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
+                                <li><a href="/post-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
                                 <li><a href="/klasse.xhtml"><span><i class="material-icons">school</i>Schulklasse</span></a></li>
-                                <li><a href="/projekt_all.xhtml"><span><i class="material-icons">flag</i>Projekte</span></a></li>
+                                <li><a href="/groups"><span><i class="material-icons">people</i>Gruppen</span></a></li>
                                 <li class="internal-divider"></li>
                                 <li><a href="/cloud"><span><i class="material-icons">folder</i>Dateien</span></a></li>
                                 <li><a href="/nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>

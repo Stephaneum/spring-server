@@ -30,7 +30,7 @@ class FileService {
     enum class StoreMode(val description: String) {
         PRIVATE("Privatspeicher"),
         SCHOOL_CLASS("Klassenspeicher"),
-        PROJECT("Projektspeicher"),
+        GROUP("Projektspeicher"),
         CATEGORY("Rubrik"),
         TEACHER_CHAT("Lehrerchat")
     }
@@ -110,23 +110,23 @@ class FileService {
         }
 
         // resolve the additional id
-        var project: Project? = null
+        var group: Group? = null
         var schoolClass: SchoolClass? = null
-        if(mode == StoreMode.SCHOOL_CLASS || mode == StoreMode.PROJECT || mode == StoreMode.CATEGORY) {
+        if(mode == StoreMode.SCHOOL_CLASS || mode == StoreMode.GROUP || mode == StoreMode.CATEGORY) {
             if(classProjectCategoryID == null)
                 return "unknown class/project/category ID"
 
             if(mode == StoreMode.SCHOOL_CLASS)
                 schoolClass = SchoolClass(classProjectCategoryID)
-            else if(mode == StoreMode.PROJECT)
-                project = Project(classProjectCategoryID)
+            else if(mode == StoreMode.GROUP)
+                group = Group(classProjectCategoryID)
         }
 
         val file = fileRepo.save(de.stephaneum.spring.database.File(
                 id = 0,
                 user = if(mode != StoreMode.CATEGORY) user else null,
                 path = "", // will be set in the next step
-                project = project,
+                group = group,
                 schoolClass = schoolClass,
                 timestamp = now(),
                 size = content.size,
@@ -191,7 +191,7 @@ class FileService {
     fun deleteFileStephaneum(user: User, file: de.stephaneum.spring.database.File) {
 
         val mode = when {
-            file.project != null -> StoreMode.PROJECT
+            file.group != null -> StoreMode.GROUP
             file.schoolClass != null -> StoreMode.SCHOOL_CLASS
             file.teacherChat -> StoreMode.TEACHER_CHAT
             else -> StoreMode.PRIVATE
@@ -201,7 +201,7 @@ class FileService {
             // has connections just remove the other connections
             file.user = null
             file.schoolClass = null
-            file.project = null
+            file.group = null
             file.teacherChat = false
             fileRepo.save(file)
             logger.info("Connections to the file '${file.generateFileName()}' has been deleted but still exists due to connections to posts / menus")

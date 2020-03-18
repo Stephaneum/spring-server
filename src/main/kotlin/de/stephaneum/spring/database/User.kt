@@ -59,6 +59,7 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @Column(nullable = true, name = "vertretungsplan")
                 var managePlans: Boolean? = false,
 
+                // used for teacher chat in the past, now it is a generic "last online" stamp
                 @Column(nullable = true, name = "lehrerchat_datum")
                 var teacherChatLastOnline: Timestamp = Timestamp(0))
 

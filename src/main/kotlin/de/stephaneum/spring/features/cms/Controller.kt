@@ -15,7 +15,7 @@ class CMSController {
     @Autowired
     private lateinit var jwtService: JwtService
 
-    @GetMapping("/beitrag-manager")
+    @GetMapping("/post-manager")
     fun get(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
 
         if(checkIE(request))
@@ -25,7 +25,7 @@ class CMSController {
         if(key != null) {
             Session.get().user = jwtService.getUser(key)
             if(Session.get().user != null) {
-                return "redirect:beitrag-manager"
+                return "redirect:${request.requestURL}"
             }
         }
 

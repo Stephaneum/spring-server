@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.plan
+package de.stephaneum.spring.features.groups
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.helper.checkIE
@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RequestParam
 import javax.servlet.http.HttpServletRequest
 
 @Controller
-class PlanController {
+class GroupController {
 
     @Autowired
     private lateinit var jwtService: JwtService
 
-    @GetMapping("/plan-manager")
+    @GetMapping("/groups")
     fun get(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
 
         if(checkIE(request))
@@ -29,7 +29,7 @@ class PlanController {
             }
         }
 
-        return "plan-manager"
+        return "groups"
     }
 
 }

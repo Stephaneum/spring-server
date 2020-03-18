@@ -25,7 +25,7 @@ class AdminController {
         if(key != null) {
             Session.get().user = jwtService.getUser(key)
             if(Session.get().user != null) {
-                return "redirect:admin-logs"
+                return "redirect:${request.requestURL}"
             }
         }
 
@@ -42,7 +42,7 @@ class AdminController {
         if(key != null) {
             Session.get().user = jwtService.getUser(key)
             if(Session.get().user != null) {
-                return "redirect:admin-codes"
+                return "redirect:${request.requestURL}"
             }
         }
 
