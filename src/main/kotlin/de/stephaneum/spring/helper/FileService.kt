@@ -20,7 +20,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
-
 @Service
 class FileService {
 
@@ -54,7 +53,7 @@ class FileService {
     private lateinit var statsCloudRepo: StatsCloudRepo
 
     @Autowired
-    private lateinit var logRepo: LogRepo
+    private lateinit var logService: LogService
 
     /**
      * @param content byte array which should be saved
@@ -154,7 +153,7 @@ class FileService {
         statsCloudRepo.save(StatsCloud(0, now(), file.size))
 
         // log
-        logRepo.save(Log(0, now(), EventType.UPLOAD.id, "[${mode.description}] ${user.firstName} ${user.lastName} (${user.code.getRoleString()}), $filename"))
+        logService.log(EventType.UPLOAD, mode.description, user, filename)
 
         return file
     }
@@ -210,7 +209,7 @@ class FileService {
         }
 
         // log
-        logRepo.save(Log(0, now(), EventType.DELETE_FILE.id, "[${mode.description}] ${user.firstName} ${user.lastName} (${user.code.getRoleString()}), ${file.generateFileName()}"))
+        logService.log(EventType.DELETE_FILE, mode.description, user, file.generateFileName())
     }
 
     fun deleteFileStephaneumFinal(file: de.stephaneum.spring.database.File) {
@@ -301,7 +300,7 @@ class FileService {
     fun listFilesRecursive(path: String): List<File> {
         val folder = File(path)
         val files: MutableList<File> = mutableListOf()
-        val entities = folder.listFiles()?.toList() ?: emptyList();
+        val entities = folder.listFiles()?.toList() ?: emptyList()
         for(entity in entities) {
             if(entity.isFile)
                 files.add(entity)

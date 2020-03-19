@@ -6,6 +6,7 @@ import de.stephaneum.spring.features.jsf.JsfCommunication
 import de.stephaneum.spring.features.jsf.JsfEvent
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.ImageService
+import de.stephaneum.spring.helper.LogService
 import de.stephaneum.spring.helper.MenuService
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
@@ -51,7 +52,7 @@ class PostAPI {
     private lateinit var filePostRepo: FilePostRepo
 
     @Autowired
-    private lateinit var logRepo: LogRepo
+    private lateinit var logService: LogService
 
     @GetMapping
     fun get(@RequestParam(required = false) unapproved: Boolean?,
@@ -146,11 +147,11 @@ class PostAPI {
 
         // log
         val eventType = when {
-            oldPost == null -> EventType.CREATE_POST.id
-            oldPost.menu == null && menu != null -> EventType.APPROVE_POST.id
-            else -> EventType.EDIT_POST.id
+            oldPost == null -> EventType.CREATE_POST
+            oldPost.menu == null && menu != null -> EventType.APPROVE_POST
+            else -> EventType.EDIT_POST
         }
-        logRepo.save(Log(0, now(), eventType, "${user.firstName} ${user.lastName} (${user.code.getRoleString()}), ${request.title}"))
+        logService.log(eventType, user, request.title)
         return savedPost
     }
 
@@ -177,7 +178,7 @@ class PostAPI {
 
         if(hasAccessToPost(user, post)) {
             postRepo.deleteById(postID)
-            logRepo.save(Log(0, now(), EventType.DELETE_POST.id, "${user.firstName} ${user.lastName} (${user.code.getRoleString()}), ${post.title}"))
+            logService.log(EventType.DELETE_POST, user, post.title)
             return Response.Feedback(true)
         } else {
             return Response.Feedback(false, message = "not allowed")
@@ -268,7 +269,7 @@ class PostAPI {
                 else -> return Response.Feedback(false, message = "invalid type")
             }
             configScheduler.save(type, finalText)
-            logRepo.save(Log(0, now(), EventType.EDIT_POST.id, "${user.firstName} ${user.lastName} (${user.code.getRoleString()}), ${type.info} (spezieller Text)"))
+            logService.log(EventType.EDIT_POST, user, "${type.info} (spezieller Text)")
             jsfCommunication.send(JsfEvent.SYNC_SPECIAL_TEXT)
             return Response.Feedback(true)
         } else {

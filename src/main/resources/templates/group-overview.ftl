@@ -118,14 +118,15 @@
                 <ul class="collection" style="margin: 20px 0 0 0">
                     <li v-for="g in allGroups" class="collection-item">
                         <div style="display: flex; align-items: center;">
-                        <span style="flex-grow: 1; display: flex; align-items: center; ">
-                            <a :href="'/groups/' + g.id" class="group-link">{{ g.name }}</a>
-                        </span>
-
+                            <span style="flex-grow: 1; display: flex; align-items: center; ">
+                                <a :href="'/groups/' + g.id" class="group-link">{{ g.name }}</a>
+                                <i v-if="!g.accepted" class="material-icons grey-text text-darken-2" style="margin-left: 15px">report_problem</i>
+                                <span v-if="!g.accepted" class="grey-text text-darken-2" style="margin-left: 5px">Warten auf Genehmigung des Betreuers</span>
+                            </span>
                             <span style="flex: 0 0 320px; text-align: right;">
-                            <span class="green-badge-light">{{ g.members }} Mitglieder</span>
-                            <span style="margin-left: 20px" class="green-badge-light">{{ g.leader.firstName }} {{ g.leader.lastName }}</span>
-                        </span>
+                                <span class="green-badge-light">{{ g.members }} Mitglieder</span>
+                                <span style="margin-left: 20px" class="green-badge-light">{{ g.leader.firstName }} {{ g.leader.lastName }}</span>
+                            </span>
 
                             <span style="flex: 0 0 150px; text-align: right">
                             <a @click="toggleChat(g)" class="tooltipped waves-effect waves-light darken-2 btn margin-1" :class="g.chat ? ['teal'] : ['grey']" href="#!" data-tooltip="Chat" data-position="bottom">
@@ -251,10 +252,10 @@
             toggleChat: async function(group) {
                 showLoadingInvisible();
                 const nextState = group.chat ? 0 : 1;
-                const response = await axios.post('/api/groups/' + group.id + '/chat/' + nextState);
-                if(response.status === 200) {
+                try {
+                    await axios.post('/api/groups/' + group.id + '/chat/' + nextState);
                     await this.fetchData();
-                } else {
+                } catch (e) {
                     M.toast({html: 'Interner Fehler.'});
                     hideLoading();
                 }
@@ -268,11 +269,10 @@
 
                 M.Modal.getInstance(document.getElementById('modal-create-group')).open();
                 if(this.student) {
-                    const teachers = await axios.post('/api/search/user', { role: 1 });
-
-                    if(teachers.status === 200) {
+                    try {
+                        const teachers = await axios.post('/api/search/user', { role: 1 });
                         teachers.data.forEach((t) => {
-                           t.teacherName = t.gender !== null ? (t.gender === 1 ? 'Frau ' + t.lastName : 'Herr ' + t.lastName) : t.firstName + ' ' + t.lastName;
+                            t.teacherName = t.gender !== null ? (t.gender === 1 ? 'Frau ' + t.lastName : 'Herr ' + t.lastName) : t.firstName + ' ' + t.lastName;
                         });
                         this.createGroupData.teachersAvailable = teachers.data;
                         const data = teachers.data.reduce((map, obj) => {
@@ -294,6 +294,8 @@
                         };
 
                         M.Autocomplete.init(document.querySelectorAll('.autocomplete'), options);
+                    } catch (e) {
+                        M.toast({html: 'Ein Fehler ist aufgetreten.'});
                     }
                 }
             },

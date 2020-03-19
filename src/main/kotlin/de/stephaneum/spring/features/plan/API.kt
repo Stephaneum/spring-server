@@ -5,6 +5,7 @@ import de.stephaneum.spring.database.*
 import de.stephaneum.spring.features.jsf.JsfCommunication
 import de.stephaneum.spring.features.jsf.JsfEvent
 import de.stephaneum.spring.helper.FileService
+import de.stephaneum.spring.helper.LogService
 import de.stephaneum.spring.helper.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
@@ -37,7 +38,7 @@ class PlanAPI {
     private lateinit var fileService: FileService
 
     @Autowired
-    private lateinit var logRepo: LogRepo
+    private lateinit var logService: LogService
 
     @GetMapping("/last-modified")
     fun lastModified(): Response.Feedback {
@@ -83,7 +84,7 @@ class PlanAPI {
                 configScheduler.save(Element.planInfo, info)
             configScheduler.save(Element.planLocation, path)
             jsfCommunication.send(JsfEvent.SYNC_PLAN)
-            logRepo.save(Log(0, now(), EventType.UPLOAD.id, "[Vertretungsplan] ${user.firstName} ${user.lastName} (${user.code.getRoleString()})"))
+            logService.log(EventType.UPLOAD, "Vertretungsplan", user)
             return Response.Feedback(true, message = if(info != null) "Änderungen gespeichert.<br>Datum wurde erkannt und aktualisiert." else "Änderungen gespeichert.")
         } else {
             return Response.Feedback(false, message = "Ein Fehler ist aufgetreten")

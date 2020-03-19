@@ -53,7 +53,7 @@
             background-color: #ffe0b2;
         }
 
-        .project-badge {
+        .group-badge {
             background-color: #e1bee7;
         }
 

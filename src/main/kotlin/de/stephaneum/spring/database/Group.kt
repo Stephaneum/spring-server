@@ -32,5 +32,5 @@ data class Group(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Repository
 interface GroupRepo: CrudRepository<Group, Int> {
 
-    fun findByAcceptedOrderByName(accepted: Boolean): List<Group>
+    fun findByOrderByName(): List<Group>
 }

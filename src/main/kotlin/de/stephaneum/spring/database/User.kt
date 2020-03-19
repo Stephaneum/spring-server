@@ -68,6 +68,7 @@ data class SimpleUser(val id: Int, val firstName: String, val lastName: String, 
 @Repository
 interface UserRepo: CrudRepository<User, Int> {
 
+    fun findByIdIn(id: List<Int>): List<User>
     fun findByEmail(email: String): User?
 
     // search

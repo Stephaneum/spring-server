@@ -13,19 +13,21 @@ enum class EventType(val id: Int, val description: String, val className: String
     UPLOAD(2, "Datei hochgeladen", "file-badge"),
     CREATE_POST(3, "Beitrag erstellt", "post-badge"),
     EDIT_POST(4, "Beitrag bearbeitet", "post-badge"),
-    CREATE_PROJECT(5, "Projekt erstellt", "project-badge"),
-    JOIN_PROJECT(6, "Projekt beigetreten", "project-badge"),
-    QUIT_PROJECT(7, "Projekt verlassen", "project-badge"),
-    DELETE_PROJECT(8, "Projekt gelöscht", "project-badge"),
+    CREATE_GROUP(5, "Gruppe erstellt", "group-badge"),
+    JOIN_GROUP(6, "Gruppe beigetreten", "group-badge"),
+    QUIT_GROUP(7, "Gruppe verlassen", "group-badge"),
+    DELETE_GROUP(8, "Gruppe gelöscht", "group-badge"),
     JOIN_CLASS(9, "Klasse festgelegt", "other-badge"),
     QUIT_CLASS(10, "Klasse verlassen", "other-badge"),
     DELETE_FILE(11, "Datei gelöscht", "file-badge"),
     APPROVE_POST(12, "Beitrag genehmigt", "post-badge"),
     CREATE_CHAT_ROOM(13, "Chatraum erstellt", "other-badge"),
     DELETE_POST(14,"Beitrag gelöscht", "post-badge"),
-    CREATE_MENU(15, "Gruppe erstellt", "menu-badge"),
-    EDIT_MENU(16, "Gruppe bearbeitet", "menu-badge"),
-    DELETE_MENU(17, "Gruppe gelöscht", "menu-badge");
+    CREATE_MENU(15, "Menü erstellt", "menu-badge"),
+    EDIT_MENU(16, "Menü bearbeitet", "menu-badge"),
+    DELETE_MENU(17, "Menü gelöscht", "menu-badge"),
+    APPROVE_GROUP(18, "Gruppe genehmigt", "group-badge"),
+    REJECT_GROUP(19, "Gruppe abgelehnt", "group-badge");
 
     companion object {
         fun valueOf(id: Int): EventType {
