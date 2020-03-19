@@ -63,6 +63,8 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @Column(nullable = true, name = "lehrerchat_datum")
                 var teacherChatLastOnline: Timestamp = Timestamp(0))
 
+data class SimpleUser(val id: Int, val firstName: String, val lastName: String, val role: Int)
+
 @Repository
 interface UserRepo: CrudRepository<User, Int> {
 

@@ -156,10 +156,10 @@
                 this.fetchData();
             },
             fetchData: function() {
-                axios.get('./api/admin/log/info')
+                axios.get('/api/admin/log/info')
                     .then((res) => {
                         this.logInfo = res.data;
-                        axios.get('./api/admin/log/'+this.currAmount)
+                        axios.get('/api/admin/log/'+this.currAmount)
                             .then((res) => {
                                 if(Array.isArray(res.data)) {
                                     this.logsRaw = res.data;
@@ -205,7 +205,7 @@
         },
         mounted: function() {
             M.AutoInit();
-            axios.get('./api/info')
+            axios.get('/api/info')
                 .then((res) => {
                     if(res.data) {
                         this.info = res.data;

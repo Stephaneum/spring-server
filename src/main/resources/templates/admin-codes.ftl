@@ -115,7 +115,7 @@
         methods: {
             create: function(role) {
                 showLoadingInvisible();
-                axios.post('./api/admin/codes/add/'+role)
+                axios.post('/api/admin/codes/add/'+role)
                     .then((res) => {
                         if(res.data.success) {
                             M.toast({ html: 'Code generiert.' });
@@ -143,7 +143,7 @@
             },
             doDelete: function(id) {
                 showLoadingInvisible();
-                axios.post('./api/admin/codes/delete/'+id)
+                axios.post('/api/admin/codes/delete/'+id)
                     .then((res) => {
                         if(res.data.success) {
                             M.toast({ html: 'Gelöscht.' });
@@ -158,7 +158,7 @@
                     });
             },
             fetchData: function() {
-                axios.get('./api/admin/codes')
+                axios.get('/api/admin/codes')
                     .then((res) => {
                         if(Array.isArray(res.data)) {
                             this.codes = res.data;
@@ -180,7 +180,7 @@
         },
         mounted: function() {
             M.AutoInit();
-            axios.get('./api/info')
+            axios.get('/api/info')
                 .then((res) => {
                     if(res.data) {
                         this.info = res.data;

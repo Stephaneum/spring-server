@@ -93,7 +93,7 @@
                 }
 
                 this.loggingIn = true;
-                axios.post('./api/login', { email: this.email, password: this.password })
+                axios.post('/api/login', { email: this.email, password: this.password })
                     .then((response) => {
                     if(response.data.success) {
                         this.loginFailed = false;
@@ -107,7 +107,7 @@
             }
         },
         mounted: function() {
-            axios.get('./api/info')
+            axios.get('/api/info')
                 .then((res) => {
                     if(res.data) {
                         this.info = res.data;

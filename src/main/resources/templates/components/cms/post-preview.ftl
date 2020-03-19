@@ -61,7 +61,7 @@
                     return this.images.length !== 0;
                 },
                 imageURL: function () {
-                    return (image) => './api/images/'+image.id+'_'+image.fileName;
+                    return (image) => '/api/images/'+image.id+'_'+image.fileName;
                 },
                 postURL: function () {
                     if(this.post_id > 1)

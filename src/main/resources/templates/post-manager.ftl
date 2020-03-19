@@ -671,7 +671,7 @@
             fetchPosts: function (menu) {
                 // if menu is null, then fetch unapproved posts
                 showLoading('Lade Beiträge...');
-                axios.get(menu ? './api/post?noContent=true&menuID='+menu.id : './api/post?unapproved=true')
+                axios.get(menu ? '/api/post?noContent=true&menuID='+menu.id : '/api/post?unapproved=true')
                     .then((res) => {
                         if(Array.isArray(res.data)) {
                             this.resetData();
@@ -711,7 +711,7 @@
             },
             selectPost: function(post) {
                 showLoading('Lade Beitrag...');
-                axios.get('./api/post?postID='+post.id)
+                axios.get('/api/post?postID='+post.id)
                     .then((res) => {
                         if(res.data.id) {
                             this.currPost.id = res.data.id;
@@ -748,7 +748,7 @@
             },
             selectSpecial: function(type) {
                 showLoadingInvisible();
-                axios.get('./api/post/special?type='+this.specialCode(type.id))
+                axios.get('/api/post/special?type='+this.specialCode(type.id))
                     .then((res) => {
                         if(res.data) {
                             this.currPost.id = type.id; // just for front end calculations
@@ -802,7 +802,7 @@
                 event.preventDefault();
                 this.imageDragging = false;
                 var files = event.dataTransfer ? event.dataTransfer.files : event.currentTarget.files;
-                uploadMultipleFiles('./api/post/upload-image', files, {
+                uploadMultipleFiles('/api/post/upload-image', files, {
                     uploaded: (file) => {
                         this.addImageData(file);
                         this.imagesAvailable.unshift(file);
@@ -828,7 +828,7 @@
                 console.log("increased limit to " + this.imagesAvailableLimit);
             },
             fetchImages: function() {
-                axios.get('./api/post/images-available')
+                axios.get('/api/post/images-available')
                     .then((res) => {
                         if(Array.isArray(res.data)) {
                             this.imagesAvailable = res.data;
@@ -855,7 +855,7 @@
             },
             sendPost: function () {
                 showLoading("Verarbeitung...");
-                axios.post('./api/post', {
+                axios.post('/api/post', {
                     id: this.currPost.id,
                     title: this.currPost.title,
                     text: this.currPost.text,
@@ -868,7 +868,7 @@
                     .then((res) => {
                         if(res.data.id) {
                             if(res.data.menu)
-                                window.location = './beitrag.xhtml?id='+res.data.id;
+                                window.location = '/beitrag.xhtml?id='+res.data.id;
                             else {
                                 // this post is unapproved
                                 if(this.currMode.id === this.modes.create.id) {
@@ -889,7 +889,7 @@
             sendSpecial: function () {
                 showLoading("Verarbeitung...");
                 var text = this.specialObj.plain ? this.currPost.text : $('#post-text-editor-special').trumbowyg('html');
-                axios.post('./api/post/special', {
+                axios.post('/api/post/special', {
                     type: this.specialCode(this.currPost.id),
                     text: text
                 })
@@ -953,7 +953,7 @@
                 return this.info.user && this.info.user.code.role === 100;
             },
             imageURL: function() {
-                return (image) => './api/images/'+image.id+'_'+image.fileName;
+                return (image) => '/api/images/'+image.id+'_'+image.fileName;
             },
             editModeText: function() {
                 return (unapproved) => unapproved ? 'Bearbeiten (' + unapproved + ')' : 'Bearbeiten';
@@ -1043,7 +1043,7 @@
         },
         mounted: function () {
             this.$nextTick(() => {
-                axios.get('./api/info')
+                axios.get('/api/info')
                     .then((res) => {
                         if(res.data) {
                             this.info = res.data;
@@ -1054,7 +1054,7 @@
                             else
                                 modes.edit.name = this.editModeText(this.info.unapproved);
 
-                            axios.get('./api/post/info-post-manager')
+                            axios.get('/api/post/info-post-manager')
                                 .then((res) => {
                                     if(res.data) {
                                         this.maxPictureSize = res.data.maxPictureSize;

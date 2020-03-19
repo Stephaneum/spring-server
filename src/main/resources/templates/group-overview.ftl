@@ -84,11 +84,11 @@
             </div>
 
             <div style="display: flex; flex-wrap: wrap; justify-content: space-evenly; margin-bottom: 30px">
-                <div v-for="g in groups" class="group-rect card white-text">
+                <a v-for="g in groups" :href="'/groups/' + g.id" class="group-rect card white-text">
                     <i class="material-icons" style="font-size: 50px">people</i>
                     <span style="font-weight: bold; font-size: 20px; text-align: center; line-height: 20px; margin-bottom: 5px">{{ g.name }}</span>
                     <span>{{ g.leader.firstName }} {{ g.leader.lastName }}</span>
-                </div>
+                </a>
             </div>
 
             <div v-if="admin">
@@ -101,7 +101,7 @@
                         </span>
 
                             <span style="flex: 0 0 320px; text-align: right;">
-                            <span class="green-badge-light">4 Mitglieder</span>
+                            <span class="green-badge-light">{{ g.members }} Mitglieder</span>
                             <span style="margin-left: 20px" class="green-badge-light">{{ g.leader.firstName }} {{ g.leader.lastName }}</span>
                         </span>
 
@@ -174,9 +174,6 @@
             admin: function() {
                 return this.info.user && this.info.user.code.role == 100;
             },
-            hasTeacherChat: function() {
-                return this.allowed && (this.info.user.code.role === 1 || this.info.user.code.role === 100);
-            }
         },
         mounted: function() {
             M.AutoInit();

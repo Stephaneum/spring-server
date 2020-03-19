@@ -180,7 +180,7 @@
                     }
                 };
                 var instance = this;
-                axios.post('./api/plan/upload', data, config)
+                axios.post('/api/plan/upload', data, config)
                     .then(function (res) {
                         if(res.data.success) {
                             M.toast({ html: res.data.message });
@@ -208,7 +208,7 @@
             },
             doDelete: function() {
                 showLoadingInvisible();
-                axios.post('./api/plan/delete')
+                axios.post('/api/plan/delete')
                     .then((res) => {
                         if(res.data.success) {
                             M.toast({ html: 'Gelöscht.' });
@@ -224,7 +224,7 @@
             },
             updateText: function() {
                 showLoadingInvisible();
-                axios.post('./api/plan/text?text='+this.planInfo)
+                axios.post('/api/plan/text?text='+this.planInfo)
                     .then((res) => {
                         if(res.data.success) {
                             M.toast({ html: 'Änderungen gespeichert.' });
@@ -239,12 +239,12 @@
                     });
             },
             fetchData: function() {
-                axios.get('./api/info')
+                axios.get('/api/info')
                     .then((res) => {
                         if(res.data) {
                             this.info = res.data;
                             this.planInfo = res.data.plan.info; // update text field
-                            axios.get('./api/plan/last-modified')
+                            axios.get('/api/plan/last-modified')
                                 .then((res) => {
                                     this.lastModified = res.data.message;
                                     hideLoading();

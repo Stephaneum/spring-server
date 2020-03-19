@@ -66,7 +66,7 @@
         },
         methods: {
             fetchData: function() {
-                axios.get('./api/info')
+                axios.get('/api/info')
                     .then((res) => {
                         if(res.data) {
                             this.info = res.data;

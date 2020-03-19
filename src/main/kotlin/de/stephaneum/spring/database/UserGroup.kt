@@ -31,4 +31,7 @@ data class UserGroup(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 interface UserGroupRepo: CrudRepository<UserGroup, Int> {
 
     fun findByUserOrderByGroupName(user: User): List<UserGroup>
+    fun findByUserAndGroup(user: User, group: Group): UserGroup?
+    fun findByGroupOrderByUserFirstNameAscUserLastNameAsc(group: Group): List<UserGroup>
+    fun countByGroup(group: Group): Int
 }

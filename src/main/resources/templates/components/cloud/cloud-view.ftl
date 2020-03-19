@@ -247,9 +247,9 @@
                       f.sizeReadable = storageReadable(f.size);
 
                       if(f.isFolder)
-                          f.link = './api/cloud/download/folder/'+f.id;
+                          f.link = '/api/cloud/download/folder/'+f.id;
                       else
-                          f.link = './api/cloud/download/file/'+f.id;
+                          f.link = '/api/cloud/download/file/'+f.id;
                   });
                   return files;
                 },
@@ -270,7 +270,7 @@
                     event.preventDefault();
                     this.filesDragging = false; // TODO: drag and drop
                     var files = event.dataTransfer ? event.dataTransfer.files : event.currentTarget.files;
-                    uploadMultipleFiles('./api/cloud/upload/user/' + (this.folderID ? this.folderID : ''), files, {
+                    uploadMultipleFiles('/api/cloud/upload/user/' + (this.folderID ? this.folderID : ''), files, {
                         uploaded: (file) => {},
                         finished: () => {
                             this.fetchData();
@@ -292,7 +292,7 @@
 
                     showLoadingInvisible();
                     M.Modal.getInstance(document.getElementById('modal-folder')).close();
-                    axios.post( './api/cloud/create-folder', { name: this.createFolderName, parentID: this.folderID })
+                    axios.post( '/api/cloud/create-folder', { name: this.createFolderName, parentID: this.folderID })
                         .then((response) => {
                             if(response.data.success) {
                                 M.toast({html: 'Ordner erstellt<br>'+this.createFolderName});
@@ -315,7 +315,7 @@
                 },
                 updatePublic: function(isPublic) {
                     showLoadingInvisible();
-                    axios.post( './api/cloud/update-public-file', { fileID: this.selected.id, isPublic })
+                    axios.post( '/api/cloud/update-public-file', { fileID: this.selected.id, isPublic })
                         .then((response) => {
                             if(response.data.success) {
                                 this.selected.public = isPublic;
@@ -348,7 +348,7 @@
                     var isFolder = this.selected.isFolder;
                     var typeString = isFolder ? 'Ordner' : 'Datei';
                     var name = this.selected.fileName || this.selected.name;
-                    var route = isFolder ? './api/cloud/delete-folder/' : './api/cloud/delete-file/';
+                    var route = isFolder ? '/api/cloud/delete-folder/' : '/api/cloud/delete-file/';
                     showLoading(typeString + ' löschen...');
                     axios.post( route + this.selected.id)
                         .then((response) => {
@@ -364,11 +364,11 @@
                         });
                 },
                 fetchData: async function () {
-                    var url = './api/cloud/view/user/' + (this.folderID ? this.folderID : '');
+                    var url = '/api/cloud/view/user/' + (this.folderID ? this.folderID : '');
                     var res = await axios.get(url);
                     this.files = this.digestFiles(res.data);
                     this.count();
-                    this.storage = (await axios.get('./api/cloud/info')).data;
+                    this.storage = (await axios.get('/api/cloud/info')).data;
                     this.storage.percentage = this.storage.used / (this.storage.total ? this.storage.total : 1);
                     this.storage.percentage = Math.min(Math.max(this.storage.percentage, 0.05), 0.95);
                     this.storage.privatePercentage = this.storage.private / this.storage.used;

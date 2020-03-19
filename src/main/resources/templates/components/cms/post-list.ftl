@@ -126,7 +126,7 @@
                 updatePassword: function() {
                     M.Modal.getInstance(document.getElementById('modal-password')).close();
                     showLoading('Passwort setzen...');
-                    axios.post( './api/post/update-password/', { postID: this.selectedPost.id, password: this.password })
+                    axios.post( '/api/post/update-password/', { postID: this.selectedPost.id, password: this.password })
                         .then((response) => {
                             if(response.data.success) {
                                 M.toast({html: 'Passwort geändert.<br>'+this.selectedPost.title});
@@ -144,7 +144,7 @@
                 deletePost: function() {
                     M.Modal.getInstance(document.getElementById('modal-delete')).close();
                     showLoading('Beitrag löschen...');
-                    axios.post( './api/post/delete/'+this.selectedPost.id)
+                    axios.post( '/api/post/delete/'+this.selectedPost.id)
                         .then((response) => {
                             if(response.data.success) {
                                 M.toast({html: 'Beitrag gelöscht.<br>'+this.selectedPost.title});

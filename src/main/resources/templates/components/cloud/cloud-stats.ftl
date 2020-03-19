@@ -10,7 +10,7 @@
                 </a>
             </div>
 
-            <p style="text-align: center; font-size: 1.8em; font-weight: bold">Speicherverbrauch</p>
+            <p style="text-align: center; font-size: 1.8em; font-weight: bold">Dein Speicherverbrauch</p>
 
             <div class="stats-storage-bar" style="margin: 70px 20px 20px 20px; height: 20px">
                 <div style="background-color: #a5d6a7; left: 0" :style="{ width: (info.percentage*100)+'%' }"></div>

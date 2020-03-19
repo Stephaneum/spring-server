@@ -179,7 +179,7 @@
                     }
                 };
 
-                axios.get('./api/cloud/key/' + this.file.id)
+                axios.get('/api/cloud/key/' + this.file.id)
                     .then((res) => {
                         if(res.data) {
                             this.key = res.data.key;
