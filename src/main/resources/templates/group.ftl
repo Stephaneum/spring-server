@@ -57,7 +57,7 @@
                 </div>
             </div>
 
-            <div class="col s10" style="display: flex;">
+            <div class="col s10" style="display: flex; min-height: 500px">
                 <div style="flex: 1; padding-right: 10px">
                     <chat-view></chat-view>
                 </div>
@@ -126,7 +126,7 @@
                 return this.info.user && this.info.user.code.role >= 0;
             },
             admin: function() {
-                return this.info.user && this.info.user.code.role == 100;
+                return this.info.user && this.info.user.code.role === 100;
             },
             hasTeacherChat: function() {
                 return this.allowed && (this.info.user.code.role === 1 || this.info.user.code.role === 100);

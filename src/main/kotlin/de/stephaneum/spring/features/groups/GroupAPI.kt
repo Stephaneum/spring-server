@@ -6,10 +6,8 @@ import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.helper.obj
 import de.stephaneum.spring.helper.toSimpleUser
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/groups")
@@ -33,23 +31,99 @@ class GroupAPI {
         if(user.code.role != ROLE_ADMIN)
             throw ErrorCode(403, "Admin only")
 
-        return groupRepo.findByAccepted(true).map { it.toGroupInfo() }
+        return groupRepo.findByAcceptedOrderByName(true).map { it.toGroupInfo() }
     }
 
     @GetMapping("/{id}")
     fun getProject(@PathVariable id: Int): GroupInfoDetailed {
         val user = Session.get().user ?: throw ErrorCode(401, "login")
-        val group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
+
+        val group: Group
+        if (user.code.role == ROLE_ADMIN) {
+            group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
+        } else {
+            group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
+        }
         val membersRaw = userGroupRepo.findByGroupOrderByUserFirstNameAscUserLastNameAsc(group)
         val members = membersRaw.map { it.user.toSimpleUser() }
         val teachers = membersRaw.filter { it.teacher }.map { it.user.toSimpleUser() }
         return GroupInfoDetailed(group.id, group.name, group.leader.toSimpleUser(), group.accepted, group.chat, members, teachers)
     }
 
+    @PostMapping("/create")
+    fun create(@RequestBody request: CreateGroup) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+
+        if(request.name.isNullOrBlank())
+            throw ErrorCode(400, "missing name")
+
+        if(user.code.role == ROLE_STUDENT) {
+            if(request.teachers.isNullOrEmpty())
+                throw ErrorCode(400, "missing teachers")
+        }
+
+        // actual group creation
+        val group = groupRepo.save(Group(0, request.name, user, user.code.role != ROLE_STUDENT, true, false))
+
+        // add connections
+        val connections = mutableListOf<UserGroup>()
+        connections.add(UserGroup(0, user, group, false, true))
+        if(request.teachers != null) {
+            connections.addAll(request.teachers.map { UserGroup(0, it.obj(), group, true, false) })
+        }
+        userGroupRepo.saveAll(connections)
+    }
+
+    @PostMapping("/{id}/chat/{chat}")
+    fun updateChat(@PathVariable id: Int, @PathVariable chat: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+
+        val group: Group
+        if (user.code.role == ROLE_ADMIN) {
+            group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
+        } else {
+            group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
+        }
+
+        group.chat = chat == 1
+        groupRepo.save(group)
+    }
+
+    @PostMapping("/{id}/delete")
+    fun delete(@PathVariable id: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+
+        val group: Group
+        if (user.code.role == ROLE_ADMIN) {
+            group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
+        } else {
+            group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
+        }
+        groupRepo.delete(group)
+    }
+
+    @PostMapping("/{id}/accept")
+    fun accept(@PathVariable id: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val connection = userGroupRepo.findByUserAndGroup(user, id.obj()) ?: throw ErrorCode(404, "no user-group connection found")
+        if(!connection.teacher)
+            throw ErrorCode(403, "you are not teacher")
+
+        connection.group.accepted = true
+        groupRepo.save(connection.group)
+    }
+
+    @PostMapping("/{id}/reject")
+    fun reject(@PathVariable id: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val connection = userGroupRepo.findByUserAndGroup(user, id.obj()) ?: throw ErrorCode(404, "no user-group connection found")
+        if(!connection.teacher)
+            throw ErrorCode(403, "you are not teacher")
+
+        groupRepo.delete(connection.group)
+    }
+
     private fun Group.toGroupInfo(): GroupInfo {
         return GroupInfo(id, name, leader.toSimpleUser(), accepted, chat, userGroupRepo.countByGroup(this))
     }
 }
-
-data class GroupInfo(val id: Int, val name: String, val leader: SimpleUser, val accepted: Boolean, val chat: Boolean, val members: Int)
-data class GroupInfoDetailed(val id: Int, val name: String, val leader: SimpleUser, val accepted: Boolean, val chat: Boolean, val members: List<SimpleUser>, val teachers: List<SimpleUser>)
