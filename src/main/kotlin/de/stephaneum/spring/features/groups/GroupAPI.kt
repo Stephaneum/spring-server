@@ -52,9 +52,8 @@ class GroupAPI {
             group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
         }
         val membersRaw = userGroupRepo.findByGroupOrderByUserFirstNameAscUserLastNameAsc(group)
-        val members = membersRaw.map { it.user.toSimpleUser() }
-        val teachers = membersRaw.filter { it.teacher }.map { it.user.toSimpleUser() }
-        return GroupInfoDetailed(group.id, group.name, group.leader.toSimpleUser(), group.accepted, group.chat, members, teachers)
+        val members = membersRaw.map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat) }
+        return GroupInfoDetailed(group.id, group.name, group.leader.toSimpleUser(), group.accepted, group.chat, members)
     }
 
     @PostMapping("/create")
@@ -145,7 +144,56 @@ class GroupAPI {
         logService.log(EventType.REJECT_GROUP, user, connection.group.name)
     }
 
+    @PostMapping("/{groupID}/add-user/{userID}")
+    fun addUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        if(!checkAdminPermission(user, groupID))
+            throw ErrorCode(403, "you are not teacher or (group) admin")
+
+        if(userGroupRepo.existsByUserAndGroup(userID.obj(), groupID.obj()))
+            throw ErrorCode(400, "target user-group already exists")
+
+        userGroupRepo.save(UserGroup(0, user, groupID.obj(), false, true))
+    }
+
+    @PostMapping("/{groupID}/toggle-chat/{userID}")
+    fun toggleChatUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        if(!checkAdminPermission(user, groupID))
+            throw ErrorCode(403, "you are not teacher or (group) admin")
+
+        val targetConnection = userGroupRepo.findByUserAndGroup(userID.obj(), groupID.obj()) ?: throw ErrorCode(404, "no target user-group connection found")
+        if(targetConnection.hasAdminPermissions())
+            throw ErrorCode(403, "this user has admin rights")
+        targetConnection.chat = !targetConnection.chat
+        userGroupRepo.save(targetConnection)
+    }
+
+    @PostMapping("/{groupID}/kick/{userID}")
+    fun kickUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        if(!checkAdminPermission(user, groupID))
+            throw ErrorCode(403, "you are not teacher or (group) admin")
+
+        val targetConnection = userGroupRepo.findByUserAndGroup(userID.obj(), groupID.obj()) ?: throw ErrorCode(404, "no target user-group connection found")
+        if(targetConnection.hasAdminPermissions())
+            throw ErrorCode(403, "this user has admin rights")
+        userGroupRepo.delete(targetConnection)
+    }
+
     private fun Group.toGroupInfo(): GroupInfo {
         return GroupInfo(id, name, leader.toSimpleUser(), accepted, chat, userGroupRepo.countByGroup(this))
+    }
+
+    private fun UserGroup.hasAdminPermissions(): Boolean {
+        return user.code.role == ROLE_ADMIN || user.id == group.leader.id || teacher
+    }
+
+    private fun checkAdminPermission(user: User, groupID: Int): Boolean {
+        if(user.code.role == ROLE_ADMIN)
+            return true
+
+        val connection = userGroupRepo.findByUserAndGroup(user, groupID.obj()) ?: throw ErrorCode(404, "no origin user-group connection found")
+        return connection.hasAdminPermissions()
     }
 }

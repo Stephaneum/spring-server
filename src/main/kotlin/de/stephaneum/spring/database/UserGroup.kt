@@ -25,7 +25,10 @@ data class UserGroup(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                      var teacher: Boolean = false,
 
                      @Column(nullable = false, name = "akzeptiert")
-                     var accepted: Boolean = false)
+                     var accepted: Boolean = false,
+
+                     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
+                     var chat: Boolean = false)
 
 @Repository
 interface UserGroupRepo: CrudRepository<UserGroup, Int> {

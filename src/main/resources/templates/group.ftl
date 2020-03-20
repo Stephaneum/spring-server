@@ -41,17 +41,17 @@
 
         <div class="row">
             <div class="col s2">
-                <div @click="showCreateFolder" class="action-btn z-depth-1">
+                <div @click="showAddSubGroup" class="action-btn z-depth-1">
                     <i style="font-size: 3em" class="material-icons">add</i>
                     <span style="font-size: 1.5em">Chatraum</span>
                 </div>
 
-                <div @click="showCreateFolder" class="action-btn z-depth-1">
+                <div @click="showSettings" class="action-btn z-depth-1">
                     <i style="font-size: 3em" class="material-icons">settings</i>
                     <span style="font-size: 1.5em">Optionen</span>
                 </div>
 
-                <div @click="showCreateFolder" class="action-btn z-depth-1">
+                <div @click="showDeleteGroup" class="action-btn z-depth-1">
                     <i style="font-size: 3em" class="material-icons">delete</i>
                     <span style="font-size: 1.5em">Löschen</span>
                 </div>
@@ -63,7 +63,7 @@
                 </div>
 
                 <div style="flex: 0 0 400px; padding-left: 10px">
-                    <member-list :members="group.members" :leader="group.leader" :teachers="group.teachers"></member-list>
+                    <member-list :members="group.members" :leader="group.leader" @adduser="showAddUser" @togglechat="toggleChatUser" @kick="showKickUser"></member-list>
                 </div>
             </div>
         </div>
@@ -74,7 +74,8 @@
             </div>
         </div>
 
-        <cloud-view :my-id="info.user.id" shared-mode="true" :modify-all="modifyAll" :root-url="'/api/cloud/view/group/' + group.id" :upload-url="'/api/cloud/upload/group/' + group.id" :folder-url="'/api/cloud/create-folder/group/' + group.id" :teacherchat="hasTeacherChat"></cloud-view>
+        <cloud-view :my-id="info.user.id" shared-mode="true" :modify-all="modifyAll" :teacherchat="hasTeacherChat"
+                    :root-url="'/api/cloud/view/group/' + group.id" :upload-url="'/api/cloud/upload/group/' + group.id" :folder-url="'/api/cloud/create-folder/group/' + group.id"></cloud-view>
 
     </div>
     <div v-else style="flex: 1; min-height: calc(100vh - 100px)"></div>
@@ -104,6 +105,42 @@
             group: null
         },
         methods: {
+            showAddSubGroup: function() {
+
+            },
+            showSettings: function() {
+
+            },
+            showDeleteGroup: function() {
+
+            },
+            showAddUser: function() {
+
+            },
+            closeAddUser: function() {
+
+            },
+            addUser: function() {
+
+            },
+            toggleChatUser: async function(user) {
+                try {
+                    showLoadingInvisible();
+                    await axios.post('/api/groups/' + this.group.id + '/toggle-chat/' + user.id);
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                }
+                await this.fetchData();
+            },
+            showKickUser: function() {
+
+            },
+            closeKickUser: function() {
+
+            },
+            kickUser: function() {
+
+            },
             fetchData: async function() {
                 const info = await axios.get('/api/info');
                 if(info.data) {
@@ -134,7 +171,7 @@
             modifyAll: function() {
                 return this.admin || // admin
                     (this.group && this.group.leader && this.group.leader.id === this.info.user.id) || // group-admin
-                    (this.group && this.group.teachers && this.group.teachers.some((t) => t.id === this.info.user.id)); // group-teacher
+                    (this.group && this.group.members && this.group.members.some((t) => t.teacher && t.id === this.info.user.id)); // group-teacher
             }
         },
         mounted: function() {
