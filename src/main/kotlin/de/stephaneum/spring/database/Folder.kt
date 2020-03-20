@@ -55,8 +55,17 @@ interface FolderRepo: CrudRepository<Folder, Int> {
     @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND f.name = ?2 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
     fun findPrivateFolderInRoot(user: User, folderName: String): List<Folder>
 
-    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND (f.group = ?2 OR ?2 IS NULL) AND (f.schoolClass = ?3 OR ?3 IS NULL) AND f.teacherChat = ?4 ORDER BY f.name")
-    fun findFolderInRoot(user: User, group: Group?, schoolClass: SchoolClass?, teacherChat: Boolean): List<Folder>
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE ORDER BY f.name")
+    fun findPrivateFolderInRoot(user: User): List<Folder>
+
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group = ?1 AND f.schoolClass IS NULL AND f.teacherChat = FALSE ORDER BY f.name")
+    fun findGroupFolderInRoot(group: Group): List<Folder>
+
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group IS NULL AND f.schoolClass = ?1 AND f.teacherChat = FALSE ORDER BY f.name")
+    fun findClassFolderInRoot(schoolClass: SchoolClass): List<Folder>
+
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = TRUE ORDER BY f.name")
+    fun findTeacherFolderInRoot(): List<Folder>
 
     fun findByParent(parent: Folder): List<Folder>
 }

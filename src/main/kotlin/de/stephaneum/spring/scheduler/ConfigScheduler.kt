@@ -47,7 +47,7 @@ class ConfigScheduler {
         configs.forEach { c ->
             val dbConfig = db.first { it.key == c.code }
             if(c.value != dbConfig.value) {
-                val value = if(dbConfig.value?.length ?: 0 <= 100) dbConfig.value else dbConfig.value?.substring(0, 100) + "..."
+                val value = if(dbConfig.value?.length ?: 0 <= 100) dbConfig.value?.replace("\n", " ") else dbConfig.value?.substring(0, 100)?.replace("\n", " ") + "..."
                 logger.info("${c.name}: ${c.value} -> $value")
                 c.value = dbConfig.value
             }

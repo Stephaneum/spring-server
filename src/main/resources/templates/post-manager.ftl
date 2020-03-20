@@ -803,6 +803,7 @@
                 this.imageDragging = false;
                 var files = event.dataTransfer ? event.dataTransfer.files : event.currentTarget.files;
                 uploadMultipleFiles('/api/post/upload-image', files, {
+                    params: {},
                     uploaded: (file) => {
                         this.addImageData(file);
                         this.imagesAvailable.unshift(file);

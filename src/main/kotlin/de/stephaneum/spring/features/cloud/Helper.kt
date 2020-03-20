@@ -2,7 +2,7 @@ package de.stephaneum.spring.features.cloud
 
 object Request {
 
-    data class CreateFolder(val name: String?, val parentID: Int?, val projectID: Int?, val classID: Int?, val teacherChat: Boolean?)
+    data class CreateFolder(val name: String?, val parentID: Int?)
 
     data class UpdatePublic(val fileID: Int?, val isPublic: Boolean?)
 

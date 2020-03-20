@@ -105,7 +105,17 @@ interface FileRepo: CrudRepository<File, Int> {
     fun findByIdIn(ids: List<Int>): List<File>
 
     // root directory
-    fun findByUserAndFolderAndGroupAndSchoolClassAndTeacherChatOrderByIdDesc(user: User, folder: Folder?, group: Group?, schoolClass: SchoolClass?, teacherChat: Boolean): List<File>
+    @Query("SELECT f FROM File f WHERE f.folder IS NULL AND f.user = ?1 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE ORDER BY f.id DESC")
+    fun findPrivateInRoot(user: User): List<File>
+
+    @Query("SELECT f FROM File f WHERE f.folder IS NULL AND f.group = ?1 AND f.schoolClass IS NULL AND f.teacherChat = FALSE ORDER BY f.id DESC")
+    fun findGroupInRoot(group: Group?): List<File>
+
+    @Query("SELECT f FROM File f WHERE f.folder IS NULL AND f.group IS NULL AND f.schoolClass = ?1 AND f.teacherChat = FALSE ORDER BY f.id DESC")
+    fun findClassInRoot(schoolClass: SchoolClass): List<File>
+
+    @Query("SELECT f FROM File f WHERE f.folder IS NULL AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = TRUE ORDER BY f.id DESC")
+    fun findTeacherInRoot(): List<File>
 
     fun findByFolder(folder: Folder): List<File>
     fun findByFolderOrderByIdDesc(folder: Folder): List<File>

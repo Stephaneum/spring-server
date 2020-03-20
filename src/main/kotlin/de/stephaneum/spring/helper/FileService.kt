@@ -123,7 +123,7 @@ class FileService {
 
         val file = fileRepo.save(de.stephaneum.spring.database.File(
                 id = 0,
-                user = if(mode != StoreMode.CATEGORY) user else null,
+                user = if(mode == StoreMode.CATEGORY) null else user,
                 path = "", // will be set in the next step
                 group = group,
                 schoolClass = schoolClass,

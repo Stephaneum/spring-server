@@ -2,8 +2,10 @@ package de.stephaneum.spring.features.cloud
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
+import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.ImageService
+import de.stephaneum.spring.helper.obj
 import de.stephaneum.spring.security.JwtService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
 import java.nio.file.Paths
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("/api/cloud")
@@ -38,8 +41,8 @@ class CloudAPI {
     private lateinit var classRepo: SchoolClassRepo
 
     @GetMapping("/info")
-    fun getInfo(): Any {
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+    fun getInfo(): Response.CloudInfo {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
 
         val used = fileRepo.calcStorageUsed(user.id)
         val total = user.storage
@@ -52,26 +55,60 @@ class CloudAPI {
         return Response.CloudInfo(used, total, count, privateUsage, projectUsage, classUsage, teacherChatUsage)
     }
 
-    @GetMapping("/view/user/", "/view/user/{folder}")
-    fun getViewUser(@PathVariable(required = false) folder: Int?): Any {
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+    @GetMapping("/view/user")
+    fun getRootViewUser(): List<Any> {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
 
-        val folders: List<Folder>
-        val files: List<File>
-        if(folder != null) {
-            val folderObj = Folder(folder)
-            folders = folderRepo.findByParent(folderObj)
-            files = fileRepo.findByUserAndFolderAndGroupAndSchoolClassAndTeacherChatOrderByIdDesc(user, folderObj, null, null, false)
-        } else {
-            folders = folderRepo.findFolderInRoot(user, null, null, false)
-            files = fileRepo.findByUserAndFolderAndGroupAndSchoolClassAndTeacherChatOrderByIdDesc(user, null, null, null, false)
-        }
+        val folders = folderRepo.findPrivateFolderInRoot(user)
+        val files = fileRepo.findPrivateInRoot(user)
 
         return digestResults(folders, files)
     }
 
-    @PostMapping("/upload/user/", "/upload/user/{folder}")
-    fun uploadUser(@PathVariable(required = false) folder: Int?, @RequestParam("file") file: MultipartFile): Any {
+    @GetMapping("/view/group/{id}")
+    fun getRootViewGroup(@PathVariable id: Int): List<Any> {
+        Session.get().user ?: throw ErrorCode(401, "login")
+        val group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "group not found")
+        val folders = folderRepo.findGroupFolderInRoot(group)
+        val files = fileRepo.findGroupInRoot(group)
+
+        return digestResults(folders, files)
+    }
+
+    @GetMapping("/view/class/{id}")
+    fun getRootViewClass(@PathVariable id: Int): List<Any> {
+        Session.get().user ?: throw ErrorCode(401, "login")
+        val schoolClass = classRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "class not found")
+        val folders = folderRepo.findClassFolderInRoot(schoolClass)
+        val files = fileRepo.findClassInRoot(schoolClass)
+
+        return digestResults(folders, files)
+    }
+
+    @GetMapping("/view/teacher")
+    fun getRootViewTeacher(): List<Any> {
+        Session.get().user ?: throw ErrorCode(401, "login")
+        val folders = folderRepo.findTeacherFolderInRoot()
+        val files = fileRepo.findTeacherInRoot()
+
+        return digestResults(folders, files)
+    }
+
+    @GetMapping("/view/{folder}")
+    fun getViewSubFolder(@PathVariable folder: Int): List<Any> {
+        Session.get().user ?: throw ErrorCode(401, "login")
+
+        val folders = folderRepo.findByParent(folder.obj())
+        val files = fileRepo.findByFolderOrderByIdDesc(folder.obj())
+
+        return digestResults(folders, files)
+    }
+
+    @PostMapping("/upload/user", "/upload/group/{id}", "/upload/class/{id}", "/upload/teacher", "/upload/category/{id}")
+    fun uploadUser(@PathVariable(required = false) id: Int?,
+                   @RequestParam("folder") folderID: String?,
+                   @RequestParam("file") file: MultipartFile,
+                   request: HttpServletRequest): Any {
 
         val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
         var fileName = file.originalFilename ?: return Response.Feedback(false, message = "Dateiname unbekannt")
@@ -88,39 +125,63 @@ class CloudAPI {
             }
         }
 
-        val result = fileService.storeFileStephaneum(user, fileName, contentType, bytes, folder, -1, FileService.StoreMode.PRIVATE)
+        val mode = when {
+            request.requestURL.endsWith("/upload/user") -> FileService.StoreMode.PRIVATE
+            request.requestURL.endsWith("/upload/group/$id") -> FileService.StoreMode.GROUP
+            request.requestURL.endsWith("/upload/class/$id") -> FileService.StoreMode.SCHOOL_CLASS
+            request.requestURL.endsWith("/upload/teacher") -> FileService.StoreMode.TEACHER_CHAT
+            request.requestURL.endsWith("/upload/category/$id") -> FileService.StoreMode.CATEGORY
+            else -> throw ErrorCode(500, "Internal Error")
+        }
+
+        val digestedFolderID = if(folderID is String) {
+            if(folderID == "null") {
+                null
+            } else {
+                folderID.toInt()
+            }
+        } else {
+            folderID?.toIntOrNull()
+        }
+
+        val result = fileService.storeFileStephaneum(user, fileName, contentType, bytes, digestedFolderID, id, mode)
         if(result is File)
             result.simplifyForPosts()
 
         return if(result is String) Response.Feedback(false, message = result) else result
     }
 
-    @PostMapping("/create-folder")
-    fun createFolder(@RequestBody request: Request.CreateFolder): Response.Feedback {
+    @PostMapping("/create-folder/user", "/create-folder/group/{id}", "/create-folder/class/{id}", "/create-folder/teacher")
+    fun createFolder(@RequestBody request: Request.CreateFolder,
+                     @PathVariable(required = false) id: Int?,
+                     httpRequest: HttpServletRequest) {
 
         if(request.name.isNullOrBlank())
-            return Response.Feedback(false, message = "Missing Name")
+            throw ErrorCode(400, "missing name")
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        var folder: Folder? = null
-        var group: Group? = null
-        var schoolClass: SchoolClass? = null
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
 
-        if(request.parentID != null) {
-            folder = folderRepo.findByIdOrNull(request.parentID) ?: return Response.Feedback(false, message = "folder not found")
+        val folder = if(request.parentID != null) {
+            folderRepo.findByIdOrNull(request.parentID) ?: throw ErrorCode(404, "folder not found")
+        } else {
+            null
         }
 
-        if(request.projectID != null) {
-            group = groupRepo.findByIdOrNull(request.projectID) ?: return Response.Feedback(false, message = "project not found")
+        val group = if(id != null && httpRequest.requestURL.endsWith("/create-folder/group/$id")) {
+            groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "group not found")
+        } else {
+            null
         }
 
-        if(request.classID != null) {
-            schoolClass = classRepo.findByIdOrNull(request.classID) ?: return Response.Feedback(false, message = "class not found")
+        val schoolClass = if(id != null && httpRequest.requestURL.endsWith("/create-folder/class/$id")) {
+            classRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "class not found")
+        } else {
+            null
         }
 
-        folderRepo.save(Folder(0, request.name.trim(), user, group, schoolClass, request.teacherChat ?: false, folder))
+        val teacherChat = httpRequest.requestURL.endsWith("/create-folder/teacher")
 
-        return Response.Feedback(true)
+        folderRepo.save(Folder(0, request.name.trim(), user, group, schoolClass, teacherChat, folder))
     }
 
     @PostMapping("/update-public-file")

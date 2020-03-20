@@ -1,5 +1,6 @@
 package de.stephaneum.spring.helper
 
+import de.stephaneum.spring.database.Folder
 import de.stephaneum.spring.database.Group
 import de.stephaneum.spring.database.SimpleUser
 import de.stephaneum.spring.database.User
@@ -13,6 +14,7 @@ inline fun <reified T> Int?.obj(): T {
     return when(T::class) {
         Group::class -> Group(id)
         User::class -> User(id)
+        Folder::class -> Folder(id)
         else -> throw IllegalArgumentException("Invalid Type")
     } as T
 }

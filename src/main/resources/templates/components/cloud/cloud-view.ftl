@@ -159,7 +159,7 @@
 
     <script type="text/javascript">
         Vue.component('cloud-view', {
-            props: ['mode', 'id', 'teacherchat'],
+            props: ['rootUrl', 'uploadUrl', 'folderUrl', 'teacherchat'],
             data: function () {
                 return {
                     statsMode: false,
@@ -270,7 +270,8 @@
                     event.preventDefault();
                     this.filesDragging = false; // TODO: drag and drop
                     var files = event.dataTransfer ? event.dataTransfer.files : event.currentTarget.files;
-                    uploadMultipleFiles('/api/cloud/upload/user/' + (this.folderID ? this.folderID : ''), files, {
+                    uploadMultipleFiles(this.uploadUrl, files, {
+                        params: { 'folder': this.folderID },
                         uploaded: (file) => {},
                         finished: () => {
                             this.fetchData();
@@ -284,7 +285,7 @@
                 closeCreateFolder: function() {
                     M.Modal.getInstance(document.getElementById('modal-folder')).close();
                 },
-                createFolder: function() {
+                createFolder: async function() {
                     if(!this.createFolderName) {
                         M.toast({html: 'Fehler<br>Bitte gib dem Ordner einen Namen.'});
                         return;
@@ -292,17 +293,13 @@
 
                     showLoadingInvisible();
                     M.Modal.getInstance(document.getElementById('modal-folder')).close();
-                    axios.post( '/api/cloud/create-folder', { name: this.createFolderName, parentID: this.folderID })
-                        .then((response) => {
-                            if(response.data.success) {
-                                M.toast({html: 'Ordner erstellt<br>'+this.createFolderName});
-                            } else if(response.data.message) {
-                                M.toast({html: 'Fehlgeschlagen.<br>'+response.data.message});
-                            } else {
-                                M.toast({html: 'Fehlgeschlagen.<br>'+this.selected.fileName});
-                            }
-                            this.fetchData();
-                        });
+                    try {
+                        await axios.post(this.folderUrl, { name: this.createFolderName, parentID: this.folderID })
+                        M.toast({html: 'Ordner erstellt<br>'+this.createFolderName});
+                    } catch (e) {
+                        M.toast({html: 'Fehlgeschlagen.<br>'+this.selected.fileName});
+                    }
+                    this.fetchData();
                 },
                 showPublic: function(f) {
                     this.selected = f;
@@ -364,7 +361,7 @@
                         });
                 },
                 fetchData: async function () {
-                    var url = '/api/cloud/view/user/' + (this.folderID ? this.folderID : '');
+                    var url = this.folderID ? '/api/cloud/view/' + this.folderID : this.rootUrl;
                     var res = await axios.get(url);
                     this.files = this.digestFiles(res.data);
                     this.count();

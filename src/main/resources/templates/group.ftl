@@ -68,13 +68,13 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row" style="margin-top: 50px">
             <div class="col s10 offset-s2">
-                <h4 style="margin: 20px 0 20px 0">Cloud</h4>
+                <h4 style="margin: 20px 0 20px 0">Gemeinsame Cloud</h4>
             </div>
         </div>
 
-        <cloud-view :teacherchat="hasTeacherChat"></cloud-view>
+        <cloud-view :root-url="'/api/cloud/view/group/' + group.id" :upload-url="'/api/cloud/upload/group/' + group.id" :folder-url="'/api/cloud/create-folder/group/' + group.id" :teacherchat="hasTeacherChat"></cloud-view>
 
     </div>
     <div v-else style="flex: 1; min-height: calc(100vh - 100px)"></div>
