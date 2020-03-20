@@ -2,10 +2,7 @@ package de.stephaneum.spring.features.groups
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
-import de.stephaneum.spring.helper.ErrorCode
-import de.stephaneum.spring.helper.LogService
-import de.stephaneum.spring.helper.obj
-import de.stephaneum.spring.helper.toSimpleUser
+import de.stephaneum.spring.helper.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
@@ -22,6 +19,12 @@ class GroupAPI {
 
     @Autowired
     private lateinit var userRepo: UserRepo
+
+    @Autowired
+    private lateinit var fileRepo: FileRepo
+
+    @Autowired
+    private lateinit var fileService: FileService
 
     @Autowired
     private lateinit var logService: LogService
@@ -147,13 +150,18 @@ class GroupAPI {
     @PostMapping("/{groupID}/add-user/{userID}")
     fun addUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
         val user = Session.get().user ?: throw ErrorCode(401, "login")
+
         if(!checkAdminPermission(user, groupID))
             throw ErrorCode(403, "you are not teacher or (group) admin")
 
-        if(userGroupRepo.existsByUserAndGroup(userID.obj(), groupID.obj()))
+        val targetUser = userRepo.findByIdOrNull(userID) ?: throw ErrorCode(404, "user not found")
+        val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "group not found")
+
+        if(userGroupRepo.existsByUserAndGroup(targetUser, group))
             throw ErrorCode(400, "target user-group already exists")
 
-        userGroupRepo.save(UserGroup(0, user, groupID.obj(), false, true))
+        userGroupRepo.save(UserGroup(0, targetUser, group, false, true, true))
+        logService.log(EventType.JOIN_GROUP, targetUser, group.name)
     }
 
     @PostMapping("/{groupID}/toggle-chat/{userID}")
@@ -178,6 +186,10 @@ class GroupAPI {
         val targetConnection = userGroupRepo.findByUserAndGroup(userID.obj(), groupID.obj()) ?: throw ErrorCode(404, "no target user-group connection found")
         if(targetConnection.hasAdminPermissions())
             throw ErrorCode(403, "this user has admin rights")
+
+        val files = fileRepo.findByUserAndGroup(targetConnection.user, targetConnection.group)
+        files.forEach { fileService.deleteFileStephaneum(targetConnection.user, it) }
+
         userGroupRepo.delete(targetConnection)
     }
 

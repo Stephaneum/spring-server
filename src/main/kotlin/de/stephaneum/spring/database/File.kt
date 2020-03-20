@@ -84,6 +84,13 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Repository
 interface FileRepo: CrudRepository<File, Int> {
 
+    fun countByUserId(userID: Int): Int
+
+    // map file ids to full file objects
+    fun findByIdIn(ids: List<Int>): List<File>
+
+    fun findByUserAndGroup(user: User, group: Group): List<File>
+
     @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1")
     fun calcStorageUsed(userID: Int): Int
 
@@ -99,13 +106,8 @@ interface FileRepo: CrudRepository<File, Int> {
     @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = TRUE")
     fun calcStorageUsedTeacherChat(userID: Int): Int
 
-    fun countByUserId(userID: Int): Int
-
     @Query("SELECT f FROM File f WHERE f.user.id = ?1 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE AND f.mime LIKE CONCAT(?2, '%') ORDER BY f.id DESC")
     fun findMyImages(userID: Int, mime: String): List<File>
-
-    // map file ids to full file objects
-    fun findByIdIn(ids: List<Int>): List<File>
 
     // root directory
     @Query("SELECT f FROM File f WHERE f.folder IS NULL AND f.user = ?1 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE ORDER BY f.id DESC")

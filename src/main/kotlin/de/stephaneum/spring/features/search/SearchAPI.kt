@@ -23,14 +23,14 @@ class SearchAPI {
         val users: List<User>
         if(request.role != null) {
             if(request.firstName.isNullOrBlank() && request.lastName.isNullOrBlank())
-                users = userRepo.findByCodeRole(request.role)
+                users = userRepo.findByCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(request.role)
             else
-                users = userRepo.findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseAndCodeRole(request.firstName ?: "", request.lastName ?: "", request.role)
+                users = userRepo.findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseAndCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(request.firstName ?: "", request.lastName ?: "", request.role)
         } else {
             if(request.firstName.isNullOrBlank() && request.lastName.isNullOrBlank())
                 throw ErrorCode(400, "missing arguments")
             else
-                users = userRepo.findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(request.firstName ?: "", request.lastName ?: "")
+                users = userRepo.findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(request.firstName ?: "", request.lastName ?: "")
         }
         return users.map { it.toSimpleUser() }
     }

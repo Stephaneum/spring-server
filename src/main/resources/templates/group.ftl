@@ -3,6 +3,7 @@
 <#import "components/vue-loader.ftl" as vueLoader/>
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
+<#import "components/user-search.ftl" as userSearch/>
 <#import "components/utils.ftl" as utils/>
 <#import "components/groups/chat-view.ftl" as chatView/>
 <#import "components/groups/member-list.ftl" as memberList/>
@@ -74,7 +75,7 @@
             </div>
         </div>
 
-        <cloud-view :my-id="info.user.id" shared-mode="true" :modify-all="modifyAll" :teacherchat="hasTeacherChat"
+        <cloud-view ref="cloudView" :my-id="info.user.id" shared-mode="true" :modify-all="modifyAll" :teacherchat="hasTeacherChat"
                     :root-url="'/api/cloud/view/group/' + group.id" :upload-url="'/api/cloud/upload/group/' + group.id" :folder-url="'/api/cloud/create-folder/group/' + group.id"></cloud-view>
 
     </div>
@@ -83,6 +84,42 @@
     <div style="height: 100px"></div>
 
     <stephaneum-footer :copyright="info.copyright"></stephaneum-footer>
+
+    <!-- add user modal -->
+    <div id="modal-add-user" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; align-items: center; justify-content: space-between">
+                <span style="display: flex; align-items: center">
+                    <i style="font-size: 2em" class="material-icons">person</i>
+                    <span style="font-size: 1.5em; margin-left: 15px">Nutzer hinzufügen</span>
+                </span>
+                <a @click="closeAddUser" class="waves-effect btn-flat" href="#!" style="margin: 0">
+                    <i class="material-icons">close</i>
+                </a>
+            </div>
+
+            <br>
+            <user-search ref="userSearch" @onselect="addUser" :excluded="group ? group.members : []" excluded-string="hinzugefügt" action-string="Hinzufügen"></user-search>
+        </div>
+    </div>
+
+    <!-- kick modal -->
+    <div id="modal-kick-user" class="modal">
+        <div class="modal-content">
+            <h4>Nutzer entfernen?</h4>
+            <br>
+            <p><b>{{ selectedUser.firstName }} {{ selectedUser.lastName }}</b> wird gelöscht.</p>
+            <p>Alle Dateien des Nutzers in dieser Gruppe werden ebenfalls gelöscht.</p>
+            <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
+        </div>
+        <div class="modal-footer">
+            <a @click="closeKickUser" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a @click="kickUser" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
+                <i class="material-icons left">delete</i>
+                Löschen
+            </a>
+        </div>
+    </div>
 </div>
 
 <script src="/static/js/moment.min.js" ></script>
@@ -94,6 +131,7 @@
 <@loading.render/>
 <@menu.render/>
 <@footer.render/>
+<@userSearch.render/>
 <@chatView.render/>
 <@memberList.render/>
 <@cloudView.render/>
@@ -102,7 +140,13 @@
         el: '#app',
         data: {
             info: { user: null, menu: null, plan: null, copyright: null, unapproved: null },
-            group: null
+            group: null,
+            selectedUser: {},
+            addUserData: {
+                firstName: null,
+                lastName: null,
+                results: []
+            }
         },
         methods: {
             showAddSubGroup: function() {
@@ -115,13 +159,26 @@
 
             },
             showAddUser: function() {
-
+                this.$refs.userSearch.reset();
+                M.Modal.getInstance(document.getElementById('modal-add-user')).open();
+                this.$nextTick(() => {
+                    M.updateTextFields();
+                });
             },
             closeAddUser: function() {
-
+                M.Modal.getInstance(document.getElementById('modal-add-user')).close();
             },
-            addUser: function() {
-
+            addUser: async function(user) {
+                try {
+                    showLoadingInvisible();
+                    await axios.post('/api/groups/' + this.group.id + '/add-user/' + user.id);
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                }
+                await this.fetchData();
+                this.$nextTick(() => {
+                    this.$refs.userSearch.search();
+                });
             },
             toggleChatUser: async function(user) {
                 try {
@@ -132,14 +189,25 @@
                 }
                 await this.fetchData();
             },
-            showKickUser: function() {
-
+            showKickUser: function(user) {
+                this.selectedUser = user;
+                M.Modal.getInstance(document.getElementById('modal-kick-user')).open();
             },
             closeKickUser: function() {
-
+                M.Modal.getInstance(document.getElementById('modal-kick-user')).close();
             },
-            kickUser: function() {
-
+            kickUser: async function() {
+                M.Modal.getInstance(document.getElementById('modal-kick-user')).close();
+                showLoading('Nutzer entfernen...');
+                try {
+                    await axios.post('/api/groups/' + this.group.id + '/kick/' + this.selectedUser.id);
+                    M.toast({html: 'Nutzer gelöscht.<br>'+this.selectedUser.firstName});
+                    await this.fetchData();
+                    await this.$refs.cloudView.fetchData(); // also update the cloud view because files may be deleted
+                } catch (e) {
+                    hideLoading();
+                    M.toast({html: 'Löschen fehlgeschlagen.<br>'+this.selectedUser.firstName});
+                }
             },
             fetchData: async function() {
                 const info = await axios.get('/api/info');

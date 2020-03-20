@@ -72,7 +72,7 @@
             </div>
 
             <!-- create folder modal -->
-            <div id="modal-folder" class="modal" style="width: 500px">
+            <div id="modal-folder" class="modal">
                 <div class="modal-content">
                     <h4>Neuer Ordner</h4>
                     <br>

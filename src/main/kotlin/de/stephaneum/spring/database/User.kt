@@ -72,7 +72,7 @@ interface UserRepo: CrudRepository<User, Int> {
     fun findByEmail(email: String): User?
 
     // search
-    fun findByCodeRole(role: Int): List<User>
-    fun findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(firstName: String, lastName: String): List<User>
-    fun findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseAndCodeRole(firstName: String, lastName: String, role: Int): List<User>
+    fun findByCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(role: Int): List<User>
+    fun findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(firstName: String, lastName: String): List<User>
+    fun findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseAndCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(firstName: String, lastName: String, role: Int): List<User>
 }
