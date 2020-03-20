@@ -74,7 +74,7 @@
             </div>
         </div>
 
-        <cloud-view :root-url="'/api/cloud/view/group/' + group.id" :upload-url="'/api/cloud/upload/group/' + group.id" :folder-url="'/api/cloud/create-folder/group/' + group.id" :teacherchat="hasTeacherChat"></cloud-view>
+        <cloud-view :my-id="info.user.id" shared-mode="true" :modify-all="modifyAll" :root-url="'/api/cloud/view/group/' + group.id" :upload-url="'/api/cloud/upload/group/' + group.id" :folder-url="'/api/cloud/create-folder/group/' + group.id" :teacherchat="hasTeacherChat"></cloud-view>
 
     </div>
     <div v-else style="flex: 1; min-height: calc(100vh - 100px)"></div>
@@ -130,6 +130,11 @@
             },
             hasTeacherChat: function() {
                 return this.allowed && (this.info.user.code.role === 1 || this.info.user.code.role === 100);
+            },
+            modifyAll: function() {
+                return this.admin || // admin
+                    (this.group && this.group.leader && this.group.leader.id === this.info.user.id) || // group-admin
+                    (this.group && this.group.teachers && this.group.teachers.some((t) => t.id === this.info.user.id)); // group-teacher
             }
         },
         mounted: function() {

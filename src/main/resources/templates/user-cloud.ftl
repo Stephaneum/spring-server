@@ -39,7 +39,7 @@
             </div>
         </div>
 
-        <cloud-view root-url="/api/cloud/view/user" upload-url="/api/cloud/upload/user" folder-url="/api/cloud/create-folder/user" :teacherchat="hasTeacherChat"></cloud-view>
+        <cloud-view :my-id="info.user.id" shared-mode="false" modify-all="true" root-url="/api/cloud/view/user" upload-url="/api/cloud/upload/user" folder-url="/api/cloud/create-folder/user" :teacherchat="hasTeacherChat"></cloud-view>
     </div>
     <div v-else style="flex: 1; min-height: calc(100vh - 100px)"></div>
 

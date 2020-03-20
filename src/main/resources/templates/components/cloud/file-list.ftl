@@ -11,10 +11,11 @@
                         <span class="file-link" @click="select(f)">{{ f.isFolder ? f.name : f.fileName }}</span>
                     </span>
 
-                    <span style="flex: 0 0 320px; text-align: right;">
+                    <span style="text-align: right;" :style="{ 'flex' : sharedMode ? '0 0 400px' : '0 0 320px' }">
                         <span v-if="f.public" class="green-badge-light">öffentlich</span>
                         <span style="margin-left: 20px" class="green-badge-light">{{ f.sizeReadable }}</span>
                         <span v-if="f.time" style="margin-left: 20px" class="green-badge-light">{{ f.time }}</span>
+                        <span v-if="sharedMode" style="margin-left: 20px; background-color: #cfd8dc" class="green-badge-light">{{ f.user.firstName }} {{ f.user.lastName }}</span>
                     </span>
 
                     <span style="flex: 0 0 270px; text-align: right">
@@ -26,11 +27,11 @@
                             <i class="material-icons">language</i>
                         </a>
 
-                        <a @click="onEdit(f)" class="tooltipped waves-effect waves-light teal darken-2 btn margin-1" href="#!" data-tooltip="Bearbeiten" data-position="bottom">
+                        <a @click="onEdit(f)" class="tooltipped waves-effect waves-light teal darken-2 btn margin-1" :class="{ disabled: !f.canModify }" href="#!" data-tooltip="Bearbeiten" data-position="bottom">
                             <i class="material-icons">edit</i>
                         </a>
 
-                        <a @click="onDelete(f)" class="tooltipped waves-effect waves-light btn red darken-4 margin-1" href="#!" data-tooltip="Löschen" data-position="bottom">
+                        <a @click="onDelete(f)" class="tooltipped waves-effect waves-light btn red darken-4 margin-1" :class="{ disabled: !f.canModify }" href="#!" data-tooltip="Löschen" data-position="bottom">
                             <i class="material-icons">delete</i>
                         </a>
                     </span>
@@ -41,7 +42,7 @@
 
     <script type="text/javascript">
         Vue.component('file-list', {
-            props: ['files'],
+            props: ['files', 'sharedMode', 'modifyAll'],
             methods: {
                 select: function(f) {
                     this.$emit('onselect', f);

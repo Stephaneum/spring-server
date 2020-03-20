@@ -73,11 +73,11 @@
                                     <i class="material-icons">language</i>
                                 </a>
 
-                                <a @click="onEdit" class="tooltipped waves-effect waves-light teal darken-2 btn margin-1" href="#!" data-tooltip="Bearbeiten" data-position="bottom">
+                                <a @click="onEdit" class="tooltipped waves-effect waves-light teal darken-2 btn margin-1" :class="{ 'disabled': !file.canModify }" href="#!" data-tooltip="Bearbeiten" data-position="bottom">
                                     <i class="material-icons">edit</i>
                                 </a>
 
-                                <a @click="onDelete" class="tooltipped waves-effect waves-light btn red darken-4 margin-1" href="#!" data-tooltip="Löschen" data-position="bottom">
+                                <a @click="onDelete" class="tooltipped waves-effect waves-light btn red darken-4 margin-1" :class="{ 'disabled': !file.canModify }" href="#!" data-tooltip="Löschen" data-position="bottom">
                                     <i class="material-icons">delete</i>
                                 </a>
                             </div>

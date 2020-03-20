@@ -44,6 +44,9 @@ class FileService {
     private lateinit var filePostRepo: FilePostRepo
 
     @Autowired
+    private lateinit var userGroupRepo: UserGroupRepo
+
+    @Autowired
     private lateinit var folderRepo: FolderRepo
 
     @Autowired
@@ -240,10 +243,12 @@ class FileService {
      * @return true if the user has access to the file
      */
     fun hasAccessToFile(user: User, file: de.stephaneum.spring.database.File): Boolean {
-        // TODO: project, class, teacherChat
         return when {
             file.user?.id == user.id -> true // user owns this file
             user.code.role == ROLE_ADMIN -> true // user is admin
+            file.group?.let { group -> userGroupRepo.existsByUserAndGroup(user, group) } ?: false -> true // user is inside group
+            file.schoolClass != null && user.schoolClass?.id == file.schoolClass?.id -> true // user is inside school class
+            file.teacherChat && user.code.role == ROLE_TEACHER -> true // teacher chat
             else -> false
         }
     }

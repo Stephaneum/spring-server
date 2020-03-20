@@ -60,9 +60,9 @@
 
             <!-- MAIN CONTENT -->
             <div class="col s10">
-                <div class="tab-panel white z-depth-1" style="margin: 0; min-height: 450px;padding: 10px">
-                    <file-grid v-if="!statsMode && gridView" :files="files" @onselect="select"></file-grid>
-                    <file-list v-else-if="!statsMode && !gridView" :files="files" @onselect="select" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
+                <div class="tab-panel white z-depth-1" style="margin: 0; min-height: 530px;padding: 10px">
+                    <file-grid v-if="!statsMode && gridView" :files="files" :shared-mode="sharedMode" @onselect="select"></file-grid>
+                    <file-list v-else-if="!statsMode && !gridView" :files="files" :shared-mode="sharedMode" :modify-all="modifyAll" @onselect="select" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
                     <cloud-stats v-else :info="storage" :teacherchat="teacherchat" @onexit="toggleStatsMode"></cloud-stats>
                 </div>
             </div>
@@ -100,12 +100,12 @@
                 <div class="modal-content">
                     <h4>{{ selected.fileName }}</h4>
                     <br>
-                    <a @click="updatePublic(false)" href="#!" class="waves-effect waves-light teal btn margin-1" :class="selected.public ? ['darken-3'] : []">
+                    <a @click="updatePublic(false)" href="#!" class="waves-effect waves-light teal btn margin-1" :class="{ 'darken-3': selected.public, 'disabled': !selected.canModify }">
                         <i class="material-icons left">lock</i>
                         Privat
                     </a>
 
-                    <a @click="updatePublic(true)" href="#!" class="waves-effect waves-light teal btn margin-1" :class="selected.public ? [] : ['darken-3']">
+                    <a @click="updatePublic(true)" href="#!" class="waves-effect waves-light teal btn margin-1" :class="{ 'darken-3': !selected.public, 'disabled': !selected.canModify }">
                         <i class="material-icons left">lock_open</i>
                         Öffentlich
                     </a>
@@ -159,7 +159,7 @@
 
     <script type="text/javascript">
         Vue.component('cloud-view', {
-            props: ['rootUrl', 'uploadUrl', 'folderUrl', 'teacherchat'],
+            props: ['myId', 'sharedMode', 'modifyAll', 'rootUrl', 'uploadUrl', 'folderUrl', 'teacherchat'],
             data: function () {
                 return {
                     statsMode: false,
@@ -250,6 +250,8 @@
                           f.link = '/api/cloud/download/folder/'+f.id;
                       else
                           f.link = '/api/cloud/download/file/'+f.id;
+
+                      f.canModify = !this.sharedMode || this.modifyAll || f.user.id === this.myId;
                   });
                   return files;
                 },

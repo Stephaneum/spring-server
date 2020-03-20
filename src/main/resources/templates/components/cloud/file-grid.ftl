@@ -8,13 +8,14 @@
                 <img v-if="image(f)" :src="f.link" @click="select(f)" class="file-image"/>
                 <i v-else @click="select(f)" :style="{ color: f.isFolder ? 'rgb(125, 125, 125)' : 'rgb(175, 175, 175)'}" class="file-icon material-icons">{{ icon(f) }}</i>
                 <span @click="select(f)" class="file-text">{{ f.isFolder ? f.name : f.fileName }}</span>
+                <span v-if="sharedMode" style="margin: 5px 0 10px 0; background-color: #cfd8dc" class="green-badge-light">{{ f.user.firstName }} {{ f.user.lastName }}</span>
             </div>
         </div>
     </template>
 
     <script type="text/javascript">
         Vue.component('file-grid', {
-            props: ['files'],
+            props: ['files', 'sharedMode'],
             methods: {
                 select: function(f) {
                     this.$emit('onselect', f);

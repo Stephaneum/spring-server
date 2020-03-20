@@ -45,7 +45,11 @@ data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                   var size: Int = 0) {
 
     fun simplifyForCloud() {
-        user = null
+        group = null
+        schoolClass = null
+        parent = null
+        user?.email = ""
+        user?.password = ""
     }
 }
 

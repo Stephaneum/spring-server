@@ -34,4 +34,6 @@ interface UserGroupRepo: CrudRepository<UserGroup, Int> {
     fun findByUserAndGroup(user: User, group: Group): UserGroup?
     fun findByGroupOrderByUserFirstNameAscUserLastNameAsc(group: Group): List<UserGroup>
     fun countByGroup(group: Group): Int
+
+    fun existsByUserAndGroup(user: User, group: Group): Boolean
 }

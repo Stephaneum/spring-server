@@ -68,8 +68,11 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     fun simplifyForCloud() {
         fileName = generateFileName()
-        user = null
+        group = null
+        schoolClass = null
         folder = null
+        user?.email = ""
+        user?.password = ""
     }
 
     fun generateFileName(): String {
