@@ -64,7 +64,7 @@
                 </div>
 
                 <div style="flex: 0 0 400px; padding-left: 10px">
-                    <member-list :members="group.members" :leader="group.leader" @adduser="showAddUser" @togglechat="toggleChatUser" @kick="showKickUser"></member-list>
+                    <member-list :members="group.members" :leader="group.leader" :modify-all="modifyAll" @adduser="showAddUser" @togglechat="toggleChatUser" @kick="showKickUser"></member-list>
                 </div>
             </div>
         </div>
