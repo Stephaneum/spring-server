@@ -65,9 +65,10 @@
                            u.excluded = this.excluded.some((e) => u.id === e.id);
                         });
                         this.results = response.data;
-                        hideLoading();
                     } catch (e) {
                         M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                    } finally {
+                        hideLoading();
                     }
                 },
                 select: function(u) {
