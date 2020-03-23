@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
 import javax.persistence.*
 
@@ -22,19 +23,39 @@ data class Message(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                    @JoinColumn(name = "nutzer_id")
                    var user: User = User(),
 
-                   @ManyToOne(optional = false) @OnDelete(action = OnDeleteAction.CASCADE)
+                   @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                    @JoinColumn(name = "projekt_id")
-                   var group: Group = Group(),
+                   var group: Group? = null,
+
+                   @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
+                   var schoolClass: SchoolClass? = null, // only true for the root chat room
 
                    @Column(nullable = false, name = "lehrerchat")
                    @JsonIgnore
-                   var teacherChat: Boolean = false,
+                   var teacherChat: Boolean = false, // only true for root chat room
 
                    @Column(nullable = false, name = "datum")
                    var timestamp: Timestamp = Timestamp(0))
 
+data class SimpleMessage(val id: Int, val text: String, val user: SimpleUser, val timestamp: Timestamp)
+
 @Repository
 interface MessageRepo: CrudRepository<Message, Int> {
 
+    fun countByGroup(group: Group): Int
+    fun countByTeacherChat(teacherChat: Boolean): Int
+    fun countBySchoolClass(schoolClass: SchoolClass): Int
+
     fun findByGroupOrderByTimestamp(group: Group): List<Message>
+    fun findByTeacherChatOrderByTimestampDesc(teacherChat: Boolean): List<Message>
+    fun findBySchoolClassOrderByTimestampDesc(schoolClass: SchoolClass): List<Message>
+
+    @Transactional
+    fun deleteByGroup(group: Group)
+
+    @Transactional
+    fun deleteBySchoolClass(schoolClass: SchoolClass)
+
+    @Transactional
+    fun deleteByTeacherChat(teacherChat: Boolean)
 }

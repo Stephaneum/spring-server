@@ -1,9 +1,6 @@
 package de.stephaneum.spring.helper
 
-import de.stephaneum.spring.database.Folder
-import de.stephaneum.spring.database.Group
-import de.stephaneum.spring.database.SimpleUser
-import de.stephaneum.spring.database.User
+import de.stephaneum.spring.database.*
 
 /**
  * @return entity with id
@@ -15,7 +12,8 @@ inline fun <reified T> Int?.obj(): T {
         Group::class -> Group(id)
         User::class -> User(id)
         Folder::class -> Folder(id)
-        else -> throw IllegalArgumentException("Invalid Type")
+        SchoolClass::class -> SchoolClass(id)
+        else -> throw IllegalArgumentException("Invalid Type. Extend the Int?.obj() if necessary")
     } as T
 }
 
