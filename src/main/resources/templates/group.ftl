@@ -75,7 +75,7 @@
             </div>
         </div>
 
-        <cloud-view ref="cloudView" :my-id="info.user.id" shared-mode="true" :modify-all="modifyAll" :teacherchat="hasTeacherChat"
+        <cloud-view ref="cloudView" :my-id="info.user.id" :shared-mode="true" :modify-all="modifyAll" :teacherchat="hasTeacherChat"
                     :root-url="'/api/cloud/view/group/' + group.id" :upload-url="'/api/cloud/upload/group/' + group.id" :folder-url="'/api/cloud/create-folder/group/' + group.id"></cloud-view>
 
     </div>
