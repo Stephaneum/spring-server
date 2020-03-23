@@ -89,6 +89,7 @@ interface FileRepo: CrudRepository<File, Int> {
     // map file ids to full file objects
     fun findByIdIn(ids: List<Int>): List<File>
 
+    fun findByGroup(group: Group): List<File>
     fun findByUserAndGroup(user: User, group: Group): List<File>
 
     @Query("SELECT COALESCE(SUM(f.size),0) FROM File f WHERE f.user.id = ?1")

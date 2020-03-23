@@ -114,13 +114,15 @@ class GroupAPI {
     fun delete(@PathVariable id: Int) {
         val user = Session.get().user ?: throw ErrorCode(401, "login")
 
-        val group: Group
-        if (user.code.role == ROLE_ADMIN) {
-            group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
-        } else {
-            group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
-        }
-        groupRepo.delete(group)
+        if(!checkAdminPermission(user, id))
+            throw ErrorCode(403, "you are not teacher or (group) admin")
+
+        val group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
+
+        val files = fileRepo.findByGroup(group)
+        files.forEach { fileService.deleteFileStephaneum(user, it) } // delete all files
+
+        groupRepo.delete(group) // folder will be deleted also
         logService.log(EventType.DELETE_GROUP, user, group.name)
     }
 
