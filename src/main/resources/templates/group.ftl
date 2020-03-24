@@ -54,7 +54,7 @@
                     <span style="font-size: 1.5em">Chatraum</span>
                 </div>
 
-                <div v-if="modifyAll" @click="showSettings" class="action-btn z-depth-1">
+                <div v-if="modifyAll" @click="showEditGroup" class="action-btn z-depth-1">
                     <i style="font-size: 3em" class="material-icons">settings</i>
                     <span style="font-size: 1.5em">Optionen</span>
                 </div>
@@ -98,6 +98,53 @@
     <div style="height: 100px"></div>
 
     <stephaneum-footer :copyright="info.copyright"></stephaneum-footer>
+
+    <!-- add chatroom modal -->
+    <div id="modal-add-subgroup" class="modal">
+        <div class="modal-content">
+            <h4>Neuer Chatraum</h4>
+            <br>
+            In Arbeit
+
+        </div>
+        <div class="modal-footer">
+            <a @click="closeAddSubGroup" href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+        </div>
+    </div>
+
+    <!-- edit modal -->
+    <div id="modal-edit-group" class="modal">
+        <div class="modal-content">
+            <h4>Gruppe bearbeiten</h4>
+            <br>
+            <div style="display: flex; align-items: center; padding: 10px 20px 0 20px;">
+                <div style="flex: 1;" class="input-field">
+                    <i class="material-icons prefix">edit</i>
+                    <label for="group-name-text">Name</label>
+                    <input @keyup.enter="changeGroupName" v-model:value="groupName" type="text" id="group-name-text"/>
+                </div>
+                <a @click="changeGroupName" href="#!" style="margin-left: 20px" class="modal-close waves-effect waves-light btn green darken-4">
+                    <i class="material-icons left">save</i>
+                    Speichern
+                </a>
+            </div>
+
+            <div style="display: flex; align-items: center; padding: 10px 20px 0 20px;">
+                Chat
+                <a @click="updateChat(true)" href="#!" style="margin-left: 20px" class="modal-close waves-effect waves-light btn green" :class="group && group.chat ? [] : ['darken-4']">
+                    <i class="material-icons left">check</i>
+                    Ja
+                </a>
+                <a @click="updateChat(false)" href="#!" style="margin-left: 20px" class="modal-close waves-effect waves-light btn green" :class="group && group.chat ? ['darken-4'] : []">
+                    <i class="material-icons left">close</i>
+                    Nein
+                </a>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a @click="closeEditGroup" href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+        </div>
+    </div>
 
     <!-- add user modal -->
     <div id="modal-add-user" class="modal">
@@ -191,18 +238,44 @@
             info: { user: null, menu: null, plan: null, copyright: null, unapproved: null },
             group: null,
             selectedUser: {},
-            addUserData: {
-                firstName: null,
-                lastName: null,
-                results: []
-            }
+            groupName: null,
         },
         methods: {
             showAddSubGroup: function() {
-
+                M.Modal.getInstance(document.getElementById('modal-add-subgroup')).open();
             },
-            showSettings: function() {
-
+            closeAddSubGroup: function() {
+                M.Modal.getInstance(document.getElementById('modal-add-subgroup')).open();
+            },
+            addSubGroup: function() {
+                M.Modal.getInstance(document.getElementById('modal-add-subgroup')).open();
+            },
+            showEditGroup: function() {
+                M.Modal.getInstance(document.getElementById('modal-edit-group')).open();
+                this.$nextTick(() => {
+                    M.updateTextFields();
+                });
+            },
+            closeEditGroup: function() {
+                M.Modal.getInstance(document.getElementById('modal-edit-group')).close();
+            },
+            changeGroupName: async function() {
+                try {
+                    showLoadingInvisible();
+                    await axios.post('/api/groups/' + this.group.id + '/update', { name: this.groupName });
+                    await this.fetchData();
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                }
+            },
+            updateChat: async function(chat) {
+                try {
+                    showLoadingInvisible();
+                    await axios.post('/api/groups/' + this.group.id + '/chat/' + (chat ? '1' : '0'));
+                    await this.fetchData();
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                }
             },
             showDeleteGroup: function() {
                 M.Modal.getInstance(document.getElementById('modal-delete-group')).open();
@@ -299,6 +372,7 @@
                 const id = window.location.pathname.split('/').pop();
                 const group = await axios.get('/api/groups/' + id);
                 this.group = group.data;
+                this.groupName = group.data.name;
 
                 hideLoading();
                 this.$nextTick(() => M.Tooltip.init(document.querySelectorAll('.tooltipped'), {}));

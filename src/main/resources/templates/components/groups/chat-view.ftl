@@ -4,7 +4,7 @@
 <#macro render>
     <template id="chat-view">
         <div class="card" style="margin: 0; width: 100%; height: 100%; display: flex; flex-direction: column">
-            <div v-if="disabledAll" class="chat-info">
+            <div v-if="disabledAll" class="chat-info" style="height: 600px">
                 Chat für alle Mitglieder deaktiviert.
             </div>
             <template v-else>

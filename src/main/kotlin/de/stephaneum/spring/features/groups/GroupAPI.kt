@@ -110,6 +110,22 @@ class GroupAPI {
         groupRepo.save(group)
     }
 
+    @PostMapping("/{id}/update")
+    fun renameGroup(@PathVariable id: Int, @RequestBody request: CreateGroup) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+
+        if(request.name.isNullOrBlank())
+            throw ErrorCode(400, "missing name")
+
+        if(!checkAdminPermission(user, id))
+            throw ErrorCode(403, "you are not teacher or (group) admin")
+
+        val group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "group not found")
+
+        group.name = request.name
+        groupRepo.save(group)
+    }
+
     @PostMapping("/{id}/delete")
     fun delete(@PathVariable id: Int) {
         val user = Session.get().user ?: throw ErrorCode(401, "login")
@@ -117,7 +133,7 @@ class GroupAPI {
         if(!checkAdminPermission(user, id))
             throw ErrorCode(403, "you are not teacher or (group) admin")
 
-        val group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
+        val group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "group not found")
 
         val files = fileRepo.findByGroup(group)
         files.forEach { fileService.deleteFileStephaneum(user, it) } // delete all files
