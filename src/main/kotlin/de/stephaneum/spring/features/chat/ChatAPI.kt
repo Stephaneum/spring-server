@@ -91,15 +91,13 @@ class ChatAPI {
         }
     }
 
-    @PostMapping("/group/{groupID}/delete/{id}", "/class/{classID}/delete/{id}", "/teacher/delete/{id}")
-    fun deleteMessage(@PathVariable(required = false) groupID: Int?,
-                      @PathVariable(required = false) classID: Int?,
-                      @PathVariable id: Int) {
+    @PostMapping("/delete/{id}")
+    fun deleteMessage(@PathVariable id: Int) {
 
         val user = Session.get().user ?: throw ErrorCode(401, "login")
         val message = messageRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "message not found")
 
-        doWhenAdminAccess(user, groupID, classID) { _, _, _ ->
+        doWhenAdminAccess(user, message.group?.id, message.schoolClass?.id) { _, _, _ ->
             messageRepo.delete(message)
         }
     }
@@ -140,7 +138,7 @@ class ChatAPI {
             groupID != null -> {
                 val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "group not found")
 
-                if(user.code.role != ROLE_ADMIN) {
+                if(user.code.role == ROLE_ADMIN) {
                     action(group, null, false)
                 } else {
                     val connection = userGroupRepo.findByUserAndGroup(user, groupID.obj()) ?: throw ErrorCode(404, "you are not member of this group")

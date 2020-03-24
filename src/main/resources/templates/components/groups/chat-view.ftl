@@ -13,7 +13,7 @@
                         Noch keine Nachrichten
                     </div>
                     <template v-else>
-                        <div v-for="(m, index) in messages">
+                        <div v-for="(m, index) in messages" @mouseover="hoveringMessage = m" @mouseleave="hoveringMessage = {}">
 
                             <div v-if="index === 0 || messages[index - 1].date !== m.date" class="chat-date-wrapper">
                                 <span class="chat-date">{{ m.date }}</span>
@@ -21,6 +21,7 @@
 
                             <div class="chat-message-user">
                                 {{ m.user.firstName }} {{ m.user.lastName }}
+                                <i v-if="modifyAll && hoveringMessage.id === m.id" @click="showDeleteMessage(m)" class="material-icons chat-delete-message">delete</i>
                             </div>
                             <div class="chat-message-body">
                                 {{ m.text }}
@@ -46,16 +47,35 @@
                     </a>
                 </div>
             </template>
+
+            <!-- delete message modal -->
+            <div id="modal-delete-message" class="modal">
+                <div class="modal-content">
+                    <h4>Nachricht entfernen?</h4>
+                    <br>
+                    <p>Folgende Nachricht wird gelöscht:</p>
+                    <p style="font-style: italic" class="grey lighten-3">{{ selectedMessage.text }}</p>
+                    <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
+                </div>
+                <div class="modal-footer">
+                    <a @click="closeDeleteMessage" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+                    <a @click="deleteMessage" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
+                        <i class="material-icons left">delete</i>
+                        Löschen
+                    </a>
+                </div>
+            </div>
         </div>
     </template>
 
     <script type="text/javascript">
         Vue.component('chat-view', {
-            props: ['disabledAll', 'disabledMe', 'messageCountUrl', 'messagesUrl', 'addMessageUrl', 'clearUrl', 'deleteUrl'],
+            props: ['disabledAll', 'disabledMe', 'modifyAll', 'messageCountUrl', 'messagesUrl', 'addMessageUrl', 'clearUrl'],
             data: function () {
                 return {
                     messages: [],
                     message: null,
+                    hoveringMessage: {},
                     selectedMessage: {},
                     fetched: false
                 }
@@ -94,6 +114,23 @@
                         await axios.post(this.addMessageUrl, { message: this.message });
                         await this.fetchData();
                         this.message = null;
+                    } catch (e) {
+                        M.toast({html: 'Interner Fehler.'});
+                    }
+                },
+                showDeleteMessage: function(message) {
+                    this.selectedMessage = message;
+                    M.Modal.getInstance(document.getElementById('modal-delete-message')).open();
+                },
+                closeDeleteMessage: function() {
+                    M.Modal.getInstance(document.getElementById('modal-delete-message')).close();
+                },
+                deleteMessage: async function() {
+                    M.Modal.getInstance(document.getElementById('modal-delete-message')).close();
+                    try {
+                        showLoadingInvisible();
+                        await axios.post('/api/chat/delete/' + this.selectedMessage.id);
+                        await this.fetchData();
                     } catch (e) {
                         M.toast({html: 'Interner Fehler.'});
                     }
@@ -136,6 +173,12 @@
         .chat-message-user {
             margin: 20px 0 5px 20px;
             font-weight: bold;
+        }
+
+        .chat-delete-message {
+            margin-left: 5px;
+            font-size: 1em;
+            cursor: pointer;
         }
 
         .chat-message-time {
