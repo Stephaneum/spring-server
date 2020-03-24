@@ -340,7 +340,7 @@
         mounted: function () {
             this.$nextTick(() => {
                 fetchData(this);
-            })
+            });
         },
         watch: {
             modules: function (val, oldVal) {

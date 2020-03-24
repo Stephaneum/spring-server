@@ -60,7 +60,7 @@
 
             <div class="col s10" style="display: flex; min-height: 500px">
                 <div style="flex: 1; padding-right: 10px">
-                    <chat-view :message-count-url="'/api/chat/group/'+group.id+'/count'" :messages-url="'/api/chat/group/'+group.id"
+                    <chat-view :disabled-all="!group.chat" :disabled-me="!canChat" :message-count-url="'/api/chat/group/'+group.id+'/count'" :messages-url="'/api/chat/group/'+group.id"
                                :add-message-url="'/api/chat/group/'+group.id" :clear-url="'/api/chat/group/'+group.id+'/clear'"
                                :delete-url="'/api/chat/group/'+group.id+'/delete/'"></chat-view>
                 </div>
@@ -242,6 +242,9 @@
                 return this.admin || // admin
                     (this.group && this.group.leader && this.group.leader.id === this.info.user.id) || // group-admin
                     (this.group && this.group.members && this.group.members.some((t) => t.teacher && t.id === this.info.user.id)); // group-teacher
+            },
+            canChat: function() {
+                return this.admin || (this.info.user && this.group.members && this.group.members.some((m) => m.id === this.info.user.id && m.chat));
             }
         },
         mounted: function() {
