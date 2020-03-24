@@ -189,10 +189,26 @@ class GroupAPI {
         if(targetConnection.hasAdminPermissions())
             throw ErrorCode(403, "this user has admin rights")
 
-        val files = fileRepo.findByUserAndGroup(targetConnection.user, targetConnection.group)
-        files.forEach { fileService.deleteFileStephaneum(targetConnection.user, it) }
+        removeUserFromGroup(targetConnection)
+        logService.log(EventType.QUIT_GROUP, targetConnection.user, targetConnection.group.name)
+    }
 
-        userGroupRepo.delete(targetConnection)
+    @PostMapping("/{groupID}/leave")
+    fun leave(@PathVariable groupID: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+
+        val connection = userGroupRepo.findByUserAndGroup(user, groupID.obj()) ?: throw ErrorCode(404, "you are not member of this group")
+        if(user.id == connection.group.id || connection.teacher)
+            throw ErrorCode(409, "you are group admin or teacher")
+
+        removeUserFromGroup(connection)
+        logService.log(EventType.QUIT_GROUP, connection.user, connection.group.name)
+    }
+
+    private fun removeUserFromGroup(userGroup: UserGroup) {
+        val files = fileRepo.findByUserAndGroup(userGroup.user, userGroup.group)
+        files.forEach { fileService.deleteFileStephaneum(userGroup.user, it) }
+        userGroupRepo.delete(userGroup)
     }
 
     private fun Group.toGroupInfo(): GroupInfo {

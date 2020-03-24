@@ -8,7 +8,7 @@
                 Chat für alle Mitglieder deaktiviert.
             </div>
             <template v-else>
-                <div id="chat-scroll-panel" style="height: 500px; overflow-y: scroll;">
+                <div id="chat-scroll-panel" style="height: 550px; overflow-y: scroll;">
                     <div v-if="fetched && messages.length === 0" class="chat-info">
                         Noch keine Nachrichten
                     </div>
@@ -35,7 +35,7 @@
                     </template>
                 </div>
 
-                <div style="display: flex; align-items: center; padding: 10px 20px 0 20px; background-color: #fafafa; border-top: 2px solid #e0e0e0">
+                <div style="display: flex; align-items: center; padding: 10px 20px 0 20px; background-color: #fafafa; border-top: 1px solid #e0e0e0">
                     <div style="flex: 1;" class="input-field">
                         <i class="material-icons prefix">chat</i>
                         <label for="add-message-text">{{ disabledMe ? 'Chat gesperrt' : 'Nachricht' }}</label>

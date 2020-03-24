@@ -42,19 +42,31 @@
 
         <div class="row">
             <div class="col s2">
-                <div @click="showAddSubGroup" class="action-btn z-depth-1">
+                <a href="../groups">
+                    <div class="action-btn z-depth-1">
+                        <i style="font-size: 3em" class="material-icons">arrow_back</i>
+                        <span style="font-size: 1.5em">Zurück</span>
+                    </div>
+                </a>
+
+                <div v-if="modifyAll" @click="showAddSubGroup" class="action-btn z-depth-1">
                     <i style="font-size: 3em" class="material-icons">add</i>
                     <span style="font-size: 1.5em">Chatraum</span>
                 </div>
 
-                <div @click="showSettings" class="action-btn z-depth-1">
+                <div v-if="modifyAll" @click="showSettings" class="action-btn z-depth-1">
                     <i style="font-size: 3em" class="material-icons">settings</i>
                     <span style="font-size: 1.5em">Optionen</span>
                 </div>
 
-                <div @click="showDeleteGroup" class="action-btn z-depth-1">
+                <div v-if="modifyAll" @click="showDeleteGroup" class="action-btn z-depth-1">
                     <i style="font-size: 3em" class="material-icons">delete</i>
                     <span style="font-size: 1.5em">Löschen</span>
+                </div>
+
+                <div v-else @click="showLeaveGroup" class="action-btn z-depth-1">
+                    <i style="font-size: 3em" class="material-icons">exit_to_app</i>
+                    <span style="font-size: 1.5em">Verlassen</span>
                 </div>
             </div>
 
@@ -122,6 +134,41 @@
             </a>
         </div>
     </div>
+
+    <!-- delete modal -->
+    <div id="modal-delete-group" class="modal">
+        <div class="modal-content">
+            <h4>Gruppe löschen?</h4>
+            <br>
+            <p>Da du Gruppenleiter/in bzw. Betreuer/in bist, wird die ganze Gruppe beim Verlassen gelöscht.</p>
+            <p>Alle Dateien in dieser Gruppe werden ebenfalls gelöscht.</p>
+            <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
+        </div>
+        <div class="modal-footer">
+            <a @click="closeDeleteGroup" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a @click="deleteGroup" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
+                <i class="material-icons left">delete</i>
+                Löschen
+            </a>
+        </div>
+    </div>
+
+    <!-- leave modal -->
+    <div id="modal-leave-group" class="modal">
+        <div class="modal-content">
+            <h4>Gruppe verlassen?</h4>
+            <br>
+            <p>Alle Dateien in dieser Gruppe werden ebenfalls gelöscht.</p>
+            <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
+        </div>
+        <div class="modal-footer">
+            <a @click="closeLeaveGroup" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a @click="leaveGroup" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
+                <i class="material-icons left">delete</i>
+                Löschen
+            </a>
+        </div>
+    </div>
 </div>
 
 <script src="/static/js/moment.min.js" ></script>
@@ -158,7 +205,36 @@
 
             },
             showDeleteGroup: function() {
-
+                M.Modal.getInstance(document.getElementById('modal-delete-group')).open();
+            },
+            closeDeleteGroup: function() {
+                M.Modal.getInstance(document.getElementById('modal-delete-group')).close();
+            },
+            deleteGroup: async function() {
+                M.Modal.getInstance(document.getElementById('modal-delete-group')).close();
+                try {
+                    showLoadingInvisible();
+                    await axios.post('/api/groups/' + this.group.id + '/delete');
+                    window.location.replace("../groups");
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                }
+            },
+            showLeaveGroup: function() {
+                M.Modal.getInstance(document.getElementById('modal-leave-group')).open();
+            },
+            closeLeaveGroup: function() {
+                M.Modal.getInstance(document.getElementById('modal-leave-group')).close();
+            },
+            leaveGroup: async function() {
+                M.Modal.getInstance(document.getElementById('modal-leave-group')).close();
+                try {
+                    showLoadingInvisible();
+                    await axios.post('/api/groups/' + this.group.id + '/leave');
+                    window.location.replace("../groups");
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                }
             },
             showAddUser: function() {
                 this.$refs.userSearch.reset();
