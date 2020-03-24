@@ -49,11 +49,6 @@
                     </div>
                 </a>
 
-                <div v-if="modifyAll" @click="showAddSubGroup" class="action-btn z-depth-1">
-                    <i style="font-size: 3em" class="material-icons">add</i>
-                    <span style="font-size: 1.5em">Chatraum</span>
-                </div>
-
                 <div v-if="modifyAll" @click="showEditGroup" class="action-btn z-depth-1">
                     <i style="font-size: 3em" class="material-icons">settings</i>
                     <span style="font-size: 1.5em">Optionen</span>
