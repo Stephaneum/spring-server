@@ -46,9 +46,9 @@ interface MessageRepo: CrudRepository<Message, Int> {
     fun countByTeacherChat(teacherChat: Boolean): Int
     fun countBySchoolClass(schoolClass: SchoolClass): Int
 
-    fun findByGroupOrderByTimestamp(group: Group): List<Message>
-    fun findByTeacherChatOrderByTimestampDesc(teacherChat: Boolean): List<Message>
-    fun findBySchoolClassOrderByTimestampDesc(schoolClass: SchoolClass): List<Message>
+    fun findByGroupOrderById(group: Group): List<Message>
+    fun findByTeacherChatOrderById(teacherChat: Boolean): List<Message>
+    fun findBySchoolClassOrderById(schoolClass: SchoolClass): List<Message>
 
     @Transactional
     fun deleteByGroup(group: Group)

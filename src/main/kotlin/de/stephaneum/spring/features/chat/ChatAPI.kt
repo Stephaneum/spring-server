@@ -46,9 +46,9 @@ class ChatAPI {
 
         val messages = doWhenNormalAccess(user, groupID, classID) { group, schoolClass, teacherChat ->
             when {
-                group != null -> messageRepo.findByGroupOrderByTimestamp(group)
-                schoolClass != null -> messageRepo.findBySchoolClassOrderByTimestampDesc(schoolClass)
-                teacherChat -> messageRepo.findByTeacherChatOrderByTimestampDesc(true)
+                group != null -> messageRepo.findByGroupOrderById(group)
+                schoolClass != null -> messageRepo.findBySchoolClassOrderById(schoolClass)
+                teacherChat -> messageRepo.findByTeacherChatOrderById(true)
                 else -> throw ErrorCode(500, "internal error")
             }
         }
@@ -62,11 +62,14 @@ class ChatAPI {
 
         val user = Session.get().user ?: throw ErrorCode(401, "login")
 
+        if(request.message.isEmpty())
+            throw ErrorCode(400, "empty message")
+
         doWhenNormalAccess(user, groupID, classID) { group, schoolClass, teacherChat ->
             when {
-                group != null -> messageRepo.save(Message(0, request.message, user, group, null, false))
-                schoolClass != null -> messageRepo.save(Message(0, request.message, user, null, schoolClass, false))
-                teacherChat -> messageRepo.save(Message(0, request.message, user, null, null, true))
+                group != null -> messageRepo.save(Message(0, request.message, user, group, null, false, now()))
+                schoolClass != null -> messageRepo.save(Message(0, request.message, user, null, schoolClass, false, now()))
+                teacherChat -> messageRepo.save(Message(0, request.message, user, null, null, true, now()))
                 else -> throw ErrorCode(500, "internal error")
             }
         }

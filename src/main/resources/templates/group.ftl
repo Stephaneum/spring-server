@@ -60,7 +60,9 @@
 
             <div class="col s10" style="display: flex; min-height: 500px">
                 <div style="flex: 1; padding-right: 10px">
-                    <chat-view></chat-view>
+                    <chat-view :message-count-url="'/api/chat/group/'+group.id+'/count'" :messages-url="'/api/chat/group/'+group.id"
+                               :add-message-url="'/api/chat/group/'+group.id" :clear-url="'/api/chat/group/'+group.id+'/clear'"
+                               :delete-url="'/api/chat/group/'+group.id+'/delete/'"></chat-view>
                 </div>
 
                 <div style="flex: 0 0 400px; padding-left: 10px">
