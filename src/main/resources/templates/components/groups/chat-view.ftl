@@ -35,7 +35,7 @@
                     </template>
                 </div>
 
-                <div style="display: flex; align-items: center; margin: 10px 20px 0 20px">
+                <div style="display: flex; align-items: center; padding: 10px 20px 0 20px; background-color: #fafafa; border-top: 2px solid #e0e0e0">
                     <div style="flex: 1;" class="input-field">
                         <i class="material-icons prefix">chat</i>
                         <label for="add-message-text">{{ disabledMe ? 'Chat gesperrt' : 'Nachricht' }}</label>
