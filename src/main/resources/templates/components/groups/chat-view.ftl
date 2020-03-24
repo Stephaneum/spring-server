@@ -39,9 +39,9 @@
                     <div style="flex: 1;" class="input-field">
                         <i class="material-icons prefix">chat</i>
                         <label for="add-message-text">{{ disabledMe ? 'Chat gesperrt' : 'Nachricht' }}</label>
-                        <input @keyup.enter="addMessage" v-model:value="message" type="text" id="add-message-text" :disabled="disabledMe"/>
+                        <input @keyup.enter="addMessage" v-model:value="message" type="text" id="add-message-text" :disabled="disabledMe || sending"/>
                     </div>
-                    <a @click="addMessage" href="#!" style="margin-left: 20px" class="modal-close waves-effect waves-light btn green darken-4" :class="{'disabled' : disabledMe}">
+                    <a @click="addMessage" href="#!" style="margin-left: 20px" class="modal-close waves-effect waves-light btn green darken-4" :class="{'disabled' : disabledMe || sending}">
                         <i class="material-icons left">send</i>
                         Senden
                     </a>
@@ -77,7 +77,8 @@
                     message: null,
                     hoveringMessage: {},
                     selectedMessage: {},
-                    fetched: false
+                    fetched: false,
+                    sending: false
                 }
             },
             methods: {
@@ -89,8 +90,9 @@
                         if(!this.fetched || count.data.count !== this.messages.length) {
                             const messages = await axios.get(this.messagesUrl);
                             messages.data.forEach((m) => {
-                                m.date = moment(m.timestamp).format('DD.MM.YYYY');
-                                m.time = moment(m.timestamp).format('HH:mm');
+                                const time = moment(m.timestamp);
+                                m.date = time.format('DD.MM.YYYY');
+                                m.time = time.format('HH:mm');
                             });
                             this.messages = messages.data;
                             this.fetched = true;
@@ -111,9 +113,11 @@
                         return;
 
                     try {
+                        this.sending = true;
                         await axios.post(this.addMessageUrl, { message: this.message });
                         await this.fetchData();
                         this.message = null;
+                        this.sending = false;
                     } catch (e) {
                         M.toast({html: 'Interner Fehler.'});
                     }
@@ -138,10 +142,14 @@
             },
             computed: {
             },
-            mounted: function() {
+            mounted: async function() {
                 M.AutoInit();
                 moment.locale('de');
-                this.fetchData();
+
+                if(!this.disabledAll) {
+                    await this.fetchData();
+                    setInterval(this.fetchData, 1500);
+                }
             },
             template: '#chat-view'
         });

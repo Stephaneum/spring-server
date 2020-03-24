@@ -11,4 +11,9 @@ class GeneralController {
         return "login"
     }
 
+    @GetMapping("/")
+    fun getRoot(): String {
+        return "redirect:login"
+    }
+
 }
