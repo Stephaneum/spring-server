@@ -5,16 +5,19 @@
     <template id="chat-view">
         <div class="card" style="margin: 0; width: 100%; height: 100%; display: flex; flex-direction: column">
             <div id="chat-scroll-panel" style="height: 500px; overflow-y: scroll;">
-                <div v-for="m in messages">
-                    <div class="chat-message-head">
-                        <div class="chat-message-user">
-                            {{ m.user.firstName }} {{ m.user.lastName }}
-                        </div>
+                <div v-for="(m, index) in messages">
+
+                    <div v-if="index === 0 || messages[index - 1].date !== m.date" class="chat-date-wrapper">
+                        <span class="chat-date">{{ m.date }}<span>
                     </div>
-                    <div class="chat-message-body" @mouseover="selectedMessage = m" @mouseleave="selectedMessage = {}">
+
+                    <div class="chat-message-user">
+                        {{ m.user.firstName }} {{ m.user.lastName }}
+                    </div>
+                    <div class="chat-message-body">
                         {{ m.text }}
                         <div class="chat-message-time">
-                            <span v-if="selectedMessage.id === m.id">{{ m.date }} / </span>{{ m.time }}
+                            {{ m.time }}
                         </div>
                     </div>
                 </div>
@@ -91,9 +94,17 @@
 
     <style>
 
-        .chat-message-head {
-            display: flex;
-            align-items: end;
+        .chat-date-wrapper {
+            text-align: center;
+        }
+
+        .chat-date {
+            display: inline-block;
+            margin: 30px 0 10px 0;
+            background-color: #eceff1;
+            border-radius: 20px;
+            padding: 0 10px 0 10px;
+            font-size: 0.8em;
         }
 
         .chat-message-user {
