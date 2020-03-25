@@ -3,31 +3,19 @@ package de.stephaneum.spring.features.groups
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.*
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/groups")
-class GroupAPI {
-
-    @Autowired
-    private lateinit var userGroupRepo: UserGroupRepo
-
-    @Autowired
-    private lateinit var groupRepo: GroupRepo
-
-    @Autowired
-    private lateinit var userRepo: UserRepo
-
-    @Autowired
-    private lateinit var fileRepo: FileRepo
-
-    @Autowired
-    private lateinit var fileService: FileService
-
-    @Autowired
-    private lateinit var logService: LogService
+class GroupAPI (
+        private val userGroupRepo: UserGroupRepo,
+        private val groupRepo: GroupRepo,
+        private val userRepo: UserRepo,
+        private val fileRepo: FileRepo,
+        private val fileService: FileService,
+        private val logService: LogService
+) {
 
     @GetMapping
     fun getMyProjects(): List<GroupInfo> {
@@ -54,9 +42,17 @@ class GroupAPI {
         } else {
             group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
         }
-        val membersRaw = userGroupRepo.findByGroupOrderByUserFirstNameAscUserLastNameAsc(group)
-        val members = membersRaw.map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat) }
-        return GroupInfoDetailed(group.id, group.name, group.leader.toSimpleUser(), group.accepted, group.chat, members)
+        val members = userGroupRepo
+                .findByGroupOrderByUserFirstNameAscUserLastNameAsc(group)
+                .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat) }
+
+        val children = groupRepo.findByParent(group).map { child ->
+            val childMembers = userGroupRepo
+                    .findByGroupOrderByUserFirstNameAscUserLastNameAsc(child)
+                    .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat) }
+            GroupInfoDetailed(child.id, child.name, child.leader.toSimpleUser(), child.accepted, child.chat, childMembers, emptyList())
+        }
+        return GroupInfoDetailed(group.id, group.name, group.leader.toSimpleUser(), group.accepted, group.chat, members, children)
     }
 
     @PostMapping("/create")

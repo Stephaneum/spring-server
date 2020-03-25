@@ -3,6 +3,7 @@
 <#import "components/vue-loader.ftl" as vueLoader/>
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
+<#import "components/tab-bar.ftl" as tabBar/>
 <#import "components/user-search.ftl" as userSearch/>
 <#import "components/utils.ftl" as utils/>
 <#import "components/groups/chat-view.ftl" as chatView/>
@@ -41,6 +42,12 @@
         </div>
 
         <div class="row">
+
+            <!-- TABS -->
+            <div class="col s10 offset-s2">
+                <tab-bar :tabs="groups" :curr-tab="currGroup" @selected="setGroup"></tab-bar>
+            </div>
+
             <div class="col s2">
                 <a href="../groups">
                     <div class="action-btn z-depth-1">
@@ -222,20 +229,28 @@
 <@loading.render/>
 <@menu.render/>
 <@footer.render/>
+<@tabBar.render/>
 <@userSearch.render/>
 <@chatView.render/>
 <@memberList.render/>
 <@cloudView.render/>
 <script type="text/javascript">
+
+    const parentGroup = { id: -1, name: 'Allgemein' };
+
     var app = new Vue({
         el: '#app',
         data: {
             info: { user: null, menu: null, plan: null, copyright: null, unapproved: null },
             group: null,
+            currGroup: parentGroup,
             selectedUser: {},
             groupName: null,
         },
         methods: {
+            setGroup: function(group) {
+
+            },
             showAddSubGroup: function() {
                 M.Modal.getInstance(document.getElementById('modal-add-subgroup')).open();
             },
@@ -390,6 +405,18 @@
             },
             canChat: function() {
                 return this.admin || (this.info.user && this.group.members && this.group.members.some((m) => m.id === this.info.user.id && m.chat));
+            },
+            groups: function() {
+                if(!this.group)
+                    return [];
+                if(this.modifyAll)
+                    return [ parentGroup, ...this.group.children, { id: -2, icon: 'add', name: 'Chatraum' } ];
+                else {
+                    if(this.group.children.length !== 0)
+                        return [ parentGroup, ...this.group.children ];
+                    else
+                        return [];
+                }
             }
         },
         mounted: function() {
