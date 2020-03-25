@@ -5,25 +5,17 @@ import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.helper.obj
 import de.stephaneum.spring.helper.toSimpleUser
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/chat")
-class ChatAPI {
-
-    @Autowired
-    private lateinit var messageRepo: MessageRepo
-
-    @Autowired
-    private lateinit var userGroupRepo: UserGroupRepo
-
-    @Autowired
-    private lateinit var groupRepo: GroupRepo
-
-    @Autowired
-    private lateinit var schoolClassRepo: SchoolClassRepo
+class ChatAPI (
+        private val messageRepo: MessageRepo,
+        private val userGroupRepo: UserGroupRepo,
+        private val groupRepo: GroupRepo,
+        private val schoolClassRepo: SchoolClassRepo
+) {
 
     @GetMapping("/group/{groupID}/count", "/class/{classID}/count", "/teacher/count")
     fun getMessageCount(@PathVariable(required = false) groupID: Int?,
