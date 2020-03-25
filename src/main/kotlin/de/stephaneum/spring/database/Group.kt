@@ -27,7 +27,13 @@ data class Group(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                  var chat: Boolean = false,
 
                  @Column(nullable = false, name="lehrerchat")
-                 var teacherChat: Boolean = false)
+                 var teacherChat: Boolean = false,
+
+                 @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+                 var generated: Boolean = false,
+
+                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
+                 var parent: Group? = null)
 
 @Repository
 interface GroupRepo: CrudRepository<Group, Int> {
