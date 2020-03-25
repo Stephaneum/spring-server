@@ -19,11 +19,11 @@
                                 <span class="chat-date">{{ m.date }}</span>
                             </div>
 
-                            <div class="chat-message-user">
-                                {{ m.user.firstName }} {{ m.user.lastName }}
-                                <i v-if="modifyAll && hoveringMessage.id === m.id" @click="showDeleteMessage(m)" class="material-icons chat-delete-message">delete</i>
-                            </div>
-                            <div class="chat-message-body">
+                            <div class="chat-message-container">
+                                <div class="chat-message-user">
+                                    {{ m.user.firstName }} {{ m.user.lastName }}
+                                    <i v-if="modifyAll && hoveringMessage.id === m.id" @click="showDeleteMessage(m)" class="material-icons chat-delete-message">delete</i>
+                                </div>
                                 {{ m.text }}
                                 <div class="chat-message-time">
                                     {{ m.time }}
@@ -179,7 +179,6 @@
         }
 
         .chat-message-user {
-            margin: 20px 0 5px 20px;
             font-weight: bold;
         }
 
@@ -196,12 +195,12 @@
             color: #9e9e9e;
         }
 
-        .chat-message-body {
+        .chat-message-container {
             display: inline-block;
-            min-width: 70px;
+            margin: 20px 20px 0 20px;
+            min-width: 150px;
             background-color: #dcedc8;
             border-radius: 0 20px 20px 20px;
-            margin: 0 20px 0 20px;
             padding: 10px;
         }
     </style>
