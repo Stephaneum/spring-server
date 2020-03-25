@@ -20,10 +20,13 @@
                             </div>
 
                             <div class="chat-message-container">
-                                <div class="chat-message-user">
-                                    {{ m.user.firstName }} {{ m.user.lastName }}
+                                <div class="chat-message-head">
+                                    <div class="chat-message-user">
+                                        {{ m.user.firstName }} {{ m.user.lastName }}
+                                    </div>
                                     <i v-if="modifyAll && hoveringMessage.id === m.id" @click="showDeleteMessage(m)" class="material-icons chat-delete-message">delete</i>
                                 </div>
+
                                 {{ m.text }}
                                 <div class="chat-message-time">
                                     {{ m.time }}
@@ -176,6 +179,12 @@
             border-radius: 20px;
             padding: 0 10px 0 10px;
             font-size: 0.8em;
+        }
+
+        .chat-message-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .chat-message-user {
