@@ -5,6 +5,7 @@
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
 <#import "components/utils.ftl" as utils/>
+<#import "components/tab-bar.ftl" as tabBar/>
 <#import "components/cms/post-preview.ftl" as preview/>
 <#import "components/cms/post.ftl" as post/>
 <#import "components/cms/post-list.ftl" as postList/>
@@ -49,43 +50,6 @@
 
         .mode-btn-active {
             background-color: #43a047 !important;
-        }
-
-        .tab-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            vertical-align: bottom;
-            padding: 5px 15px 5px 10px;
-            margin: 0 5px 0 5px;
-            border-radius: 10px 10px 0 0;
-            background-color: #558b2f;
-            height: 40px;
-            color: white;
-            font-size: 1.2em;
-        }
-
-        .tab-btn:hover {
-            background-color: #689f38;
-            cursor: pointer;
-        }
-
-        .tab-btn-active {
-            background-color: #43a047 !important;
-            height: 45px !important;
-        }
-
-        .tab-btn-special {
-            background-color: #009688;
-        }
-
-        .tab-btn-special:hover {
-            background-color: #26a69a;
-        }
-
-        .tab-btn-special-active {
-            background-color: #00897b !important;
-            height: 45px !important;
         }
 
         .tab-panel {
@@ -203,10 +167,7 @@
         </div>
         <!-- TABS -->
         <div class="col s10 offset-s2">
-            <div v-for="(t, index) in currTabs" @click="setTab(t)" class="tab-btn" :class="{ 'tab-btn-special': t.special, 'tab-btn-active': !t.special && t.id === currTab.id, 'tab-btn-special-active': t.special && t.id === currTab.id }">
-                <i style="font-size: 1em; margin-right: 5px" class="material-icons">{{ t.icon }}</i>
-                <span style="vertical-align: middle">{{ t.name }}{{ t.number ? ' ('+t.number+')' : null }}</span>
-            </div>
+            <tab-bar :tabs="currTabs" :curr-tab="currTab" @selected="setTab"></tab-bar>
         </div>
         <!-- MODES -->
         <div class="col s2">
@@ -488,6 +449,7 @@
 <@footer.render/>
 <@loading.render/>
 <@preview.render/>
+<@tabBar.render/>
 <@post.render/>
 <@postList.render/>
 <@constants.render/>
