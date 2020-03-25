@@ -43,7 +43,7 @@ class GroupController {
         if(key != null) {
             Session.get().user = jwtService.getUser(key)
             if(Session.get().user != null) {
-                return "redirect:${request.requestURL}/$id"
+                return "redirect:${request.requestURL}"
             }
         }
 
