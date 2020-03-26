@@ -74,13 +74,13 @@
 
             <div class="col s10" style="display: flex; min-height: 500px">
                 <div style="flex: 1; padding-right: 10px">
-                    <chat-view :disabled-all="!group.chat" :disabled-me="!canChat" :modify-all="modifyAll"
+                    <chat-view :disabled-all="!group.chat" :disabled-me="!canChat" :modify-all="modifyAll" :height="memberListHeight"
                                :message-count-url="'/api/chat/group/'+group.id+'/count'" :messages-url="'/api/chat/group/'+group.id"
                                :add-message-url="'/api/chat/group/'+group.id" :clear-url="'/api/chat/group/'+group.id+'/clear'"></chat-view>
                 </div>
 
                 <div style="flex: 0 0 400px; padding-left: 10px">
-                    <member-list :members="group.members" :leader="group.leader" :modify-all="modifyAll" @adduser="showAddUser" @togglechat="toggleChatUser" @kick="showKickUser"></member-list>
+                    <member-list :members="group.members" :leader="group.leader" :modify-all="modifyAll" @adduser="showAddUser" @togglechat="toggleChatUser" @kick="showKickUser" @height="setMemberListHeight"></member-list>
                 </div>
             </div>
         </div>
@@ -246,6 +246,7 @@
             currGroup: parentGroup,
             selectedUser: {},
             groupName: null,
+            memberListHeight: 0,
         },
         methods: {
             setGroup: function(group) {
@@ -369,6 +370,9 @@
                     hideLoading();
                     M.toast({html: 'Löschen fehlgeschlagen.<br>'+this.selectedUser.firstName});
                 }
+            },
+            setMemberListHeight: function(h) {
+                this.memberListHeight = h;
             },
             fetchData: async function() {
                 const info = await axios.get('/api/info');

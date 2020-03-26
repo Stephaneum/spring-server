@@ -78,7 +78,7 @@
             this.$nextTick(() => {
                 instance = this;
                 fetchLogs();
-            })
+            });
         }
     });
 

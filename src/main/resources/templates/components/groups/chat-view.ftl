@@ -3,12 +3,12 @@
 
 <#macro render>
     <template id="chat-view">
-        <div class="card" style="margin: 0; width: 100%; display: flex; flex-direction: column">
+        <div class="card" style="margin: 0; display: flex; flex-direction: column" :style="{ height: (height || 0)+'px' }">
             <div v-if="disabledAll" class="chat-info" style="height: 550px; color: grey">
                 Chat für alle Mitglieder deaktiviert.
             </div>
             <template v-else>
-                <div id="chat-scroll-panel" style="height: 450px; overflow-y: scroll;">
+                <div id="chat-scroll-panel" style="flex: 1; overflow-y: scroll;">
                     <div v-if="fetched && messages.length === 0" class="chat-info">
                         Noch keine Nachrichten
                     </div>
@@ -73,7 +73,7 @@
 
     <script type="text/javascript">
         Vue.component('chat-view', {
-            props: ['disabledAll', 'disabledMe', 'modifyAll', 'messageCountUrl', 'messagesUrl', 'addMessageUrl', 'clearUrl'],
+            props: ['disabledAll', 'disabledMe', 'modifyAll', 'messageCountUrl', 'messagesUrl', 'addMessageUrl', 'clearUrl', 'height'],
             data: function () {
                 return {
                     messages: [],

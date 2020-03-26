@@ -3,7 +3,7 @@
 
 <#macro render>
     <template id="member-list">
-        <div class="card" style="margin: 0; width: 100%; height: 100%; padding: 10px">
+        <div id="member-list-card" class="card" style="min-height: 500px; margin: 0; padding: 10px">
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
                 <h5 style="margin-top: 5px">Mitglieder</h5>
                 <a v-if="modifyAll" @click="addUser" class="tooltipped waves-effect waves-light green darken-4 btn-floating" href="#!" data-tooltip="Mitglied hinzufügen" data-position="top">
@@ -50,9 +50,13 @@
                 },
                 kick: function(u) {
                     this.$emit('kick', u);
-                }
+                },
             },
-            computed: {
+            mounted: function() {
+                this.$nextTick(() => {
+                    const height = document.getElementById("member-list-card").getBoundingClientRect().height;
+                    this.$emit('height', height);
+                });
             },
             template: '#member-list'
         });
