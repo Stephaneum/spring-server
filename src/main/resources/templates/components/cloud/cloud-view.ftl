@@ -61,9 +61,16 @@
             <!-- MAIN CONTENT -->
             <div class="col s10">
                 <div class="tab-panel white z-depth-1" style="margin: 0; min-height: 530px;padding: 10px">
-                    <file-grid v-if="!statsMode && gridView" :files="files" :shared-mode="sharedMode" @onselect="select"></file-grid>
-                    <file-list v-else-if="!statsMode && !gridView" :files="files" :shared-mode="sharedMode" :modify-all="modifyAll" @onselect="select" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
-                    <cloud-stats v-else :info="storage" :teacherchat="teacherchat" @onexit="toggleStatsMode"></cloud-stats>
+                    <cloud-stats v-if="statsMode" :info="storage" :teacherchat="teacherchat" @onexit="toggleStatsMode"></cloud-stats>
+                    <template v-else>
+                        <template v-if="files.length !== 0">
+                            <file-grid v-if="gridView" :files="files" :shared-mode="sharedMode" @onselect="select"></file-grid>
+                            <file-list v-else :files="files" :shared-mode="sharedMode" :modify-all="modifyAll" @onselect="select" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
+                        </template>
+                        <div v-else style="height: 400px; display: flex; align-items: center; justify-content: center; font-size: 2em; color: #e0e0e0; font-weight: bold">
+                            {{ fetching ? 'Lade Dateien...' : 'Dieser Ordner ist leer.' }}
+                        </div>
+                    </template>
                 </div>
             </div>
 
@@ -162,6 +169,7 @@
             props: ['myId', 'sharedMode', 'modifyAll', 'rootUrl', 'uploadUrl', 'folderUrl', 'teacherchat'],
             data: function () {
                 return {
+                    fetching: true,
                     statsMode: false,
                     gridView: true,
                     folderID: null,
@@ -363,6 +371,7 @@
                         });
                 },
                 fetchData: async function () {
+                    this.fetching = true;
                     var url = this.folderID ? '/api/cloud/view/' + this.folderID : this.rootUrl;
                     var res = await axios.get(url);
                     this.files = this.digestFiles(res.data);
@@ -383,6 +392,7 @@
                     this.storage.teacherChat = storageReadable(this.storage.teacherChat);
                     initTooltips();
                     hideLoading();
+                    this.fetching = false;
                 },
             },
             computed: {
