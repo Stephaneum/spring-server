@@ -112,7 +112,7 @@
                 },
                 addMessage: async function() {
 
-                    if(!this.message || this.disabledMe)
+                    if(this.disabledMe || !this.message || this.message.trim().length === 0)
                         return;
 
                     try {
