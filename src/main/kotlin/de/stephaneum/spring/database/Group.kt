@@ -38,6 +38,6 @@ data class Group(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Repository
 interface GroupRepo: CrudRepository<Group, Int> {
 
-    fun findByOrderByName(): List<Group>
+    fun findByParentOrderByName(parent: Group?): List<Group>
     fun findByParent(group: Group): List<Group>
 }

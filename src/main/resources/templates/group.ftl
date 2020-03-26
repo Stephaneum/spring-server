@@ -4,6 +4,7 @@
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
 <#import "components/tab-bar.ftl" as tabBar/>
+<#import "components/user-add-list.ftl" as userAddList/>
 <#import "components/user-search.ftl" as userSearch/>
 <#import "components/utils.ftl" as utils/>
 <#import "components/groups/chat-view.ftl" as chatView/>
@@ -45,7 +46,7 @@
 
             <!-- TABS -->
             <div class="col s10 offset-s2">
-                <tab-bar :tabs="groups" :curr-tab="currGroup" @selected="setGroup"></tab-bar>
+                <tab-bar :tabs="groups" :curr-tab="currTab" @selected="setTab"></tab-bar>
             </div>
 
             <div class="col s2">
@@ -105,12 +106,20 @@
     <div id="modal-add-subgroup" class="modal">
         <div class="modal-content">
             <h4>Neuer Chatraum</h4>
-            <br>
-            In Arbeit
-
+            <p>Chaträume bieten die Möglichkeit, Untergruppen zu bilden und dort zu chatten oder Dateien auszutauschen. Chaträume können nur von Gruppenadmins oder Betreuer erstellt werden.</p>
+            <div class="input-field">
+                <i class="material-icons prefix">edit</i>
+                <label for="subgroup-name-text">Name</label>
+                <input v-model:value="groupName" type="text" id="subgroup-name-text"/>
+            </div>
+            <user-add-list @select="addUserSubGroup" :users="((group || {}).members || [])" :excluded="usersSubGroup" excluded-string="hinzugefügt" action-string="Hinzufügen"></user-add-list>
         </div>
         <div class="modal-footer">
-            <a @click="closeAddSubGroup" href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+            <button @click="addSubGroup" type="button" class="btn waves-effect waves-light green darken-3">
+                <i class="material-icons left">add</i>
+                Erstellen
+            </button>
         </div>
     </div>
 
@@ -125,7 +134,7 @@
                     <label for="group-name-text">Name</label>
                     <input @keyup.enter="changeGroupName" v-model:value="groupName" type="text" id="group-name-text"/>
                 </div>
-                <a @click="changeGroupName" href="#!" style="margin-left: 20px" class="modal-close waves-effect waves-light btn green darken-4">
+                <a @click="changeGroupName" style="margin-left: 20px" class="waves-effect waves-light btn green darken-4">
                     <i class="material-icons left">save</i>
                     Speichern
                 </a>
@@ -133,18 +142,18 @@
 
             <div style="display: flex; align-items: center; padding: 10px 20px 0 20px;">
                 Chat
-                <a @click="updateChat(true)" href="#!" style="margin-left: 20px" class="modal-close waves-effect waves-light btn green" :class="group && group.chat ? [] : ['darken-4']">
+                <a @click="updateChat(true)" href="#!" style="margin-left: 20px" class="waves-effect waves-light btn green" :class="group && group.chat ? [] : ['darken-4']">
                     <i class="material-icons left">check</i>
                     Ja
                 </a>
-                <a @click="updateChat(false)" href="#!" style="margin-left: 20px" class="modal-close waves-effect waves-light btn green" :class="group && group.chat ? ['darken-4'] : []">
+                <a @click="updateChat(false)" href="#!" style="margin-left: 20px" class="waves-effect waves-light btn green" :class="group && group.chat ? ['darken-4'] : []">
                     <i class="material-icons left">close</i>
                     Nein
                 </a>
             </div>
         </div>
         <div class="modal-footer">
-            <a @click="closeEditGroup" href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
         </div>
     </div>
 
@@ -156,13 +165,14 @@
                     <i style="font-size: 2em" class="material-icons">person</i>
                     <span style="font-size: 1.5em; margin-left: 15px">Nutzer hinzufügen</span>
                 </span>
-                <a @click="closeAddUser" class="waves-effect btn-flat" href="#!" style="margin: 0">
+                <a class="modal-close waves-effect btn-flat" href="#!" style="margin: 0">
                     <i class="material-icons">close</i>
                 </a>
             </div>
 
             <br>
-            <user-search ref="userSearch" @onselect="addUser" :excluded="group ? group.members : []" excluded-string="hinzugefügt" action-string="Hinzufügen"></user-search>
+            <user-search ref="userSearch" @result="setSearchResult"></user-search>
+            <user-add-list @select="addUser" :users="searchResult" :excluded="group ? group.members : []" excluded-string="hinzugefügt" action-string="Hinzufügen"></user-add-list>
         </div>
     </div>
 
@@ -176,7 +186,7 @@
             <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
         </div>
         <div class="modal-footer">
-            <a @click="closeKickUser" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
             <a @click="kickUser" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
                 <i class="material-icons left">delete</i>
                 Löschen
@@ -194,7 +204,7 @@
             <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
         </div>
         <div class="modal-footer">
-            <a @click="closeDeleteGroup" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
             <a @click="deleteGroup" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
                 <i class="material-icons left">delete</i>
                 Löschen
@@ -211,7 +221,7 @@
             <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
         </div>
         <div class="modal-footer">
-            <a @click="closeLeaveGroup" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
             <a @click="leaveGroup" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
                 <i class="material-icons left">delete</i>
                 Löschen
@@ -230,6 +240,7 @@
 <@menu.render/>
 <@footer.render/>
 <@tabBar.render/>
+<@userAddList.render/>
 <@userSearch.render/>
 <@chatView.render/>
 <@memberList.render/>
@@ -237,31 +248,63 @@
 <script type="text/javascript">
 
     const parentGroup = { id: -1, name: 'Allgemein' };
+    const addSubGroup = { id: -2, icon: 'add', name: 'Chatraum' };
 
     var app = new Vue({
         el: '#app',
         data: {
             info: { user: null, menu: null, plan: null, copyright: null, unapproved: null },
-            group: null,
-            currGroup: parentGroup,
-            selectedUser: {},
-            groupName: null,
-            memberListHeight: 0,
+            group: null, // main group
+            currTab: parentGroup, // curr tab
+            currGroup: null,
+            selectedUser: {}, // e.g. from member list
+            groupName: null, // used for edit / new sub group
+            memberListHeight: 0, // applied to chat view
+            searchResult: [],
+            usersSubGroup: [],
         },
         methods: {
-            setGroup: function(group) {
+            setTab: function(tab) {
+                if(tab.id === this.currTab.id)
+                    return;
 
+                switch(tab.id) {
+                    case addSubGroup.id:
+                        this.showAddSubGroup();
+                        break;
+                    default:
+                        // TODO: select sub group
+                }
             },
             showAddSubGroup: function() {
+                this.groupName = null;
+                this.usersSubGroup = [ this.info.user ];
                 M.Modal.getInstance(document.getElementById('modal-add-subgroup')).open();
+                this.$nextTick(() => {
+                    M.updateTextFields();
+                });
             },
-            closeAddSubGroup: function() {
-                M.Modal.getInstance(document.getElementById('modal-add-subgroup')).open();
+            addUserSubGroup: function(u) {
+                this.usersSubGroup.push(u);
             },
-            addSubGroup: function() {
-                M.Modal.getInstance(document.getElementById('modal-add-subgroup')).open();
+            addSubGroup: async function() {
+
+                if(!this.groupName || this.groupName.trim().length === 0)
+                    return;
+
+                M.Modal.getInstance(document.getElementById('modal-add-subgroup')).close();
+                try {
+                    await axios.post( '/api/groups/create', { name: this.groupName, parent: this.group.id, members: this.usersSubGroup.filter((u) => u.id !== this.info.user.id) });
+                    await this.fetchData();
+                    M.toast({html: 'Chatraum erstellt.<br>'+this.groupName});
+                } catch (e) {
+                    hideLoading();
+                    console.log(e);
+                    M.toast({html: 'Fehlgeschlagen.'});
+                }
             },
             showEditGroup: function() {
+                this.groupName = this.group.name;
                 M.Modal.getInstance(document.getElementById('modal-edit-group')).open();
                 this.$nextTick(() => {
                     M.updateTextFields();
@@ -291,9 +334,6 @@
             showDeleteGroup: function() {
                 M.Modal.getInstance(document.getElementById('modal-delete-group')).open();
             },
-            closeDeleteGroup: function() {
-                M.Modal.getInstance(document.getElementById('modal-delete-group')).close();
-            },
             deleteGroup: async function() {
                 M.Modal.getInstance(document.getElementById('modal-delete-group')).close();
                 try {
@@ -307,9 +347,6 @@
             showLeaveGroup: function() {
                 M.Modal.getInstance(document.getElementById('modal-leave-group')).open();
             },
-            closeLeaveGroup: function() {
-                M.Modal.getInstance(document.getElementById('modal-leave-group')).close();
-            },
             leaveGroup: async function() {
                 M.Modal.getInstance(document.getElementById('modal-leave-group')).close();
                 try {
@@ -321,14 +358,14 @@
                 }
             },
             showAddUser: function() {
-                this.$refs.userSearch.reset();
+                this.searchResult = [];
                 M.Modal.getInstance(document.getElementById('modal-add-user')).open();
                 this.$nextTick(() => {
                     M.updateTextFields();
                 });
             },
-            closeAddUser: function() {
-                M.Modal.getInstance(document.getElementById('modal-add-user')).close();
+            setSearchResult: function(users) {
+                this.searchResult = users;
             },
             addUser: async function(user) {
                 try {
@@ -354,9 +391,6 @@
             showKickUser: function(user) {
                 this.selectedUser = user;
                 M.Modal.getInstance(document.getElementById('modal-kick-user')).open();
-            },
-            closeKickUser: function() {
-                M.Modal.getInstance(document.getElementById('modal-kick-user')).close();
             },
             kickUser: async function() {
                 M.Modal.getInstance(document.getElementById('modal-kick-user')).close();
@@ -386,7 +420,6 @@
                 const id = window.location.pathname.split('/').pop();
                 const group = await axios.get('/api/groups/' + id);
                 this.group = group.data;
-                this.groupName = group.data.name;
 
                 hideLoading();
                 this.$nextTick(() => M.Tooltip.init(document.querySelectorAll('.tooltipped'), {}));
@@ -414,7 +447,7 @@
                 if(!this.group)
                     return [];
                 if(this.modifyAll)
-                    return [ parentGroup, ...this.group.children, { id: -2, icon: 'add', name: 'Chatraum' } ];
+                    return [ parentGroup, ...this.group.children, addSubGroup ];
                 else {
                     if(this.group.children.length !== 0)
                         return [ parentGroup, ...this.group.children ];

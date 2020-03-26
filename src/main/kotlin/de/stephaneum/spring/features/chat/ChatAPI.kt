@@ -54,7 +54,7 @@ class ChatAPI (
 
         val user = Session.get().user ?: throw ErrorCode(401, "login")
 
-        if(request.message.isEmpty())
+        if(request.message.isBlank())
             throw ErrorCode(400, "empty message")
 
         doWhenNormalAccess(user, groupID, classID) { group, schoolClass, teacherChat ->

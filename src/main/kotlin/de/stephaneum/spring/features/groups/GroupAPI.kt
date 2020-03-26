@@ -20,7 +20,7 @@ class GroupAPI (
     @GetMapping
     fun getMyProjects(): List<GroupInfo> {
         val user = Session.get().user ?: throw ErrorCode(401, "login")
-        return userGroupRepo.findByUserOrderByGroupName(user).map { it.group.toGroupInfo() }
+        return userGroupRepo.findByUserAndGroupParentOrderByGroupName(user, null).map { it.group.toGroupInfo() }
     }
 
     @GetMapping("/all")
@@ -29,7 +29,7 @@ class GroupAPI (
         if(user.code.role != ROLE_ADMIN)
             throw ErrorCode(403, "Admin only")
 
-        return groupRepo.findByOrderByName().map { it.toGroupInfo() }
+        return groupRepo.findByParentOrderByName(null).map { it.toGroupInfo() }
     }
 
     @GetMapping("/{id}")
@@ -56,14 +56,35 @@ class GroupAPI (
     }
 
     @PostMapping("/create")
-    fun create(@RequestBody request: CreateGroup) {
+    fun create(@RequestBody request: UpdateGroup) {
         val user = Session.get().user ?: throw ErrorCode(401, "login")
 
         if(request.name.isNullOrBlank())
             throw ErrorCode(400, "missing name")
 
+        // parent
+        val parent: Group?
+        val members: List<User>
+        if(request.parent != null && request.members != null) {
+            if(!checkAdminPermission(user, request.parent))
+                throw ErrorCode(403, "you cannot specify sub groups")
+
+            parent = groupRepo.findByIdOrNull(request.parent) ?: throw ErrorCode(404, "parent not found")
+            if(parent.parent != null)
+                throw ErrorCode(409, "you cannot create nested sub groups")
+
+            members = userRepo.findByIdIn(request.members)
+            if(members.any { it.id == user.id })
+                throw ErrorCode(400, "member list should not contain yourself")
+        } else {
+            parent = null
+            members = emptyList()
+        }
+
+        // teachers
         val teachers: List<User>
         if(user.code.role == ROLE_STUDENT) {
+
             if(request.teachers.isNullOrEmpty())
                 throw ErrorCode(400, "missing teachers")
 
@@ -79,12 +100,13 @@ class GroupAPI (
         }
 
         // actual group creation
-        val group = groupRepo.save(Group(0, request.name.trim(), user, user.code.role != ROLE_STUDENT, true, false))
+        val group = groupRepo.save(Group(0, request.name.trim(), user, user.code.role != ROLE_STUDENT, true, false, false, parent))
 
         // add connections
         val connections = mutableListOf<UserGroup>()
         connections.add(UserGroup(0, user, group, false, true))
         connections.addAll(teachers.map { UserGroup(0, it, group, true, false) })
+        connections.addAll(members.map { UserGroup(0, it, group, false, true) })
         userGroupRepo.saveAll(connections)
 
         logService.log(EventType.CREATE_GROUP, user, group.name)
@@ -107,7 +129,7 @@ class GroupAPI (
     }
 
     @PostMapping("/{id}/update")
-    fun renameGroup(@PathVariable id: Int, @RequestBody request: CreateGroup) {
+    fun renameGroup(@PathVariable id: Int, @RequestBody request: UpdateGroup) {
         val user = Session.get().user ?: throw ErrorCode(401, "login")
 
         if(request.name.isNullOrBlank())
