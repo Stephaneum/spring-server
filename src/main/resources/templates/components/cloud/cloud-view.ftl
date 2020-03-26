@@ -67,7 +67,7 @@
                             <file-grid v-if="gridView" :files="files" :shared-mode="sharedMode" @onselect="select"></file-grid>
                             <file-list v-else :files="files" :shared-mode="sharedMode" :modify-all="modifyAll" @onselect="select" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
                         </template>
-                        <div v-else style="height: 400px; display: flex; align-items: center; justify-content: center; font-size: 2em; color: #e0e0e0; font-weight: bold">
+                        <div v-else style="height: 400px;" class="empty-hint">
                             {{ fetching ? 'Lade Dateien...' : 'Dieser Ordner ist leer.' }}
                         </div>
                     </template>

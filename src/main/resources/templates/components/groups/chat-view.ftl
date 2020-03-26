@@ -4,12 +4,12 @@
 <#macro render>
     <template id="chat-view">
         <div class="card" style="margin: 0; display: flex; flex-direction: column" :style="{ height: (height || 0)+'px' }">
-            <div v-if="disabledAll" class="chat-info" style="height: 550px; color: grey">
+            <div v-if="disabledAll" class="empty-hint">
                 Chat für alle Mitglieder deaktiviert.
             </div>
             <template v-else>
                 <div id="chat-scroll-panel" style="flex: 1; overflow-y: scroll;">
-                    <div v-if="fetched && messages.length === 0" class="chat-info">
+                    <div v-if="fetched && messages.length === 0" class="empty-hint">
                         Noch keine Nachrichten
                     </div>
                     <template v-else>
@@ -147,6 +147,10 @@
                 messagesUrl: function() {
                     this.fetched = false;
                     this.fetchData();
+                },
+                disabledAll: function() {
+                    this.fetched = false;
+                    this.fetchData();
                 }
             },
             mounted: async function() {
@@ -163,14 +167,6 @@
     </script>
 
     <style>
-
-        .chat-info {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center
-        }
 
         .chat-date-wrapper {
             text-align: center;
