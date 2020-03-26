@@ -151,6 +151,9 @@
                 disabledAll: function() {
                     this.fetched = false;
                     this.fetchData();
+                    this.$nextTick(() => {
+                        M.Modal.init(document.querySelectorAll('.modal'), {});
+                    });
                 }
             },
             mounted: async function() {
