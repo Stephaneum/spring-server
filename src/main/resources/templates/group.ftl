@@ -75,25 +75,26 @@
 
             <div class="col s10" style="display: flex; min-height: 500px">
                 <div style="flex: 1; padding-right: 10px">
-                    <chat-view :disabled-all="!group.chat" :disabled-me="!canChat" :modify-all="modifyAll" :height="memberListHeight"
-                               :message-count-url="'/api/chat/group/'+group.id+'/count'" :messages-url="'/api/chat/group/'+group.id"
-                               :add-message-url="'/api/chat/group/'+group.id" :clear-url="'/api/chat/group/'+group.id+'/clear'"></chat-view>
+                    <chat-view :disabled-all="!currGroup.chat" :disabled-me="!canChat" :modify-all="modifyAll" :height="memberListHeight"
+                               :message-count-url="'/api/chat/group/'+currGroup.id+'/count'" :messages-url="'/api/chat/group/'+currGroup.id"
+                               :add-message-url="'/api/chat/group/'+currGroup.id" :clear-url="'/api/chat/group/'+currGroup.id+'/clear'"></chat-view>
                 </div>
 
                 <div style="flex: 0 0 400px; padding-left: 10px">
-                    <member-list :members="group.members" :leader="group.leader" :modify-all="modifyAll" @adduser="showAddUser" @togglechat="toggleChatUser" @kick="showKickUser" @height="setMemberListHeight"></member-list>
+                    <member-list :members="currGroup.members" :leader="currGroup.leader" :modify-all="modifyAll" :show-add-user="currGroup.id === group.id" @adduser="showAddUser" @togglechat="toggleChatUser" @kick="showKickUser" @height="setMemberListHeight"></member-list>
                 </div>
             </div>
         </div>
 
         <div class="row" style="margin-top: 50px">
             <div class="col s10 offset-s2">
-                <h4 style="margin: 20px 0 20px 0">Gemeinsame Cloud</h4>
+                <h4 style="margin: 20px 0 10px 0">Gemeinsame Cloud</h4>
+                <p v-if="currGroup.id !== group.id" style="margin: 0">des Chatraums <b>{{ currGroup.name }}</b></p>
             </div>
         </div>
 
         <cloud-view ref="cloudView" :my-id="info.user.id" :shared-mode="true" :modify-all="modifyAll" :teacherchat="hasTeacherChat"
-                    :root-url="'/api/cloud/view/group/' + group.id" :upload-url="'/api/cloud/upload/group/' + group.id" :folder-url="'/api/cloud/create-folder/group/' + group.id"></cloud-view>
+                    :root-url="'/api/cloud/view/group/' + currGroup.id" :upload-url="'/api/cloud/upload/group/' + currGroup.id" :folder-url="'/api/cloud/create-folder/group/' + currGroup.id"></cloud-view>
 
     </div>
     <div v-else style="flex: 1; min-height: calc(100vh - 100px)"></div>
@@ -142,11 +143,11 @@
 
             <div style="display: flex; align-items: center; padding: 10px 20px 0 20px;">
                 Chat
-                <a @click="updateChat(true)" href="#!" style="margin-left: 20px" class="waves-effect waves-light btn green" :class="group && group.chat ? [] : ['darken-4']">
+                <a @click="updateChat(true)" href="#!" style="margin-left: 20px" class="waves-effect waves-light btn green" :class="currGroup && currGroup.chat ? [] : ['darken-4']">
                     <i class="material-icons left">check</i>
                     Ja
                 </a>
-                <a @click="updateChat(false)" href="#!" style="margin-left: 20px" class="waves-effect waves-light btn green" :class="group && group.chat ? ['darken-4'] : []">
+                <a @click="updateChat(false)" href="#!" style="margin-left: 20px" class="waves-effect waves-light btn green" :class="currGroup && currGroup.chat ? ['darken-4'] : []">
                     <i class="material-icons left">close</i>
                     Nein
                 </a>
@@ -197,7 +198,7 @@
     <!-- delete modal -->
     <div id="modal-delete-group" class="modal">
         <div class="modal-content">
-            <h4>Gruppe löschen?</h4>
+            <h4>{{ (currGroup || {}).name }} löschen?</h4>
             <br>
             <p>Da du Gruppenleiter/in bzw. Betreuer/in bist, wird die ganze Gruppe beim Verlassen gelöscht.</p>
             <p>Alle Dateien in dieser Gruppe werden ebenfalls gelöscht.</p>
@@ -215,7 +216,7 @@
     <!-- leave modal -->
     <div id="modal-leave-group" class="modal">
         <div class="modal-content">
-            <h4>Gruppe verlassen?</h4>
+            <h4>{{ (currGroup || {}).name }} verlassen?</h4>
             <br>
             <p>Alle Dateien in dieser Gruppe werden ebenfalls gelöscht.</p>
             <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
@@ -247,7 +248,7 @@
 <@cloudView.render/>
 <script type="text/javascript">
 
-    const parentGroup = { id: -1, name: 'Allgemein' };
+    const parentGroup = { id: -1, special: true, name: 'Allgemein' };
     const addSubGroup = { id: -2, icon: 'add', name: 'Chatraum' };
 
     var app = new Vue({
@@ -269,12 +270,23 @@
                     return;
 
                 switch(tab.id) {
+                    case parentGroup.id:
+                        this.currGroup = this.group;
+                        this.currTab = parentGroup;
+                        break;
                     case addSubGroup.id:
                         this.showAddSubGroup();
                         break;
                     default:
-                        // TODO: select sub group
+                        // select sub group
+                        this.currGroup = tab;
+                        this.currTab = tab;
+                        break;
                 }
+
+                this.$nextTick(async () => {
+                    await this.$refs.cloudView.reset(); // also update the cloud view
+                });
             },
             showAddSubGroup: function() {
                 this.groupName = null;
@@ -294,7 +306,7 @@
 
                 M.Modal.getInstance(document.getElementById('modal-add-subgroup')).close();
                 try {
-                    await axios.post( '/api/groups/create', { name: this.groupName, parent: this.group.id, members: this.usersSubGroup.filter((u) => u.id !== this.info.user.id) });
+                    await axios.post( '/api/groups/create', { name: this.groupName, parent: this.group.id, members: this.usersSubGroup.filter((u) => u.id !== this.info.user.id).map((u) => u.id) });
                     await this.fetchData();
                     M.toast({html: 'Chatraum erstellt.<br>'+this.groupName});
                 } catch (e) {
@@ -304,7 +316,7 @@
                 }
             },
             showEditGroup: function() {
-                this.groupName = this.group.name;
+                this.groupName = this.currGroup.name;
                 M.Modal.getInstance(document.getElementById('modal-edit-group')).open();
                 this.$nextTick(() => {
                     M.updateTextFields();
@@ -316,7 +328,7 @@
             changeGroupName: async function() {
                 try {
                     showLoadingInvisible();
-                    await axios.post('/api/groups/' + this.group.id + '/update', { name: this.groupName });
+                    await axios.post('/api/groups/' + this.currGroup.id + '/update', { name: this.groupName });
                     await this.fetchData();
                 } catch (e) {
                     M.toast({html: 'Ein Fehler ist aufgetreten.'});
@@ -325,7 +337,7 @@
             updateChat: async function(chat) {
                 try {
                     showLoadingInvisible();
-                    await axios.post('/api/groups/' + this.group.id + '/chat/' + (chat ? '1' : '0'));
+                    await axios.post('/api/groups/' + this.currGroup.id + '/chat/' + (chat ? '1' : '0'));
                     await this.fetchData();
                 } catch (e) {
                     M.toast({html: 'Ein Fehler ist aufgetreten.'});
@@ -338,8 +350,13 @@
                 M.Modal.getInstance(document.getElementById('modal-delete-group')).close();
                 try {
                     showLoadingInvisible();
-                    await axios.post('/api/groups/' + this.group.id + '/delete');
-                    window.location.replace("../groups");
+                    await axios.post('/api/groups/' + this.currGroup.id + '/delete');
+                    if(this.currGroup.id === this.group.id)
+                        window.location.replace("../groups");
+                    else {
+                        this.setTab(parentGroup);
+                        await this.fetchData();
+                    }
                 } catch (e) {
                     M.toast({html: 'Ein Fehler ist aufgetreten.'});
                 }
@@ -351,8 +368,13 @@
                 M.Modal.getInstance(document.getElementById('modal-leave-group')).close();
                 try {
                     showLoadingInvisible();
-                    await axios.post('/api/groups/' + this.group.id + '/leave');
-                    window.location.replace("../groups");
+                    await axios.post('/api/groups/' + this.currGroup.id + '/leave');
+                    if(this.currGroup.id === this.group.id)
+                        window.location.replace("../groups");
+                    else {
+                        this.setTab(parentGroup);
+                        await this.fetchData();
+                    }
                 } catch (e) {
                     M.toast({html: 'Ein Fehler ist aufgetreten.'});
                 }
@@ -382,7 +404,7 @@
             toggleChatUser: async function(user) {
                 try {
                     showLoadingInvisible();
-                    await axios.post('/api/groups/' + this.group.id + '/toggle-chat/' + user.id);
+                    await axios.post('/api/groups/' + this.currGroup.id + '/toggle-chat/' + user.id);
                 } catch (e) {
                     M.toast({html: 'Ein Fehler ist aufgetreten.'});
                 }
@@ -396,7 +418,7 @@
                 M.Modal.getInstance(document.getElementById('modal-kick-user')).close();
                 showLoading('Nutzer entfernen...');
                 try {
-                    await axios.post('/api/groups/' + this.group.id + '/kick/' + this.selectedUser.id);
+                    await axios.post('/api/groups/' + this.currGroup.id + '/kick/' + this.selectedUser.id);
                     M.toast({html: 'Nutzer gelöscht.<br>'+this.selectedUser.firstName});
                     await this.fetchData();
                     await this.$refs.cloudView.fetchData(); // also update the cloud view because files may be deleted
@@ -420,6 +442,17 @@
                 const id = window.location.pathname.split('/').pop();
                 const group = await axios.get('/api/groups/' + id);
                 this.group = group.data;
+                if(!this.currGroup) {
+                    // init
+                    this.currGroup = this.group;
+                } else {
+                    // update
+                    if(this.currTab === parentGroup) {
+                        this.currGroup = this.group;
+                    } else {
+                        this.currGroup = this.group.children.find((g) => g.id === this.currGroup.id);
+                    }
+                }
 
                 hideLoading();
                 this.$nextTick(() => M.Tooltip.init(document.querySelectorAll('.tooltipped'), {}));
@@ -441,7 +474,7 @@
                     (this.group && this.group.members && this.group.members.some((t) => t.teacher && t.id === this.info.user.id)); // group-teacher
             },
             canChat: function() {
-                return this.admin || (this.info.user && this.group.members && this.group.members.some((m) => m.id === this.info.user.id && m.chat));
+                return this.admin || (this.info.user && this.currGroup.members && this.currGroup.members.some((m) => m.id === this.info.user.id && m.chat));
             },
             groups: function() {
                 if(!this.group)

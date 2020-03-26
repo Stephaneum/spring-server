@@ -143,7 +143,11 @@
                     }
                 }
             },
-            computed: {
+            watch: {
+                messagesUrl: function() {
+                    this.fetched = false;
+                    this.fetchData();
+                }
             },
             mounted: async function() {
                 M.AutoInit();

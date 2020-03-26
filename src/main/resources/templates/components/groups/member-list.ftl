@@ -6,7 +6,7 @@
         <div id="member-list-card" class="card" style="min-height: 500px; margin: 0; padding: 10px">
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
                 <h5 style="margin-top: 5px">Mitglieder</h5>
-                <a v-if="modifyAll" @click="addUser" class="tooltipped waves-effect waves-light green darken-4 btn-floating" href="#!" data-tooltip="Mitglied hinzufügen" data-position="top">
+                <a v-if="modifyAll && showAddUser" @click="addUser" class="tooltipped waves-effect waves-light green darken-4 btn-floating" href="#!" data-tooltip="Mitglied hinzufügen" data-position="top">
                     <i class="material-icons">add</i>
                 </a>
             </div>
@@ -40,7 +40,7 @@
 
     <script type="text/javascript">
         Vue.component('member-list', {
-            props: ['members', 'leader', 'modifyAll'],
+            props: ['members', 'leader', 'modifyAll', 'showAddUser'],
             methods: {
                 addUser: function() {
                     this.$emit('adduser');

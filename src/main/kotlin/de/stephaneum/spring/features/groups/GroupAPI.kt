@@ -46,7 +46,8 @@ class GroupAPI (
                 .findByGroupOrderByUserFirstNameAscUserLastNameAsc(group)
                 .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat) }
 
-        val children = groupRepo.findByParent(group).map { child ->
+        val childrenRaw = if (user.code.role == ROLE_ADMIN) groupRepo.findByParent(group) else userGroupRepo.findByUserAndGroupParent(user, group).map { it.group }
+        val children = childrenRaw.map { child ->
             val childMembers = userGroupRepo
                     .findByGroupOrderByUserFirstNameAscUserLastNameAsc(child)
                     .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat) }
@@ -100,13 +101,13 @@ class GroupAPI (
         }
 
         // actual group creation
-        val group = groupRepo.save(Group(0, request.name.trim(), user, user.code.role != ROLE_STUDENT, true, false, false, parent))
+        val group = groupRepo.save(Group(0, request.name.trim(), user, parent != null || user.code.role != ROLE_STUDENT, true, false, false, parent))
 
         // add connections
         val connections = mutableListOf<UserGroup>()
-        connections.add(UserGroup(0, user, group, false, true))
-        connections.addAll(teachers.map { UserGroup(0, it, group, true, false) })
-        connections.addAll(members.map { UserGroup(0, it, group, false, true) })
+        connections.add(UserGroup(0, user, group, false, true, true))
+        connections.addAll(teachers.map { UserGroup(0, it, group, true, false, true) })
+        connections.addAll(members.map { UserGroup(0, it, group, false, true, true) })
         userGroupRepo.saveAll(connections)
 
         logService.log(EventType.CREATE_GROUP, user, group.name)
@@ -153,8 +154,7 @@ class GroupAPI (
 
         val group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "group not found")
 
-        val files = fileRepo.findByGroup(group)
-        files.forEach { fileService.deleteFileStephaneum(user, it) } // delete all files
+        deleteFilesGroupRecursive(user, group)
 
         groupRepo.delete(group) // folder will be deleted also
         logService.log(EventType.DELETE_GROUP, user, group.name)
@@ -223,7 +223,7 @@ class GroupAPI (
         if(targetConnection.hasAdminPermissions())
             throw ErrorCode(403, "this user has admin rights")
 
-        removeUserFromGroup(targetConnection)
+        removeUserFromGroupRecursive(targetConnection)
         logService.log(EventType.QUIT_GROUP, targetConnection.user, targetConnection.group.name)
     }
 
@@ -235,14 +235,23 @@ class GroupAPI (
         if(user.id == connection.group.id || connection.teacher)
             throw ErrorCode(409, "you are group admin or teacher")
 
-        removeUserFromGroup(connection)
+        removeUserFromGroupRecursive(connection)
         logService.log(EventType.QUIT_GROUP, connection.user, connection.group.name)
     }
 
-    private fun removeUserFromGroup(userGroup: UserGroup) {
+    private fun removeUserFromGroupRecursive(userGroup: UserGroup) {
         val files = fileRepo.findByUserAndGroup(userGroup.user, userGroup.group)
         files.forEach { fileService.deleteFileStephaneum(userGroup.user, it) }
         userGroupRepo.delete(userGroup)
+
+        userGroupRepo.findByUserAndGroupParent(userGroup.user, userGroup.group).forEach { removeUserFromGroupRecursive(it) }
+    }
+
+    private fun deleteFilesGroupRecursive(user: User, group: Group) {
+        val files = fileRepo.findByGroup(group)
+        files.forEach { fileService.deleteFileStephaneum(user, it) } // delete all files
+
+        groupRepo.findByParent(group).forEach { deleteFilesGroupRecursive(user, it) }
     }
 
     private fun Group.toGroupInfo(): GroupInfo {

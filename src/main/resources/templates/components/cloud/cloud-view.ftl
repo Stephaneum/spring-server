@@ -197,6 +197,11 @@
                 }
             },
             methods: {
+                reset: async function() {
+                    this.statsMode = false;
+                    this.fetching = true;
+                    await this.toHomeFolder();
+                },
                 toggleStatsMode: function() {
                     this.statsMode = !this.statsMode;
                 },
@@ -213,9 +218,9 @@
                 action: function(action) {
                     console.log(action);
                 },
-                select: function(file) {
+                select: async function(file) {
                     if(file.isFolder) {
-                        this.openFolder(file);
+                        await this.openFolder(file);
                     } else {
                         this.file = file;
                     }
@@ -223,7 +228,7 @@
                 closeFilePopup: function() {
                     this.file = null;
                 },
-                openFolder: function(folder) {
+                openFolder: async function(folder) {
 
                     if(this.statsMode)
                         return;
@@ -236,16 +241,16 @@
                         this.folderStack = this.folderStack.slice(0, index + 1);
                     }
                     this.folderID = folder.id;
-                    this.fetchData();
+                    await this.fetchData();
                 },
-                toHomeFolder: function() {
+                toHomeFolder: async function() {
                     if(this.statsMode)
                         return;
 
                     showLoadingInvisible();
                     this.folderStack = [];
                     this.folderID = null;
-                    this.fetchData();
+                    await this.fetchData();
                 },
                 digestFiles: function(files) {
                   files.forEach((f) => {

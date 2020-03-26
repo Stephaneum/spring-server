@@ -28,11 +28,12 @@ data class UserGroup(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                      var accepted: Boolean = false,
 
                      @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
-                     var chat: Boolean = false)
+                     var chat: Boolean = true)
 
 @Repository
 interface UserGroupRepo: CrudRepository<UserGroup, Int> {
 
+    fun findByUserAndGroupParent(user: User, parent: Group?): List<UserGroup>
     fun findByUserAndGroupParentOrderByGroupName(user: User, parent: Group?): List<UserGroup>
     fun findByUserAndGroup(user: User, group: Group): UserGroup?
     fun findByGroupOrderByUserFirstNameAscUserLastNameAsc(group: Group): List<UserGroup>
