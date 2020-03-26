@@ -52,11 +52,16 @@
                     this.$emit('kick', u);
                 },
             },
-            mounted: function() {
-                this.$nextTick(() => {
-                    const height = document.getElementById("member-list-card").getBoundingClientRect().height;
-                    this.$emit('height', height);
-                });
+            watch: {
+                members: {
+                    immediate: true,
+                    handler(newValue, oldValue) {
+                        this.$nextTick(() => {
+                            const height = document.getElementById("member-list-card").getBoundingClientRect().height;
+                            this.$emit('height', height);
+                        });
+                    }
+                }
             },
             template: '#member-list'
         });
