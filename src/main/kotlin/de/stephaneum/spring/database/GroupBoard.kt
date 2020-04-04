@@ -17,6 +17,9 @@ data class GroupBoard(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                       var group: Group = Group(),
 
                       @Column(nullable = false)
+                      var boardIndex: Int = 0,
+
+                      @Column(nullable = false)
                       var lastUpdate: Timestamp = now())
 
 @Repository

@@ -90,7 +90,7 @@ class FileService {
      * @param mode will be used to determine where to store and what ID to be used
      * @return the file if success, else a string representing the error
      */
-    fun storeFileStephaneum(user: User, filename: String, mime: String, content: ByteArray, folder: Any?, classProjectCategoryID: Int?, mode: StoreMode): Any {
+    fun storeFileStephaneum(user: User, filename: String, mime: String, content: ByteArray, folder: Any?, classProjectCategoryID: Int?, mode: StoreMode, lockedFolder: Boolean = false): Any {
 
         // check if enough space
         if(user.storage - fileRepo.calcStorageUsed(user.id) < content.size)
@@ -98,17 +98,14 @@ class FileService {
 
         // resolve folder
         val mainPath = configScheduler.get(Element.fileLocation) ?: return "Interner Fehler"
-        var savingFolder: Folder?
-        if(mode == StoreMode.PRIVATE && folder is String) {
-            savingFolder = folderRepo.findPrivateFolderInRoot(user, folder).firstOrNull()
-            if(savingFolder == null) {
-                // create new one
-                savingFolder = folderRepo.save(Folder(0, folder, user, null, null, false, null))
+        val savingFolder = when (folder) {
+            is Int -> Folder(folder)
+            is String -> when (mode) {
+                StoreMode.PRIVATE -> folderRepo.findPrivateFolderInRoot(user, folder).firstOrNull() ?: folderRepo.save(Folder(0, folder, user, null, null, false, null, lockedFolder))
+                StoreMode.GROUP -> folderRepo.findGroupFolderInRoot(classProjectCategoryID.obj(), folder).firstOrNull() ?: folderRepo.save(Folder(0, folder, user, classProjectCategoryID.obj(), null, false, null, lockedFolder))
+                else -> throw ErrorCode(400, "StoreMode $mode with folder as string is not possible.")
             }
-        } else if(folder is Int){
-            savingFolder = Folder(folder)
-        } else {
-            savingFolder = null
+            else -> null
         }
 
         // resolve the additional id
@@ -485,4 +482,6 @@ class FileService {
      * @return true if the mime type indicates that it is an image
      */
     fun isImage(mime: String) = mime.startsWith("image")
+
+    fun isPDF(mime: String) = mime == "application/pdf"
 }

@@ -1,0 +1,87 @@
+package de.stephaneum.spring.features.groups
+
+import de.stephaneum.spring.Session
+import de.stephaneum.spring.database.*
+import de.stephaneum.spring.helper.ErrorCode
+import de.stephaneum.spring.helper.FileService
+import de.stephaneum.spring.helper.ImageService
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import java.nio.file.Files
+import java.nio.file.Paths
+
+@RestController
+@RequestMapping("/api/groups")
+class BoardAPI (
+        private val imageService: ImageService,
+        private val fileService: FileService,
+        private val groupRepo: GroupRepo,
+        private val boardAreaRepo: BoardAreaRepo,
+        private val groupBoardRepo: GroupBoardRepo
+) {
+
+    @GetMapping("/{groupID}/board")
+    fun getBoard(@PathVariable groupID: Int): List<BoardArea> {
+        val board = getOrCreateBoard(groupID)
+        return boardAreaRepo.findByBoard(board)
+    }
+
+    @PostMapping("/{groupID}/board/add-area-text")
+    fun addAreaText(@PathVariable groupID: Int, @RequestBody request: UpdateAreaText) {
+        val board = getOrCreateBoard(groupID)
+        val area = BoardArea(0, board, 0, 0, 0, 0, request.text, null, AreaType.TEXT)
+        boardAreaRepo.save(area)
+    }
+
+    @PostMapping("/board/update-area-text")
+    fun updateAreaText(@RequestBody request: UpdateAreaText) {
+        val area = boardAreaRepo.findByIdOrNull(request.id ?: 0) ?: throw ErrorCode(404, "Area not found")
+        area.text = request.text
+        boardAreaRepo.save(area)
+    }
+
+    @PostMapping("/{groupID}/board/add-area-file")
+    fun addAreaFile(@PathVariable groupID: Int, @RequestParam("file") file: MultipartFile) {
+
+        val user = Session.get().user ?: throw ErrorCode(401, "Login")
+        var fileName = file.originalFilename ?: throw ErrorCode(400, "Unknown filename")
+        var contentType = file.contentType ?: throw ErrorCode(400, "Unknown content type")
+        val areaType = when {
+            fileService.isImage(contentType) -> AreaType.IMAGE
+            fileService.isPDF(contentType) -> AreaType.PDF
+            else -> throw ErrorCode(400, "only images or pdfs are allowed")
+        }
+
+        // ensure that the image is rotated properly
+        var bytes = file.bytes
+        if(areaType == AreaType.IMAGE) {
+            val rotatedBytes = imageService.digestImageRotation(file.bytes)
+            if (rotatedBytes != null) {
+                bytes = rotatedBytes
+                fileName = fileService.getPathWithNewExtension(fileName, "jpg")
+                contentType = Files.probeContentType(Paths.get(fileName))
+            }
+        }
+
+        val result = fileService.storeFileStephaneum(user, fileName, contentType, bytes, "Tafel", groupID, FileService.StoreMode.GROUP, lockedFolder = true)
+
+        if(result !is File)
+            throw ErrorCode(500, "File could not be saved")
+
+        val board = getOrCreateBoard(groupID)
+        val area = BoardArea(0, board, 0, 0, 0, 0, null, result, areaType)
+        boardAreaRepo.save(area)
+    }
+
+    @PostMapping("/board/delete-area/{areaID}")
+    fun deleteArea(@PathVariable areaID: Int) {
+        val area = boardAreaRepo.findByIdOrNull(areaID) ?: throw ErrorCode(404, "Area not found")
+        boardAreaRepo.delete(area)
+    }
+
+    private fun getOrCreateBoard(groupID: Int): GroupBoard {
+        val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "Group not found")
+        return groupBoardRepo.findByGroup(group) ?: groupBoardRepo.save(GroupBoard(0, group))
+    }
+}

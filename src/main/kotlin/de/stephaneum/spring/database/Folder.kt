@@ -68,6 +68,9 @@ interface FolderRepo: CrudRepository<Folder, Int> {
     @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group = ?1 AND f.schoolClass IS NULL AND f.teacherChat = FALSE ORDER BY f.name")
     fun findGroupFolderInRoot(group: Group): List<Folder>
 
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group = ?1 AND f.name = ?2 AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
+    fun findGroupFolderInRoot(group: Group, folderName: String): List<Folder>
+
     @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group IS NULL AND f.schoolClass = ?1 AND f.teacherChat = FALSE ORDER BY f.name")
     fun findClassFolderInRoot(schoolClass: SchoolClass): List<Folder>
 
