@@ -36,6 +36,9 @@ data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                   @JoinColumn(name = "parent")
                   var parent: Folder? = null,
 
+                  @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+                  var locked: Boolean = false,
+
                   @JsonInclude
                   @Transient
                   var isFolder: Boolean = true,

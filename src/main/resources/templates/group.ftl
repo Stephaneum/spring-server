@@ -8,6 +8,7 @@
 <#import "components/user-search.ftl" as userSearch/>
 <#import "components/utils.ftl" as utils/>
 <#import "components/groups/chat-view.ftl" as chatView/>
+<#import "components/groups/group-board.ftl" as groupBoard/>
 <#import "components/groups/member-list.ftl" as memberList/>
 <#import "components/cloud/cloud-view.ftl" as cloudView/>
 
@@ -244,6 +245,7 @@
 <@userAddList.render/>
 <@userSearch.render/>
 <@chatView.render/>
+<@groupBoard.render/>
 <@memberList.render/>
 <@cloudView.render/>
 <script type="text/javascript">
