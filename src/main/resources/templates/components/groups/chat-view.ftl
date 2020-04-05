@@ -146,6 +146,7 @@
             watch: {
                 messagesUrl: function() {
                     this.fetched = false;
+                    this.messages = [];
                     this.fetchData();
                 },
                 disabledAll: function() {

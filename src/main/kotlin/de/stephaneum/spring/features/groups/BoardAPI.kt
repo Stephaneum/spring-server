@@ -27,10 +27,16 @@ class BoardAPI (
         return boardAreaRepo.findByBoard(board)
     }
 
+    @GetMapping("/{groupID}/board/timestamp")
+    fun getTimestamp(@PathVariable groupID: Int): TimestampResponse {
+        return TimestampResponse(getOrCreateBoard(groupID).lastUpdate.time)
+    }
+
     @PostMapping("/{groupID}/board/add-area-text")
     fun addAreaText(@PathVariable groupID: Int, @RequestBody request: UpdateAreaText) {
         val board = getOrCreateBoard(groupID)
         val area = BoardArea(0, board, 0, 0, 0, 0, request.text, null, AreaType.TEXT)
+        updateTimestamp(board)
         boardAreaRepo.save(area)
     }
 
@@ -38,6 +44,7 @@ class BoardAPI (
     fun updateAreaText(@RequestBody request: UpdateAreaText) {
         val area = boardAreaRepo.findByIdOrNull(request.id ?: 0) ?: throw ErrorCode(404, "Area not found")
         area.text = request.text
+        updateTimestamp(area.board)
         boardAreaRepo.save(area)
     }
 
@@ -71,17 +78,30 @@ class BoardAPI (
 
         val board = getOrCreateBoard(groupID)
         val area = BoardArea(0, board, 0, 0, 0, 0, null, result, areaType)
+        updateTimestamp(board)
         boardAreaRepo.save(area)
     }
 
     @PostMapping("/board/delete-area/{areaID}")
     fun deleteArea(@PathVariable areaID: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "Login")
         val area = boardAreaRepo.findByIdOrNull(areaID) ?: throw ErrorCode(404, "Area not found")
-        boardAreaRepo.delete(area)
+        val file = area.file
+        if(file != null) {
+            fileService.deleteFileStephaneum(user, file) // the area will be deleted also
+        } else {
+            boardAreaRepo.delete(area)
+        }
+        updateTimestamp(area.board)
     }
 
     private fun getOrCreateBoard(groupID: Int): GroupBoard {
         val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "Group not found")
         return groupBoardRepo.findByGroup(group) ?: groupBoardRepo.save(GroupBoard(0, group))
+    }
+
+    private fun updateTimestamp(board: GroupBoard) {
+        board.lastUpdate = now()
+        groupBoardRepo.save(board)
     }
 }

@@ -30,6 +30,7 @@
                         <span>{{ u.firstName }} {{ u.lastName }}</span>
                     </span>
                     <div v-if="modifyAll" style="display: flex; align-items: center">
+                        <i @click="toggleWriteBoard(u)" class="material-icons" style="cursor: pointer; user-select: none; margin-right: 10px; font-size: 1.2em">{{ u.writeBoard ? 'edit' : 'close' }}</i>
                         <i @click="toggleChat(u)" class="material-icons" style="cursor: pointer; user-select: none; margin-right: 10px; font-size: 1.2em">{{ u.chat ? 'chat' : 'close' }}</i>
                         <i @click="kick(u)" class="material-icons" style="cursor: pointer; user-select: none; font-size: 1.2em">delete</i>
                     </div>
@@ -47,6 +48,9 @@
                 },
                 toggleChat: function(u) {
                     this.$emit('togglechat', u);
+                },
+                toggleWriteBoard: function(u) {
+                    this.$emit('togglewriteboard', u);
                 },
                 kick: function(u) {
                     this.$emit('kick', u);

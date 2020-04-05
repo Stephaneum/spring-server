@@ -32,6 +32,9 @@ data class Group(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                  @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
                  var generated: Boolean = false,
 
+                 @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
+                 var showBoardFirst: Boolean = true,
+
                  @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                  var parent: Group? = null)
 

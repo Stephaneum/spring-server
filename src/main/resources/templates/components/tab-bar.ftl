@@ -5,7 +5,7 @@
     <template id="tab-bar">
         <div>
             <div v-for="(t, index) in tabs" @click="emit(t)" class="tab-btn" :class="{ 'tab-btn-special': t.special, 'tab-btn-active': !t.special && t.id === currTab.id, 'tab-btn-special-active': t.special && t.id === currTab.id }">
-                <i style="font-size: 1em; margin-right: 5px" class="material-icons">{{ t.icon }}</i>
+                <i style="font-size: 1em; margin-right: 7px" class="material-icons">{{ t.icon }}</i>
                 <span style="vertical-align: middle">{{ t.name }}{{ t.number ? ' ('+t.number+')' : null }}</span>
             </div>
         </div>

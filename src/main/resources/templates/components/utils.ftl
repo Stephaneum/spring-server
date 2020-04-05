@@ -1,6 +1,38 @@
 <#macro render>
     <script type="text/javascript">
 
+        var TEXT_EDITOR_CONFIG = {
+            semantic: false,
+            lang: 'de',
+            btns: [
+                ['strong', 'em', 'underline', 'del'],
+                ['foreColor', 'backColor'],
+                ['formatting', 'fontsize'],
+                ['superscript', 'subscript'],
+                ['link'],
+                ['table'],
+                ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+                ['orderedList'],
+                ['horizontalRule'],
+                ['removeformat'],
+                ['viewHTML'],
+                ['fullscreen']],
+            plugins: {
+                fontsize: {
+                    sizeList: [
+                        '10pt',
+                        '11pt',
+                        '12pt',
+                        '14pt',
+                        '16pt',
+                        '18pt',
+                        '24pt'
+                    ],
+                    allowCustomSize: false
+                }
+            }
+        };
+
         function initTooltips() {
             M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
         }

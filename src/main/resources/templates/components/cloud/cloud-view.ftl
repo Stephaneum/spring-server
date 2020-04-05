@@ -264,7 +264,7 @@
                       else
                           f.link = '/api/cloud/download/file/'+f.id;
 
-                      f.canModify = !this.sharedMode || this.modifyAll || f.user.id === this.myId;
+                      f.canModify = !f.locked && (!this.sharedMode || this.modifyAll || f.user.id === this.myId);
                   });
                   return files;
                 },

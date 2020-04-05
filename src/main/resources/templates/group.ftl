@@ -23,6 +23,10 @@
     <link rel="stylesheet" type="text/css" href="/static/css/materialize.min.css">
     <link rel="stylesheet" type="text/css" href="/static/css/material-icons.css">
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <!-- for board -->
+    <link rel="stylesheet" type="text/css" href="/static/trumbowyg/ui/trumbowyg.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/trumbowyg/plugins/table/ui/trumbowyg.table.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/trumbowyg/plugins/colors/ui/trumbowyg.colors.min.css">
     <style>
         [v-cloak] {
             display: none;
@@ -47,7 +51,7 @@
 
             <!-- TABS -->
             <div class="col s10 offset-s2">
-                <tab-bar :tabs="groups" :curr-tab="currTab" @selected="setTab"></tab-bar>
+                <tab-bar :tabs="tabs" :curr-tab="currTab" @selected="setTab"></tab-bar>
             </div>
 
             <div class="col s2">
@@ -76,13 +80,20 @@
 
             <div class="col s10" style="display: flex; min-height: 500px">
                 <div style="flex: 1; padding-right: 10px">
-                    <chat-view :disabled-all="!currGroup.chat" :disabled-me="!canChat" :modify-all="modifyAll" :height="memberListHeight"
+                    <group-board v-show="boardMode" :visible="boardMode" :write-board="canWriteBoard" :height="memberListHeight"
+                                 :timestamp-url="'/api/groups/'+currGroup.id+'/board/timestamp'"
+                                 :board-url="'/api/groups/'+currGroup.id+'/board'"
+                                 :add-text-url="'/api/groups/'+currGroup.id+'/board/add-area-text'"
+                                 :update-text-url="'/api/groups/board/update-area-text'"
+                                 :add-file-url="'/api/groups/'+currGroup.id+'/board/add-area-file'"
+                                 :delete-area-url="'/api/groups/board/delete-area/'"></group-board>
+                    <chat-view v-show="!boardMode" :disabled-all="!currGroup.chat" :disabled-me="!canChat" :modify-all="modifyAll" :height="memberListHeight"
                                :message-count-url="'/api/chat/group/'+currGroup.id+'/count'" :messages-url="'/api/chat/group/'+currGroup.id"
                                :add-message-url="'/api/chat/group/'+currGroup.id" :clear-url="'/api/chat/group/'+currGroup.id+'/clear'"></chat-view>
                 </div>
 
                 <div style="flex: 0 0 400px; padding-left: 10px">
-                    <member-list :members="currGroup.members" :leader="currGroup.leader" :modify-all="modifyAll" :show-add-user="currGroup.id === group.id" @adduser="showAddUser" @togglechat="toggleChatUser" @kick="showKickUser" @height="setMemberListHeight"></member-list>
+                    <member-list :members="currGroup.members" :leader="currGroup.leader" :modify-all="modifyAll" :show-add-user="currGroup.id === group.id" @adduser="showAddUser" @togglechat="toggleChatUser" @togglewriteboard="toggleWriteBoardUser" @kick="showKickUser" @height="setMemberListHeight"></member-list>
                 </div>
             </div>
         </div>
@@ -143,7 +154,9 @@
             </div>
 
             <div style="display: flex; align-items: center; padding: 10px 20px 0 20px;">
-                Chat
+                <div style="flex: 0 0 130px; text-align: right">
+                    Chat
+                </div>
                 <a @click="updateChat(true)" href="#!" style="margin-left: 20px" class="waves-effect waves-light btn green" :class="currGroup && currGroup.chat ? [] : ['darken-4']">
                     <i class="material-icons left">check</i>
                     Ja
@@ -151,6 +164,20 @@
                 <a @click="updateChat(false)" href="#!" style="margin-left: 20px" class="waves-effect waves-light btn green" :class="currGroup && currGroup.chat ? ['darken-4'] : []">
                     <i class="material-icons left">close</i>
                     Nein
+                </a>
+            </div>
+
+            <div v-if="isParentGroup" style="display: flex; align-items: center; padding: 20px 20px 0 20px;">
+                <div style="flex: 0 0 130px; text-align: right">
+                    Zuerst anzeigen
+                </div>
+                <a @click="updateBoard(true)" href="#!" style="margin-left: 20px" class="waves-effect waves-light btn green" :class="currGroup && currGroup.showBoardFirst ? [] : ['darken-4']">
+                    <i class="material-icons left">video_label</i>
+                    Tafel
+                </a>
+                <a @click="updateBoard(false)" href="#!" style="margin-left: 20px" class="waves-effect waves-light btn green" :class="currGroup && currGroup.showBoardFirst ? ['darken-4'] : []">
+                    <i class="material-icons left">chat</i>
+                    Chat
                 </a>
             </div>
         </div>
@@ -237,6 +264,13 @@
 <script src="/static/js/materialize.min.js" ></script>
 <script src="/static/js/axios.min.js" ></script>
 <script src="/static/js/vue.js" ></script>
+<!-- for board -->
+<script src="/static/js/jquery.min.js" ></script>
+<script src="/static/trumbowyg/trumbowyg.min.js" ></script>
+<script src="/static/trumbowyg/plugins/table/trumbowyg.table.min.js"></script>
+<script src="/static/trumbowyg/plugins/colors/trumbowyg.colors.min.js"></script>
+<script src="/static/trumbowyg/plugins/fontSize/trumbowyg.fontsize.min.js"></script>
+<script src="/static/trumbowyg/langs/de.min.js" ></script>
 <@utils.render/>
 <@loading.render/>
 <@menu.render/>
@@ -250,14 +284,16 @@
 <@cloudView.render/>
 <script type="text/javascript">
 
-    const parentGroup = { id: -1, special: true, name: 'Allgemein' };
+    const parentGroup = { id: -1, icon: 'chat', special: true, name: 'Chat' };
     const addSubGroup = { id: -2, icon: 'add', name: 'Chatraum' };
+    const board = { id: -3, icon: 'video_label', special: true, name: 'Tafel' };
 
     var app = new Vue({
         el: '#app',
         data: {
             info: { user: null, menu: null, plan: null, copyright: null, unapproved: null },
             group: null, // main group
+            boardMode: false,
             currTab: parentGroup, // curr tab
             currGroup: null,
             selectedUser: {}, // e.g. from member list
@@ -275,14 +311,21 @@
                     case parentGroup.id:
                         this.currGroup = this.group;
                         this.currTab = parentGroup;
+                        this.boardMode = false;
                         break;
                     case addSubGroup.id:
                         this.showAddSubGroup();
+                        break;
+                    case board.id:
+                        this.currGroup = this.group;
+                        this.currTab = board;
+                        this.boardMode = true;
                         break;
                     default:
                         // select sub group
                         this.currGroup = tab;
                         this.currTab = tab;
+                        this.boardMode = false;
                         break;
                 }
 
@@ -340,6 +383,15 @@
                 try {
                     showLoadingInvisible();
                     await axios.post('/api/groups/' + this.currGroup.id + '/chat/' + (chat ? '1' : '0'));
+                    await this.fetchData();
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                }
+            },
+            updateBoard: async function(show) {
+                try {
+                    showLoadingInvisible();
+                    await axios.post('/api/groups/' + this.currGroup.id + '/show-board-first/' + (show ? '1' : '0'));
                     await this.fetchData();
                 } catch (e) {
                     M.toast({html: 'Ein Fehler ist aufgetreten.'});
@@ -407,6 +459,23 @@
                 try {
                     showLoadingInvisible();
                     await axios.post('/api/groups/' + this.currGroup.id + '/toggle-chat/' + user.id);
+                    if(user.chat)
+                        M.toast({html: user.firstName+' darf nur den Chat mitverfolgen.' });
+                    else
+                        M.toast({html: user.firstName+' darf chatten.' });
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                }
+                await this.fetchData();
+            },
+            toggleWriteBoardUser: async function(user) {
+                try {
+                    showLoadingInvisible();
+                    await axios.post('/api/groups/' + this.currGroup.id + '/toggle-write-board/' + user.id);
+                    if(user.writeBoard)
+                        M.toast({html: user.firstName+' darf nur die Tafel angucken.' });
+                    else
+                        M.toast({html: user.firstName+' darf die Tafel beschreiben.' });
                 } catch (e) {
                     M.toast({html: 'Ein Fehler ist aufgetreten.'});
                 }
@@ -444,12 +513,17 @@
                 const id = window.location.pathname.split('/').pop();
                 const group = await axios.get('/api/groups/' + id);
                 this.group = group.data;
+                this.group.children.forEach(c => c.icon = 'chat');
                 if(!this.currGroup) {
                     // init
                     this.currGroup = this.group;
+                    if(this.currGroup.showBoardFirst) {
+                        this.currTab = board;
+                        this.boardMode = true;
+                    }
                 } else {
                     // update
-                    if(this.currTab === parentGroup) {
+                    if(this.currTab === parentGroup || this.currTab === board) {
                         this.currGroup = this.group;
                     } else {
                         this.currGroup = this.group.children.find((g) => g.id === this.currGroup.id);
@@ -476,18 +550,21 @@
                     (this.group && this.group.members && this.group.members.some((t) => t.teacher && t.id === this.info.user.id)); // group-teacher
             },
             canChat: function() {
-                return this.admin || (this.info.user && this.currGroup.members && this.currGroup.members.some((m) => m.id === this.info.user.id && m.chat));
+                return this.modifyAll || (this.info.user && this.currGroup.members && this.currGroup.members.some((m) => m.id === this.info.user.id && m.chat));
             },
-            groups: function() {
+            canWriteBoard: function() {
+                return this.modifyAll || (this.info.user && this.currGroup.members && this.currGroup.members.some((m) => m.id === this.info.user.id && m.writeBoard));
+            },
+            isParentGroup: function() {
+                return this.currGroup && this.group && this.currGroup.id === this.group.id;
+            },
+            tabs: function() {
                 if(!this.group)
                     return [];
                 if(this.modifyAll)
-                    return [ parentGroup, ...this.group.children, addSubGroup ];
+                    return [ board, parentGroup, ...this.group.children, addSubGroup ];
                 else {
-                    if(this.group.children.length !== 0)
-                        return [ parentGroup, ...this.group.children ];
-                    else
-                        return [];
+                    return [ board, parentGroup, ...this.group.children ];
                 }
             }
         },

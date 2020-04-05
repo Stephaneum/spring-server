@@ -870,42 +870,11 @@
                 this.$nextTick(() => {
                     M.AutoInit();
                     M.updateTextFields();
-                    var config = {
-                        semantic: false,
-                        lang: 'de',
-                        btns: [
-                            ['strong', 'em', 'underline', 'del'],
-                            ['foreColor', 'backColor'],
-                            ['formatting', 'fontsize'],
-                            ['superscript', 'subscript'],
-                            ['link'],
-                            ['table'],
-                            ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
-                            ['orderedList'],
-                            ['horizontalRule'],
-                            ['removeformat'],
-                            ['viewHTML'],
-                            ['fullscreen']],
-                        plugins: {
-                            fontsize: {
-                                sizeList: [
-                                    '10pt',
-                                    '11pt',
-                                    '12pt',
-                                    '14pt',
-                                    '16pt',
-                                    '18pt',
-                                    '24pt'
-                                ],
-                                allowCustomSize: false
-                            }
-                        }
-                    };
 
                     // init text input editor
-                    $('#post-text-editor').trumbowyg(config);
+                    $('#post-text-editor').trumbowyg(TEXT_EDITOR_CONFIG);
                     if(this.admin || this.info.user.managePosts)
-                        $('#post-text-editor-special').trumbowyg(config);
+                        $('#post-text-editor-special').trumbowyg(TEXT_EDITOR_CONFIG);
                     moment.locale('de');
                     console.log('post init finished')
                 });

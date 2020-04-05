@@ -7,8 +7,11 @@
             <div v-for="f in files" class="file-rect">
                 <img v-if="image(f)" :src="f.link" @click="select(f)" class="file-image"/>
                 <i v-else @click="select(f)" :style="{ color: f.isFolder ? 'rgb(125, 125, 125)' : 'rgb(175, 175, 175)'}" class="file-icon material-icons">{{ icon(f) }}</i>
-                <span @click="select(f)" class="file-text">{{ f.isFolder ? f.name : f.fileName }}</span>
-                <span v-if="sharedMode" style="margin-bottom: 10px;" class="grey-text lighten-2">{{ f.user.firstName }} {{ f.user.lastName }}</span>
+                <span @click="select(f)" class="file-text"><i v-if="f.locked" class="material-icons file-lock-icon">lock</i>{{ f.isFolder ? f.name : f.fileName }}</span>
+                <div style="margin-bottom: 10px;">
+                    <span v-if="f.locked" class="grey-text lighten-2">System</span>
+                    <span v-else-if="sharedMode" class="grey-text lighten-2">{{ f.user.firstName }} {{ f.user.lastName }}</span>
+                </div>
             </div>
         </div>
     </template>
@@ -66,6 +69,11 @@
             cursor: pointer;
             font-size: 4em;
             text-shadow: 2px 2px 4px #aaa;
+        }
+
+        .file-lock-icon {
+            font-size: 0.8em;
+            margin-right: 4px;
         }
 
         .file-text {

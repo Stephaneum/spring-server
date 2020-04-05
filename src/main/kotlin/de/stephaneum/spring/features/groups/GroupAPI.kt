@@ -44,16 +44,16 @@ class GroupAPI (
         }
         val members = userGroupRepo
                 .findByGroupOrderByUserFirstNameAscUserLastNameAsc(group)
-                .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat) }
+                .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat, it.writeBoard) }
 
         val childrenRaw = if (user.code.role == ROLE_ADMIN) groupRepo.findByParent(group) else userGroupRepo.findByUserAndGroupParent(user, group).map { it.group }
         val children = childrenRaw.map { child ->
             val childMembers = userGroupRepo
                     .findByGroupOrderByUserFirstNameAscUserLastNameAsc(child)
-                    .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat) }
-            GroupInfoDetailed(child.id, child.name, child.leader.toSimpleUser(), child.accepted, child.chat, childMembers, emptyList())
+                    .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat, it.writeBoard) }
+            GroupInfoDetailed(child.id, child.name, child.leader.toSimpleUser(), child.accepted, child.chat, child.showBoardFirst, childMembers, emptyList())
         }
-        return GroupInfoDetailed(group.id, group.name, group.leader.toSimpleUser(), group.accepted, group.chat, members, children)
+        return GroupInfoDetailed(group.id, group.name, group.leader.toSimpleUser(), group.accepted, group.chat, group.showBoardFirst, members, children)
     }
 
     @PostMapping("/create")
@@ -101,13 +101,13 @@ class GroupAPI (
         }
 
         // actual group creation
-        val group = groupRepo.save(Group(0, request.name.trim(), user, parent != null || user.code.role != ROLE_STUDENT, true, false, false, parent))
+        val group = groupRepo.save(Group(0, request.name.trim(), user, parent != null || user.code.role != ROLE_STUDENT, true, false, false, true, parent))
 
         // add connections
         val connections = mutableListOf<UserGroup>()
-        connections.add(UserGroup(0, user, group, false, true, true))
-        connections.addAll(teachers.map { UserGroup(0, it, group, true, false, true) })
-        connections.addAll(members.map { UserGroup(0, it, group, false, true, true) })
+        connections.add(UserGroup(0, user, group, false, true, true, true))
+        connections.addAll(teachers.map { UserGroup(0, it, group, true, false, true, true) })
+        connections.addAll(members.map { UserGroup(0, it, group, false, true, true, false) })
         userGroupRepo.saveAll(connections)
 
         logService.log(EventType.CREATE_GROUP, user, group.name)
@@ -126,6 +126,21 @@ class GroupAPI (
         }
 
         group.chat = chat == 1
+        groupRepo.save(group)
+    }
+
+    @PostMapping("/{id}/show-board-first/{show}")
+    fun updateShowBoardFirst(@PathVariable id: Int, @PathVariable show: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+
+        val group: Group
+        if (user.code.role == ROLE_ADMIN) {
+            group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
+        } else {
+            group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
+        }
+
+        group.showBoardFirst = show == 1
         groupRepo.save(group)
     }
 
@@ -210,6 +225,19 @@ class GroupAPI (
         if(targetConnection.hasAdminPermissions())
             throw ErrorCode(403, "this user has admin rights")
         targetConnection.chat = !targetConnection.chat
+        userGroupRepo.save(targetConnection)
+    }
+
+    @PostMapping("/{groupID}/toggle-write-board/{userID}")
+    fun toggleWriteBoardUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        if(!checkAdminPermission(user, groupID))
+            throw ErrorCode(403, "you are not teacher or (group) admin")
+
+        val targetConnection = userGroupRepo.findByUserAndGroup(userID.obj(), groupID.obj()) ?: throw ErrorCode(404, "no target user-group connection found")
+        if(targetConnection.hasAdminPermissions())
+            throw ErrorCode(403, "this user has admin rights")
+        targetConnection.writeBoard = !targetConnection.writeBoard
         userGroupRepo.save(targetConnection)
     }
 

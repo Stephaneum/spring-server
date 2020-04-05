@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest
 
 class ErrorCode(code: Int, message: String) : ResponseStatusException(when(code) {
     400 -> HttpStatus.BAD_REQUEST
+    401 -> HttpStatus.UNAUTHORIZED
     403 -> HttpStatus.FORBIDDEN
     404 -> HttpStatus.NOT_FOUND
     409 -> HttpStatus.CONFLICT
