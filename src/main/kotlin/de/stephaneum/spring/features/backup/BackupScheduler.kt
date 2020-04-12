@@ -22,21 +22,15 @@ class BackupScheduler {
     private val dateFull = DateTimeFormatter.ofPattern("EEEE, dd.MMMM yyyy", Locale.GERMANY)
     private val BACKUP_HOUR = 4
     private val BACKUP_MINUTE = 30
-    private val BACKUP_DAY = DayOfWeek.SATURDAY
-    private val MIN_INTERVAL = 30*60*1000 // 30min
-
-    private var lastBackup = 0L
+    private val BACKUP_DAY = DayOfWeek.SUNDAY
 
     @Autowired
     private lateinit var backupService: BackupService
 
-    @Scheduled(initialDelay=5000, fixedDelay = 60*1000) // check every minute
+    @Scheduled(cron = "0 30 4 ? * SUN")
     fun update() {
-        val now = LocalDateTime.now()
-        if(now.dayOfWeek == BACKUP_DAY && now.hour == BACKUP_HOUR && (now.minute == BACKUP_MINUTE || now.minute == BACKUP_MINUTE+1) && System.currentTimeMillis() - lastBackup >= MIN_INTERVAL) {
-            logger.info("It is now BACKUP TIME!")
-            backupService.backupFull()
-        }
+        logger.info("It is now BACKUP TIME!")
+        backupService.backupFull()
     }
 
     fun getNextBackup(): String {
