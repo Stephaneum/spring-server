@@ -44,17 +44,16 @@ class MenuService {
      */
     fun ownsCategory(userID: Int, menuID: Int): Boolean {
         val rootCategory = menuRepo.findCategory(userID) ?: return false
-        val target = menuRepo.findByIdOrNull(menuID) ?: return false
 
-        var curr: Menu? = target
+        var curr: Menu = menuRepo.findByIdOrNull(menuID) ?: return false
         var owns = false
         do {
-            if(curr!!.id == rootCategory.id) {
+            if(curr.id == rootCategory.id) {
                 owns = true
                 break
             }
-            curr = curr.parent
-        } while (curr != null);
+            curr = curr.parent ?: break
+        } while (true)
         return owns
     }
 
