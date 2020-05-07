@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.chat
+package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
@@ -7,6 +7,9 @@ import de.stephaneum.spring.helper.obj
 import de.stephaneum.spring.helper.toSimpleUser
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
+
+data class MessageCount(val count: Int)
+data class AddMessage(val message: String)
 
 @RestController
 @RequestMapping("/api/chat")
