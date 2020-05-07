@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.jsf
+package de.stephaneum.spring.jsf
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.UserRepo

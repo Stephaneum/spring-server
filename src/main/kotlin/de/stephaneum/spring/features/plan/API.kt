@@ -2,10 +2,11 @@ package de.stephaneum.spring.features.plan
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
-import de.stephaneum.spring.features.jsf.JsfCommunication
-import de.stephaneum.spring.features.jsf.JsfEvent
+import de.stephaneum.spring.jsf.JsfCommunication
+import de.stephaneum.spring.jsf.JsfEvent
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.LogService
+import de.stephaneum.spring.helper.PlanService
 import de.stephaneum.spring.helper.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element

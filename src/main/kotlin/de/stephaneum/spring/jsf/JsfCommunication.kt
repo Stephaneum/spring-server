@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.jsf
+package de.stephaneum.spring.jsf
 
 import de.stephaneum.spring.helper.RestClient
 import de.stephaneum.spring.security.JwtService

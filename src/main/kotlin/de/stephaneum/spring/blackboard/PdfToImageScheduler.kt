@@ -4,7 +4,7 @@ import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.database.now
-import de.stephaneum.spring.features.plan.PlanService
+import de.stephaneum.spring.helper.PlanService
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import org.slf4j.LoggerFactory

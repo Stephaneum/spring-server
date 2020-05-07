@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.plan
+package de.stephaneum.spring.helper
 
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper

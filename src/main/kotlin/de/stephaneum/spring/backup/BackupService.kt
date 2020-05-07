@@ -1,7 +1,7 @@
 package de.stephaneum.spring.backup
 
-import de.stephaneum.spring.features.jsf.JsfCommunication
-import de.stephaneum.spring.features.jsf.JsfEvent
+import de.stephaneum.spring.jsf.JsfCommunication
+import de.stephaneum.spring.jsf.JsfEvent
 import de.stephaneum.spring.helper.DBHelper
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.cmd

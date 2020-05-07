@@ -2,8 +2,8 @@ package de.stephaneum.spring.features.cms
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
-import de.stephaneum.spring.features.jsf.JsfCommunication
-import de.stephaneum.spring.features.jsf.JsfEvent
+import de.stephaneum.spring.jsf.JsfCommunication
+import de.stephaneum.spring.jsf.JsfEvent
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.helper.LogService
