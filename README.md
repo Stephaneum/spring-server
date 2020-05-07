@@ -38,17 +38,17 @@ Bereich | Seite(n) | JSF | Spring
 Öffentlich|Beiträge|X|
 Öffentlich|Login/Registrierung|X|
 Öffentlich|Impressum, Kontakt, etc.|X|
-Admin|Konfiguration|X|
+Admin|Konfiguration|X|N
 Admin|Benutzerdefinierte Seiten| |X
-Admin|Rubriken|X|
+Admin|Rubriken|X|N
 Admin|Zugangscodes| |X
 Admin|Nutzerdaten-Manager|X|
 Admin|Logdaten| |X
 Verwaltung|Vertretungsplan-Manager| |X
 Gemeinschaft|Beitrag-Manager| |X
-Gemeinschaft|Klassen-Cloud|X|
-Gemeinschaft|Projekt-Cloud|X|
-Nutzer|Nutzer-Cloud|X|N
+Gemeinschaft|Klassen-Cloud| |X
+Gemeinschaft|Projekt-Cloud| |X
+Nutzer|Nutzer-Cloud| |X
 Nutzer|Account-Einstellungen|X|
 
 #### Kommunikation JSF nach Spring
