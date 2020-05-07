@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.search
+package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.database.SimpleUser
 import de.stephaneum.spring.database.User
@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+
+data class SearchRequest(val firstName: String?, val lastName: String?, val role: Int?)
 
 @RestController
 @RequestMapping("/api/search")
