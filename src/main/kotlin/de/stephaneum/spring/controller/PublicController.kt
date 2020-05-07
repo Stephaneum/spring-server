@@ -1,19 +1,19 @@
-package de.stephaneum.spring.features.general
+package de.stephaneum.spring.controller
 
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 
 @Controller
-class GeneralController {
-
-    @GetMapping("/login")
-    fun get(): String {
-        return "login"
-    }
+class PublicController {
 
     @GetMapping("/")
     fun getRoot(): String {
         return "redirect:login"
+    }
+
+    @GetMapping("/login")
+    fun getLogin(): String {
+        return "login"
     }
 
 }

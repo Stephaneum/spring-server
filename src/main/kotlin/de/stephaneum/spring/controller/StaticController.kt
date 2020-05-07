@@ -1,6 +1,5 @@
-package de.stephaneum.spring.features.statics
+package de.stephaneum.spring.controller
 
-import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.Static
 import de.stephaneum.spring.database.StaticMode
 import de.stephaneum.spring.database.StaticRepo
@@ -8,9 +7,7 @@ import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.checkIE
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
-import de.stephaneum.spring.security.JwtService
 import org.jsoup.Jsoup
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -22,19 +19,11 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Controller
-class StaticController {
-
-    @Autowired
-    private lateinit var jwtService: JwtService
-
-    @Autowired
-    private lateinit var fileService: FileService
-
-    @Autowired
-    private lateinit var configScheduler: ConfigScheduler
-
-    @Autowired
-    private lateinit var staticRepo: StaticRepo
+class StaticController (
+        private val fileService: FileService,
+        private val configScheduler: ConfigScheduler,
+        private val staticRepo: StaticRepo
+) {
 
     @GetMapping("/s/**")
     fun getPublic(@RequestParam(required = false) key: String?, request: HttpServletRequest, response: HttpServletResponse, model: Model): Any? {
@@ -79,22 +68,5 @@ class StaticController {
                     .contentType(MediaType.parseMediaType(fileService.getMimeFromPath(path)))
                     .body(resource)
         }
-    }
-
-    @GetMapping("admin-static")
-    fun getAdmin(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
-
-        if(checkIE(request))
-            return "forward:/static/no-support-ie.html"
-
-        // login
-        if(key != null) {
-            Session.get().user = jwtService.getUser(key)
-            if(Session.get().user != null) {
-                return "redirect:${request.requestURL}"
-            }
-        }
-
-        return "admin-static"
     }
 }
