@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.cms
+package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
@@ -19,6 +19,28 @@ import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
 import java.nio.file.Paths
 
+object PostRequest {
+    data class UpdatePost(val id: Int?,
+                          val title: String?,
+                          val text: String?,
+                          val images: List<File>,
+                          val layoutPost: Int,
+                          val layoutPreview: Int,
+                          val preview: Int,
+                          val menuID: Int?)
+
+    data class UpdatePostPassword(val postID: Int,
+                                  val password: String?)
+
+    data class UpdateSpecial(val type: String, val text: String?)
+}
+
+object PostResponse {
+    data class Feedback(val success: Boolean, val needLogin: Boolean = false, val message: String? = null)
+
+    data class PostManager(val maxPictureSize: Int, val category: List<Menu>)
+    data class Text(val text: String?)
+}
 
 @RestController
 @RequestMapping("/api/post")
@@ -62,7 +84,7 @@ class PostAPI {
         when {
             postID != null -> {
                 // single post
-                val post = postRepo.findByIdOrNull(postID) ?: return Response.Feedback(false, message = "post not found")
+                val post = postRepo.findByIdOrNull(postID) ?: return PostResponse.Feedback(false, message = "post not found")
                 post.simplify()
                 post.menu?.simplify()
                 post.images = filePostRepo.findByPostId(post.id).map { it.file.apply { simplifyForPosts() } }
@@ -72,7 +94,7 @@ class PostAPI {
             }
             unapproved == true || menuID != null -> {
                 // multiple posts
-                val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+                val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
                 val posts = when {
                     menuID != null -> postRepo.findByMenuIdOrderByTimestampDesc(menuID) // get posts from a menu
                     user.code.role == ROLE_ADMIN || user.managePosts == true -> postRepo.findUnapproved() // get all unapproved posts
@@ -93,21 +115,21 @@ class PostAPI {
                     }
                 }
             }
-            else -> return Response.Feedback(false, message = "Empty request body")
+            else -> return PostResponse.Feedback(false, message = "Empty request body")
         }
     }
 
     @PostMapping
-    fun update(@RequestBody request: Request.UpdatePost): Any {
+    fun update(@RequestBody request: PostRequest.UpdatePost): Any {
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
         val oldPost: Post?
         if(request.id != null) {
             // update post -> check
             // we also create a copy because Repository.save() does modify the old reference
-            oldPost = postRepo.findByIdOrNull(request.id)?.copy() ?: return Response.Feedback(false, message = "post not found")
+            oldPost = postRepo.findByIdOrNull(request.id)?.copy() ?: return PostResponse.Feedback(false, message = "post not found")
             if(!hasAccessToPost(user, oldPost))
-                return Response.Feedback(false, message = "You are not allowed to modify this post.")
+                return PostResponse.Feedback(false, message = "You are not allowed to modify this post.")
         } else {
             oldPost = null
         }
@@ -116,16 +138,16 @@ class PostAPI {
         if(request.menuID != null) {
             val allowed = user.code.role == ROLE_ADMIN || user.managePosts == true || (user.createCategories == true && menuService.ownsCategory(user.id, request.menuID))
             if(!allowed)
-                return Response.Feedback(false, message = "You are not allowed to specify a menu")
+                return PostResponse.Feedback(false, message = "You are not allowed to specify a menu")
         }
 
         // validate title
         if(request.title.isNullOrBlank())
-            return Response.Feedback(false, message = "Empty title.")
+            return PostResponse.Feedback(false, message = "Empty title.")
 
         // validate assignment
         if((user.code.role == ROLE_ADMIN || user.managePosts == true) && request.menuID == null)
-            return Response.Feedback(false, message = "Missing assignment.")
+            return PostResponse.Feedback(false, message = "Missing assignment.")
 
         // save the post
         val menu = if(request.menuID != null) Menu(request.menuID) else null
@@ -157,45 +179,46 @@ class PostAPI {
 
     @ExperimentalUnsignedTypes
     @PostMapping("/update-password")
-    fun updatePassword(@RequestBody request: Request.UpdatePostPassword): Response.Feedback {
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        val post = postRepo.findByIdOrNull(request.postID) ?: return Response.Feedback(false, message = "post not found")
+    fun updatePassword(@RequestBody request: PostRequest.UpdatePostPassword): PostResponse.Feedback {
+        val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
+        val post = postRepo.findByIdOrNull(request.postID) ?: return PostResponse.Feedback(false, message = "post not found")
 
         if(hasAccessToPost(user, post)) {
             val password = if(request.password.isNullOrBlank()) null else cryptoService.hashMD5(request.password)
             post.password = password
             postRepo.save(post)
-            return Response.Feedback(true)
+            return PostResponse.Feedback(true)
         } else {
-            return Response.Feedback(false, message = "not allowed")
+            return PostResponse.Feedback(false, message = "not allowed")
         }
     }
 
     @PostMapping("/delete/{postID}")
-    fun delete(@PathVariable postID: Int): Response.Feedback {
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        val post = postRepo.findByIdOrNull(postID) ?: return Response.Feedback(false, message = "post not found")
+    fun delete(@PathVariable postID: Int): PostResponse.Feedback {
+        val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
+        val post = postRepo.findByIdOrNull(postID) ?: return PostResponse.Feedback(false, message = "post not found")
 
         if(hasAccessToPost(user, post)) {
             postRepo.deleteById(postID)
             logService.log(EventType.DELETE_POST, user, post.title)
-            return Response.Feedback(true)
+            return PostResponse.Feedback(true)
         } else {
-            return Response.Feedback(false, message = "not allowed")
+            return PostResponse.Feedback(false, message = "not allowed")
         }
     }
 
     @GetMapping("/info-post-manager")
     fun infoPostManager(): Any {
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
 
-        return Response.PostManager(configScheduler.get(Element.maxPictureSize)?.toInt() ?: 0, menuService.getCategory(user.id))
+        return PostResponse.PostManager(configScheduler.get(Element.maxPictureSize)?.toInt()
+                ?: 0, menuService.getCategory(user.id))
     }
 
     @GetMapping("/images-available")
     fun getImages(): Any {
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
         val files = fileRepo.findMyImages(user.id, "image")
         files.forEach { f -> f.simplifyForPosts() }
 
@@ -205,12 +228,12 @@ class PostAPI {
     @PostMapping("/upload-image")
     fun uploadImage(@RequestParam("file") file: MultipartFile): Any {
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        var fileName = file.originalFilename ?: return Response.Feedback(false, message = "Dateiname unbekannt")
-        var contentType = file.contentType ?: return Response.Feedback(false, message = "Dateityp unbekannt")
+        val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
+        var fileName = file.originalFilename ?: return PostResponse.Feedback(false, message = "Dateiname unbekannt")
+        var contentType = file.contentType ?: return PostResponse.Feedback(false, message = "Dateityp unbekannt")
 
         if(!contentType.startsWith("image"))
-            return Response.Feedback(false, message = "Nur Bilder erlaubt")
+            return PostResponse.Feedback(false, message = "Nur Bilder erlaubt")
 
         // ensure that the image is rotated properly
         val bytes = imageService.digestImageRotation(file.bytes)
@@ -223,7 +246,7 @@ class PostAPI {
         if(result is File)
             result.simplifyForPosts()
 
-        return if(result is String) Response.Feedback(false, message = result) else result
+        return if(result is String) PostResponse.Feedback(false, message = result) else result
     }
 
     private fun hasAccessToPost(user: User, post: Post): Boolean {
@@ -242,18 +265,18 @@ class PostAPI {
     @GetMapping("/special")
     fun getSpecial(@RequestParam type: String): Any {
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
         if(user.code.role == ROLE_ADMIN || user.managePosts == true) {
-            return Response.Text(configScheduler.get(Element.valueOf(type)))
+            return PostResponse.Text(configScheduler.get(Element.valueOf(type)))
         } else {
-            return Response.Feedback(false, message = "only admin or post manager")
+            return PostResponse.Feedback(false, message = "only admin or post manager")
         }
     }
 
     @PostMapping("/special")
-    fun updateSpecial(@RequestBody request: Request.UpdateSpecial): Any {
+    fun updateSpecial(@RequestBody request: PostRequest.UpdateSpecial): Any {
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
+        val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
         if(user.code.role == ROLE_ADMIN || user.managePosts == true) {
             val type = Element.valueOf(request.type)
             val plainText = Jsoup.parse(request.text ?: "").text()
@@ -266,14 +289,14 @@ class PostAPI {
                         request.text
                     }
                 }
-                else -> return Response.Feedback(false, message = "invalid type")
+                else -> return PostResponse.Feedback(false, message = "invalid type")
             }
             configScheduler.save(type, finalText)
             logService.log(EventType.EDIT_POST, user, "${type.info} (spezieller Text)")
             jsfCommunication.send(JsfEvent.SYNC_SPECIAL_TEXT)
-            return Response.Feedback(true)
+            return PostResponse.Feedback(true)
         } else {
-            return Response.Feedback(false, message = "only admin or post manager")
+            return PostResponse.Feedback(false, message = "only admin or post manager")
         }
     }
 }
