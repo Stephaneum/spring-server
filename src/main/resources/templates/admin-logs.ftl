@@ -156,10 +156,10 @@
                 this.fetchData();
             },
             fetchData: function() {
-                axios.get('/api/admin/log/info')
+                axios.get('/api/logs/info')
                     .then((res) => {
                         this.logInfo = res.data;
-                        axios.get('/api/admin/log/'+this.currAmount)
+                        axios.get('/api/logs/'+this.currAmount)
                             .then((res) => {
                                 if(Array.isArray(res.data)) {
                                     this.logsRaw = res.data;
