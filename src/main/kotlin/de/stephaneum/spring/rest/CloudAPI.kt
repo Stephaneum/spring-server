@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.cloud
+package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
@@ -14,6 +14,19 @@ import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
 import java.nio.file.Paths
 import javax.servlet.http.HttpServletRequest
+
+object CloudRequest {
+    data class CreateFolder(val name: String?, val parentID: Int?)
+    data class UpdatePublic(val fileID: Int?, val isPublic: Boolean?)
+    data class MoveFile(val fileID: Int?, val parentFolderID: Int?)
+    data class MoveFolder(val folderID: Int?, val parentFolderID: Int?)
+}
+
+object CloudResponse {
+    data class Feedback(val success: Boolean, val needLogin: Boolean = false, val message: String? = null)
+    data class CloudInfo(val used: Int, val total: Int, val count: Int, val private: Int, val project: Int, val schoolClass: Int, val teacherChat: Int)
+    data class FileKey(val key: String)
+}
 
 @RestController
 @RequestMapping("/api/cloud")
@@ -41,7 +54,7 @@ class CloudAPI {
     private lateinit var classRepo: SchoolClassRepo
 
     @GetMapping("/info")
-    fun getInfo(): Response.CloudInfo {
+    fun getInfo(): CloudResponse.CloudInfo {
         val user = Session.get().user ?: throw ErrorCode(401, "login")
 
         val used = fileRepo.calcStorageUsed(user.id)
@@ -52,7 +65,7 @@ class CloudAPI {
         val classUsage = fileRepo.calcStorageUsedClass(user.id)
         val teacherChatUsage = fileRepo.calcStorageUsedTeacherChat(user.id)
 
-        return Response.CloudInfo(used, total, count, privateUsage, projectUsage, classUsage, teacherChatUsage)
+        return CloudResponse.CloudInfo(used, total, count, privateUsage, projectUsage, classUsage, teacherChatUsage)
     }
 
     @GetMapping("/view/user")
@@ -110,9 +123,9 @@ class CloudAPI {
                    @RequestParam("file") file: MultipartFile,
                    request: HttpServletRequest): Any {
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        var fileName = file.originalFilename ?: return Response.Feedback(false, message = "Dateiname unbekannt")
-        var contentType = file.contentType ?: return Response.Feedback(false, message = "Dateityp unbekannt")
+        val user = Session.get().user ?: return CloudResponse.Feedback(false, needLogin = true)
+        var fileName = file.originalFilename ?: return CloudResponse.Feedback(false, message = "Dateiname unbekannt")
+        var contentType = file.contentType ?: return CloudResponse.Feedback(false, message = "Dateityp unbekannt")
 
         // ensure that the image is rotated properly
         var bytes = file.bytes
@@ -148,11 +161,11 @@ class CloudAPI {
         if(result is File)
             result.simplifyForPosts()
 
-        return if(result is String) Response.Feedback(false, message = result) else result
+        return if(result is String) CloudResponse.Feedback(false, message = result) else result
     }
 
     @PostMapping("/create-folder/user", "/create-folder/group/{id}", "/create-folder/class/{id}", "/create-folder/teacher")
-    fun createFolder(@RequestBody request: Request.CreateFolder,
+    fun createFolder(@RequestBody request: CloudRequest.CreateFolder,
                      @PathVariable(required = false) id: Int?,
                      httpRequest: HttpServletRequest) {
 
@@ -185,79 +198,79 @@ class CloudAPI {
     }
 
     @PostMapping("/update-public-file")
-    fun updatePublic(@RequestBody request: Request.UpdatePublic): Response.Feedback {
+    fun updatePublic(@RequestBody request: CloudRequest.UpdatePublic): CloudResponse.Feedback {
 
         if(request.fileID == null || request.isPublic == null)
-            return Response.Feedback(false, message = "Missing Arguments")
+            return CloudResponse.Feedback(false, message = "Missing Arguments")
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        val file = fileRepo.findByIdOrNull(request.fileID) ?: return Response.Feedback(false, message = "file not found")
+        val user = Session.get().user ?: return CloudResponse.Feedback(false, needLogin = true)
+        val file = fileRepo.findByIdOrNull(request.fileID) ?: return CloudResponse.Feedback(false, message = "file not found")
 
         if(!fileService.hasAccessToFile(user, file))
-            return Response.Feedback(false, message = "no access to this file")
+            return CloudResponse.Feedback(false, message = "no access to this file")
 
         file.public = request.isPublic
         fileRepo.save(file)
 
-        return Response.Feedback(true)
+        return CloudResponse.Feedback(true)
     }
 
     @PostMapping("/delete-file/{fileID}")
-    fun deleteFile(@PathVariable fileID: Int): Response.Feedback {
+    fun deleteFile(@PathVariable fileID: Int): CloudResponse.Feedback {
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        val file = fileRepo.findByIdOrNull(fileID) ?: return Response.Feedback(false, message = "file not found")
+        val user = Session.get().user ?: return CloudResponse.Feedback(false, needLogin = true)
+        val file = fileRepo.findByIdOrNull(fileID) ?: return CloudResponse.Feedback(false, message = "file not found")
 
         if(!fileService.hasAccessToFile(user, file))
-            return Response.Feedback(false, message = "no access to this file")
+            return CloudResponse.Feedback(false, message = "no access to this file")
 
         fileService.deleteFileStephaneum(user, file)
 
-        return Response.Feedback(true)
+        return CloudResponse.Feedback(true)
     }
 
     @PostMapping("/delete-folder/{folderID}")
-    fun deleteFolder(@PathVariable folderID: Int): Response.Feedback {
+    fun deleteFolder(@PathVariable folderID: Int): CloudResponse.Feedback {
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        val folder = folderRepo.findByIdOrNull(folderID) ?: return Response.Feedback(false, message = "folder not found")
+        val user = Session.get().user ?: return CloudResponse.Feedback(false, needLogin = true)
+        val folder = folderRepo.findByIdOrNull(folderID) ?: return CloudResponse.Feedback(false, message = "folder not found")
 
         // TODO: check permissions
 
         fileService.deleteFolderStephaneum(user, folder)
 
-        return Response.Feedback(true)
+        return CloudResponse.Feedback(true)
     }
 
     @PostMapping("/move-file")
-    fun moveFile(@RequestBody request: Request.MoveFile): Response.Feedback {
+    fun moveFile(@RequestBody request: CloudRequest.MoveFile): CloudResponse.Feedback {
 
         if(request.fileID == null || request.parentFolderID == null)
-            return Response.Feedback(false, message = "Missing Arguments")
+            return CloudResponse.Feedback(false, message = "Missing Arguments")
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        val file = fileRepo.findByIdOrNull(request.fileID) ?: return Response.Feedback(false, message = "file not found")
-        val folder = folderRepo.findByIdOrNull(request.parentFolderID) ?: return Response.Feedback(false, message = "file not found")
+        val user = Session.get().user ?: return CloudResponse.Feedback(false, needLogin = true)
+        val file = fileRepo.findByIdOrNull(request.fileID) ?: return CloudResponse.Feedback(false, message = "file not found")
+        val folder = folderRepo.findByIdOrNull(request.parentFolderID) ?: return CloudResponse.Feedback(false, message = "file not found")
 
         if(!fileService.hasAccessToFile(user, file))
-            return Response.Feedback(false, message = "no access to this file")
+            return CloudResponse.Feedback(false, message = "no access to this file")
 
         file.folder = folder
         fileRepo.save(file)
 
-        return Response.Feedback(true)
+        return CloudResponse.Feedback(true)
     }
 
     @GetMapping("/key/{fileID}")
     fun getKey(@PathVariable fileID: Int): Any {
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        val file = fileRepo.findByIdOrNull(fileID) ?: return Response.Feedback(false, message = "file not found")
+        val user = Session.get().user ?: return CloudResponse.Feedback(false, needLogin = true)
+        val file = fileRepo.findByIdOrNull(fileID) ?: return CloudResponse.Feedback(false, message = "file not found")
 
         if(!fileService.hasAccessToFile(user, file))
-            return Response.Feedback(false, message = "no access to this file")
+            return CloudResponse.Feedback(false, message = "no access to this file")
 
-        return Response.FileKey(jwtService.generateToken(mapOf("fileID" to fileID.toString())))
+        return CloudResponse.FileKey(jwtService.generateToken(mapOf("fileID" to fileID.toString())))
     }
 
     private fun calcSizeRecursive(folder: Folder): Int {
