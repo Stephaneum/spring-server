@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.plan
+package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
@@ -23,7 +23,7 @@ import java.util.*
 @RequestMapping("/api/plan")
 class PlanAPI {
 
-    private val lastModifiedFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm (EEEE)", Locale.GERMANY).withZone(ZoneId.systemDefault());
+    private val lastModifiedFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm (EEEE)", Locale.GERMANY).withZone(ZoneId.systemDefault())
     private val finalFileName = "vertretungsplan.pdf"
 
     @Autowired

@@ -105,7 +105,7 @@
         methods: {
             toggleMode: function(id) {
                 this.waitingForData = true;
-                axios.post('/api/admin/static/toggle-mode/'+id)
+                axios.post('/api/static/toggle-mode/'+id)
                     .then((res) => {
                         if(res.data.success) {
                             this.fetchData();
@@ -120,7 +120,7 @@
             },
             deletePage: function(id) {
                 this.waitingForData = true;
-                axios.post('/api/admin/static/delete/'+id)
+                axios.post('/api/static/delete/'+id)
                     .then((res) => {
                         if(res.data.success) {
                             M.toast({ html: 'Gelöscht.' });
@@ -135,7 +135,7 @@
                     });
             },
             fetchData: function() {
-                axios.get('/api/admin/static')
+                axios.get('/api/static')
                     .then((res) => {
                         this.staticPath = res.data.staticPath;
                         this.pages = res.data.pages;

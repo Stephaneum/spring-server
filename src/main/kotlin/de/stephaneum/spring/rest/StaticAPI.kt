@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.statics
+package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.ROLE_ADMIN
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 data class AdminStaticInfo(val staticPath: String, val pages: List<Static>)
 
 @RestController
-@RequestMapping("/api/admin/static")
+@RequestMapping("/api/static")
 class StaticAPI {
 
     @Autowired
