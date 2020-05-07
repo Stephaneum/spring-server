@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.groups
+package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
 import java.nio.file.Paths
+
+data class UpdateAreaText(val id: Int?, val text: String?)
+data class TimestampResponse(val timestamp: Long)
 
 @RestController
 @RequestMapping("/api/groups")
