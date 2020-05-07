@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.blackboard
+package de.stephaneum.spring.blackboard
 
 import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.database.BlackboardRepo

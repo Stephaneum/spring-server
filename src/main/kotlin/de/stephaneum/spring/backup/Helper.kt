@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.backup
+package de.stephaneum.spring.backup
 
 val REDIRECT_LOGIN = "redirect:/backup/login"
 val REDIRECT_ADMIN = "redirect:/backup/admin"

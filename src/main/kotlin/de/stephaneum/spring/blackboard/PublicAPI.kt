@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.blackboard
+package de.stephaneum.spring.blackboard
 
 import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session

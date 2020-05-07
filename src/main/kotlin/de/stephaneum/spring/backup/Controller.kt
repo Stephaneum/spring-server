@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.backup
+package de.stephaneum.spring.backup
 
 import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session

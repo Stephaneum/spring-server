@@ -1,4 +1,4 @@
-package de.stephaneum.spring.features.backup
+package de.stephaneum.spring.backup
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
