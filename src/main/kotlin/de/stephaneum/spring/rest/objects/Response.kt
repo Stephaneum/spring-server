@@ -1,12 +1,8 @@
-package de.stephaneum.spring.features.general
+package de.stephaneum.spring.rest.objects
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import de.stephaneum.spring.database.Menu
 import de.stephaneum.spring.database.User
-
-object Request {
-    data class Login(val email: String?, val password: String?)
-}
 
 object Response {
     @JsonInclude(JsonInclude.Include.NON_NULL)

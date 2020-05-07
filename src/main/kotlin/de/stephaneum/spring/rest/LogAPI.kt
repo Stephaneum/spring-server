@@ -12,7 +12,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-object Response {
+object LogResponse {
     data class LogInfo(val amount: Long)
     data class Log(val id: Int, val date: String, val type: String, val className: String, val typeID: Int, val info: String)
 }
@@ -25,7 +25,7 @@ class LogAPI (
 
     private val dateFormat = DateTimeFormatter.ofPattern("EEEE, dd.MM.yyyy, HH:mm:ss", Locale.GERMANY).withZone(ZoneId.systemDefault())
     private val updateInterval = 30*1000 // 30 sec
-    private var logs: List<Response.Log> = emptyList()
+    private var logs: List<LogResponse.Log> = emptyList()
     private var lastUpdate = 0L
 
     @GetMapping("/info")
@@ -33,7 +33,7 @@ class LogAPI (
         val user = Session.get().user ?: return de.stephaneum.spring.helper.Response.Feedback(false, needLogin = true)
         if(user.code.role != ROLE_ADMIN)
             return de.stephaneum.spring.helper.Response.Feedback(false, message = "not allowed")
-        return Response.LogInfo(logRepo.count())
+        return LogResponse.LogInfo(logRepo.count())
     }
 
     @GetMapping("/{amount}")
@@ -45,7 +45,7 @@ class LogAPI (
         if(System.currentTimeMillis() - lastUpdate >= updateInterval) {
             logs = logRepo.findByOrderByTimestampDesc().map { log ->
                 val type = EventType.valueOf(log.type)
-                Response.Log(
+                LogResponse.Log(
                         id = log.id,
                         date = dateFormat.format(log.timestamp.toLocalDateTime()),
                         type = type.description,

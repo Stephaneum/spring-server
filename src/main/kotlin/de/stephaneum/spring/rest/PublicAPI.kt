@@ -1,40 +1,30 @@
-package de.stephaneum.spring.features.general
+package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
-import de.stephaneum.spring.database.*
+import de.stephaneum.spring.database.EMPTY_USER
+import de.stephaneum.spring.database.PostRepo
+import de.stephaneum.spring.database.ROLE_ADMIN
+import de.stephaneum.spring.database.ROLE_NO_LOGIN
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.MenuService
-import de.stephaneum.spring.scheduler.Element
+import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
-import de.stephaneum.spring.security.CryptoService
-import org.springframework.beans.factory.annotation.Autowired
+import de.stephaneum.spring.scheduler.Element
 import org.springframework.http.*
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("/api")
-class API {
-
-    private val PEPPER = "A43w8pa0M245qga4293zt9o4mc3z98TA3nQ9mzvTa943cta43mTaoz47tz3loIhbiKh"
-
-    @Autowired
-    private lateinit var configScheduler: ConfigScheduler
-
-    @Autowired
-    private lateinit var fileService: FileService
-
-    @Autowired
-    private lateinit var menuService: MenuService
-
-    @Autowired
-    private lateinit var cryptoService: CryptoService
-
-    @Autowired
-    private lateinit var postRepo: PostRepo
-
-    @Autowired
-    private lateinit var userRepo: UserRepo
+class PublicAPI (
+        private val configScheduler: ConfigScheduler,
+        private val menuService: MenuService,
+        private val fileService: FileService,
+        private val postRepo: PostRepo
+) {
 
     @GetMapping("/info")
     fun get(): Response.Info {
@@ -49,25 +39,6 @@ class API {
             else                                                        -> null
         }
         return Response.Info(user, menuService.getPublic(), copyright, plan, history, euSa, unapproved)
-    }
-
-    @ExperimentalUnsignedTypes
-    @PostMapping("/login")
-    fun login(@RequestBody request: Request.Login): Response.Feedback {
-        val user = userRepo.findByEmail(request.email ?: "") ?: return Response.Feedback(false)
-        val salt = user.password.substring(32)
-        if(user.password == cryptoService.hashMD5(request.password+salt+PEPPER)+salt) {
-            Session.get().user = user;
-            return Response.Feedback(true)
-        } else {
-            Thread.sleep(2000)
-            return Response.Feedback(false)
-        }
-    }
-
-    @PostMapping("/logout")
-    fun logout() {
-        Session.logout()
     }
 
     @GetMapping("/images/{fileName}")
