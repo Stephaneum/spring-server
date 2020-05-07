@@ -14,7 +14,7 @@ class PrivateController (
         private val jwtService: JwtService
 ) {
 
-    @GetMapping("admin-static")
+    @GetMapping("/admin-static")
     fun staticFiles(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
 
         if(checkIE(request))
@@ -80,6 +80,23 @@ class PrivateController (
         }
 
         return "plan-manager"
+    }
+
+    @GetMapping("/menu-manager")
+    fun menuManager(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
+
+        if(checkIE(request))
+            return "forward:/static/no-support-ie.html"
+
+        // login
+        if(key != null) {
+            Session.get().user = jwtService.getUser(key)
+            if(Session.get().user != null) {
+                return "redirect:${request.requestURL}"
+            }
+        }
+
+        return "menu-manager"
     }
 
     @GetMapping("/post-manager")

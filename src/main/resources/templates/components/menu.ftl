@@ -5,17 +5,17 @@
     <template id="nav-menu">
         <div style="width: 100%">
             <nav>
-                <div class="nav-wrapper" :style="{ 'z-index': minimal ? 'auto' : 100 }" style="background-color: white">
+                <div class="nav-wrapper" :style="{ 'z-index': unreal ? 'auto' : 100 }" style="background-color: white">
                     <a href="#" data-target="sidenav" class="sidenav-trigger hide-on-large-only">
                         <i class="material-icons" style="color: #1b5e20">menu</i>
                     </a>
-                    <a :href="minimal ? '#!' : '/home.xhtml'" class="brand-logo" :style="minimal ? { 'opacity': 0.05 } : {}">
+                    <a v-if="!editMode" :href="unreal ? '#!' : '/home.xhtml'" class="brand-logo" :style="unreal ? { 'opacity': 0.05 } : {}">
                         <img src="/static/img/logo-banner-green.png" style="height:50px;margin-top:5px;margin-left:10px"/>
                     </a>
                     <ul class="right hide-on-med-and-down">
                         <li v-for="m1 in menu">
-                            <a v-text="m1.name" @click="emit(m1)" :href="url(m1)" :target="target(m1)"  style="color: #1b5e20"></a>
-                            <ul v-if="m1.children.length != 0" class="z-depth-1" style="z-index: 200">
+                            <a v-text="m1.name" @click="emit(m1)" :href="url(m1)" :target="target(m1)" style="color: #1b5e20"></a>
+                            <ul v-if="m1.children.length != 0 || editMode" class="z-depth-1" style="z-index: 200">
                                 <li v-for="m2 in m1.children">
                                     <a @click="emit(m2)" :href="url(m2)" :target="target(m2)">
                                         <span>
@@ -23,9 +23,9 @@
                                             <i v-else class="material-icons">stop</i>
                                             {{m2.name}}
                                         </span>
-                                        <i v-if="m2.children.length != 0" class="material-icons">keyboard_arrow_right</i>
+                                        <i v-if="m2.children.length != 0 || editMode" class="material-icons">keyboard_arrow_right</i>
                                     </a>
-                                    <ul v-if="m2.children.length != 0" class="z-depth-1" style="z-index: 300">
+                                    <ul v-if="m2.children.length != 0 || editMode" class="z-depth-1" style="z-index: 300">
                                         <li v-for="m3 in m2.children">
                                             <a @click="emit(m3)" :href="url(m3)" :target="target(m3)">
                                                 <span>
@@ -33,9 +33,9 @@
                                                     <i v-else class="material-icons">stop</i>
                                                     {{m3.name}}
                                                 </span>
-                                                <i v-if="m3.children.length != 0" class="material-icons">keyboard_arrow_right</i>
+                                                <i v-if="m3.children.length != 0 || editMode" class="material-icons">keyboard_arrow_right</i>
                                             </a>
-                                            <ul v-if="m3.children.length != 0" class="z-depth-1" style="z-index: 400">
+                                            <ul v-if="m3.children.length != 0 || editMode" class="z-depth-1" style="z-index: 400">
                                                 <li v-for="m4 in m3.children">
                                                     <a @click="emit(m4)" :href="url(m4)" :target="target(m4)">
                                                         <span>
@@ -45,16 +45,71 @@
                                                         </span>
                                                     </a>
                                                 </li>
+                                                <template v-if="editMode">
+                                                    <li>
+                                                        <a @click="emitNewGroup(m3)" class="edit-btn">
+                                                        <span>
+                                                            <i class="material-icons">add</i>
+                                                            Gruppe
+                                                        </span>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a @click="emitNewLink(m3)" class="edit-btn">
+                                                        <span>
+                                                            <i class="material-icons">add</i>
+                                                            Link
+                                                        </span>
+                                                        </a>
+                                                    </li>
+                                                </template>
                                             </ul>
                                         </li>
+                                        <template v-if="editMode">
+                                            <li>
+                                                <a @click="emitNewGroup(m2)" class="edit-btn">
+                                                <span>
+                                                    <i class="material-icons">add</i>
+                                                    Gruppe
+                                                </span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a @click="emitNewLink(m2)" class="edit-btn">
+                                                <span>
+                                                    <i class="material-icons">add</i>
+                                                    Link
+                                                </span>
+                                                </a>
+                                            </li>
+                                        </template>
                                     </ul>
                                 </li>
+                                <template v-if="editMode">
+                                    <li>
+                                        <a @click="emitNewGroup(m1)" class="edit-btn">
+                                        <span>
+                                            <i class="material-icons">add</i>
+                                            Gruppe
+                                        </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a @click="emitNewLink(m1)" class="edit-btn">
+                                        <span>
+                                            <i class="material-icons">add</i>
+                                            Link
+                                        </span>
+                                        </a>
+                                    </li>
+                                </template>
                             </ul>
                         </li>
-                        <li v-if="!minimal && loggedIn">
+                        <li v-if="!unreal && loggedIn">
                             <a id="internal-btn">Intern</a>
                             <ul id="internal-menu" class="z-depth-1" style="z-index: 200">
                                 <li v-if="admin"><a href="/admin_konfig.xhtml"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
+                                <li v-if="admin"><a href="/menu-manager"><span><i class="material-icons">list</i>Menü</span></a></li>
                                 <li v-if="admin"><a href="/admin-static"><span><i class="material-icons">brush</i>Benutzerdefinierte Seiten</span></a></li>
                                 <li v-if="admin"><a href="/admin_rubriken.xhtml"><span><i class="material-icons">bookmark</i>Rubriken</span></a></li>
                                 <li v-if="admin"><a href="/admin-codes"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
@@ -75,16 +130,30 @@
                                 <p style="white-space: nowrap">({{ role }})</p>
                             </div>
                         </li>
+                        <template v-if="editMode">
+                            <li style="margin-left: 10px; margin-right: 10px">
+                                <a @click="emitNewGroup(null)" class="edit-btn" style="border: none">
+                                    <i class="material-icons left" style="margin-right: 5px">add</i>
+                                    Gruppe
+                                </a>
+                            </li>
+                            <li>
+                                <a @click="emitNewLink(null)" class="edit-btn" style="border: none">
+                                    <i class="material-icons left" style="margin-right: 5px">add</i>
+                                    Link
+                                </a>
+                            </li>
+                        </template>
                         <li>
-                            <a class="waves-effect waves-dark btn" style="background-color: #1b5e20" :style="minimal ? {'opacity': 0.1 } : {}" @click="toggleAuth">
-                                {{ loggedIn && !minimal ? 'Abmelden' : 'Login' }}
+                            <a class="waves-effect waves-dark btn" style="background-color: #1b5e20" :style="unreal ? {'opacity': 0.1 } : {}" @click="toggleAuth">
+                                {{ loggedIn && !unreal ? 'Abmelden' : 'Login' }}
                                 <i class="material-icons right">exit_to_app</i>
                             </a>
                         </li>
                     </ul>
                 </div>
             </nav>
-            <ul v-if="!minimal" id="sidenav" class="sidenav">
+            <ul v-if="!unreal" id="sidenav" class="sidenav">
                 <br />
                 <li>
                     <a href="home.xhtml"><i class="material-icons">home</i>Startseite</a>
@@ -113,12 +182,24 @@
 
     <script type="text/javascript">
         Vue.component('nav-menu', {
-            props: ['menu', 'user', 'plan', 'unapproved', 'minimal'],
+            props: ['menu', 'user', 'plan', 'unapproved', 'unreal', 'editMode'],
             methods: {
                 emit: function(menu) {
                     this.$emit('selected', menu);
                 },
+                emitNewGroup: function(parent) {
+                    console.log(parent.name);
+                    this.$emit('group', parent);
+                },
+                emitNewLink: function(parent) {
+                    console.log(parent.name);
+                    this.$emit('link', parent);
+                },
                 toggleAuth: function() {
+
+                    if(this.unreal)
+                        return;
+
                     if(this.loggedIn) {
                         showLoading("Abmelden...");
                         axios.post('/api/logout')
@@ -155,14 +236,14 @@
                     return this.user && this.user.createCategories;
                 },
                 url: function () {
-                    return (menu) => this.minimal ? null : menu.link ? menu.link : '/home.xhtml?id='+menu.id;
+                    return (menu) => this.unreal ? null : menu.link ? menu.link : '/home.xhtml?id='+menu.id;
                 },
                 target: function () {
-                    return (menu) => this.minimal ? null : menu.link ? '_blank' : '_self';
+                    return (menu) => this.unreal ? null : menu.link ? '_blank' : '_self';
                 }
             },
             mounted: function() {
-                if(!this.minimal) {
+                if(!this.unreal) {
                     var callback = function(){
                         // Handler when the DOM is fully loaded
                         M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
@@ -278,6 +359,18 @@
         .internal-divider {
             height: 1px;
             background-color: #4caf50;
+        }
+
+        /* edit mode */
+
+        .edit-btn {
+            background-color: #558b2f !important;
+            color: white !important;
+            border: white solid 2px;
+        }
+
+        .edit-btn:hover {
+            background-color: #689f38 !important;
         }
 
         /* bugfix height */
