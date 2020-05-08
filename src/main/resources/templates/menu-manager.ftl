@@ -39,8 +39,13 @@
 
         <nav-menu :menu="menu" unreal="true" edit-mode="true" :edit-root-level="menuAdmin" @select="selectMenu" @group="showCreateGroup" @link="showCreateLink"></nav-menu>
 
-        <div v-if="menuAdmin" style="padding-top: 20px; padding-left: 50px">
-            Startseite: <b>{{ defaultMenu ? defaultMenu.name : '-' }}</b>
+        <div v-if="menuAdmin" style="padding-top: 20px; padding-left: 50px; display: flex; justify-content: space-between">
+            <span>Startseite: <b>{{ defaultMenu ? defaultMenu.name : '-' }}</b></span>
+            <span>Je höher die Priorität, desto weiter oben/links das Element eingeordnet.</span>
+        </div>
+
+        <div v-else style="margin-top: 100px; text-align: center; font-size: 1.2em">
+            Je höher die Priorität, desto weiter oben/links wird das Element eingeordnet.
         </div>
 
         <div v-if="admin" class="card-panel" style="margin-top: 60px">
