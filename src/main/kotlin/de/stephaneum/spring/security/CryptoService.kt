@@ -10,8 +10,8 @@ class CryptoService {
 
     @ExperimentalUnsignedTypes
     fun checkPassword(password: String, hash: String): Boolean {
-        val salt = password.substring(32)
-        return password == hashMD5(password+salt+PEPPER)+salt
+        val salt = hash.substring(32)
+        return hashMD5(password+salt+PEPPER)+salt == hash
     }
 
     @ExperimentalUnsignedTypes
