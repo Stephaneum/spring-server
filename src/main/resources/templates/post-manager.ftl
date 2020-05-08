@@ -183,7 +183,7 @@
                 <div v-if="admin || info.user.managePosts || category.length !== 0">
                     <h5 style="margin-bottom: 20px">Gruppe auswählen:</h5>
                     <div class="grey-round-border">
-                        <nav-menu :menu="category.length !== 0 ? category : info.menu" unreal="true" @selected="fetchPosts"></nav-menu>
+                        <nav-menu :menu="category.length !== 0 ? category : info.menu" unreal="true" @select="fetchPosts"></nav-menu>
                     </div>
                 </div>
 
@@ -373,7 +373,7 @@
                     </div>
                     <div style="height: 60px"></div>
                     <div class="grey-round-border">
-                        <nav-menu :menu="category.length !== 0 ? category : info.menu" unreal="true" @selected="assignMenu"></nav-menu>
+                        <nav-menu :menu="category.length !== 0 ? category : info.menu" unreal="true" @select="assignMenu"></nav-menu>
                     </div>
 
                     <div style="height: 300px"></div>

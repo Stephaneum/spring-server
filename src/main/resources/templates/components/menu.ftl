@@ -116,7 +116,7 @@
                                 <li class="internal-divider"></li>
 
                                 <!-- cms -->
-                                <li v-if="hasMenuWriteAccess"><a href="/menu-manager"><span><i class="material-icons">list</i>Menü</span></a></li>
+                                <li v-if="hasMenuWriteAccess"><a href="/menu-manager"><span><i class="material-icons">device_hub</i>Menü</span></a></li>
                                 <li v-if="admin || managePlans"><a href="/plan-manager"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
                                 <li v-if="admin"><a href="/admin-static"><span><i class="material-icons">note_add</i>Seiten</span></a></li>
                                 <li><a href="/post-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
@@ -188,7 +188,7 @@
             props: ['menu', 'user', 'hasMenuWriteAccess', 'plan', 'unapproved', 'unreal', 'editMode', 'editRootLevel'],
             methods: {
                 emit: function(menu) {
-                    this.$emit('selected', menu);
+                    this.$emit('select', menu);
                 },
                 emitNewGroup: function(parent) {
                     this.$emit('group', parent);

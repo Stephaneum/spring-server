@@ -154,8 +154,8 @@ class MenuAPI (
         val activeRules = userMenuRepo.findByUser(user)
         when {
             activeRules.isEmpty() -> userMenuRepo.save(UserMenu(0, user, menu))
-            activeRules.any { it.menu == null } -> throw ErrorCode(405, "already menu admin")
-            activeRules.any { it.menu == menu } -> throw ErrorCode(406, "rule already exists")
+            activeRules.any { it.menu == null } -> throw ErrorCode(409, "already menu admin")
+            activeRules.any { it.menu == menu } -> throw ErrorCode(410, "rule already exists")
             else -> {
                 if(menu == null)
                     userMenuRepo.deleteByUser(user) // reset, because user will be menu admin
