@@ -5,8 +5,8 @@ import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.helper.LogService
 import de.stephaneum.spring.helper.MenuService
-import de.stephaneum.spring.jsf.JsfCommunication
-import de.stephaneum.spring.jsf.JsfEvent
+import de.stephaneum.spring.helper.JsfService
+import de.stephaneum.spring.helper.JsfEvent
 import de.stephaneum.spring.rest.objects.Request
 import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/menu")
 class MenuAPI (
-        private val jsfCommunication: JsfCommunication,
+        private val jsfService: JsfService,
         private val logService: LogService,
         private val configScheduler: ConfigScheduler,
         private val menuService: MenuService,
@@ -68,7 +68,7 @@ class MenuAPI (
         val menu = Menu(0, request.name, parent, request.priority, request.link, null, null, request.password, true)
         menuRepo.save(menu)
         logService.log(EventType.CREATE_MENU, user, request.name)
-        jsfCommunication.send(JsfEvent.SYNC_MENU)
+        jsfService.send(JsfEvent.SYNC_MENU)
     }
 
     @PostMapping("/update")
@@ -86,7 +86,7 @@ class MenuAPI (
         menu.link = request.link
         menuRepo.save(menu)
         logService.log(EventType.EDIT_MENU, user, request.name)
-        jsfCommunication.send(JsfEvent.SYNC_MENU)
+        jsfService.send(JsfEvent.SYNC_MENU)
     }
 
     @ExperimentalUnsignedTypes
@@ -105,7 +105,7 @@ class MenuAPI (
 
         menuRepo.delete(menu)
         logService.log(EventType.DELETE_MENU, user, menu.name)
-        jsfCommunication.send(JsfEvent.SYNC_MENU)
+        jsfService.send(JsfEvent.SYNC_MENU)
     }
 
     @PostMapping("/default/{menuID}")
@@ -120,7 +120,7 @@ class MenuAPI (
             throw ErrorCode(404, "menu not found")
 
         configScheduler.save(Element.defaultMenu, menuID.toString())
-        jsfCommunication.send(JsfEvent.SYNC_VARIABLES)
+        jsfService.send(JsfEvent.SYNC_VARIABLES)
     }
 
     @GetMapping("/rules")

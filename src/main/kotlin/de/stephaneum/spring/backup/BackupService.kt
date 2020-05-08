@@ -1,7 +1,7 @@
 package de.stephaneum.spring.backup
 
-import de.stephaneum.spring.jsf.JsfCommunication
-import de.stephaneum.spring.jsf.JsfEvent
+import de.stephaneum.spring.helper.JsfService
+import de.stephaneum.spring.helper.JsfEvent
 import de.stephaneum.spring.helper.DBHelper
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.cmd
@@ -32,7 +32,7 @@ class BackupService {
     private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
-    private lateinit var jsfCommunication: JsfCommunication
+    private lateinit var jsfService: JsfService
 
     @Value("\${database}")
     private lateinit var db: String
@@ -257,7 +257,7 @@ class BackupService {
             return result
         else {
             configScheduler.update()
-            jsfCommunication.send(JsfEvent.SYNC_ALL)
+            jsfService.send(JsfEvent.SYNC_ALL)
         }
 
         Thread.sleep(1000)

@@ -2,8 +2,8 @@ package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
-import de.stephaneum.spring.jsf.JsfCommunication
-import de.stephaneum.spring.jsf.JsfEvent
+import de.stephaneum.spring.helper.JsfService
+import de.stephaneum.spring.helper.JsfEvent
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.helper.LogService
@@ -47,7 +47,7 @@ object PostResponse {
 class PostAPI {
 
     @Autowired
-    private lateinit var jsfCommunication: JsfCommunication
+    private lateinit var jsfService: JsfService
 
     @Autowired
     private lateinit var cryptoService: CryptoService
@@ -293,7 +293,7 @@ class PostAPI {
             }
             configScheduler.save(type, finalText)
             logService.log(EventType.EDIT_POST, user, "${type.info} (spezieller Text)")
-            jsfCommunication.send(JsfEvent.SYNC_SPECIAL_TEXT)
+            jsfService.send(JsfEvent.SYNC_SPECIAL_TEXT)
             return PostResponse.Feedback(true)
         } else {
             return PostResponse.Feedback(false, message = "only admin or post manager")

@@ -2,8 +2,8 @@ package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
-import de.stephaneum.spring.jsf.JsfCommunication
-import de.stephaneum.spring.jsf.JsfEvent
+import de.stephaneum.spring.helper.JsfService
+import de.stephaneum.spring.helper.JsfEvent
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.LogService
 import de.stephaneum.spring.helper.PlanService
@@ -27,7 +27,7 @@ class PlanAPI {
     private val finalFileName = "vertretungsplan.pdf"
 
     @Autowired
-    private lateinit var jsfCommunication: JsfCommunication
+    private lateinit var jsfService: JsfService
 
     @Autowired
     private lateinit var planService: PlanService
@@ -61,7 +61,7 @@ class PlanAPI {
             return Response.Feedback(false, message = "not allowed")
 
         configScheduler.save(Element.planInfo, text)
-        jsfCommunication.send(JsfEvent.SYNC_PLAN)
+        jsfService.send(JsfEvent.SYNC_PLAN)
 
         return Response.Feedback(true)
     }
@@ -84,7 +84,7 @@ class PlanAPI {
             if(info != null)
                 configScheduler.save(Element.planInfo, info)
             configScheduler.save(Element.planLocation, path)
-            jsfCommunication.send(JsfEvent.SYNC_PLAN)
+            jsfService.send(JsfEvent.SYNC_PLAN)
             logService.log(EventType.UPLOAD, "Vertretungsplan", user)
             return Response.Feedback(true, message = if(info != null) "Änderungen gespeichert.<br>Datum wurde erkannt und aktualisiert." else "Änderungen gespeichert.")
         } else {
@@ -104,7 +104,7 @@ class PlanAPI {
             val success = fileService.deleteFile(path)
             if(success) {
                 configScheduler.save(Element.planLocation, null)
-                jsfCommunication.send(JsfEvent.SYNC_PLAN)
+                jsfService.send(JsfEvent.SYNC_PLAN)
                 return Response.Feedback(true)
             }
         }

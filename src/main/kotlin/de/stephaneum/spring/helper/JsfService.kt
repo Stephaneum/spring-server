@@ -1,6 +1,5 @@
-package de.stephaneum.spring.jsf
+package de.stephaneum.spring.helper
 
-import de.stephaneum.spring.helper.RestClient
 import de.stephaneum.spring.security.JwtService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,9 +17,9 @@ enum class JsfEvent {
 }
 
 @Service
-class JsfCommunication {
+class JsfService {
 
-    val logger = LoggerFactory.getLogger(JsfCommunication::class.java)
+    val logger = LoggerFactory.getLogger(JsfService::class.java)
 
     @Value("\${jsf.url}")
     private lateinit var jsfURL: String
