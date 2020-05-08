@@ -37,6 +37,10 @@
 
         <nav-menu :menu="menu" unreal="true" edit-mode="true" :edit-root-level="menuAdmin" @selected="selectMenu" @group="showCreateGroup" @link="showCreateLink"></nav-menu>
 
+        <div style="padding-top: 20px; padding-left: 50px">
+            Startseite: <b>{{ defaultMenu ? defaultMenu.name : '-' }}</b>
+        </div>
+
         <div class="card-panel" style="margin-top: 60px">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px">
                 <span style="font-size: 2em">Schreibrechte</span>
@@ -151,6 +155,16 @@
                 <label for="update-menu-priority">Priorität</label>
                 <input v-model:value="selected.priority" type="text" id="update-menu-priority"/>
             </div>
+            <div v-if="!selected.linkMode" style="display: flex; justify-content: space-evenly">
+                <a @click="setHome" class="waves-effect btn-flat" href="#!" style="margin: 10px 10px 0 0" :style="defaultMenu && selected.id === defaultMenu.id ? { color: 'green' } : {}">
+                    <i class="material-icons left">home</i>
+                    {{ defaultMenu && selected.id === defaultMenu.id ? 'Ist Startseite' : 'Startseite festlegen' }}
+                </a>
+                <a class="waves-effect btn-flat" :href="'/home.xhtml?id='+selected.id" target="_blank" style="margin: 10px 10px 0 0">
+                    <i class="material-icons left">open_in_new</i>
+                    Öffnen
+                </a>
+            </div>
         </div>
         <div class="modal-footer">
             <a href="#!"
@@ -204,6 +218,7 @@
             info: { user: null, hasMenuWriteAccess: false, menu: null, plan: null, copyright: null, unapproved: null },
             menu: [],
             menuAdmin: false,
+            defaultMenu: null,
             rules: [],
             deletePassword: null,
             selected: {
@@ -226,9 +241,12 @@
                     return;
                 }
 
+                const menuInfo = await axios.get('/api/menu/info');
+                this.menuAdmin = menuInfo.data.menuAdmin;
+                this.defaultMenu = menuInfo.data.defaultMenu;
+
                 const menu = await axios.get('/api/menu/writable');
-                this.menu = menu.data.menu;
-                this.menuAdmin = menu.data.menuAdmin;
+                this.menu = menu.data;
 
                 if(this.admin) {
                     const rules = await axios.get('/api/menu/rules');
@@ -294,6 +312,21 @@
                 this.$nextTick(() => {
                     M.updateTextFields();
                 });
+            },
+            setHome: async function() {
+
+                if(this.selected && this.defaultMenu && this.selected.id === this.defaultMenu.id)
+                    return;
+
+                showLoadingInvisible();
+                try {
+                    await axios.post('/api/menu/default/' + this.selected.id);
+                    await this.fetchData();
+                    M.toast({html: 'Startseite festgelegt.<br>'+this.selected.name});
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                    hideLoading();
+                }
             },
             updateMenu: async function() {
                 showLoadingInvisible();

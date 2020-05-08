@@ -28,11 +28,19 @@ class MenuAPI (
         private val userRepo: UserRepo
 ) {
 
+    @GetMapping("/info")
+    fun getInfo(): Response.MenuInfo {
+        val me = Session.get().user ?: throw ErrorCode(401, "Login")
+        val menuAdmin = menuService.isMenuAdmin(me)
+        val menuID = configScheduler.get(Element.defaultMenu)
+        val menu = menuRepo.findByIdOrNull(menuID?.toInt() ?: 0) ?: throw ErrorCode(500, "menu not found")
+        return Response.MenuInfo(menuAdmin, menu)
+    }
+
     @GetMapping("/writable")
-    fun getMenu(): Response.WritableMenu {
-        val user = Session.get().user ?: throw ErrorCode(401, "Login")
-        val (menu, menuAdmin) = menuService.getWritable(user)
-        return Response.WritableMenu(menu, menuAdmin)
+    fun getMenu(): List<Menu> {
+        val me = Session.get().user ?: throw ErrorCode(401, "Login")
+        return menuService.getWritable(me)
     }
 
     @GetMapping("/default-priority")
@@ -43,7 +51,7 @@ class MenuAPI (
 
     @PostMapping("/create", "/create/{parentID}")
     fun createMenu(@PathVariable(required = false) parentID: Int?, @RequestBody request: Menu) {
-        val user = Session.get().user ?: throw ErrorCode(401, "Login")
+        val me = Session.get().user ?: throw ErrorCode(401, "Login")
 
         if(request.name.isBlank())
             throw ErrorCode(400, "empty name")
@@ -51,14 +59,14 @@ class MenuAPI (
         // check
         val parent = when (parentID) {
             null -> {
-                if(!menuService.isMenuAdmin(user))
+                if(!menuService.isMenuAdmin(me))
                     throw ErrorCode(403, "no write access")
 
                 null
             }
             else -> {
                 val parent = menuRepo.findByIdOrNull(parentID) ?: throw ErrorCode(404, "parent not found")
-                if(!menuService.canWrite(user, parent))
+                if(!menuService.canWrite(me, parent))
                     throw ErrorCode(403, "no write access")
 
                 parent
@@ -67,17 +75,17 @@ class MenuAPI (
 
         val menu = Menu(0, request.name, parent, request.priority, request.link, null, null, request.password, true)
         menuRepo.save(menu)
-        logService.log(EventType.CREATE_MENU, user, request.name)
+        logService.log(EventType.CREATE_MENU, me, request.name)
         jsfService.send(JsfEvent.SYNC_MENU)
     }
 
     @PostMapping("/update")
     fun updateMenu(@RequestBody request: Menu) {
-        val user = Session.get().user ?: throw ErrorCode(401, "Login")
+        val me = Session.get().user ?: throw ErrorCode(401, "Login")
 
         // check
         val menu = menuRepo.findByIdOrNull(request.id) ?: throw ErrorCode(404, "menu not found")
-        if(!menuService.canWrite(user, menu))
+        if(!menuService.canWrite(me, menu))
             throw ErrorCode(403, "no write access")
 
         menu.name = request.name
@@ -85,35 +93,35 @@ class MenuAPI (
         menu.password = request.password
         menu.link = request.link
         menuRepo.save(menu)
-        logService.log(EventType.EDIT_MENU, user, request.name)
+        logService.log(EventType.EDIT_MENU, me, request.name)
         jsfService.send(JsfEvent.SYNC_MENU)
     }
 
     @ExperimentalUnsignedTypes
     @PostMapping("/delete/{menuID}")
     fun deleteMenu(@PathVariable menuID: Int, @RequestBody request: Request.Password) {
-        val user = Session.get().user ?: throw ErrorCode(401, "Login")
+        val me = Session.get().user ?: throw ErrorCode(401, "Login")
 
         // check
         val menu = menuRepo.findByIdOrNull(menuID) ?: throw ErrorCode(404, "menu not found")
-        if(!menuService.canWrite(user, menu))
+        if(!menuService.canWrite(me, menu))
             throw ErrorCode(405, "no write access")
 
         // password check only applied to "groups"
-        if(menu.link == null && !cryptoService.checkPassword(request.password ?: "", user.password))
+        if(menu.link == null && !cryptoService.checkPassword(request.password ?: "", me.password))
             throw ErrorCode(403, "wrong password")
 
         menuRepo.delete(menu)
-        logService.log(EventType.DELETE_MENU, user, menu.name)
+        logService.log(EventType.DELETE_MENU, me, menu.name)
         jsfService.send(JsfEvent.SYNC_MENU)
     }
 
     @PostMapping("/default/{menuID}")
     fun setDefaultMenu(@PathVariable menuID: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "Login")
+        val me = Session.get().user ?: throw ErrorCode(401, "Login")
 
         // check
-        if(!menuService.isMenuAdmin(user))
+        if(!menuService.isMenuAdmin(me))
             throw ErrorCode(403, "you are not menu admin")
 
         if(!menuRepo.existsById(menuID))
@@ -125,8 +133,8 @@ class MenuAPI (
 
     @GetMapping("/rules")
     fun getWriteRules(): List<UserMenu> {
-        val user = Session.get().user ?: throw ErrorCode(401, "Login")
-        if(user.code.role != ROLE_ADMIN)
+        val me = Session.get().user ?: throw ErrorCode(401, "Login")
+        if(me.code.role != ROLE_ADMIN)
             throw ErrorCode(403, "you are not admin")
 
         return userMenuRepo.findAll().toList()

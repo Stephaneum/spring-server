@@ -14,6 +14,6 @@ object Response {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     data class Plan(val exists: Boolean, val info: String?)
 
-    data class WritableMenu(val menu: List<Menu>, val menuAdmin: Boolean)
+    data class MenuInfo(val menuAdmin: Boolean, val defaultMenu: Menu)
     data class Priority(val priority: Int)
 }
