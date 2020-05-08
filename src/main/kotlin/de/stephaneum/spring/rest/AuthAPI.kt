@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api")
 class AuthAPI {
 
-    private val PEPPER = "A43w8pa0M245qga4293zt9o4mc3z98TA3nQ9mzvTa943cta43mTaoz47tz3loIhbiKh"
-
     @Autowired
     private lateinit var cryptoService: CryptoService
 
@@ -27,9 +25,8 @@ class AuthAPI {
     @PostMapping("/login")
     fun login(@RequestBody request: Request.Login): Response.Feedback {
         val user = userRepo.findByEmail(request.email ?: "") ?: return Response.Feedback(false)
-        val salt = user.password.substring(32)
-        if(user.password == cryptoService.hashMD5(request.password+salt+PEPPER)+salt) {
-            Session.get().user = user;
+        if(cryptoService.checkPassword(request.password ?: "", user.password)) {
+            Session.get().user = user
             return Response.Feedback(true)
         } else {
             Thread.sleep(2000)

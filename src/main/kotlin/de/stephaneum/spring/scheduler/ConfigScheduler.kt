@@ -12,6 +12,7 @@ enum class Element(val code: String, val info: String, var value: String? = null
     planInfo("str_vertretung_info", "Vertretungsplan-Info"),
     backupLocation("backup_dir", "Backup-Ort"),
     maxPictureSize("picture_size", "Max. Bildgröße in Beiträgen"),
+    defaultMenu("default_gruppe_id", "Menüeintrag für die Startseite"),
 
     // special
     contact("str_kontakt", "Kontakt"),
