@@ -35,14 +35,35 @@ class MenuAPI (
         return Response.WritableMenu(menu, menuAdmin)
     }
 
-    @PostMapping("/create/{parentID}")
-    fun createMenu(@PathVariable parentID: Int, @RequestBody request: Menu) {
+    @GetMapping("/default-priority")
+    fun getDefaultPriority(@RequestParam(required = false) id: Int?): Response.Priority {
+        val children = menuRepo.findByParentId(id)
+        return Response.Priority(children.minBy { it.priority }?.priority?.minus(1) ?: 10)
+    }
+
+    @PostMapping("/create", "/create/{parentID}")
+    fun createMenu(@PathVariable(required = false) parentID: Int?, @RequestBody request: Menu) {
         val user = Session.get().user ?: throw ErrorCode(401, "Login")
 
+        if(request.name.isBlank())
+            throw ErrorCode(400, "empty name")
+
         // check
-        val parent = menuRepo.findByIdOrNull(parentID) ?: throw ErrorCode(404, "parent not found")
-        if(!menuService.canWrite(user, parent))
-            throw ErrorCode(403, "no write access")
+        val parent = when (parentID) {
+            null -> {
+                if(!menuService.isMenuAdmin(user))
+                    throw ErrorCode(403, "no write access")
+
+                null
+            }
+            else -> {
+                val parent = menuRepo.findByIdOrNull(parentID) ?: throw ErrorCode(404, "parent not found")
+                if(!menuService.canWrite(user, parent))
+                    throw ErrorCode(403, "no write access")
+
+                parent
+            }
+        }
 
         val menu = Menu(0, request.name, parent, request.priority, request.link, null, null, request.password, true)
         menuRepo.save(menu)

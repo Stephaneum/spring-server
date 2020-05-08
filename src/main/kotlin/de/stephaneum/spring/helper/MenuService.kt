@@ -13,7 +13,7 @@ class MenuService (
         private val userMenuRepo: UserMenuRepo
 ) {
 
-    fun getPublic(): List<Menu> {
+    fun getPublic(keepPassword: Boolean = false): List<Menu> {
         val menu = menuRepo.findPublic()
 
         var rootMenu = menu.filter { it.parent == null } // only the top level menus
@@ -25,7 +25,7 @@ class MenuService (
         rootMenu = sortPriority(rootMenu)
 
         // remove unnecessary information
-        rootMenu.forEach { it.simplify() }
+        rootMenu.forEach { it.simplify(keepPassword) }
 
         return rootMenu
     }
@@ -36,7 +36,7 @@ class MenuService (
     fun getWritable(user: User): Pair<List<Menu>, Boolean> {
 
         if(userMenuRepo.existsByUserAndMenuIsNull(user))
-            return Pair(getPublic(), true)
+            return Pair(getPublic(keepPassword = true), true)
 
         val menus = userMenuRepo.findByMenu(user)
         menus.forEach { addChildren(it, menuRepo.findAll().toList()) }

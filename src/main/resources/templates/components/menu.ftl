@@ -191,11 +191,9 @@
                     this.$emit('selected', menu);
                 },
                 emitNewGroup: function(parent) {
-                    console.log(parent.name);
                     this.$emit('group', parent);
                 },
                 emitNewLink: function(parent) {
-                    console.log(parent.name);
                     this.$emit('link', parent);
                 },
                 toggleAuth: function() {

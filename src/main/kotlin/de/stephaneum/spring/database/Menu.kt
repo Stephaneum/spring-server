@@ -45,12 +45,13 @@ data class Menu(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @Transient
                 var children: List<Menu> = emptyList()) {
 
-    fun simplify() {
+    fun simplify(keepPassword: Boolean = false) {
         parent = null
         user = null
         image = null
-        password = null
         approved = null
+        if(!keepPassword)
+            password = null
         children.forEach { it.simplify() } // recursive call
     }
 }
@@ -63,6 +64,8 @@ interface MenuRepo: CrudRepository<Menu, Int> {
 
     @Query("SELECT m FROM Menu m WHERE m.user.id = ?1")
     fun findCategory(userID: Int): Menu?
+
+    fun findByParentId(parentId: Int?): List<Menu>
 
     fun countByImage(image: File): Int
 }

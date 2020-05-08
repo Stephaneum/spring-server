@@ -97,7 +97,7 @@
                     .then((response) => {
                     if(response.data.success) {
                         this.loginFailed = false;
-                        window.location = '/groups';
+                        window.location = '/menu-manager';
                     } else {
                         this.loginFailed = true;
                         this.loggingIn = false;

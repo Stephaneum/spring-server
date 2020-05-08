@@ -20,49 +20,6 @@
         [v-cloak] {
             display: none;
         }
-
-        .group-rect {
-            flex-basis: calc(25% - 30px);
-            background-color: #1b5e20;
-            cursor: pointer;
-            padding: 15px 5px 15px 5px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .group-rect:hover {
-            background-color: #388e3c !important;
-        }
-
-        @media screen and (min-width: 901px) and (max-width: 1100px) {
-            .group-rect {
-                flex-basis: calc(33.3% - 30px);
-            }
-        }
-
-        @media screen and (min-width: 601px) and (max-width: 900px) {
-            .group-rect {
-                flex-basis: calc(50% - 30px);
-            }
-        }
-
-        @media screen and (max-width: 600px) {
-            .group-rect {
-                flex-basis: 100%;
-            }
-        }
-
-        .group-link {
-            color: black;
-        }
-
-        .group-link:hover {
-            color: #2e7d32;
-            text-decoration: underline;
-            cursor: pointer;
-        }
     </style>
 </head>
 
@@ -78,7 +35,7 @@
             <h4 style="margin: 0">Menü konfigurieren</h4>
         </div>
 
-        <nav-menu :menu="menu" unreal="true" edit-mode="true" :edit-root-level="menuAdmin" @selected="selectMenu"></nav-menu>
+        <nav-menu :menu="menu" unreal="true" edit-mode="true" :edit-root-level="menuAdmin" @selected="selectMenu" @group="showCreateGroup" @link="showCreateLink"></nav-menu>
 
         <div class="card-panel" style="margin-top: 60px">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px">
@@ -131,6 +88,106 @@
     <div style="height: 100px"></div>
 
     <stephaneum-footer :copyright="info.copyright"></stephaneum-footer>
+
+    <!-- create menu modal -->
+    <div id="modal-create-menu" class="modal" style="width: 500px">
+        <div class="modal-content">
+            <h4>{{ selected.linkMode ? 'Neuer Link' : 'Neue Gruppe' }}</h4>
+            <p>Wird erstellt in <b>{{ selected.parent ? selected.parent.name : 'Hauptleiste' }}</b></p>
+            <br>
+            <div class="input-field">
+                <i class="material-icons prefix">edit</i>
+                <label for="create-menu-name">Name</label>
+                <input v-model:value="selected.name" type="text" id="create-menu-name"/>
+            </div>
+            <div v-if="selected.linkMode" class="input-field">
+                <i class="material-icons prefix">language</i>
+                <label for="create-menu-link">Link</label>
+                <input v-model:value="selected.link" type="text" id="create-menu-link"/>
+            </div>
+            <div v-else class="input-field">
+                <i class="material-icons prefix">vpn_key</i>
+                <label for="create-menu-password">Passwort</label>
+                <input v-model:value="selected.password" type="password" id="create-menu-password"/>
+            </div>
+            <div class="input-field">
+                <i class="material-icons prefix">low_priority</i>
+                <label for="create-menu-priority">Priorität</label>
+                <input v-model:value="selected.priority" type="text" id="create-menu-priority"/>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!"
+               class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <button @click="createMenu" type="button" class="btn waves-effect waves-light green darken-3">
+                <i class="material-icons left">add</i>
+                Erstellen
+            </button>
+        </div>
+    </div>
+
+    <!-- update menu modal -->
+    <div id="modal-update-menu" class="modal" style="width: 500px">
+        <div class="modal-content">
+            <h4>{{ selected.name }}</h4>
+            <br>
+            <div class="input-field">
+                <i class="material-icons prefix">edit</i>
+                <label for="update-menu-name">Name</label>
+                <input v-model:value="selected.name" type="text" id="update-menu-name"/>
+            </div>
+            <div v-if="selected.linkMode" class="input-field">
+                <i class="material-icons prefix">language</i>
+                <label for="update-menu-link">Link</label>
+                <input v-model:value="selected.link" type="text" id="update-menu-link"/>
+            </div>
+            <div v-else class="input-field">
+                <i class="material-icons prefix">vpn_key</i>
+                <label for="update-menu-password">Passwort</label>
+                <input v-model:value="selected.password" type="password" id="update-menu-password"/>
+            </div>
+            <div class="input-field">
+                <i class="material-icons prefix">low_priority</i>
+                <label for="update-menu-priority">Priorität</label>
+                <input v-model:value="selected.priority" type="text" id="update-menu-priority"/>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!"
+               class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <button @click="showDeleteMenu" type="button" class="btn waves-effect waves-light red darken-3">
+                <i class="material-icons left">delete</i>
+                Löschen
+            </button>
+            <button @click="updateMenu" type="button" class="btn waves-effect waves-light green darken-3" style="margin-left: 10px;">
+                <i class="material-icons left">save</i>
+                Speichern
+            </button>
+        </div>
+    </div>
+
+    <!-- password delete menu modal -->
+    <div id="modal-delete-menu" class="modal" style="width: 500px">
+        <div class="modal-content">
+            <h4>{{ selected.name }} löschen</h4>
+            <br>
+            <p>Für die Bestätigung das Nutzer-Passwort eingeben:</p>
+            <br>
+            <div class="input-field">
+                <i class="material-icons prefix">vpn_key</i>
+                <label for="menu-delete-password">Passwort</label>
+                <input v-model:value="deletePassword" type="password" id="menu-delete-password"/>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!"
+               class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <button @click="deleteMenu" type="button" class="btn waves-effect waves-light red darken-3">
+                <i class="material-icons left">delete</i>
+                Löschen
+            </button>
+        </div>
+    </div>
 </div>
 
 <script src="/static/js/materialize.min.js" ></script>
@@ -148,7 +205,16 @@
             menu: [],
             menuAdmin: false,
             rules: [],
-            selected: {},
+            deletePassword: null,
+            selected: {
+                linkMode: false,
+                id: null, // only in update mode
+                parent: null,
+                name: null,
+                priority: 0,
+                link: null,
+                password: null
+            },
         },
         methods: {
             fetchData: async function() {
@@ -172,8 +238,108 @@
                 hideLoading();
                 this.$nextTick(() => M.Tooltip.init(document.querySelectorAll('.tooltipped'), {}));
             },
+            resetSelection: function() {
+                this.selected = {
+                    parent: null,
+                    name: null,
+                    priority: 0,
+                    link: null,
+                    password: null
+                };
+            },
+            showCreateGroup: async function(parent) {
+                await this.showCreateMenu(false, parent);
+            },
+            showCreateLink: async function(parent) {
+                await this.showCreateMenu(true, parent);
+            },
+            showCreateMenu: async function(link, parent) {
+                this.resetSelection();
+                this.selected.linkMode = link;
+                this.selected.parent = parent;
+                const priority = await axios.get('/api/menu/default-priority'+(parent ? '?id='+parent.id : ''));
+                this.selected.priority = priority.data.priority;
+                M.Modal.getInstance(document.getElementById('modal-create-menu')).open();
+                this.$nextTick(() => {
+                    M.updateTextFields();
+                });
+            },
+            createMenu: async function() {
+                showLoadingInvisible();
+                try {
+                    const data = {
+                        name: this.selected.name,
+                        priority: this.selected.priority,
+                        link: this.selected.link,
+                        password: this.selected.password
+                    };
+                    await axios.post('/api/menu/create' + (this.selected.parent ? '/' + this.selected.parent.id : ''), data);
+                    await this.fetchData();
+                    M.toast({html: 'Gruppe erstellt.<br>'+this.selected.name});
+                    M.Modal.getInstance(document.getElementById('modal-create-menu')).close();
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                    hideLoading();
+                }
+            },
             selectMenu: function(menu) {
-
+                this.resetSelection();
+                this.selected.id = menu.id;
+                this.selected.name = menu.name;
+                this.selected.priority = menu.priority;
+                this.selected.link = menu.link;
+                this.selected.password = menu.password;
+                this.selected.linkMode = !!menu.link;
+                M.Modal.getInstance(document.getElementById('modal-update-menu')).open();
+                this.$nextTick(() => {
+                    M.updateTextFields();
+                });
+            },
+            updateMenu: async function() {
+                showLoadingInvisible();
+                try {
+                    const data = {
+                        id: this.selected.id,
+                        name: this.selected.name,
+                        priority: this.selected.priority,
+                        link: this.selected.link,
+                        password: this.selected.password
+                    };
+                    await axios.post('/api/menu/update', data);
+                    await this.fetchData();
+                    M.toast({html: 'Eintrag aktualisiert.<br>'+this.selected.name});
+                    M.Modal.getInstance(document.getElementById('modal-update-menu')).close();
+                } catch (e) {
+                    M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                    hideLoading();
+                }
+            },
+            showDeleteMenu: function() {
+                this.deletePassword = null;
+                M.Modal.getInstance(document.getElementById('modal-update-menu')).close();
+                M.Modal.getInstance(document.getElementById('modal-delete-menu')).open();
+                this.$nextTick(() => {
+                    M.updateTextFields();
+                });
+            },
+            deleteMenu: async function() {
+                showLoadingInvisible();
+                try {
+                    await axios.post('/api/menu/delete/' + this.selected.id, { password: this.deletePassword });
+                    await this.fetchData();
+                    M.toast({html: 'Eintrag gelöscht.<br>'+this.selected.name});
+                    M.Modal.getInstance(document.getElementById('modal-delete-menu')).close();
+                } catch (e) {
+                    switch (e.response.status) {
+                        case 403:
+                            M.toast({html: 'Falsches Passwort.'});
+                            break;
+                        default:
+                            M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                            break;
+                    }
+                    hideLoading();
+                }
             },
             showCreateRule: function(menu) {
 
@@ -188,6 +354,8 @@
             },
             menuPath: function() {
                 return (menu) => {
+                    if(!menu)
+                        return null;
                     let s = '';
                     let curr = menu;
                     while (curr.parent) {

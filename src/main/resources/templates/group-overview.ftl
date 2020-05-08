@@ -177,8 +177,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <a @click="closeCreateGroup" href="#!"
-               class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
             <button @click="createGroup" type="button" class="btn waves-effect waves-light green darken-3">
                 <i class="material-icons left">add</i>
                 Erstellen
@@ -195,7 +194,7 @@
             <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
         </div>
         <div class="modal-footer">
-            <a @click="closeDelete" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
             <a @click="deleteItem" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
                 <i class="material-icons left">delete</i>
                 Löschen
@@ -299,9 +298,6 @@
                     }
                 }
             },
-            closeCreateGroup: function() {
-                M.Modal.getInstance(document.getElementById('modal-create-group')).close();
-            },
             createGroup: async function() {
                 M.Modal.getInstance(document.getElementById('modal-create-group')).close();
                 showLoading('Gruppe erstellen...');
@@ -317,9 +313,6 @@
             showDelete: function(f) {
                 this.selected = f;
                 M.Modal.getInstance(document.getElementById('modal-delete-group')).open();
-            },
-            closeDelete: function() {
-                M.Modal.getInstance(document.getElementById('modal-delete-group')).close();
             },
             deleteItem: async function() {
                 M.Modal.getInstance(document.getElementById('modal-delete-group')).close();

@@ -5,6 +5,7 @@ import de.stephaneum.spring.security.JwtService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.lang.Exception
 
@@ -32,6 +33,7 @@ class JsfCommunication {
      * this server will do the actions needed for this event
      * @param event the event
      */
+    @Async
     fun send(event: JsfEvent) {
         val token = jwtService.generateToken(mapOf("event" to event.toString()))
         try {
