@@ -8,6 +8,7 @@ import de.stephaneum.spring.helper.MenuService
 import de.stephaneum.spring.jsf.JsfCommunication
 import de.stephaneum.spring.jsf.JsfEvent
 import de.stephaneum.spring.rest.objects.Request
+import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.security.CryptoService
@@ -28,9 +29,10 @@ class MenuAPI (
 ) {
 
     @GetMapping("/writable")
-    fun getMenu(): List<Menu> {
+    fun getMenu(): Response.WritableMenu {
         val user = Session.get().user ?: throw ErrorCode(401, "Login")
-        return menuService.getWritable(user)
+        val (menu, menuAdmin) = menuService.getWritable(user)
+        return Response.WritableMenu(menu, menuAdmin)
     }
 
     @PostMapping("/create/{parentID}")

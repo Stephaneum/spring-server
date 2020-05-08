@@ -32,7 +32,7 @@
 
 <@vueLoader.blank/>
 <div id="app" style="display: flex; align-items: center; flex-direction: column; min-height: 100vh" v-cloak>
-    <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
+    <nav-menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
     <div style="flex: 1; display: flex; align-items: center; justify-content: center">
         <div style="max-width: 500px">
             <div class="card" style="margin-top: 100px; padding: 5px 20px 40px 20px">

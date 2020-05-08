@@ -9,7 +9,7 @@
                     <a href="#" data-target="sidenav" class="sidenav-trigger hide-on-large-only">
                         <i class="material-icons" style="color: #1b5e20">menu</i>
                     </a>
-                    <a v-if="!editMode" :href="unreal ? '#!' : '/home.xhtml'" class="brand-logo" :style="unreal ? { 'opacity': 0.05 } : {}">
+                    <a v-if="!editRootLevel" :href="unreal ? '#!' : '/home.xhtml'" class="brand-logo" :style="unreal ? { 'opacity': 0.05 } : {}">
                         <img src="/static/img/logo-banner-green.png" style="height:50px;margin-top:5px;margin-left:10px"/>
                     </a>
                     <ul class="right hide-on-med-and-down">
@@ -108,19 +108,22 @@
                         <li v-if="!unreal && loggedIn">
                             <a id="internal-btn">Intern</a>
                             <ul id="internal-menu" class="z-depth-1" style="z-index: 200">
+                                <!-- admin -->
                                 <li v-if="admin"><a href="/admin_konfig.xhtml"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
-                                <li v-if="admin"><a href="/menu-manager"><span><i class="material-icons">list</i>Menü</span></a></li>
-                                <li v-if="admin"><a href="/admin-static"><span><i class="material-icons">brush</i>Benutzerdefinierte Seiten</span></a></li>
-                                <li v-if="admin"><a href="/admin_rubriken.xhtml"><span><i class="material-icons">bookmark</i>Rubriken</span></a></li>
                                 <li v-if="admin"><a href="/admin-codes"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
                                 <li v-if="admin"><a href="/admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
                                 <li v-if="admin"><a href="/admin-logs"><span><i class="material-icons">history</i>Logdaten</span></a></li>
                                 <li class="internal-divider"></li>
+
+                                <!-- cms -->
+                                <li v-if="hasMenuWriteAccess"><a href="/menu-manager"><span><i class="material-icons">list</i>Menü</span></a></li>
                                 <li v-if="admin || managePlans"><a href="/plan-manager"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
-                                <li v-if="createCategories"><a href="/nutzer_rubrik.xhtml"><span><i class="material-icons">bookmark</i>Rubrik</span></a></li>
+                                <li v-if="admin"><a href="/admin-static"><span><i class="material-icons">note_add</i>Seiten</span></a></li>
                                 <li><a href="/post-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
-                                <li><a href="/groups"><span><i class="material-icons">people</i>Gruppen</span></a></li>
                                 <li class="internal-divider"></li>
+
+                                <!-- internal -->
+                                <li><a href="/groups"><span><i class="material-icons">people</i>Gruppen</span></a></li>
                                 <li><a href="/cloud"><span><i class="material-icons">folder</i>Dateien</span></a></li>
                                 <li><a href="/nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>
                             </ul>
@@ -130,7 +133,7 @@
                                 <p style="white-space: nowrap">({{ role }})</p>
                             </div>
                         </li>
-                        <template v-if="editMode">
+                        <template v-if="editMode && editRootLevel">
                             <li style="margin-left: 10px; margin-right: 10px">
                                 <a @click="emitNewGroup(null)" class="edit-btn" style="border: none">
                                     <i class="material-icons left" style="margin-right: 5px">add</i>
@@ -182,7 +185,7 @@
 
     <script type="text/javascript">
         Vue.component('nav-menu', {
-            props: ['menu', 'user', 'plan', 'unapproved', 'unreal', 'editMode'],
+            props: ['menu', 'user', 'hasMenuWriteAccess', 'plan', 'unapproved', 'unreal', 'editMode', 'editRootLevel'],
             methods: {
                 emit: function(menu) {
                     this.$emit('selected', menu);
@@ -342,6 +345,7 @@
 
         #internal-menu > li > a {
             background-color: #e8f5e9;
+            padding-right: 20px;
         }
 
         #internal-menu > li > a:hover {

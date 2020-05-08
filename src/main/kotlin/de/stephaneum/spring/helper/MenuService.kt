@@ -30,15 +30,18 @@ class MenuService (
         return rootMenu
     }
 
-    fun getWritable(user: User): List<Menu> {
+    /**
+     * @return pair of (menus with write access, is menu admin)
+     */
+    fun getWritable(user: User): Pair<List<Menu>, Boolean> {
 
         if(userMenuRepo.existsByUserAndMenuIsNull(user))
-            return getPublic()
+            return Pair(getPublic(), true)
 
         val menus = userMenuRepo.findByMenu(user)
         menus.forEach { addChildren(it, menuRepo.findAll().toList()) }
         menus.forEach { it.simplify() }
-        return menus
+        return Pair(menus, false)
     }
 
     fun getCategory(userID: Int): List<Menu> {
@@ -57,6 +60,10 @@ class MenuService (
 
     fun isMenuAdmin(user: User): Boolean {
         return userMenuRepo.existsByUserAndMenuIsNull(user)
+    }
+
+    fun hasMenuWriteAccess(user: User): Boolean {
+        return userMenuRepo.existsByUser(user)
     }
 
     /**

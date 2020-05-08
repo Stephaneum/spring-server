@@ -33,6 +33,6 @@ class PublicAPI (
             user.code.role != ROLE_NO_LOGIN                             -> postRepo.countByApprovedAndUser(false, user)
             else                                                        -> null
         }
-        return Response.Info(user, menuService.getPublic(), copyright, plan, history, euSa, unapproved)
+        return Response.Info(user, menuService.hasMenuWriteAccess(user), menuService.getPublic(), copyright, plan, history, euSa, unapproved)
     }
 }

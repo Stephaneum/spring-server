@@ -30,7 +30,7 @@
 
 <@vueLoader.blank/>
 <div id="app" v-cloak>
-    <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
+    <nav-menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
     <div v-if="allowed" id="main-row" style="margin: 50px auto 0 auto;">
 
         <div class="row">

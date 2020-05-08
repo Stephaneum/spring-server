@@ -70,7 +70,7 @@
 
 <@vueLoader.blank/>
 <div id="app" v-cloak>
-    <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
+    <nav-menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
     <div v-if="allowed" style="margin: 50px auto 0 auto; max-width: 1200px; min-height: calc(100vh - 350px)">
 
         <div style="text-align: center; margin: 60px 0 40px 0">

@@ -28,10 +28,10 @@
 
 <@vueLoader.blank/>
 <div id="app" v-cloak>
-    <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
+    <nav-menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
     <div v-if="allowed" style="margin: auto; min-height: calc(100vh - 200px); max-width: 1200px">
         <div style="text-align: center; margin: 60px 0 40px 0">
-            <i class="material-icons" style="font-size: 4em">brush</i>
+            <i class="material-icons" style="font-size: 4em">note_add</i>
             <h4 style="margin: 0">Benutzerdefinierte Seiten</h4>
         </div>
 

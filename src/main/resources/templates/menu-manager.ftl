@@ -70,7 +70,7 @@
 
 <@vueLoader.blank/>
 <div id="app" v-cloak>
-    <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
+    <nav-menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
     <div v-if="allowed" style="margin: 50px auto 0 auto; max-width: 1200px; min-height: calc(100vh - 350px)">
 
         <div style="text-align: center; margin: 60px 0 60px 0">
@@ -78,19 +78,51 @@
             <h4 style="margin: 0">Menü konfigurieren</h4>
         </div>
 
-        <nav-menu :menu="info.menu" unreal="true" edit-mode="true" @selected="fetchPosts"></nav-menu>
+        <nav-menu :menu="menu" unreal="true" edit-mode="true" :edit-root-level="menuAdmin" @selected="selectMenu"></nav-menu>
 
         <div class="card-panel" style="margin-top: 60px">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px">
                 <span style="font-size: 2em">Schreibrechte</span>
-                <a @click="showCreateGroup" style="margin-right: 20px" class="tooltipped waves-effect waves-light btn-floating green darken-4"
-                   data-tooltip="Neue Gruppe" data-position="top" href="#!">
+                <a @click="showCreateRule" style="margin-right: 20px" class="tooltipped waves-effect waves-light btn-floating green darken-4"
+                   data-tooltip="Neue Regel" data-position="top" href="#!">
                     <i class="material-icons">add</i>
                 </a>
             </div>
 
-            <div style="display: flex; flex-wrap: wrap; align-items: stretch; justify-content: space-evenly; margin-bottom: 30px">
-            </div>
+            <p style="margin: 0">Nutzer können in diesen Menüpunkten (inkl. Untermenüs) <b>Beiträge</b> erstellen, bearbeiten und genehmigen - sowie das <b>Menü</b> selber bearbeiten.</p>
+            <p style="margin: 0">Regeln sind <b>kombinierbar</b>, z.B. kann Nutzer A für die Menüpunkte M1 und M2 Schreibrechte zugewiesen werden.</p>
+            <br>
+
+            <ul v-if="rules.length !== 0" class="collection">
+                <li v-for="r in rules" class="collection-item">
+                    <div style="display: flex; align-items: center; justify-content: space-between">
+                        <span style="display: flex; align-items: center">
+                            <i class="material-icons grey-text text-darken-2">person</i>
+                            <span style="margin-left: 10px">{{ r.user.firstName }} {{ r.user.lastName }} ({{ r.user.code.roleString }})</span>
+                        </span>
+
+                        <span>
+                            <span v-if="r.menu">
+                                <span style="font-size: 1.2rem; color: grey">{{ menuPath(r.menu) }}</span>
+                                <span style="font-size: 1.2rem; font-weight: bold">{{ r.menu.name }}</span>
+                            </span>
+                            <span v-else style="font-size: 1.4rem; font-weight: bold">
+                                ALLES
+                            </span>
+                        </span>
+
+                        <span>
+                            <a class="tooltipped waves-effect waves-light btn green darken-3" data-tooltip="Regel bearbeiten" data-position="top">
+                                <i class="material-icons">edit</i>
+                            </a>
+                            <a class="tooltipped waves-effect waves-light btn red darken-3" data-tooltip="Regel löschen" data-position="top" style="margin-left: 10px"
+                               @click="deletePage(p.id)">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </span>
+                    </div>
+                </li>
+            </ul>
         </div>
 
     </div>
@@ -101,8 +133,6 @@
     <stephaneum-footer :copyright="info.copyright"></stephaneum-footer>
 </div>
 
-<script src="/static/js/moment.min.js" ></script>
-<script src="/static/js/moment.de.js" ></script>
 <script src="/static/js/materialize.min.js" ></script>
 <script src="/static/js/axios.min.js" ></script>
 <script src="/static/js/vue.js" ></script>
@@ -114,16 +144,11 @@
     var app = new Vue({
         el: '#app',
         data: {
-            info: { user: null, menu: null, plan: null, copyright: null, unapproved: null },
-            groups: [],
-            allGroups: [],
+            info: { user: null, hasMenuWriteAccess: false, menu: null, plan: null, copyright: null, unapproved: null },
+            menu: [],
+            menuAdmin: false,
+            rules: [],
             selected: {},
-            createGroupData: {
-                name: null,
-                teacherInput: null,
-                teachersAdded: [],
-                teachersAvailable: []
-            }
         },
         methods: {
             fetchData: async function() {
@@ -135,29 +160,46 @@
                     return;
                 }
 
-                const groups = await axios.get('/api/groups');
-                this.groups = groups.data;
+                const menu = await axios.get('/api/menu/writable');
+                this.menu = menu.data.menu;
+                this.menuAdmin = menu.data.menuAdmin;
 
                 if(this.admin) {
-                    const allGroups = await axios.get('/api/groups/all');
-                    this.allGroups = allGroups.data;
+                    const rules = await axios.get('/api/menu/rules');
+                    this.rules = rules.data;
                 }
 
                 hideLoading();
                 this.$nextTick(() => M.Tooltip.init(document.querySelectorAll('.tooltipped'), {}));
             },
+            selectMenu: function(menu) {
+
+            },
+            showCreateRule: function(menu) {
+
+            }
         },
         computed: {
             allowed: function() {
-                return this.info.user && this.info.user.code.role === 100;
+                return this.info.hasMenuWriteAccess;
             },
             admin: function() {
                 return this.info.user && this.info.user.code.role === 100;
             },
+            menuPath: function() {
+                return (menu) => {
+                    let s = '';
+                    let curr = menu;
+                    while (curr.parent) {
+                        curr = curr.parent;
+                        s = curr.name + ' / ' + s;
+                    }
+                    return s;
+                }
+            }
         },
         mounted: function() {
             M.AutoInit();
-            moment.locale('de');
             this.fetchData();
         }
     });

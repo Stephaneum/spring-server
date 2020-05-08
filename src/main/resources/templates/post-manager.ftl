@@ -159,7 +159,7 @@
 
 <@vueLoader.blank/>
 <div id="app">
-    <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
+    <nav-menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
 
     <div v-if="currMode" id="main-row" class="row" style="min-height: 100vh; margin-top: 50px">
         <div class="col s10 offset-s2">

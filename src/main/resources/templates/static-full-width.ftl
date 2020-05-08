@@ -25,7 +25,7 @@
 
 <@vueLoader.blank/>
 <div id="app" style="display: flex; align-items: center; flex-direction: column; min-height: 100vh" v-cloak>
-    <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
+    <nav-menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
 
     <div id="main-row" style="margin-top: 30px;min-height: 100vh">
         ${body}

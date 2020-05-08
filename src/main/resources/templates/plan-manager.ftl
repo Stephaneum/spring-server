@@ -59,7 +59,7 @@
 
 <@vueLoader.blank/>
 <div id="app" style="display: flex; align-items: center; flex-direction: column; min-height: calc(100vh + 100px)" v-cloak>
-    <nav-menu :menu="info.menu" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
+    <nav-menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></nav-menu>
     <div v-if="allowed" style="flex: 1; display: flex; align-items: center; justify-content: center">
         <div style="width: 900px;">
             <div style="text-align: center; margin-bottom: 40px">

@@ -30,6 +30,7 @@ interface UserMenuRepo : CrudRepository<UserMenu, Int> {
 
     fun existsByUserAndMenuIsNull(user: User): Boolean
     fun existsByUserAndMenu(user: User, menu: Menu): Boolean
+    fun existsByUser(user: User): Boolean
 
     @Transactional
     fun deleteByUserAndMenu(user: User, menu: Menu?)
