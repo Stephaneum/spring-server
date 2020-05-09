@@ -90,7 +90,10 @@
         </div>
 
     </div>
-    <div v-else style="flex: 1; min-height: calc(100vh - 100px)"></div>
+    <div v-else style="flex: 1; min-height: calc(100vh - 100px); display: flex; flex-direction: column; align-items: center; justify-content: center">
+        <span>Keine Berechtigung.</span>
+        <span>Bei Fragen wende dich bitte an dem Administrator.</span>
+    </div>
 
     <div style="height: 100px"></div>
 
