@@ -42,7 +42,10 @@ class PrivateController (
             }
         }
 
-        return templateMapping[request.requestURI] ?: "404"
+        // take from last "/" because this app can have a different context path
+        val route = request.requestURI.substring(request.requestURI.lastIndexOf("/"))
+
+        return templateMapping[route] ?: "404"
     }
 
     @GetMapping("/groups/{id}")
