@@ -1,0 +1,41 @@
+package de.stephaneum.spring.database
+
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
+import org.springframework.data.repository.CrudRepository
+import org.springframework.stereotype.Repository
+import javax.persistence.*
+
+// TODO: implement enum-native approach
+enum class SliderDirection (val code: String, val description: String) {
+    LEFT("left-align", "von links"),
+    TOP("center-align", "von oben"),
+    RIGHT("right-align", "von rechts")
+}
+
+@Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Slider(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+                  var id: Int = 0,
+
+                  @Column(nullable = false, name = "idx")
+                  var index: Int = 0,
+
+                  @Column(nullable = true, length = 1024)
+                  @JsonIgnore
+                  var path: String = "",
+
+                  @Column(nullable = true)
+                  var title: String? = null,
+
+                  @Column(nullable = true, name = "sub")
+                  var subTitle: String? = null,
+
+                  @Column(nullable = false)
+                  var direction: String = "")
+
+@Repository
+interface SliderRepo: CrudRepository<Slider, Int> {
+
+    fun findByOrderByIndex(): List<Slider>
+}

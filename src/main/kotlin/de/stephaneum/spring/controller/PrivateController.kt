@@ -14,8 +14,22 @@ class PrivateController (
         private val jwtService: JwtService
 ) {
 
-    @GetMapping("/admin-static")
-    fun staticFiles(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
+    // mapping for internal routes (without /groups/{id})
+    private val templateMapping = mapOf(
+            "/admin-config" to "admin-config",
+            "/admin-static" to "admin-static",
+            "/admin-codes" to "admin-codes",
+            "/admin-logs" to "admin-logs",
+            "/plan-manager" to "plan-manager",
+            "/menu-manager" to "menu-manager",
+            "/post-manager" to "post-manager",
+            "/groups" to "group-overview",
+            "/cloud" to "user-cloud"
+    )
+
+    @GetMapping("/admin-config", "/admin-static", "/admin-codes", "/admin-logs",
+            "/plan-manager", "/menu-manager", "/post-manager", "/groups", "/cloud")
+    fun get(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
 
         if(checkIE(request))
             return "forward:/static/no-support-ie.html"
@@ -28,109 +42,7 @@ class PrivateController (
             }
         }
 
-        return "admin-static"
-    }
-
-    @GetMapping("/admin-codes")
-    fun codes(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
-
-        if(checkIE(request))
-            return "forward:/static/no-support-ie.html"
-
-        // login
-        if(key != null) {
-            Session.get().user = jwtService.getUser(key)
-            if(Session.get().user != null) {
-                return "redirect:${request.requestURL}"
-            }
-        }
-
-        return "admin-codes"
-    }
-
-    @GetMapping("/admin-logs")
-    fun logs(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
-
-        if(checkIE(request))
-            return "forward:/static/no-support-ie.html"
-
-        // login
-        if(key != null) {
-            Session.get().user = jwtService.getUser(key)
-            if(Session.get().user != null) {
-                return "redirect:${request.requestURL}"
-            }
-        }
-
-        return "admin-logs"
-    }
-
-    @GetMapping("/plan-manager")
-    fun plan(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
-
-        if(checkIE(request))
-            return "forward:/static/no-support-ie.html"
-
-        // login
-        if(key != null) {
-            Session.get().user = jwtService.getUser(key)
-            if(Session.get().user != null) {
-                return "redirect:${request.requestURL}"
-            }
-        }
-
-        return "plan-manager"
-    }
-
-    @GetMapping("/menu-manager")
-    fun menuManager(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
-
-        if(checkIE(request))
-            return "forward:/static/no-support-ie.html"
-
-        // login
-        if(key != null) {
-            Session.get().user = jwtService.getUser(key)
-            if(Session.get().user != null) {
-                return "redirect:${request.requestURL}"
-            }
-        }
-
-        return "menu-manager"
-    }
-
-    @GetMapping("/post-manager")
-    fun postManager(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
-
-        if(checkIE(request))
-            return "forward:/static/no-support-ie.html"
-
-        // login
-        if(key != null) {
-            Session.get().user = jwtService.getUser(key)
-            if(Session.get().user != null) {
-                return "redirect:${request.requestURL}"
-            }
-        }
-
-        return "post-manager"
-    }
-
-    @GetMapping("/groups")
-    fun groupOverview(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
-
-        if(checkIE(request))
-            return "forward:/static/no-support-ie.html"
-
-        // login
-        if(key != null) {
-            Session.get().user = jwtService.getUser(key)
-            if(Session.get().user != null) {
-                return "redirect:${request.requestURL}"
-            }
-        }
-
-        return "group-overview"
+        return templateMapping[request.requestURI] ?: "404"
     }
 
     @GetMapping("/groups/{id}")
@@ -148,25 +60,6 @@ class PrivateController (
         }
 
         return "group"
-    }
-
-    // user specific
-
-    @GetMapping("/cloud")
-    fun cloud(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
-
-        if(checkIE(request))
-            return "forward:/static/no-support-ie.html"
-
-        // login
-        if(key != null) {
-            Session.get().user = jwtService.getUser(key)
-            if(Session.get().user != null) {
-                return "redirect:${request.requestURL}"
-            }
-        }
-
-        return "user-cloud"
     }
 
 }

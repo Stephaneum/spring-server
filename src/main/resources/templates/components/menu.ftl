@@ -109,7 +109,7 @@
                             <a id="internal-btn">Intern</a>
                             <ul id="internal-menu" class="z-depth-1" style="z-index: 200">
                                 <!-- admin -->
-                                <li v-if="admin"><a href="/admin_konfig.xhtml"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
+                                <li v-if="admin"><a href="/admin-config"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
                                 <li v-if="admin"><a href="/admin-codes"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
                                 <li v-if="admin"><a href="/admin_nutzer.xhtml"><span><i class="material-icons">people</i>Nutzer</span></a></li>
                                 <li v-if="admin"><a href="/admin-logs"><span><i class="material-icons">history</i>Logdaten</span></a></li>
