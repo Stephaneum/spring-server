@@ -97,7 +97,7 @@
                     .then((response) => {
                     if(response.data.success) {
                         this.loginFailed = false;
-                        window.location = '/menu-manager';
+                        window.location = '/admin-config';
                     } else {
                         this.loginFailed = true;
                         this.loggingIn = false;

@@ -32,7 +32,18 @@ data class Slider(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                   var subTitle: String? = null,
 
                   @Column(nullable = false)
-                  var direction: String = "")
+                  var direction: String = "") {
+
+    // for json
+    fun getName(): String {
+        val index = path.indexOf("slider_")
+        return if(index != -1) {
+            path.substring(index+7, path.length-4)
+        } else {
+            ""
+        }
+    }
+}
 
 @Repository
 interface SliderRepo: CrudRepository<Slider, Int> {

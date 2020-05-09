@@ -45,6 +45,18 @@ class SliderAPI (
         sliderRepo.save(Slider(0, (max?.index ?: 0) + 1, path, null, null, SliderDirection.values().first().code))
     }
 
+    @PostMapping("/update")
+    fun deleteSlider(@RequestBody request: Slider) {
+        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        if(user.code.role != ROLE_ADMIN)
+            throw ErrorCode(403, "admin only")
+
+        val slider = sliderRepo.findByIdOrNull(request.id) ?: throw ErrorCode(404, "slider not found")
+        slider.title = request.title
+        slider.subTitle = request.subTitle
+        sliderRepo.save(slider)
+    }
+
     @PostMapping("/up/{id}")
     fun moveUp(@PathVariable id: Int) {
         move(id, up = true)
@@ -90,7 +102,7 @@ class SliderAPI (
         if(direction == -1)
             throw ErrorCode(500, "invalid direction")
 
-        slider.direction = directions[(direction + 1) % directions.size].description
+        slider.direction = directions[(direction + 1) % directions.size].code
         sliderRepo.save(slider)
     }
 

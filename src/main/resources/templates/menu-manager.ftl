@@ -69,14 +69,14 @@
                             <span style="margin-left: 10px">{{ r.user.firstName }} {{ r.user.lastName }} ({{ r.user.code.roleString }})</span>
                         </span>
 
-                        <span style="flex: 1">
+                        <span style="flex: 1; font-size: 1.1rem">
                             <span v-if="r.menu">
-                                <span style="font-size: 1.1rem; color: grey">{{ menuPath(r.menu) }}</span>
-                                <span style="font-size: 1.1rem; font-weight: bold">{{ r.menu.name }}</span>
+                                <span style="color: grey">{{ menuPath(r.menu) }}</span>
+                                <span style="font-weight: bold">{{ r.menu.name }}</span>
                             </span>
-                            <span v-else style="font-size: 1.4rem; font-weight: bold">
-                                <i class="material-icons left" style="margin-right: 5px">star</i>
-                                ALLE
+                            <span v-else style="font-weight: bold; display: flex; align-items: center">
+                                Alle Einträge
+                                <i class="material-icons" style="margin-left: 5px">star</i>
                             </span>
                         </span>
 
@@ -175,7 +175,7 @@
         <div class="modal-footer">
             <a href="#!"
                class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
-            <button @click="showDeleteMenu" type="button" class="btn waves-effect waves-light red darken-3">
+            <button @click="showDeleteMenu" type="button" class="btn waves-effect waves-light red darken-3" style="margin-left: 10px">
                 <i class="material-icons left">delete</i>
                 Löschen
             </button>

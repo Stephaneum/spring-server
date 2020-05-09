@@ -68,19 +68,14 @@
             };
             axios.post(url, data, config)
                 .then((res) => {
-                    if(res.data.id) {
-                        uploaded(res.data);
-                        if(index < files.length-1)
-                            uploadMultipleFiles(url, files, { params, uploaded, finished }, index+1);
-                        else {
-                            if(files.length === 1) M.toast({ html: 'Datei hochgeladen.' });
-                            else M.toast({ html: 'Dateien hochgeladen.' });
-                            hideLoading(); // finished successfully
-                            finished();
-                        }
-                    } else if(res.data.message) {
-                        M.toast({ html: res.data.message });
-                        hideLoading(); // backend error
+                    uploaded(res.data);
+                    if(index < files.length-1)
+                        uploadMultipleFiles(url, files, { params, uploaded, finished }, index+1);
+                    else {
+                        if(files.length === 1) M.toast({ html: 'Datei hochgeladen.' });
+                        else M.toast({ html: 'Dateien hochgeladen.' });
+                        hideLoading(); // finished successfully
+                        finished();
                     }
                 })
                 .catch(function (err) {

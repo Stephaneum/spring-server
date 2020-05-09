@@ -19,7 +19,7 @@ import java.io.UncheckedIOException
 import javax.servlet.http.HttpServletRequest
 
 @Controller
-class CloudController (
+class FileController (
         private val fileService: FileService,
         private val jwtService: JwtService,
         private val configScheduler: ConfigScheduler,
@@ -66,8 +66,8 @@ class CloudController (
         }
     }
 
-    @GetMapping("/api/images/{fileName}")
-    fun image(@PathVariable fileName: String, request: HttpServletRequest): Any {
+    @GetMapping("/files/image/{fileName}")
+    fun image(@PathVariable fileName: String, request: HttpServletRequest): ResponseEntity<*> {
 
         // get file content
         val resource = configScheduler.get(Element.fileLocation)?.let { location ->
@@ -95,5 +95,10 @@ class CloudController (
                 .contentLength(resource.contentLength())
                 .contentType(MediaType.parseMediaType(mime))
                 .body(resource)
+    }
+
+    @GetMapping("/files/slider/{id}")
+    fun slider(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<*> {
+        return image("slider_$id.jpg", request)
     }
 }
