@@ -2,17 +2,11 @@ package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
-import de.stephaneum.spring.helper.JsfService
-import de.stephaneum.spring.helper.JsfEvent
-import de.stephaneum.spring.helper.FileService
-import de.stephaneum.spring.helper.ImageService
-import de.stephaneum.spring.helper.LogService
-import de.stephaneum.spring.helper.MenuService
+import de.stephaneum.spring.helper.*
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.security.CryptoService
 import org.jsoup.Jsoup
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -38,43 +32,25 @@ object PostRequest {
 object PostResponse {
     data class Feedback(val success: Boolean, val needLogin: Boolean = false, val message: String? = null)
 
-    data class PostManager(val maxPictureSize: Int, val category: List<Menu>)
+    data class PostManager(val maxPictureSize: Int, val menuAdmin: Boolean, val writableMenu: List<Menu>)
     data class Text(val text: String?)
 }
 
 @RestController
 @RequestMapping("/api/post")
-class PostAPI {
-
-    @Autowired
-    private lateinit var jsfService: JsfService
-
-    @Autowired
-    private lateinit var cryptoService: CryptoService
-
-    @Autowired
-    private lateinit var fileRepo: FileRepo
-
-    @Autowired
-    private lateinit var postRepo: PostRepo
-
-    @Autowired
-    private lateinit var imageService: ImageService
-
-    @Autowired
-    private lateinit var fileService: FileService
-
-    @Autowired
-    private lateinit var configScheduler: ConfigScheduler
-
-    @Autowired
-    private lateinit var menuService: MenuService
-
-    @Autowired
-    private lateinit var filePostRepo: FilePostRepo
-
-    @Autowired
-    private lateinit var logService: LogService
+class PostAPI (
+        private val jsfService: JsfService,
+        private val cryptoService: CryptoService,
+        private val imageService: ImageService,
+        private val fileService: FileService,
+        private val menuService: MenuService,
+        private val configScheduler: ConfigScheduler,
+        private val logService: LogService,
+        private val menuRepo: MenuRepo,
+        private val fileRepo: FileRepo,
+        private val postRepo: PostRepo,
+        private val filePostRepo: FilePostRepo
+) {
 
     @GetMapping
     fun get(@RequestParam(required = false) unapproved: Boolean?,
@@ -97,7 +73,7 @@ class PostAPI {
                 val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
                 val posts = when {
                     menuID != null -> postRepo.findByMenuIdOrderByTimestampDesc(menuID) // get posts from a menu
-                    user.code.role == ROLE_ADMIN || user.managePosts == true -> postRepo.findUnapproved() // get all unapproved posts
+                    user.code.role == ROLE_ADMIN || menuService.isMenuAdmin(user) -> postRepo.findUnapproved() // get all unapproved posts
                     else -> postRepo.findUnapproved(user.id) // get only unapproved posts from the current user
                 }
 
@@ -120,37 +96,38 @@ class PostAPI {
     }
 
     @PostMapping
-    fun update(@RequestBody request: PostRequest.UpdatePost): Any {
+    fun update(@RequestBody request: PostRequest.UpdatePost): Post {
 
-        val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
+        val user = Session.get().user ?: throw ErrorCode(401, "Login")
         val oldPost: Post?
         if(request.id != null) {
             // update post -> check
             // we also create a copy because Repository.save() does modify the old reference
-            oldPost = postRepo.findByIdOrNull(request.id)?.copy() ?: return PostResponse.Feedback(false, message = "post not found")
+            oldPost = postRepo.findByIdOrNull(request.id)?.copy() ?: throw ErrorCode(404, "post not found")
             if(!hasAccessToPost(user, oldPost))
-                return PostResponse.Feedback(false, message = "You are not allowed to modify this post.")
+                throw ErrorCode(403, "You are not allowed to modify this post.")
         } else {
             oldPost = null
         }
 
-        // validate menuID
-        if(request.menuID != null) {
-            val allowed = user.code.role == ROLE_ADMIN || user.managePosts == true || (user.createCategories == true && menuService.ownsCategory(user.id, request.menuID))
+        val menu = if(request.menuID != null) menuRepo.findByIdOrNull(request.menuID) else null
+
+        // validate menu
+        if(menu != null) {
+            val allowed = user.code.role == ROLE_ADMIN || menuService.canWrite(user, menu)
             if(!allowed)
-                return PostResponse.Feedback(false, message = "You are not allowed to specify a menu")
+                throw ErrorCode(403, "You are not allowed to specify a menu")
         }
 
         // validate title
         if(request.title.isNullOrBlank())
-            return PostResponse.Feedback(false, message = "Empty title.")
+            throw ErrorCode(400, "Empty title")
 
         // validate assignment
-        if((user.code.role == ROLE_ADMIN || user.managePosts == true) && request.menuID == null)
-            return PostResponse.Feedback(false, message = "Missing assignment.")
+        if((user.code.role == ROLE_ADMIN || menuService.isMenuAdmin(user)) && request.menuID == null)
+            throw ErrorCode(400, "missing assignment")
 
         // save the post
-        val menu = if(request.menuID != null) Menu(request.menuID) else null
         val text = if(request.text != null && (request.text.isBlank() || Jsoup.parse(request.text).text().isBlank())) null else request.text
         val savedPost = postRepo.save(Post(request.id ?: 0, oldPost?.user ?: user, menu, request.title, text, now(), if(oldPost != null) user else null, null, request.menuID != null, request.preview, false, request.layoutPost, request.layoutPreview))
 
@@ -212,7 +189,7 @@ class PostAPI {
         val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
 
         return PostResponse.PostManager(configScheduler.get(Element.maxPictureSize)?.toInt()
-                ?: 0, menuService.getCategory(user.id))
+                ?: 0, menuService.isMenuAdmin(user), menuService.getWritable(user))
     }
 
     @GetMapping("/images-available")
@@ -250,13 +227,13 @@ class PostAPI {
     }
 
     private fun hasAccessToPost(user: User, post: Post): Boolean {
-        if(post.menu != null) {
+        val menu = post.menu
+        if(menu != null) {
             // assigned
-            val menuID = post.menu?.id ?: return false
-            return user.code.role == ROLE_ADMIN || user.managePosts == true || (user.createCategories == true && menuService.ownsCategory(user.id, menuID))
+            return user.code.role == ROLE_ADMIN || menuService.canWrite(user, menu)
         } else {
             // unapproved
-            return user.code.role == ROLE_ADMIN || user.managePosts == true || user.id == (post.user?.id ?: 0)
+            return user.code.role == ROLE_ADMIN || menuService.isMenuAdmin(user) || user.id == (post.user?.id ?: 0)
         }
     }
 
@@ -266,7 +243,7 @@ class PostAPI {
     fun getSpecial(@RequestParam type: String): Any {
 
         val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
-        if(user.code.role == ROLE_ADMIN || user.managePosts == true) {
+        if(user.code.role == ROLE_ADMIN || menuService.isMenuAdmin(user)) {
             return PostResponse.Text(configScheduler.get(Element.valueOf(type)))
         } else {
             return PostResponse.Feedback(false, message = "only admin or post manager")
@@ -277,7 +254,7 @@ class PostAPI {
     fun updateSpecial(@RequestBody request: PostRequest.UpdateSpecial): Any {
 
         val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
-        if(user.code.role == ROLE_ADMIN || user.managePosts == true) {
+        if(user.code.role == ROLE_ADMIN || menuService.isMenuAdmin(user)) {
             val type = Element.valueOf(request.type)
             val plainText = Jsoup.parse(request.text ?: "").text()
             val finalText = when(type) {

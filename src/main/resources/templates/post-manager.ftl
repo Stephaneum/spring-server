@@ -180,18 +180,20 @@
 
             <!-- SELECT-EDIT -->
             <div v-show="currTab.id === tabs.selectEdit.id" class="tab-panel white z-depth-1">
-                <div v-if="admin || info.user.managePosts || category.length !== 0">
+                <div v-if="admin || info.hasMenuWriteAccess">
                     <h5 style="margin-bottom: 20px">Gruppe auswählen:</h5>
                     <div class="grey-round-border">
-                        <nav-menu :menu="category.length !== 0 ? category : info.menu" unreal="true" @select="fetchPosts"></nav-menu>
+                        <nav-menu :menu="writableMenu" unreal="true" @select="fetchPosts"></nav-menu>
                     </div>
                 </div>
 
                 <div v-if="currTab.id === tabs.selectEdit.id && currSelection.menu && currSelection.posts.length !== 0" style="margin-top: 50px">
+                    <!-- post list for a menu -->
                     <post-list :name="currSelection.menu.name" :posts="currSelection.posts" :selected="currPost.id"
                                @selected="selectPost" @updated="fetchPosts(currSelection.menu)"></post-list>
                 </div>
                 <div v-else-if="currTab.id === tabs.selectEdit.id && !currSelection.menu && currSelection.posts.length !== 0" style="margin-top: 50px">
+                    <!-- post list of unapproved posts-->
                     <post-list name="Noch nicht genehmigte Beiträge" :posts="currSelection.posts" :selected="currPost.id"
                                :hide_password="true"
                                @selected="selectPost" @updated="fetchPosts"></post-list>
@@ -368,12 +370,12 @@
                             <span v-html="menuAssigned" style="color: #808080; margin-left: 20px"></span>
                         </span>
                     </div>
-                    <div v-if="!admin && !info.user.managePosts" style="text-align: center; margin-top: 40px">
+                    <div v-if="!admin && !menuAdmin" style="text-align: center; margin-top: 40px">
                         <span>Die Zuordnung ist optional. Der Admin ordnet dann diesen Beitrag zu, falls keine Auswahl getätigt wurde.</span>
                     </div>
                     <div style="height: 60px"></div>
                     <div class="grey-round-border">
-                        <nav-menu :menu="category.length !== 0 ? category : info.menu" unreal="true" @select="assignMenu"></nav-menu>
+                        <nav-menu :menu="writableMenu" unreal="true" @select="assignMenu"></nav-menu>
                     </div>
 
                     <div style="height: 300px"></div>
@@ -463,7 +465,8 @@
             initialized: false,
             currentDate: moment().format('DD.MM.YYYY'),
             maxPictureSize: 0, // will be fetched, image will be compressed if larger than this number
-            category: [], // will be fetched (like menu but only a part of it)
+            menuAdmin: false, // just like admin
+            writableMenu: [], // will be fetched (like menu but only a part of it)
             modes: modes,
             tabs: tabs,
             postLayouts: postLayouts,
@@ -509,14 +512,15 @@
 
                 switch(mode.id) {
                     case modes.create.id:
-                        this.currTabs = this.admin || this.info.user.managePosts || this.category.length !== 0 ?
-                            [tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize] : [tabs.text, tabs.images, tabs.layout, tabs.finalize];
+                        this.currTabs = this.admin || this.info.hasMenuWriteAccess ?
+                            [tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize] :
+                            [tabs.text, tabs.images, tabs.layout, tabs.finalize];
                         this.currTab = tabs.text;
                         break;
                     case modes.edit.id:
                         this.currTabs = [tabs.selectEdit];
                         this.currTab = tabs.selectEdit;
-                        if(!this.admin && !this.info.user.managePosts)
+                        if(!this.admin && !this.menuAdmin)
                             this.fetchPosts(); // load unapproved posts for non-admins
                         break;
                     case modes.approve.id:
@@ -600,7 +604,7 @@
                         error.error = true;
                     }
 
-                    if((this.admin || this.info.user.managePosts) && !this.currPost.menu) {
+                    if((this.admin || this.menuAdmin) && !this.currPost.menu) {
                         error.missingAssignment = true;
                         error.error = true;
                     }
@@ -651,8 +655,8 @@
                                 M.Modal.init(document.querySelectorAll('.modal'), {});
                             });
 
-                            if(this.admin || this.info.user.managePosts) {
-                                // for admin and post manager
+                            if(this.admin || this.menuAdmin) {
+                                // for admin and menu admin
                                 if(this.currMode.id === this.modes.approve.id) {
                                     this.info.unapproved = res.data.length;
                                     this.modes.approve.name = this.approvedModeText(this.info.unapproved); // update button text
@@ -692,7 +696,7 @@
                             });
 
                             var selectTab = this.currMode.id === modes.edit.id ? tabs.selectEdit : this.currMode.id === modes.approve.id ? tabs.selectApprove : tabs.selectSpecial;
-                            this.currTabs = this.admin || this.info.user.managePosts || this.category.length !== 0 ?
+                            this.currTabs = this.admin || this.info.hasMenuWriteAccess ?
                                 [selectTab, tabs.text, tabs.images, tabs.layout, tabs.assign, tabs.finalize] : [selectTab, tabs.text, tabs.images, tabs.layout, tabs.finalize];
                             this.currTab = tabs.text;
 
@@ -816,38 +820,43 @@
                     M.toast({html: 'Gruppe ausgewählt'});
                 }
             },
-            sendPost: function () {
+            sendPost: async function () {
                 showLoading("Verarbeitung...");
-                axios.post('/api/post', {
-                    id: this.currPost.id,
-                    title: this.currPost.title,
-                    text: this.currPost.text,
-                    images: this.currPost.imagesAdded,
-                    layoutPost: this.currPost.layoutPost,
-                    layoutPreview: this.currPost.layoutPreview,
-                    preview: this.currPost.preview,
-                    menuID: this.currPost.menu ? this.currPost.menu.id : null
-                })
-                    .then((res) => {
-                        if(res.data.id) {
-                            if(res.data.menu)
-                                window.location = '/beitrag.xhtml?id='+res.data.id;
-                            else {
-                                // this post is unapproved
-                                if(this.currMode.id === this.modes.create.id) {
-                                    // user has created a new unapproved post
-                                    this.info.unapproved++;
-                                    this.modes.edit.name = this.editModeText(this.info.unapproved);
-                                }
-                                hideLoading();
-                                M.toast({ html: 'Fertig!' });
-                                this.setMode(this.currMode);
-                            }
-                        } else if(res.data.message) {
-                            hideLoading();
-                            M.toast({ html: res.data.message });
-                        }
+                try {
+                    const res = await axios.post('/api/post', {
+                        id: this.currPost.id,
+                        title: this.currPost.title,
+                        text: this.currPost.text,
+                        images: this.currPost.imagesAdded,
+                        layoutPost: this.currPost.layoutPost,
+                        layoutPreview: this.currPost.layoutPreview,
+                        preview: this.currPost.preview,
+                        menuID: this.currPost.menu ? this.currPost.menu.id : null
                     });
+
+                    if(res.data.id) {
+                        if(res.data.menu)
+                            window.location = '/beitrag.xhtml?id='+res.data.id;
+                        else {
+                            // this post is unapproved
+                            if(this.currMode.id === this.modes.create.id) {
+                                // user has created a new unapproved post
+                                this.info.unapproved++;
+                                this.modes.edit.name = this.editModeText(this.info.unapproved);
+                            }
+                            hideLoading();
+                            M.toast({ html: 'Fertig!' });
+                            this.setMode(this.currMode);
+                        }
+                    }
+                } catch (e) {
+                    if(e.response.data.message) {
+                        M.toast({ html: e.response.data.message });
+                    } else {
+                        M.toast({ html: 'Ein Fehler ist aufgetreten.' });
+                    }
+                    hideLoading();
+                }
             },
             sendSpecial: function () {
                 showLoading("Verarbeitung...");
@@ -873,7 +882,7 @@
 
                     // init text input editor
                     $('#post-text-editor').trumbowyg(TEXT_EDITOR_CONFIG);
-                    if(this.admin || this.info.user.managePosts)
+                    if(this.admin || this.menuAdmin)
                         $('#post-text-editor-special').trumbowyg(TEXT_EDITOR_CONFIG);
                     moment.locale('de');
                     console.log('post init finished')
@@ -974,39 +983,35 @@
             },
         },
         mounted: function () {
-            this.$nextTick(() => {
-                axios.get('/api/info')
-                    .then((res) => {
-                        if(res.data) {
-                            this.info = res.data;
+            this.$nextTick(async () => {
+                const info = await axios.get('/api/info')
 
-                            // update button text
-                            if(this.admin || this.info.user.managePosts)
-                                modes.approve.name = this.approvedModeText(this.info.unapproved);
-                            else
-                                modes.edit.name = this.editModeText(this.info.unapproved);
+                if(!info.data) {
+                    M.toast({html: 'Interner Fehler.'});
+                    return;
+                }
 
-                            axios.get('/api/post/info-post-manager')
-                                .then((res) => {
-                                    if(res.data) {
-                                        this.maxPictureSize = res.data.maxPictureSize;
-                                        this.category = res.data.category;
-                                        if(this.info.user && this.info.user.code.role >= 0) {
-                                            // set one time the modes available
-                                            if(this.info.user.code.role === 100 || this.info.user.managePosts)
-                                                this.modes = { create: modes.create, edit: modes.edit, approve: modes.approve, special: modes.special };
-                                            else
-                                                this.modes = { create: modes.create, edit: modes.edit };
-                                            this.setMode(modes.create);
-                                        }
-                                    } else {
-                                        M.toast({html: 'Interner Fehler.'});
-                                    }
-                                });
-                        } else {
-                            M.toast({html: 'Interner Fehler.'});
-                        }
-                    });
+                this.info = info.data;
+
+                const infoPostManager = await axios.get('/api/post/info-post-manager')
+                this.maxPictureSize = infoPostManager.data.maxPictureSize;
+                this.menuAdmin = infoPostManager.data.menuAdmin;
+                this.writableMenu = infoPostManager.data.writableMenu;
+
+                // update button text
+                if(this.admin || this.menuAdmin)
+                    modes.approve.name = this.approvedModeText(this.info.unapproved);
+                else
+                    modes.edit.name = this.editModeText(this.info.unapproved);
+
+                if(this.info.user && this.info.user.code.role >= 0) {
+                    // set one time the modes available
+                    if(this.info.user.code.role === 100 || this.menuAdmin)
+                        this.modes = { create: modes.create, edit: modes.edit, approve: modes.approve, special: modes.special };
+                    else
+                        this.modes = { create: modes.create, edit: modes.edit };
+                    this.setMode(modes.create);
+                }
             })
         }
     });

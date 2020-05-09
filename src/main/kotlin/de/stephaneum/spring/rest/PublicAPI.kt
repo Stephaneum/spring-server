@@ -29,9 +29,9 @@ class PublicAPI (
         val history = configScheduler.get(Element.history)
         val euSa = configScheduler.get(Element.euSa)
         val unapproved = when {
-            user.code.role == ROLE_ADMIN || user.managePosts == true    -> postRepo.countByApproved(false)
-            user.code.role != ROLE_NO_LOGIN                             -> postRepo.countByApprovedAndUser(false, user)
-            else                                                        -> null
+            user.code.role == ROLE_ADMIN || menuService.isMenuAdmin(user)   -> postRepo.countByApproved(false)
+            user.code.role != ROLE_NO_LOGIN                                 -> postRepo.countByApprovedAndUser(false, user)
+            else                                                            -> null
         }
         return Response.Info(user, menuService.hasMenuWriteAccess(user), menuService.getPublic(), copyright, plan, history, euSa, unapproved)
     }

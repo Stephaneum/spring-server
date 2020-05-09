@@ -137,7 +137,7 @@ class MenuAPI (
         if(me.code.role != ROLE_ADMIN)
             throw ErrorCode(403, "you are not admin")
 
-        return userMenuRepo.findAll().toList()
+        return userMenuRepo.findAll().sortedWith(compareBy({ it.menu != null }, {it.user.firstName}, {it.user.lastName}))
     }
 
     @PostMapping("/rules/add")

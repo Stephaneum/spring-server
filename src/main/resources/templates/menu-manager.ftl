@@ -41,11 +41,11 @@
 
         <div v-if="menuAdmin" style="padding-top: 20px; padding-left: 50px; display: flex; justify-content: space-between">
             <span>Startseite: <b>{{ defaultMenu ? defaultMenu.name : '-' }}</b></span>
-            <span>Je höher die Priorität, desto weiter oben/links das Element eingeordnet.</span>
+            <span>Je höher die Priorität, desto weiter oben/links ist das Element eingeordnet.</span>
         </div>
 
         <div v-else style="margin-top: 100px; text-align: center; font-size: 1.2em">
-            Je höher die Priorität, desto weiter oben/links wird das Element eingeordnet.
+            Je höher die Priorität, desto weiter oben/links ist das Element eingeordnet.
         </div>
 
         <div v-if="admin" class="card-panel" style="margin-top: 60px">
@@ -57,7 +57,7 @@
                 </a>
             </div>
 
-            <p style="margin: 0">Nutzer können in diesen Menüpunkten (inkl. Untermenüs) <b>Beiträge</b> erstellen, bearbeiten und genehmigen - sowie das <b>Menü</b> selber bearbeiten.</p>
+            <p style="margin: 0">Nutzer können in diesen Menüpunkten (inkl. Untermenüs) <b>Beiträge</b> erstellen und bearbeiten - sowie das <b>Menü</b> selber bearbeiten.</p>
             <p style="margin: 0">Regeln sind <b>kombinierbar</b>, z.B. kann Nutzer A für die Menüpunkte M1 und M2 Schreibrechte zugewiesen werden.</p>
             <br>
 
@@ -71,10 +71,11 @@
 
                         <span style="flex: 1">
                             <span v-if="r.menu">
-                                <span style="font-size: 1.2rem; color: grey">{{ menuPath(r.menu) }}</span>
-                                <span style="font-size: 1.2rem; font-weight: bold">{{ r.menu.name }}</span>
+                                <span style="font-size: 1.1rem; color: grey">{{ menuPath(r.menu) }}</span>
+                                <span style="font-size: 1.1rem; font-weight: bold">{{ r.menu.name }}</span>
                             </span>
                             <span v-else style="font-size: 1.4rem; font-weight: bold">
+                                <i class="material-icons left" style="margin-right: 5px">star</i>
                                 ALLE
                             </span>
                         </span>
