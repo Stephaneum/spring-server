@@ -40,7 +40,7 @@ Bereich | Seite(n) | JSF | Spring
 Öffentlich|Impressum, Kontakt, etc.|X|
 Admin|Konfiguration|X|N
 Admin|Benutzerdefinierte Seiten| |X
-Admin|Rubriken|X|N
+Admin|Rubriken| |D
 Admin|Zugangscodes| |X
 Admin|Nutzerdaten-Manager|X|
 Admin|Logdaten| |X
