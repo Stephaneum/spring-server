@@ -38,11 +38,11 @@ Bereich | Seite(n) | JSF | Spring
 Öffentlich|Beiträge|X|
 Öffentlich|Login/Registrierung|X|
 Öffentlich|Impressum, Kontakt, etc.|X|
-Admin|Konfiguration|X|N
+Admin|Konfiguration| |X
 Admin|Benutzerdefinierte Seiten| |X
 Admin|Rubriken| |D
 Admin|Zugangscodes| |X
-Admin|Nutzerdaten-Manager|X|
+Admin|Nutzerdaten-Manager|X|N
 Admin|Logdaten| |X
 Verwaltung|Vertretungsplan-Manager| |X
 Gemeinschaft|Beitrag-Manager| |X
