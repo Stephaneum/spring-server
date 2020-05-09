@@ -16,4 +16,13 @@ object Response {
 
     data class MenuInfo(val menuAdmin: Boolean, val defaultMenu: Menu)
     data class Priority(val priority: Int)
+
+    data class Variables(
+            val storageTeacher: Int,
+            val storageStudent: Int,
+            val fileLocation: String,
+            val backupLocation: String,
+            val maxPictureSize: Int,
+            val passwordResetTimeout: Int
+    )
 }

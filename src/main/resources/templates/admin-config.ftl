@@ -5,6 +5,7 @@
 <#import "components/footer.ftl" as footer/>
 <#import "components/utils.ftl" as utils/>
 <#import "components/config/slider-manager.ftl" as sliderManager/>
+<#import "components/config/variable-manager.ftl" as variableManager/>
 
 <!DOCTYPE HTML>
 <html lang="de">
@@ -38,6 +39,8 @@
 
         <slider-manager></slider-manager>
 
+        <variable-manager></variable-manager>
+
     </div>
     <div v-else style="flex: 1; min-height: calc(100vh - 100px); display: flex; flex-direction: column; align-items: center; justify-content: center"></div>
 
@@ -54,6 +57,7 @@
 <@menu.render/>
 <@footer.render/>
 <@sliderManager.render/>
+<@variableManager.render/>
 <script type="text/javascript">
     var app = new Vue({
         el: '#app',
@@ -71,7 +75,6 @@
                 }
 
                 hideLoading();
-                this.$nextTick(() => M.Tooltip.init(document.querySelectorAll('.tooltipped'), {}));
             }
         },
         computed: {

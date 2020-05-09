@@ -8,11 +8,14 @@ import org.springframework.stereotype.Service
 
 enum class Element(val code: String, val info: String, var value: String? = null) {
     fileLocation("speicherort", "Speicherort"),
+    backupLocation("backup_dir", "Backup-Ort"),
     planLocation("str_vertretung", "Vertretungsplan"),
     planInfo("str_vertretung_info", "Vertretungsplan-Info"),
-    backupLocation("backup_dir", "Backup-Ort"),
     maxPictureSize("picture_size", "Max. Bildgröße in Beiträgen"),
     defaultMenu("default_gruppe_id", "Menüeintrag für die Startseite"),
+    storageTeacher("storage_lehrer", "Speicherplatz Lehrer"),
+    storageStudent("storage_schueler", "Speicherplatz Schueler"),
+    passwordResetTimeout("timeout_passwort_vergessen", "Timeout Passwort Zuruecksetzen"),
 
     // special
     contact("str_kontakt", "Kontakt"),
