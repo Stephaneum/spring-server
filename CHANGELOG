@@ -1,0 +1,243 @@
+2019-03-15
+- stephaneum700.de/s/<static>
+- Liveticker wieder implementiert
+- Bugfix: Bilder (Beitrag-Layout 2) werden manchmal inkorrekt angeordnet -> behoben!
+
+2019-02-05
+- Terminkalender implementiert
+
+2019-01-28
+- Bugfix: oberes Menü unvollständig, falls man eingeloggt ist und eine nicht-veröffentliche Rubrik besitzt
+
+2019-01-08
+- Layout für große Auflösungen (~ ab 1500px Breite) optimiert
+- Statistiken: ROM und RAM Verbrauch wieder hinzugefügt
+- Statistiken: MaterializeCSS vermerkt und es wird öffentlich nur das Datum vom Serverstart angezeigt
+
+2019-01-05
+- neues Design im öffentlichen Bereich mit MaterializeCSS
+- mobile Version entfernt, da das neue Design einen "Responsive-Layout" besitzt
+
+2018-12-23
+- Backup-Funktion für Windows implementiert
+
+2018-12-17
+- Bugfix: Besucherzahlen bei der mobilen Version wurde nicht angezeigt
+- Button "Schüler-Passwörter zurücksetzen" in Nutzerdaten-Verwaltung hinzugefügt
+
+2018-09-08
+- Backup-Funktion (Backup & Restore)
+- Links im oberen Menü unterstützen nun relative Links
+
+2018-09-02
+- Lehrer-Chat
+- Beitrag bearbeiten/genehmigen: Ajax-Feedback "Beitrag wird geladen" hinzugefügt
+- Datei-Vorschau: bei zip, exe und msi wird die Option "als Textdatei öffnen" nicht angezeigt
+
+2018-08-15
+- Der Knopf Projekt verlassen ist nun in "Konfiguration" zu finden
+- "Hier investiert Europa in die Zukunft des Landes" - Logo hinzugefügt
+- Nutzerdaten importieren: 3. Syntax (Klasse-Nachname-Vorname) hinzugefügt
+
+2018-07-09
+- alle Betreuer müssen das Projekt des Schülers genehmigen, damit es freigeschaltet wird
+- Versionen in "Informationen" sind privat nur für den Admin sichtbar
+
+2018-05-16
+- Passwörter in Gruppen werden rekursiv auf die Kinder übertragen
+- Quotas klassenweise ändern
+- Nutzerdaten importieren: Trennzeichen und Standardpasswort festlegbar
+- Schüler müssen mindestens einen Betreuer angeben
+
+2018-04-30
+- zu große Bilder in Beiträgen werden IMMER automatisch komprimiert
+- Optimierungen beim Erstellen/Bearbeiten/Genehmigen von Beiträgen
+- Admin > Nutzer : Speicherverbrauch-Tabelle hinzugefügt
+
+2018-04-25
+- Vertretungsplan-Datum wird anhand der PDF automatisch ermittelt (kann im Nachhinein trotzdem geändert werden)
+- Das System kann zu große Bilder in Beiträgen automatisch komprimieren
+- SQL-Anfragen auf der Startseite optimiert
+
+2018-03-28
+- Gruppen (früher Sammlungen) können Projekte zugeordnet werden (unter Projekt -> Konfiguration)
+- Es wird eine Liste angezeigt für Gruppen, die keine Beiträge haben, aber Untergruppen besitzen 
+- Chatverläufe kann man nun löschen
+- mehr Statistiken in "Informationen"
+- Schüler können standardmäßig keine Projekte mehr erstellen
+- HTTP-Response von XHTML-Dateien werden um "Cache-Control: no-cache, no-store, must-revalidate" erweitert (Caching von Proxys verhindern)
+- Anzeigen von Textdateien (z.B. .txt): Kodierung zwischen UTF-8 und ANSI auswählbar
+- Statistiken: Aufrufe nach Uhrzeit basiert auf letzten 20000 Aufrufen
+
+2018-03-11
+- Quellcode neu strukturiert, gesäubert
+- Viewer für Dateien
+- Datei-Analyse
+- Speicherort ändern: löscht nun keine Dateien mehr, sondern ändert in der Datenbank deren Pfade
+- oberes Menü: Sammlung/Zweige in Gruppen umgewandelt (Javascript-Workaround)
+- Rubriken: Nutzer können bestimmte Bereiche des oberen Menüs verwalten
+- Mehrere Layouts für Beiträge hinzugefügt
+- Projekt-Chat
+- Vertretungsplan vollständig integriert
+
+2018-02-26
+- Icon: Text entfernt, ist nun minimalistischer (Text war sowieso nicht gut lesbar)
+- Version der Datenbank und des Webservers wird bei "Information" angezeigt
+- Layout bei der Einrichtung optimiert
+- Projekt- und Klassenspeicher: Ordner-Funktionalität hinzugefügt
+- Editor für die Beiträge aktualisiert
+- markierte Projekte werden auf der Startseite angezeigt (in der nächsten Version werden alle Projekte angezeigt)
+
+2018-01-25
+- Admin kann Vorname, Nachname, E-Mail und Passwort eines beliebigen Nutzers ändern
+- Bots werden bei den Statistiken ignoriert
+
+2018-01-09
+- Fehler bei der ersten Einrichtung behoben
+
+2017-12-17
+- URL wird nun aktualisiert, wenn man auf "Home" drückt
+- Layout von Home und Beitrag: 2 Layouts (980px und 1220px Breite, passt sich dynamisch an)
+- Login: begrenzte Anzahl an Versuchen
+- Statistiken: Farbe der Balken dynamisch konfigurierbar
+- Bilder in Beiträgen über den Editor hinzufügen (wird aber nicht in der Vorschau angezeigt)
+
+2017-12-05
+- Registrierung und Login: Layout angepasst
+- Passwort-Vergessen: Algorithmus angepasst
+- Admin: Beiträge bearbeiten ohne Datumsänderung möglich
+- Reihenfolge des oberen Menüs änderbar
+
+2017-11-30
+- Schriftgröße des oberen Menüs und des Sitemaps: 12pt,10pt
+- Logo hinzugefügt (favicon)
+- Rechte-Konfiguration hinzugefügt: Login, Projekte erstellen, Beiträge bearbeiten/genehmigen
+- Beiträge können nun als passwortgeschützt markiert werden
+
+2017-11-26
+- Zugriffverlauf hinzugefügt (Admin)
+- Geschichte hinzugefügt
+- Ordnerstruktur nun auch in Nutzerverwaltung
+- Schriftgröße des oberen Menüs und des Sitemaps: 12pt,10pt,9pt,...
+- mobile Version für Smartphones
+
+2017-11-22
+- RAM-Anzeige hinzugefügt (Admin)
+- Gäste können sich nun registrieren
+- Zugangscodes: Text-Ansicht hinzugefügt
+- Zugangscodes sind nun löschbar
+- Privatspeicher: Nach dem Hochladen bleibt das Overlay offen
+
+2017-11-18
+- Caching von Bildern in Beiträgen optimiert
+- In der ersten Untergruppe 'Aktuelles' können Beiträge aus anderen Untergruppen angezeigt werden
+- Maximale Bildergröße in Beiträgen konfigurierbar
+- Logbuch: Parameter für die Einschränkung hinzugefügt
+- Performance-Optimierungen:
+	große Tabellen werden on demand geladen
+	Warnung bei Bilder über 500 KB (vorher 1 MB)
+
+2017-11-02
+- Logdaten sind detaillierter
+- Datei/Ordner bearbeiten: Layout neu angepasst
+
+2017-10-30
+- Privatspeicher: Ordner-Funktionalität
+
+2017-10-26
+- Admin: Privatspeicher der einzelnen Nutzer einsehbar (über Nutzerverwaltung)
+- Nutzerverwaltung: "Nutzerdaten verwalten" steht nun über "Nutzerdaten importieren"
+
+2017-10-15
+- Standardwerte für Beiträgen: Vorschau = 200, Autor anzeigen = false
+- Informationsseite: Systeme ausblendbar
+
+2017-10-12
+- URL vom Vertretungsplan konfigurierbar
+- Admin sieht im Seitenmenü die Anzahl (noch) nicht genehmigter Beiträge
+
+2017-09-04
+- Logos an der Seite hinzugefügt (Europaschule, UN, Schule ohne Rassismus & mit Courage)
+- Live-Ticker
+- Aufrufe in den letzten 30 Tagen (vorher 24h auf Monat bezogen)
+- Privat-Speicher: neue Buttons
+
+2017-08-29
+- Seitenmenü angepasst
+- Klassen kann man als Lehrer(in) im Nachhinein festlegen
+- Variablen: Speicherplatz, Speicherort, E-Mail-Timeout konfigurierbar
+- Systeme: Farbwahl optimiert
+- Sitemap fertiggestellt
+
+2017-08-24
+- Logbuch hinzugefügt
+- Informationen: "Systeme" hinzugefügt
+- "Oberfläche" in "Konfiguration" verschoben
+
+2017-08-22
+- Standard-Design festgelegt
+- Informationen-Seite hinzugefügt
+- Seitenmenü angepasst
+- Kontakt, Impressum, Copyright hinzugefügt
+
+2017-08-18
+- oberes Menü: Untergruppen können nun Untergruppen beinhalten
+- Dateien können als "öffentlich" markiert werden (über URL aufrufbar)
+
+2017-08-15
+- Seitenmenü immer sichtbar
+- Vertretungsplan hinzugefügt
+- Beiträge auf der Startseite werden verkürzt dargestellt ("weiterlesen")
+- Beiträge: keine Tabs mehr, sondern alles auf einer Seite (stabiler)
+
+2017-06-28
+- Weiterführung des Projektes, um als Alternative zur alten Stephaneum-Homepage zu dienen
+- "Nutzer"-Seite hinzugefügt
+- Quotas hinzugefügt
+- neue Zugangscodes können erstellt werden
+- Quellcode neu umstrukturiert
+
+2016-10-31 (Build 7)
+- Beiträge unterstützen Bilder
+- Statistiken über Noten (wurde entfernt)
+
+2016-10-08 (Build 6)
+- Klassennamen mit Suffix (z.B. 11-3)
+- Stundenplan (wurde entfernt)
+- Noten (wurde entfernt)
+- Beiträge (nur Text)
+- oberes Menü für die Beiträge
+
+2016-08-12 (Build 5)
+- Einrichtungsvorgang: Admin hinzugefügt
+- Seitenmenü verbessert
+- Dummys
+- Zugangscode-Seite
+- Fächer (wurde entfernt)
+- Kurse (wurde entfernt)
+
+2016-08-01 (Build 4)
+- Seitenmenü hinzugefügt
+- Passwort-Vergessen über E-Mails
+
+2016-07-20 (Build 3)
+- Einrichtungsvorgang hinzugefügt
+- Privatspeicher
+- Klassenübersicht und Klassenspeicher
+- Projektübersicht und Projektspeicher
+
+2016-07-04 (Build 2)
+- Login und Registrierung fertiggestellt
+- Datenbankstruktur wird automatisch erstellt
+
+2016-06-12 (Build 1)
+- Beginn der Programmierung der Homepage mit der Vorlage vom Jugend forscht Projekt
+- Zugangscode-Überprüfung
+
+2016-02-18 (Jugend forscht)
+- Projekt wird vor der Jury in Halle vorgeführt
+- erste Einrichtung, Zugangscodes, Privatspeicher, Klassen und Projekte
+
+2015-10
+- Beginn der Programmierung mit dem Ziel "Jugend forscht"
+- zunächst auf Servlet-Basis, dann JSF, danach JSF + Primefaces
