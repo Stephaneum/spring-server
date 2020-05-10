@@ -49,7 +49,7 @@ Gemeinschaft|Beitrag-Manager| |X
 Gemeinschaft|Klassen-Cloud| |X
 Gemeinschaft|Projekt-Cloud| |X
 Nutzer|Nutzer-Cloud| |X
-Nutzer|Account-Einstellungen|X|
+Nutzer|Account-Einstellungen| |X
 
 #### Kommunikation JSF nach Spring
 
