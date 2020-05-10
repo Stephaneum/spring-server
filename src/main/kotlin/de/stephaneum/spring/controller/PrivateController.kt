@@ -24,11 +24,12 @@ class PrivateController (
             "/menu-manager" to "menu-manager",
             "/post-manager" to "post-manager",
             "/groups" to "group-overview",
-            "/cloud" to "user-cloud"
+            "/cloud" to "user-cloud",
+            "/account" to "account"
     )
 
     @GetMapping("/admin-config", "/admin-static", "/admin-codes", "/admin-logs",
-            "/plan-manager", "/menu-manager", "/post-manager", "/groups", "/cloud")
+            "/plan-manager", "/menu-manager", "/post-manager", "/groups", "/cloud", "/account")
     fun get(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
 
         if(checkIE(request))

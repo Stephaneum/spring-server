@@ -125,7 +125,7 @@
                                 <!-- internal -->
                                 <li><a href="/groups"><span><i class="material-icons">people</i>Gruppen</span></a></li>
                                 <li><a href="/cloud"><span><i class="material-icons">folder</i>Dateien</span></a></li>
-                                <li><a href="/nutzer_account.xhtml"><span><i class="material-icons">account_circle</i>Account</span></a></li>
+                                <li><a href="/account"><span><i class="material-icons">account_circle</i>Account</span></a></li>
                             </ul>
                             <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: -190px; display: none; overflow: hidden;text-align: center; width: 200px; height: 160px; background-color: #f1f8e9; color: #1b5e20; line-height: normal;" class="z-depth-1">
                                 <i style="font-size: 4em; margin-top: 10px" class="material-icons">person</i>

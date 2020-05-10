@@ -8,6 +8,8 @@ object Response {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     data class Feedback(val success: Boolean, val needLogin: Boolean = false, val message: String? = null)
 
+    data class AccountInfo(val schoolClass: String, val used: Int, val total: Int)
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     data class Info(val user: User, val hasMenuWriteAccess: Boolean, val menu: List<Menu>, val copyright: String?, val plan: Plan, val history: String?, val euSa: String?, val unapproved: Int?)
 

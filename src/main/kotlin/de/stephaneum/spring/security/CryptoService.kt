@@ -7,11 +7,28 @@ import java.security.MessageDigest
 class CryptoService {
 
     private val PEPPER = "A43w8pa0M245qga4293zt9o4mc3z98TA3nQ9mzvTa943cta43mTaoz47tz3loIhbiKh"
+    private val SALT_POOL = listOf('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+        'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+        '0','1','2','3','4','5','6','7','8','9')
+
+    fun getRandomSalt(length: Int): String {
+        val builder = StringBuilder()
+        repeat(length) {
+            builder.append(SALT_POOL.random())
+        }
+        return builder.toString()
+    }
 
     @ExperimentalUnsignedTypes
     fun checkPassword(password: String, hash: String): Boolean {
         val salt = hash.substring(32)
         return hashMD5(password+salt+PEPPER)+salt == hash
+    }
+
+    @ExperimentalUnsignedTypes
+    fun hashPassword(password: String): String {
+        val salt = getRandomSalt(223)
+        return hashMD5(password+salt+PEPPER)+salt
     }
 
     @ExperimentalUnsignedTypes

@@ -48,7 +48,7 @@
             Je höher die Priorität, desto weiter oben/links ist das Element eingeordnet.
         </div>
 
-        <div v-if="admin" class="card-panel" style="margin-top: 60px">
+        <div v-if="admin" class="card-panel" style="margin-top: 100px">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px">
                 <span style="font-size: 2em">Schreibrechte</span>
                 <a @click="showCreateRule" style="margin-right: 20px" class="tooltipped waves-effect waves-light btn-floating green darken-4"
