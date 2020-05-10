@@ -153,17 +153,29 @@
                 },
                 toggleDirection: async function(slider) {
                     showLoadingInvisible();
-                    await axios.post('/api/slider/direction/' + slider.id);
-                    await this.fetchData();
+                    try {
+                        await axios.post('/api/slider/direction/' + slider.id);
+                        await this.fetchData();
+                        M.toast({html: 'Richtung geändert.'});
+                    } catch (e) {
+                        hideLoading();
+                        M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                    }
                 },
                 saveSlider: async function() {
-                    await axios.post('/api/slider/update', {
-                        id: this.selectedSlider.id,
-                        title: this.selectedSlider.title,
-                        subTitle: this.selectedSlider.subTitle
-                    });
-                    await this.fetchData();
-                    this.selectedSlider = null;
+                    try {
+                        await axios.post('/api/slider/update', {
+                            id: this.selectedSlider.id,
+                            title: this.selectedSlider.title,
+                            subTitle: this.selectedSlider.subTitle
+                        });
+                        await this.fetchData();
+                        this.selectedSlider = null;
+                        M.toast({html: 'Text aktualisiert.'});
+                    } catch (e) {
+                        hideLoading();
+                        M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                    }
                 },
                 showDeleteSlider: function(slider) {
                     this.selectedSlider = slider;
