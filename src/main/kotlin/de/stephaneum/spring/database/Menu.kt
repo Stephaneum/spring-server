@@ -52,7 +52,7 @@ data class Menu(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         approved = null
         if(!keepPassword)
             password = null
-        children.forEach { it.simplify() } // recursive call
+        children.forEach { it.simplify(keepPassword) } // recursive call
     }
 }
 

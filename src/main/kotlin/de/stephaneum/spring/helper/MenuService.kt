@@ -36,7 +36,7 @@ class MenuService (
 
         val menus = userMenuRepo.findByMenu(user)
         menus.forEach { addChildren(it, menuRepo.findAll().toList()) }
-        menus.forEach { it.simplify() }
+        menus.forEach { it.simplify(keepPassword = true) }
         return menus
     }
 

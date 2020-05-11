@@ -73,6 +73,9 @@ class MenuAPI (
             }
         }
 
+        if(request.password.isNullOrBlank())
+            request.password = null
+
         val menu = Menu(0, request.name, parent, request.priority, request.link, null, null, request.password, true)
         menuRepo.save(menu)
         logService.log(EventType.CREATE_MENU, me, request.name)
@@ -87,6 +90,9 @@ class MenuAPI (
         val menu = menuRepo.findByIdOrNull(request.id) ?: throw ErrorCode(404, "menu not found")
         if(!menuService.canWrite(me, menu))
             throw ErrorCode(403, "no write access")
+
+        if(request.password.isNullOrBlank())
+            request.password = null
 
         menu.name = request.name
         menu.priority = request.priority
