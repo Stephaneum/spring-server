@@ -21,7 +21,7 @@ class UserAPI (
 ) {
 
     @ExperimentalUnsignedTypes
-    @PostMapping("/password")
+    @PostMapping("/batch/password")
     fun updatePassword(@RequestBody request: Request.ChangePasswordBatch) {
         Session.getUser(adminOnly = true)
 
@@ -30,7 +30,7 @@ class UserAPI (
         userRepo.saveAll(users)
     }
 
-    @PostMapping("/delete/batch")
+    @PostMapping("/batch/delete")
     fun deleteUsers(@RequestBody request: Request.Role) {
         val me = Session.getUser(adminOnly = true)
 
@@ -40,7 +40,7 @@ class UserAPI (
         }
     }
 
-    @PostMapping("/quotas/batch")
+    @PostMapping("/batch/quotas")
     fun updateQuotas(@RequestBody request: Request.UpdateQuotasBatch) {
         Session.getUser(adminOnly = true)
 

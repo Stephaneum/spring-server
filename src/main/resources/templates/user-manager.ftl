@@ -59,7 +59,6 @@
 <@loading.render/>
 <@menu.render/>
 <@footer.render/>
-<@upload.render/>
 <@userBatchActions.render/>
 <@userSearchAndManage.render/>
 <@userImport.render/>
