@@ -38,7 +38,7 @@
 
         <div class="card-panel">
             <div style="display: flex; align-items: center; justify-content: space-evenly; margin-top: 10px; margin-bottom: 40px">
-                <div class="grey lighten-5" style="display: flex; align-items: center; border-radius: 20px; padding: 10px 30px 10px 20px">
+                <div style="background-color: #f8f8f8; display: flex; align-items: center; border-radius: 20px; padding: 10px 30px 10px 20px">
                     <i class="material-icons" style="font-size: 3rem">info</i>
                     <div style="margin-left: 20px;">
                         <p style="margin: 0">https://stephaneum.de/s/<b>hallo-welt.html</b></p>
