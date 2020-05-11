@@ -5,6 +5,7 @@
 <#import "components/vue-loader.ftl" as vueLoader/>
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
+<#import "components/upload.ftl" as upload/>
 
 <!DOCTYPE HTML>
 <html lang="de">
@@ -36,16 +37,28 @@
         </div>
 
         <div class="card-panel">
-            <div style="display: flex; align-items: center; margin-top: 10px; margin-bottom: 40px">
-                <div style="flex: 50%; text-align: center">
+            <div style="display: flex; align-items: center; justify-content: space-evenly; margin-top: 10px; margin-bottom: 40px">
+                <div class="green lighten-5" style="display: flex; align-items: center; border-radius: 20px; padding: 10px 20px 10px 20px">
+                    <i class="material-icons" style="font-size: 3rem">info</i>
+                    <div style="margin-left: 20px;">
+                        <p>https://stephaneum.de/s/<b>hallo-welt.html</b></p>
+                        <p class="grey-text">greift auf folgende Datei zu:</p>
+                        <p>{{staticPath}}/<b>hallo-welt.html</b></p>
+                        <p class="grey-text">Dieser Ordner wird periodisch gescannt. Neue Dateien werden automatisch hinzugefügt.</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center">
                     <p style="margin: 0;font-size: 3em; font-weight: bold">{{ pages.length }}</p>
                     <p style="margin: 0;font-size: 1.5em">Seiten aktiv</p>
                 </div>
-                <div class="green lighten-5" style="flex: 50%; display: inline-block; text-align: center; border-radius: 20px; padding: 10px 40px 10px 40px">
-                    <p>https://stephaneum.de/s/<b>hallo-welt.html</b></p>
-                    <p class="grey-text">greift auf folgende Datei zu:</p>
-                    <p>{{staticPath}}/<b>hallo-welt.html</b></p>
-                </div>
+
+                <file-upload url="/api/static/upload" @upload="fetchData" @error="uploadError" v-slot:default="slot">
+                    <a @click="slot.upload" class="tooltipped waves-effect waves-light btn-floating green darken-4"
+                       data-tooltip="HTML-Datei hochladen" data-position="top" href="#!">
+                        <i class="material-icons">arrow_upward</i>
+                    </a>
+                </file-upload>
             </div>
 
             <ul v-if="pages.length !== 0" class="collection">
@@ -62,10 +75,13 @@
                                @click="toggleMode(p.id)" :class="{ disabled: waitingForData }">
                                 <i class="material-icons left">brush</i>Modus ändern
                             </a>
-                            <a class="waves-effect waves-light btn green darken-3" :href="'/s/'+p.path" target="_blank" style="margin-left: 10px">
+                            <a class="tooltipped waves-effect waves-light btn green darken-3" data-tooltip="Herunterladen" data-position="top" :href="'/s/'+p.path+'?download=true'" style="margin-left: 10px">
+                                <i class="material-icons">arrow_downward</i>
+                            </a>
+                            <a class="tooltipped waves-effect waves-light btn green darken-3" data-tooltip="Öffnen" data-position="top" :href="'/s/'+p.path" target="_blank" style="margin-left: 10px">
                                 <i class="material-icons">open_in_new</i>
                             </a>
-                            <a class="waves-effect waves-light btn red darken-3" style="margin-left: 10px"
+                            <a class="tooltipped waves-effect waves-light btn red darken-3" data-tooltip="Löschen" data-position="top" style="margin-left: 10px"
                                @click="deletePage(p.id)" :class="{ disabled: waitingForData }">
                                 <i class="material-icons">delete</i>
                             </a>
@@ -90,6 +106,7 @@
 <@loading.render/>
 <@menu.render/>
 <@footer.render/>
+<@upload.render/>
 <script type="text/javascript">
 
     var amounts = [ 200, 1000, 5000 ];
@@ -103,44 +120,50 @@
             waitingForData: true,
         },
         methods: {
-            toggleMode: function(id) {
+            toggleMode: async function(id) {
                 this.waitingForData = true;
-                axios.post('/api/static/toggle-mode/'+id)
-                    .then((res) => {
-                        if(res.data.success) {
-                            this.fetchData();
-                        } else if(res.data.message) {
-                            M.toast({ html: res.data.message });
-                            this.waitingForData = false;
-                        } else {
-                            M.toast({ html: 'Ein Fehler ist aufgetreten.' });
-                            this.waitingForData = false;
-                        }
-                    });
+                try {
+                    await axios.post('/api/static/toggle-mode/'+id);
+                    this.fetchData();
+                } catch (e) {
+                    M.toast({ html: 'Ein Fehler ist aufgetreten.' });
+                    this.waitingForData = false;
+                }
             },
-            deletePage: function(id) {
+            deletePage: async function(id) {
                 this.waitingForData = true;
-                axios.post('/api/static/delete/'+id)
-                    .then((res) => {
-                        if(res.data.success) {
-                            M.toast({ html: 'Gelöscht.' });
-                            this.fetchData();
-                        } else if(res.data.message) {
-                            M.toast({ html: res.data.message });
-                            this.waitingForData = false;
-                        } else {
-                            M.toast({ html: 'Ein Fehler ist aufgetreten.' });
-                            this.waitingForData = false;
-                        }
-                    });
+                try {
+                    await axios.post('/api/static/delete/'+id);
+                    M.toast({ html: 'Gelöscht.' });
+                    this.fetchData();
+                } catch (e) {
+                    M.toast({ html: 'Ein Fehler ist aufgetreten.' });
+                    this.waitingForData = false;
+                }
             },
-            fetchData: function() {
-                axios.get('/api/static')
-                    .then((res) => {
-                        this.staticPath = res.data.staticPath;
-                        this.pages = res.data.pages;
-                        this.waitingForData = false;
-                    });
+            uploadError: function(status) {
+                switch (status) {
+                    case 409:
+                        M.toast({html: 'Nur HTML-Dateien erlaubt.'});
+                        break;
+                    case 410:
+                        M.toast({html: 'Dateinamen vergeben.'});
+                        break;
+                    default:
+                        M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                        break;
+                }
+            },
+            fetchData: async function() {
+                try {
+                    const response = await axios.get('/api/static');
+                    this.staticPath = response.data.staticPath;
+                    this.pages = response.data.pages;
+                    this.waitingForData = false;
+                    this.$nextTick(() => M.Tooltip.init(document.querySelectorAll('.tooltipped'), {}));
+                } catch (e) {
+                    M.toast({ html: 'Ein Fehler ist aufgetreten.' });
+                }
             }
         },
         computed: {
@@ -157,17 +180,15 @@
                 };
             },
         },
-        mounted: function() {
-            M.AutoInit();
-            axios.get('/api/info')
-                .then((res) => {
-                    if(res.data) {
-                        this.info = res.data;
-                    } else {
-                        M.toast({html: 'Interner Fehler.'});
-                    }
-                });
-            this.fetchData();
+        mounted: async function() {
+            try {
+                const response = await axios.get('/api/info');
+                this.info = response.data;
+                await this.fetchData();
+                M.AutoInit();
+            } catch (e) {
+                M.toast({html: 'Interner Fehler.'});
+            }
         }
     });
 </script>

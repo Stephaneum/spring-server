@@ -31,4 +31,6 @@ data class Static(
 interface StaticRepo: CrudRepository<Static, Int> {
 
     fun findByPath(path: String): Static?
+
+    fun existsByPath(path: String): Boolean
 }

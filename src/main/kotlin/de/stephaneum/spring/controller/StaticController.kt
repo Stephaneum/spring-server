@@ -26,7 +26,7 @@ class StaticController (
 ) {
 
     @GetMapping("/s/**")
-    fun getPublic(@RequestParam(required = false) key: String?, request: HttpServletRequest, response: HttpServletResponse, model: Model): Any? {
+    fun getPublic(@RequestParam(required = false) download: Boolean?, request: HttpServletRequest, response: HttpServletResponse, model: Model): Any? {
 
         if(checkIE(request))
             return "forward:/static/no-support-ie.html"
@@ -40,25 +40,32 @@ class StaticController (
             val page = staticRepo.findByPath(path)
             val content = fileService.loadFileAsString("$mainPath/${Static.FOLDER_NAME}/$path")
 
-            if(page != null && content != null) {
-                val doc = Jsoup.parse(content)
-                model["head"] = doc.select("head").first().html()
-                model["body"] = doc.select("body").first().html()
-                model["title"] = doc.select("title").first()?.html() ?: "Beitrag"
-
-                return when(page.mode) {
-                    StaticMode.MIDDLE -> "static-middle"
-                    StaticMode.FULL_WIDTH -> "static-full-width"
-                    StaticMode.FULL_SCREEN -> {
-                        // just return the html file as is
-                        response.contentType = "text/html"
-                        response.characterEncoding = "UTF-8"
-                        response.writer.println(content)
-                        null
-                    }
-                }
-            } else {
+            if (page == null || content == null)
                 return "404"
+
+            if(download == true) {
+                val name = fileService.getFileName(path)
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType("text/html; charset=utf-8"))
+                        .header("Content-Disposition", "attachment; filename=\"$name\"")
+                        .body(content)
+            }
+
+            val doc = Jsoup.parse(content)
+            model["head"] = doc.select("head").first().html()
+            model["body"] = doc.select("body").first().html()
+            model["title"] = doc.select("title").first()?.html() ?: "Beitrag"
+
+            return when(page.mode) {
+                StaticMode.MIDDLE -> "static-middle"
+                StaticMode.FULL_WIDTH -> "static-full-width"
+                StaticMode.FULL_SCREEN -> {
+                    // just return the html file as is
+                    response.contentType = "text/html"
+                    response.characterEncoding = "UTF-8"
+                    response.writer.println(content)
+                    null
+                }
             }
         } else {
             // other file types, e.g. images

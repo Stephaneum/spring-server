@@ -441,6 +441,14 @@ class FileService {
         zis.close()
     }
 
+    fun getFileName(path: String): String {
+        val index = path.lastIndexOf('/')+1
+        return if(index != -1)
+            path.substring(index)
+        else
+            ""
+    }
+
     fun getExtension(path: String): String {
         val index = path.lastIndexOf('.')+1
         return if(index != -1)
