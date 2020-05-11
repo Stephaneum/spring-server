@@ -1,5 +1,5 @@
 
-<#-- logos on the right -->
+<#-- upload utility -->
 
 <#macro render>
     <template id="file-upload">
