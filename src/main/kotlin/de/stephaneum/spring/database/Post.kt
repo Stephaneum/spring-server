@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDeleteAction
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
 import javax.persistence.*
 
@@ -80,10 +81,14 @@ interface PostRepo: CrudRepository<Post, Int> {
     fun countByApprovedAndUser(approved: Boolean, user: User): Int
 
     fun findByMenuIdOrderByTimestampDesc(menuID: Int): List<Post>
+    fun findByUserAndApproved(user: User, approved: Boolean): List<Post>
 
     @Query("SELECT p FROM Post p WHERE p.approved = FALSE ORDER BY p.timestamp")
     fun findUnapproved(): List<Post>
 
     @Query("SELECT p FROM Post p WHERE p.approved = FALSE AND p.user.id = ?1 ORDER BY p.timestamp")
     fun findUnapproved(userID: Int): List<Post>
+
+    @Transactional
+    fun deleteByUserAndApproved(user: User, approved: Boolean)
 }

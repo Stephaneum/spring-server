@@ -176,7 +176,15 @@ class FileService {
             deleteFileStephaneum(user, f) // delete files of the current folder
         }
 
-        folderRepo.deleteById(folder.id)
+        folderRepo.delete(folder)
+    }
+
+    /**
+     * deletes all files which are uploaded by this user
+     */
+    fun clearStorage(user: User) {
+        val files = fileRepo.findByUser(user)
+        files.forEach { file -> deleteFileStephaneum(user, file) }
     }
 
     /**
@@ -212,6 +220,11 @@ class FileService {
         logService.log(EventType.DELETE_FILE, mode.description, user, file.generateFileName())
     }
 
+    /**
+     * deletes a file from hdd and from database permanently
+     * please ensure that there are no connections to posts etc.
+     * called by [de.stephaneum.spring.scheduler.GarbageCollector] and [deleteFileStephaneum]
+     */
     fun deleteFileStephaneumFinal(file: de.stephaneum.spring.database.File) {
         // delete file (db and hard drive)
         fileRepo.delete(file)

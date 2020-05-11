@@ -6,5 +6,9 @@ object Request {
     data class ChangePassword(val oldPassword: String, val newPassword: String)
     data class Email(val email: String)
 
+    data class ChangePasswordBatch(val password: String, val role: Int)
+    data class Role(val role: Int)
+    data class UpdateQuotasBatch(val storage: Int, val grade: Int)
+
     data class MenuWriteRule(val user: Int, val menu: Int?)
 }

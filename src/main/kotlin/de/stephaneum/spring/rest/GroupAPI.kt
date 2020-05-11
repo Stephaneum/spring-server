@@ -15,11 +15,10 @@ data class GroupInfoDetailed(val id: Int, val name: String, val leader: SimpleUs
 @RestController
 @RequestMapping("/api/groups")
 class GroupAPI (
+        private val groupService: GroupService,
         private val userGroupRepo: UserGroupRepo,
         private val groupRepo: GroupRepo,
         private val userRepo: UserRepo,
-        private val fileRepo: FileRepo,
-        private val fileService: FileService,
         private val logService: LogService
 ) {
 
@@ -175,10 +174,7 @@ class GroupAPI (
 
         val group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "group not found")
 
-        deleteFilesGroupRecursive(user, group)
-
-        groupRepo.delete(group) // folder will be deleted also
-        logService.log(EventType.DELETE_GROUP, user, group.name)
+        groupService.deleteGroupAndChildren(user, group)
     }
 
     @PostMapping("/{id}/accept")
@@ -257,8 +253,7 @@ class GroupAPI (
         if(targetConnection.hasAdminPermissions())
             throw ErrorCode(403, "this user has admin rights")
 
-        removeUserFromGroupRecursive(targetConnection)
-        logService.log(EventType.QUIT_GROUP, targetConnection.user, targetConnection.group.name)
+        groupService.removeUserFromGroupRecursive(targetConnection)
     }
 
     @PostMapping("/{groupID}/leave")
@@ -269,23 +264,7 @@ class GroupAPI (
         if(user.id == connection.group.id || connection.teacher)
             throw ErrorCode(409, "you are group admin or teacher")
 
-        removeUserFromGroupRecursive(connection)
-        logService.log(EventType.QUIT_GROUP, connection.user, connection.group.name)
-    }
-
-    private fun removeUserFromGroupRecursive(userGroup: UserGroup) {
-        val files = fileRepo.findByUserAndGroup(userGroup.user, userGroup.group)
-        files.forEach { fileService.deleteFileStephaneum(userGroup.user, it) }
-        userGroupRepo.delete(userGroup)
-
-        userGroupRepo.findByUserAndGroupParent(userGroup.user, userGroup.group).forEach { removeUserFromGroupRecursive(it) }
-    }
-
-    private fun deleteFilesGroupRecursive(user: User, group: Group) {
-        val files = fileRepo.findByGroup(group)
-        files.forEach { fileService.deleteFileStephaneum(user, it) } // delete all files
-
-        groupRepo.findByParent(group).forEach { deleteFilesGroupRecursive(user, it) }
+        groupService.removeUserFromGroupRecursive(connection)
     }
 
     private fun Group.toGroupInfo(): GroupInfo {

@@ -3,6 +3,7 @@ package de.stephaneum.spring.database
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.*
 
 const val ROLE_NO_LOGIN = -1
@@ -42,4 +43,7 @@ data class Code(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 interface CodeRepo: CrudRepository<Code, Int> {
 
     fun findByUsed(used: Boolean): List<Code>
+
+    @Transactional
+    fun deleteByCode(code: String)
 }

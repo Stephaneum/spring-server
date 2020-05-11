@@ -70,6 +70,8 @@ interface UserRepo: CrudRepository<User, Int> {
 
     fun findByIdIn(id: List<Int>): List<User>
     fun findByEmail(email: String): User?
+    fun findByCodeRole(role: Int): List<User>
+    fun findBySchoolClassGrade(grade: Int): List<User>
     fun existsByEmail(email: String): Boolean
 
     // search

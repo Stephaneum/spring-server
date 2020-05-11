@@ -1,6 +1,8 @@
 package de.stephaneum.spring
 
+import de.stephaneum.spring.database.ROLE_ADMIN
 import de.stephaneum.spring.database.User
+import de.stephaneum.spring.helper.ErrorCode
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
@@ -22,6 +24,14 @@ object Session {
             session.setAttribute(KEY, voteSession)
         }
         return voteSession
+    }
+
+    fun getUser(adminOnly: Boolean = false): User {
+        val user = get().user ?: throw ErrorCode(401, "Unauthorized")
+        if(adminOnly && user.code.role != ROLE_ADMIN)
+            throw ErrorCode(403, "admin only")
+
+        return user
     }
 
     fun login(permission: Permission) {
