@@ -2,6 +2,7 @@ package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
+import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.helper.GroupService
 import de.stephaneum.spring.rest.objects.Request
@@ -30,9 +31,13 @@ class UserAPI (
         userRepo.saveAll(users)
     }
 
+    @ExperimentalUnsignedTypes
     @PostMapping("/batch/delete")
-    fun deleteUsers(@RequestBody request: Request.Role) {
+    fun deleteUsers(@RequestBody request: Request.DeleteByRole) {
         val me = Session.getUser(adminOnly = true)
+
+        if(!cryptoService.checkPassword(request.password, me.password))
+            throw ErrorCode(403, "wrong password")
 
         val users = userRepo.findByCodeRole(request.role)
         users.forEach { user ->
