@@ -6,15 +6,13 @@
         <div class="card-panel" style="margin-top: 60px">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px">
                 <span style="font-size: 2em">Diashow</span>
-                <a @click="showUpload" style="margin-right: 20px" class="tooltipped waves-effect waves-light btn-floating green darken-4"
-                   data-tooltip="Bild hochladen" data-position="top" href="#!">
-                    <i class="material-icons">add</i>
-                </a>
+                <file-upload url="/api/slider/upload" @upload="fetchData" @error="uploadError" v-slot:default="slot">
+                    <a @click="slot.upload" style="margin-right: 20px" class="tooltipped waves-effect waves-light btn-floating green darken-4"
+                       data-tooltip="Bild hochladen" data-position="top" href="#!">
+                        <i class="material-icons">add</i>
+                    </a>
+                </file-upload>
             </div>
-
-            <form method="POST" enctype="multipart/form-data">
-                <input name="file" type="file" id="upload-slider" @change="upload" style="display: none">
-            </form>
 
             <ul v-if="sliders.length !== 0" class="collection">
                 <li v-for="s in sliders" class="collection-item">
@@ -116,24 +114,15 @@
                     hideLoading();
                     this.$nextTick(() => M.Tooltip.init(document.querySelectorAll('.tooltipped'), {}));
                 },
-                showUpload: function() {
-                    document.getElementById('upload-slider').click();
-                },
-                upload: function(event) {
-                    event.preventDefault();
-                    var files = event.dataTransfer ? event.dataTransfer.files : event.currentTarget.files;
-                    if(files.length !== 1) {
-                        M.toast({html: 'Nur eine Datei erlaubt.'});
-                        return;
+                uploadError: function(status) {
+                    switch (status) {
+                        case 409:
+                            M.toast({html: 'Nur JPEG-Dateien erlaubt.'});
+                            break;
+                        default:
+                            M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                            break;
                     }
-                    uploadMultipleFiles('/api/slider/upload', files, {
-                        params: {},
-                        uploaded: (file) => {},
-                        finished: () => {
-                            console.log('LOL');
-                            this.fetchData();
-                        }
-                    });
                 },
                 up: async function(slider) {
                     showLoadingInvisible();

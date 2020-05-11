@@ -4,6 +4,7 @@
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
 <#import "components/utils.ftl" as utils/>
+<#import "components/upload.ftl" as upload/> <!-- slider manager -->
 <#import "components/config/slider-manager.ftl" as sliderManager/>
 <#import "components/config/variable-manager.ftl" as variableManager/>
 
@@ -56,6 +57,7 @@
 <@loading.render/>
 <@menu.render/>
 <@footer.render/>
+<@upload.render/>
 <@sliderManager.render/>
 <@variableManager.render/>
 <script type="text/javascript">
