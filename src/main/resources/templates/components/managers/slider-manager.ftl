@@ -5,7 +5,7 @@
     <template id="slider-manager">
         <div class="card-panel" style="margin-top: 60px">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px">
-                <span style="font-size: 2em">Diashow</span>
+                <span style="font-size: 2rem">Diashow</span>
                 <file-upload url="/api/slider/upload" @upload="fetchData" @error="uploadError" v-slot:default="slot">
                     <a @click="slot.upload" style="margin-right: 20px" class="tooltipped waves-effect waves-light btn-floating green darken-4"
                        data-tooltip="Bild hochladen" data-position="top" href="#!">

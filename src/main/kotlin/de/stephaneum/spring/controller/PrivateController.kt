@@ -20,6 +20,7 @@ class PrivateController (
             "/admin-static" to "admin-static",
             "/admin-codes" to "admin-codes",
             "/admin-logs" to "admin-logs",
+            "/user-manager" to "user-manager",
             "/plan-manager" to "plan-manager",
             "/menu-manager" to "menu-manager",
             "/post-manager" to "post-manager",
@@ -28,7 +29,7 @@ class PrivateController (
             "/account" to "account"
     )
 
-    @GetMapping("/admin-config", "/admin-static", "/admin-codes", "/admin-logs",
+    @GetMapping("/admin-config", "/admin-static", "/admin-codes", "/admin-logs", "/user-manager",
             "/plan-manager", "/menu-manager", "/post-manager", "/groups", "/cloud", "/account")
     fun get(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
 

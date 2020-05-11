@@ -4,14 +4,14 @@
 <#import "components/menu.ftl" as menu/>
 <#import "components/footer.ftl" as footer/>
 <#import "components/utils.ftl" as utils/>
-<#import "components/upload.ftl" as upload/> <!-- slider manager -->
-<#import "components/managers/slider-manager.ftl" as sliderManager/>
-<#import "components/managers/variable-manager.ftl" as variableManager/>
+<#import "components/managers/user-batch-actions.ftl" as userBatchActions/>
+<#import "components/managers/user-search-and-manage.ftl" as userSearchAndManage/>
+<#import "components/managers/user-import.ftl" as userImport/>
 
 <!DOCTYPE HTML>
 <html lang="de">
 <head>
-    <title>Konfiguration - Stephaneum</title>
+    <title>Nutzerverwaltung - Stephaneum</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/static/img/favicon.png" />
@@ -34,13 +34,15 @@
     <div v-if="allowed" style="margin: 50px auto 0 auto; max-width: 1200px; min-height: calc(100vh - 350px)">
 
         <div style="text-align: center; margin: 60px 0 60px 0">
-            <i class="material-icons" style="font-size: 4em">build</i>
-            <h4 style="margin: 0">Konfiguration</h4>
+            <i class="material-icons" style="font-size: 4em">people</i>
+            <h4 style="margin: 0">Nutzerverwaltung</h4>
         </div>
 
-        <slider-manager></slider-manager>
+        <user-batch-actions></user-batch-actions>
 
-        <variable-manager></variable-manager>
+        <user-search-and-manage></user-search-and-manage>
+
+        <user-import></user-import>
 
     </div>
     <div v-else style="flex: 1; min-height: calc(100vh - 100px); display: flex; flex-direction: column; align-items: center; justify-content: center"></div>
@@ -58,8 +60,9 @@
 <@menu.render/>
 <@footer.render/>
 <@upload.render/>
-<@sliderManager.render/>
-<@variableManager.render/>
+<@userBatchActions.render/>
+<@userSearchAndManage.render/>
+<@userImport.render/>
 <script type="text/javascript">
     var app = new Vue({
         el: '#app',
