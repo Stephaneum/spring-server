@@ -1,5 +1,6 @@
 package de.stephaneum.spring.helper
 
+import de.stephaneum.spring.database.User
 import de.stephaneum.spring.security.JwtService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,7 +14,8 @@ enum class JsfEvent {
     SYNC_MENU,
     SYNC_SPECIAL_TEXT,
     SYNC_VARIABLES,
-    SYNC_PLAN
+    SYNC_PLAN,
+    CHANGE_ACCOUNT
 }
 
 @Service
@@ -41,6 +43,10 @@ class JsfService {
         } catch (e: Exception) {
             logger.error(e.toString())
         }
+    }
 
+    fun getChangeAccountToken(user: User): String {
+        val data = mapOf("event" to JsfEvent.CHANGE_ACCOUNT.toString(), "id" to user.id)
+        return jwtService.generateToken(data)
     }
 }

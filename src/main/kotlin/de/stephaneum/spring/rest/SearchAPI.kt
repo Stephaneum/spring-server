@@ -1,15 +1,10 @@
 package de.stephaneum.spring.rest
 
-import de.stephaneum.spring.database.SimpleUser
-import de.stephaneum.spring.database.User
 import de.stephaneum.spring.database.UserRepo
-import de.stephaneum.spring.helper.ErrorCode
+import de.stephaneum.spring.helper.toMiniUser
 import de.stephaneum.spring.helper.toSimpleUser
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 data class SearchRequest(val firstName: String?, val lastName: String?, val role: Int?)
 
@@ -21,19 +16,22 @@ class SearchAPI {
     private lateinit var userRepo: UserRepo
 
     @PostMapping("/user")
-    fun search(@RequestBody request: SearchRequest): List<SimpleUser> {
-        val users: List<User>
-        if(request.role != null) {
+    fun search(@RequestBody request: SearchRequest, @RequestParam(required = false) detailed: Boolean = false): List<*> {
+        val users = if(request.role != null) {
             if(request.firstName.isNullOrBlank() && request.lastName.isNullOrBlank())
-                users = userRepo.findByCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(request.role)
+                userRepo.findByCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(request.role)
             else
-                users = userRepo.findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseAndCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(request.firstName ?: "", request.lastName ?: "", request.role)
+                userRepo.findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseAndCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(request.firstName ?: "", request.lastName ?: "", request.role)
         } else {
             if(request.firstName.isNullOrBlank() && request.lastName.isNullOrBlank())
-                throw ErrorCode(400, "missing arguments")
+                userRepo.findByOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc()
             else
-                users = userRepo.findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(request.firstName ?: "", request.lastName ?: "")
+                userRepo.findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(request.firstName ?: "", request.lastName ?: "")
         }
-        return users.map { it.toSimpleUser() }
+
+        return if(detailed)
+            users.map { it.toSimpleUser() }
+        else
+            users.map { it.toMiniUser() }
     }
 }

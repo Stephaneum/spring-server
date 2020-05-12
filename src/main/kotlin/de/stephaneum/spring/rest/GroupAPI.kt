@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.*
 
 data class UpdateGroup(val name: String?, val teachers: List<Int>?, val parent: Int?, val members: List<Int>?)
 
-data class GroupInfo(val id: Int, val name: String, val leader: SimpleUser, val accepted: Boolean, val chat: Boolean, val members: Int)
+data class GroupInfo(val id: Int, val name: String, val leader: MiniUser, val accepted: Boolean, val chat: Boolean, val members: Int)
 data class GroupUser(val id: Int, val firstName: String, val lastName: String, val teacher: Boolean, val chat: Boolean, val writeBoard: Boolean)
-data class GroupInfoDetailed(val id: Int, val name: String, val leader: SimpleUser, val accepted: Boolean, val chat: Boolean, val showBoardFirst: Boolean, val members: List<GroupUser>, val children: List<GroupInfoDetailed>)
+data class GroupInfoDetailed(val id: Int, val name: String, val leader: MiniUser, val accepted: Boolean, val chat: Boolean, val showBoardFirst: Boolean, val members: List<GroupUser>, val children: List<GroupInfoDetailed>)
 
 @RestController
 @RequestMapping("/api/groups")
@@ -56,9 +56,9 @@ class GroupAPI (
             val childMembers = userGroupRepo
                     .findByGroupOrderByUserFirstNameAscUserLastNameAsc(child)
                     .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat, it.writeBoard) }
-            GroupInfoDetailed(child.id, child.name, child.leader.toSimpleUser(), child.accepted, child.chat, child.showBoardFirst, childMembers, emptyList())
+            GroupInfoDetailed(child.id, child.name, child.leader.toMiniUser(), child.accepted, child.chat, child.showBoardFirst, childMembers, emptyList())
         }
-        return GroupInfoDetailed(group.id, group.name, group.leader.toSimpleUser(), group.accepted, group.chat, group.showBoardFirst, members, children)
+        return GroupInfoDetailed(group.id, group.name, group.leader.toMiniUser(), group.accepted, group.chat, group.showBoardFirst, members, children)
     }
 
     @PostMapping("/create")
@@ -268,7 +268,7 @@ class GroupAPI (
     }
 
     private fun Group.toGroupInfo(): GroupInfo {
-        return GroupInfo(id, name, leader.toSimpleUser(), accepted, chat, userGroupRepo.countByGroup(this))
+        return GroupInfo(id, name, leader.toMiniUser(), accepted, chat, userGroupRepo.countByGroup(this))
     }
 
     private fun UserGroup.hasAdminPermissions(): Boolean {

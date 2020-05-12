@@ -27,4 +27,8 @@ object Response {
             val maxPictureSize: Int,
             val passwordResetTimeout: Int
     )
+
+    // user api
+    data class UserInfo(val firstName: String, val lastName: String, val email: String, val storage: Int, val permissionLogin: Boolean, val permissionPlan: Boolean)
+    data class Token(val token: String)
 }

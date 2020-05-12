@@ -35,7 +35,7 @@ class JwtService {
         jwtKey = SecretKeySpec(jwtKeyBytes, 0, jwtKeyBytes.size, "HmacSHA256")
     }
 
-    fun generateToken(map: Map<String, String>): String {
+    fun generateToken(map: Map<String, Any>): String {
         val now = Date()
         val validity = Date(now.time + validityInMilliseconds)
         val builder = Jwts.builder()

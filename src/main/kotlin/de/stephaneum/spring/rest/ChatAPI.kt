@@ -4,7 +4,7 @@ import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.helper.obj
-import de.stephaneum.spring.helper.toSimpleUser
+import de.stephaneum.spring.helper.toMiniUser
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 
@@ -47,7 +47,7 @@ class ChatAPI (
                 else -> throw ErrorCode(500, "internal error")
             }
         }
-        return messages.map { SimpleMessage(it.id, it.text, it.user.toSimpleUser(), it.timestamp) }
+        return messages.map { SimpleMessage(it.id, it.text, it.user.toMiniUser(), it.timestamp) }
     }
 
     @PostMapping("/group/{groupID}", "/class/{classID}", "/teacher")

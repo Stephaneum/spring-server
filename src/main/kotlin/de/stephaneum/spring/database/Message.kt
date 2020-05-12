@@ -37,7 +37,7 @@ data class Message(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                    @Column(nullable = false, name = "datum")
                    var timestamp: Timestamp = Timestamp(0))
 
-data class SimpleMessage(val id: Int, val text: String, val user: SimpleUser, val timestamp: Timestamp)
+data class SimpleMessage(val id: Int, val text: String, val user: MiniUser, val timestamp: Timestamp)
 
 @Repository
 interface MessageRepo: CrudRepository<Message, Int> {

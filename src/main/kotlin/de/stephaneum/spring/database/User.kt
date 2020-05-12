@@ -67,7 +67,8 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @Column(nullable = true, name = "lehrerchat_datum")
                 var teacherChatLastOnline: Timestamp = Timestamp(0))
 
-data class SimpleUser(val id: Int, val firstName: String, val lastName: String, val schoolClass: String?, val gender: Int?, val role: Int)
+data class SimpleUser(val id: Int, val firstName: String, val lastName: String, val email: String, val schoolClass: String?, val gender: Int, val storage: Int, val role: Int, val banned: Boolean)
+data class MiniUser(val id: Int, val firstName: String, val lastName: String, val schoolClass: String?, val gender: Int?, val role: Int)
 
 @Repository
 interface UserRepo: CrudRepository<User, Int> {
@@ -79,6 +80,7 @@ interface UserRepo: CrudRepository<User, Int> {
     fun existsByEmail(email: String): Boolean
 
     // search
+    fun findByOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(): List<User>
     fun findByCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(role: Int): List<User>
     fun findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(firstName: String, lastName: String): List<User>
     fun findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseAndCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(firstName: String, lastName: String, role: Int): List<User>

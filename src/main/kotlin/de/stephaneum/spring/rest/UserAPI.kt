@@ -2,19 +2,19 @@ package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
-import de.stephaneum.spring.helper.CodeService
-import de.stephaneum.spring.helper.ErrorCode
-import de.stephaneum.spring.helper.FileService
-import de.stephaneum.spring.helper.GroupService
+import de.stephaneum.spring.helper.*
 import de.stephaneum.spring.rest.objects.Request
+import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.security.CryptoService
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/users")
 class UserAPI (
+        private val jsfService: JsfService,
         private val cryptoService: CryptoService,
         private val fileService: FileService,
         private val groupService: GroupService,
@@ -62,6 +62,42 @@ class UserAPI (
         val users = userRepo.findBySchoolClassGrade(request.grade)
         users.forEach { user -> user.storage = request.storage }
         userRepo.saveAll(users)
+    }
+
+    @GetMapping("/{id}")
+    fun getUserInfo(@PathVariable id: Int): Response.UserInfo {
+        Session.getUser(adminOnly = true)
+
+        val user = userRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "user not found")
+        return Response.UserInfo(user.firstName, user.lastName, user.email, user.storage, user.banned != true, user.managePlans == true)
+    }
+
+    @ExperimentalUnsignedTypes
+    @ExperimentalStdlibApi
+    @PostMapping("/update")
+    fun updateUser(@RequestBody request: Request.UpdateUser) {
+        Session.getUser(adminOnly = true)
+        val user = userRepo.findByIdOrNull(request.user) ?: throw ErrorCode(404, "user not found")
+        user.firstName = request.firstName
+        user.lastName = request.lastName
+        user.email = request.email
+        if(!request.password.isNullOrBlank())
+            user.password = cryptoService.hashPassword(request.password)
+        user.storage = request.storage
+        user.banned = !request.permissionLogin
+        user.managePlans = request.permissionPlan
+        userRepo.save(user)
+    }
+
+    @GetMapping("/change-account/{id}")
+    fun changeAccount(@PathVariable id: Int): Response.Token {
+        Session.getUser(adminOnly = true)
+
+        val user = userRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "user not found")
+        val token = jsfService.getChangeAccountToken(user)
+
+        Session.get().user = user
+        return Response.Token(token)
     }
 
     @ExperimentalUnsignedTypes
