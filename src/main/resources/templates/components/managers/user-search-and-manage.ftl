@@ -7,12 +7,12 @@
             <div style="display: flex; align-items: center; justify-content: space-evenly">
                 <div class="input-field" style="margin-top: 40px">
                     <label for="input-search-firstname">Vorname</label>
-                    <input v-model:value="firstName" type="text" id="input-search-firstname" autocomplete="off" placeholder="Max"/>
+                    <input v-model:value="firstName" type="text" id="input-search-firstname" autocomplete="off" placeholder="z.B. Max"/>
                 </div>
 
                 <div class="input-field" style="margin-top: 40px">
                     <label for="input-search-lastname">Nachname</label>
-                    <input v-model:value="lastName" type="text" id="input-search-lastname" autocomplete="off" placeholder="Mustermann"/>
+                    <input v-model:value="lastName" type="text" id="input-search-lastname" autocomplete="off" placeholder="z.B. Mustermann"/>
                 </div>
 
                 <div class="input-field" style="margin-top: 40px">

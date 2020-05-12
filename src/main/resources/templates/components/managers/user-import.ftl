@@ -46,7 +46,7 @@
             <div class="input-field" :style="parseInt(format) === 0 ? {'display': 'none'} : {}">
                 <i class="material-icons prefix">vpn_key</i>
                 <label for="input-import-pw">Standard-Passwort</label>
-                <input v-model:value="password" type="text" id="input-import-pw" autocomplete="off" placeholder="schule"/>
+                <input v-model:value="password" type="text" id="input-import-pw" autocomplete="off" placeholder="z.B. schule"/>
             </div>
 
             <div class="input-field">
@@ -55,7 +55,7 @@
                 <input :value="example" type="text" id="import-example" autocomplete="off" disabled/>
             </div>
 
-            <textarea v-model:value="data" style="height: 600px; padding: 10px; border:solid 1px #c9c9c9; resize: none; font-family: Consolas, monospace" placeholder="(leer)" ></textarea>
+            <textarea v-model:value="data" style="height: 600px; padding: 10px; border:solid 1px #c9c9c9; resize: none; font-family: Consolas, monospace" :placeholder="example + '\n' + example2 + '\n' + example3 + '\n[...]'" ></textarea>
         </div>
     </template>
 
@@ -118,20 +118,29 @@
                         }
                         hideLoading();
                     }
-                }
-            },
-            computed: {
-                example: function() {
+                },
+                generateExample: function(firstName, lastName, login, password, clazz, salutation) {
                     let s = this.separator;
                     if(s === 'tab') {
                         s = '   ';
                     }
                     switch(parseInt(this.format)) {
-                        case 0: return 'Max' + s + 'Mustermann' + s + 'm.mustermann' + s + 'meinPasswort' + s + '7c';
-                        case 1: return 'm.mustermann' + s + 'Herr' + s + 'Mustermann' + s + 'Max';
-                        case 2: return '7c' + s + 'Mustermann' + s + 'Max';
+                        case 0: return firstName + s + lastName + s + login + s + password + s + clazz;
+                        case 1: return login + s + salutation + s + lastName + s + firstName;
+                        case 2: return clazz + s + lastName + s + firstName;
                         default: return 'Error';
                     }
+                }
+            },
+            computed: {
+                example: function() {
+                    return this.generateExample('Max', 'Mustermann', 'm.mustermann', 'meinPasswort', '7c', 'Herr');
+                },
+                example2: function() {
+                    return this.generateExample('Sabine', 'Meier', 's.meier', 'eule', '11-2', 'Frau');
+                },
+                example3: function() {
+                    return this.generateExample('Tom', 'Müller', 't.müller', 'schule', '9a', 'Herr');
                 }
             },
             mounted: function() {
