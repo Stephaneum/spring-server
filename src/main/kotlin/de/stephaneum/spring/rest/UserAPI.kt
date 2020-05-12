@@ -103,12 +103,14 @@ class UserAPI (
 
         // assign values
         newUsers.forEachIndexed { index, user ->
+            codes[index].used = true // code is now used
             user.code = codes[index] // assign codes
             user.storage = storage // assign storage
             user.password = cryptoService.hashPassword(user.password) // hash passwords
         }
 
         // register
+        codeRepo.saveAll(codes)
         userRepo.saveAll(newUsers)
     }
 
