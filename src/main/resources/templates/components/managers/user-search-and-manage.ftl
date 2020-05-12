@@ -215,9 +215,7 @@
                     showLoading('Account wechseln...');
                     try {
                         const response = await axios.post('/api/users/change-account/' + this.selected.id);
-                        const token = response.data.token;
-                        await axios.post('/event?event=' + token);
-                        window.location.href = '/';
+                        window.location.href = '/change_account.xhtml?key=' + response.data.token;
                     } catch (e) {
                         M.toast({html: 'Ein Fehler ist aufgetreten.'});
                         hideLoading();

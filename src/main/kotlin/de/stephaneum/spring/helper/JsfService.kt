@@ -14,8 +14,7 @@ enum class JsfEvent {
     SYNC_MENU,
     SYNC_SPECIAL_TEXT,
     SYNC_VARIABLES,
-    SYNC_PLAN,
-    CHANGE_ACCOUNT
+    SYNC_PLAN
 }
 
 @Service
@@ -46,7 +45,7 @@ class JsfService {
     }
 
     fun getChangeAccountToken(user: User): String {
-        val data = mapOf("event" to JsfEvent.CHANGE_ACCOUNT.toString(), "id" to user.id)
+        val data = mapOf("id" to user.id)
         return jwtService.generateToken(data)
     }
 }
