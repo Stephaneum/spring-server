@@ -89,7 +89,7 @@
             <!-- update password modal -->
             <div id="modal-delete-users" class="modal" style="width: 500px">
                 <div class="modal-content">
-                    <h4>Passwort festlegen</h4>
+                    <h4>Nutzer löschen</h4>
                     <br>
                     Alle Accounts einer bestimmten Rolle werden gelöscht.
                     <br>
@@ -252,7 +252,7 @@
             color: #ffffff;
             min-width: 210px;
             cursor: pointer;
-            padding: 10px 15px 10px 15px;
+            padding: 15px 15px 15px 15px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -269,6 +269,7 @@
 
         .batch-btn span {
             font-size: 1.4rem;
+            margin-top: 5px;
         }
     </style>
 </#macro>
