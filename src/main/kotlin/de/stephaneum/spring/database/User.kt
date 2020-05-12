@@ -10,6 +10,10 @@ import javax.persistence.*
 
 val EMPTY_USER = User(-1, Code(-1, "", ROLE_NO_LOGIN))
 
+const val SEX_MALE = 0
+const val SEX_FEMALE = 1
+const val SEX_UNKNOWN = 2
+
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name="nutzer")
@@ -30,7 +34,7 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var schoolClass: SchoolClass? = null,
 
                 @Column(nullable = true, name = "geschlecht", length = 4)
-                var gender: Int? = null,
+                var gender: Int? = SEX_UNKNOWN,
 
                 @Column(nullable = false, length = 100)
                 var email: String = "",

@@ -43,6 +43,7 @@ data class Code(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 interface CodeRepo: CrudRepository<Code, Int> {
 
     fun findByUsed(used: Boolean): List<Code>
+    fun findByUsedAndRole(used: Boolean, role: Int): List<Code>
 
     @Transactional
     fun deleteByCode(code: String)

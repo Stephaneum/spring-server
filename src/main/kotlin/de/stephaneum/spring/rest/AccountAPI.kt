@@ -51,6 +51,7 @@ class AccountAPI (
         userRepo.save(me)
     }
 
+    @ExperimentalStdlibApi
     @ExperimentalUnsignedTypes
     @PostMapping("/password")
     fun updatePassword(@RequestBody request: Request.ChangePassword) {

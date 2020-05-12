@@ -16,7 +16,7 @@
                 </div>
 
                 <div class="input-field" style="margin-top: 40px">
-                    <i class="material-icons prefix">person</i>
+                    <i class="material-icons prefix">people</i>
                     <select v-model:value="role">
                         <option value="null" selected>Alle</option>
                         <option value="0">Schüler</option>
@@ -26,7 +26,7 @@
                     <label>Rolle</label>
                 </div>
 
-                <a class="btn-large waves-effect waves-light green darken-4" style="margin-left: 10px">
+                <a class="btn-large waves-effect waves-light green darken-4">
                     <i class="material-icons left">search</i>
                     Suchen
                 </a>

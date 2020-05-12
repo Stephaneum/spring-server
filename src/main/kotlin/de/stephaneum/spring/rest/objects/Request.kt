@@ -9,6 +9,7 @@ object Request {
     data class ChangePasswordBatch(val password: String, val role: Int)
     data class DeleteByRole(val password: String, val role: Int)
     data class UpdateQuotasBatch(val storage: Int, val grade: Int)
+    data class ImportUsers(val data: String, val format: Int, val separator: String, val password: String?, val role: Int)
 
     data class MenuWriteRule(val user: Int, val menu: Int?)
 }

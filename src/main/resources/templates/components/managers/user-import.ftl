@@ -3,8 +3,59 @@
 
 <#macro render>
     <template id="user-import">
-        <div class="card-panel" style="margin-top: 60px;">
-            <span style="font-size: 2rem">Nutzerimport</span>
+        <div class="import-panel card-panel" style="margin-top: 60px;">
+            <div style="display: flex; align-items: center; justify-content: space-between">
+                <span style="font-size: 2rem">Nutzerimport</span>
+
+                <a @click="importUsers" class="btn-large waves-effect waves-light green darken-4">
+                    <i class="material-icons left">arrow_forward</i>
+                    Importieren
+                </a>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s2" style="padding-left: 0">
+                    <i class="material-icons prefix">people</i>
+                    <select v-model:value="role">
+                        <option value="0">Schüler</option>
+                        <option value="1">Lehrer</option>
+                        <option value="2">Gast</option>
+                    </select>
+                    <label>Rolle</label>
+                </div>
+
+                <div class="input-field col s3">
+                    <select v-model:value="separator">
+                        <option value=";">Semikolon [ ; ] (empfohlen)</option>
+                        <option value="/">Schrägstrich [ / ]</option>
+                        <option value="tab">Tab [&emsp;]</option>
+                    </select>
+                    <label>Trennzeichen</label>
+                </div>
+
+                <div class="input-field col s7">
+                    <select v-model:value="format">
+                        <option value="0">Vorname | Nachname | Anmeldename | Passwort | Klasse</option>
+                        <option value="1">Anmeldename | Anrede | Nachname | Vorname</option>
+                        <option value="2">Klasse | Nachname | Vorname</option>
+                    </select>
+                    <label>Format</label>
+                </div>
+            </div>
+
+            <div class="input-field" :style="parseInt(format) === 0 ? {'display': 'none'} : {}">
+                <i class="material-icons prefix">vpn_key</i>
+                <label for="input-import-pw">Standard-Passwort</label>
+                <input v-model:value="password" type="text" id="input-import-pw" autocomplete="off" placeholder="schule"/>
+            </div>
+
+            <div class="input-field">
+                <i class="material-icons prefix">person</i>
+                <label for="import-example">Beispiel</label>
+                <input :value="example" type="text" id="import-example" autocomplete="off" disabled/>
+            </div>
+
+            <textarea v-model:value="data" style="height: 600px; padding: 10px; border:solid 1px #c9c9c9; resize: none; font-family: Consolas, monospace" placeholder="(leer)" ></textarea>
         </div>
     </template>
 
@@ -13,16 +64,88 @@
             props: [],
             data: function () {
                 return {
+                    role: 0,
+                    format: 0,
+                    separator: ';',
+                    password: null,
+                    data: null
                 }
             },
             methods: {
+                importUsers: async function() {
+
+                    if(!this.data) {
+                        M.toast({html: 'Keine Daten'});
+                        return;
+                    }
+
+                    let separator = this.separator;
+                    if(separator === 'tab') {
+                        separator = '\t';
+                    }
+
+                    showLoading('Nutzer importieren...')
+                    try {
+                        await axios.post('/api/users/import', {
+                            data: this.data,
+                            format: this.format,
+                            separator: separator,
+                            password: this.password,
+                            role: this.role
+                        });
+                        hideLoading();
+                        M.toast({html: 'Nutzer importiert'});
+                    } catch (e) {
+                        switch (e.response.status) {
+                            case 409:
+                                M.toast({html: 'E-Mails sind vergeben.'});
+                                break;
+                            case 410:
+                                M.toast({html: 'Syntax fehlerhaft.'});
+                                break;
+                            case 412:
+                                M.toast({html: 'Format nicht für Schüler verfügbar.'});
+                                break;
+                            case 417:
+                                M.toast({html: 'Standard-Passwort fehlt.'});
+                                break;
+                            case 418:
+                                M.toast({html: 'Syntax der Klassen fehlerhaft.'});
+                                break;
+                            default:
+                                M.toast({html: 'Ein Fehler ist aufgetreten.'});
+                                break;
+                        }
+                        hideLoading();
+                    }
+                }
+            },
+            computed: {
+                example: function() {
+                    let s = this.separator;
+                    if(s === 'tab') {
+                        s = '   ';
+                    }
+                    switch(parseInt(this.format)) {
+                        case 0: return 'Max' + s + 'Mustermann' + s + 'm.mustermann' + s + 'meinPasswort' + s + '7c';
+                        case 1: return 'm.mustermann' + s + 'Herr' + s + 'Mustermann' + s + 'Max';
+                        case 2: return '7c' + s + 'Mustermann' + s + 'Max';
+                        default: return 'Error';
+                    }
+                }
             },
             mounted: function() {
                 this.$nextTick(() => {
-                    M.Modal.init(document.querySelectorAll('.modal'), {});
+                    M.updateTextFields();
                 });
             },
             template: '#user-import'
         });
     </script>
+
+    <style>
+        .import-panel .input-field {
+            margin-top: 40px;
+        }
+    </style>
 </#macro>
