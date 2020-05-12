@@ -89,7 +89,7 @@ class UserAPI (
         userRepo.save(user)
     }
 
-    @GetMapping("/change-account/{id}")
+    @PostMapping("/change-account/{id}")
     fun changeAccount(@PathVariable id: Int): Response.Token {
         Session.getUser(adminOnly = true)
 
