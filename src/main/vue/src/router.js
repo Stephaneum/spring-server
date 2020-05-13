@@ -41,6 +41,12 @@ const routes = [
         import(/* webpackChunkName: "logs" */ "./views/Logs.vue"),
   },
   {
+    path: "/menu-manager",
+    name: "menu-manager",
+    component: () =>
+        import(/* webpackChunkName: "menu-manager" */ "./views/MenuManager.vue"),
+  },
+  {
     path: "/plan-manager",
     name: "plan-manager",
     component: () =>
