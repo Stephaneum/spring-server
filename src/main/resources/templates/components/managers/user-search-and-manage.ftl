@@ -31,11 +31,11 @@
                     Suchen
                 </a>
             </div>
-            <div style="margin-top: 20px; height: 500px; border: #e0e0e0 solid 1px; overflow-y: scroll">
+            <div v-show="result.length !== 0" style="margin-top: 20px; height: 500px; border: #e0e0e0 solid 1px; overflow-y: scroll">
                 <table class="striped">
                     <thead>
                     <tr>
-                        <th>Vorname</th>
+                        <th style="padding-left: 20px">Vorname</th>
                         <th>Nachname</th>
                         <th>E-Mail</th>
                         <th>Klasse</th>
@@ -47,7 +47,7 @@
 
                     <tbody>
                     <tr v-for="u in result">
-                        <td>{{ u.firstName }}</td>
+                        <td style="padding-left: 20px">{{ u.firstName }}</td>
                         <td>{{ u.lastName }}</td>
                         <td>{{ u.email }}</td>
                         <td>{{ u.schoolClass }}</td>
@@ -58,18 +58,21 @@
                                 <i class="material-icons">edit</i>
                             </a>
                             <a @click="showChangeAccount(u)" class="btn waves-effect waves-light teal darken-3" style="margin-left: 10px">
-                                <i class="material-icons">compare_arrows</i>
+                                <i class="material-icons">swap_horiz</i>
                             </a>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
+            <div v-show="result.length === 0" class="empty-hint" style="height: 200px; display: flex; align-items: center; justify-content: center">
+                {{ hasSearched ? 'Keine Ergebnisse' : 'Noch keine Suchergebnisse' }}
+            </div>
 
             <!-- update user data -->
             <div id="modal-search-update-user" class="modal" style="width: 500px">
                 <div class="modal-content">
-                    <h4>{{ selected.firstName }} {{ selected.lastName }}</h4>
+                    <h4>{{ roleString(selected.role) }} verwalten</h4>
                     <br>
                     <div class="row">
                         <div class="input-field col s6">
@@ -90,14 +93,12 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="input-field col s12">
+                        <div class="input-field col s6">
                             <i class="material-icons prefix">vpn_key</i>
                             <label for="input-user-password">Passwort</label>
                             <input v-model:value="selected.password" type="password" id="input-user-password" autocomplete="off" placeholder="(unverändert)"/>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="input-field col s12">
+                        <div class="input-field col s6">
                             <i class="material-icons prefix">storage</i>
                             <label for="input-user-storage">Speicherplatz (in MB)</label>
                             <input v-model:value="selected.storage" type="text" id="input-user-storage" autocomplete="off"/>
@@ -137,7 +138,7 @@
                 <div class="modal-footer">
                     <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
                     <button @click="changeAccount" type="button" class="btn waves-effect waves-light green darken-3">
-                        <i class="material-icons left">compare_arrows</i>
+                        <i class="material-icons left">swap_horiz</i>
                         Wechseln
                     </button>
                 </div>
@@ -154,7 +155,8 @@
                     lastName: null,
                     role: null,
                     result: [],
-                    selected: {}
+                    selected: {},
+                    hasSearched: false
                 }
             },
             methods: {
@@ -167,6 +169,7 @@
                             r.storageReadable = storageReadable(r.storage);
                         });
                         hideLoading();
+                        this.hasSearched = true;
                         M.toast({html: this.result.length +' Nutzer'});
                     } catch (e) {
                         M.toast({html: 'Ein Fehler ist aufgetreten.'});
