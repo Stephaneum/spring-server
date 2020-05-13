@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "@/views/Home.vue";
+import Home from "./views/Home.vue";
 
 Vue.use(VueRouter);
 
@@ -14,19 +14,25 @@ const routes = [
     path: "/login",
     name: "login",
     component: () =>
-      import(/* webpackChunkName: "login" */ "@/views/Login.vue"),
+      import(/* webpackChunkName: "login" */ "./views/Login.vue"),
   },
   {
     path: "/config-manager",
     name: "config-manager",
     component: () =>
-        import(/* webpackChunkName: "config-manager" */ "@/views/ConfigManager.vue"),
+        import(/* webpackChunkName: "config-manager" */ "./views/ConfigManager.vue"),
+  },
+  {
+    path: "/code-manager",
+    name: "code-manager",
+    component: () =>
+        import(/* webpackChunkName: "code-manager" */ "./views/CodeManager.vue"),
   },
   {
     path: "/user-manager",
     name: "user-manager",
     component: () =>
-        import(/* webpackChunkName: "user-manager" */ "@/views/UserManager.vue"),
+        import(/* webpackChunkName: "user-manager" */ "./views/UserManager.vue"),
   },
 ];
 

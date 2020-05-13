@@ -110,7 +110,11 @@
                                     <a @click="navigate" :href="href"><span><i class="material-icons">build</i>Konfiguration</span></a>
                                 </router-link>
                             </li>
-                            <li v-if="admin"><a href="/admin-codes"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
+                            <li v-if="admin">
+                                <router-link to="code-manager" v-slot="{ href, navigate }">
+                                    <a @click="navigate" :href="href"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a>
+                                </router-link>
+                            </li>
                             <li v-if="admin">
                                 <router-link to="user-manager" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">people</i>Nutzer</span></a>
