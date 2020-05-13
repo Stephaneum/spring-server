@@ -1,6 +1,10 @@
 .gradle
 /build/
 
+# vue
+/src/main/vue/node_modules/
+/src/main/vue/dist/
+
 # Ignore Gradle GUI config
 gradle-app.setting
 

@@ -59,3 +59,18 @@ tasks {
 		launchScript()
 	}
 }
+
+task<Exec>("buildVue") {
+	workingDir("src/main/vue")
+	commandLine("npm", "run", "build")
+}
+
+task<Copy>("updateVue") {
+	dependsOn("buildVue")
+	from("src/main/vue/dist")
+	into("$buildDir/resources/main/static")
+}
+
+tasks.withType<ProcessResources> {
+	dependsOn("updateVue")
+}
