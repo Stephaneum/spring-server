@@ -52,7 +52,7 @@
             <div class="input-field">
                 <i class="material-icons prefix">person</i>
                 <label for="import-example">Beispiel</label>
-                <input :value="example" type="text" id="import-example" autocomplete="off" disabled/>
+                <input :value="example" type="text" id="import-example" autocomplete="off"/>
             </div>
 
             <textarea v-model:value="data" style="height: 600px; padding: 10px; border:solid 1px #c9c9c9; resize: none; font-family: Consolas, monospace" :placeholder="example + '\n' + example2 + '\n' + example3 + '\n[...]'" ></textarea>
