@@ -120,7 +120,11 @@
                                     <a @click="navigate" :href="href"><span><i class="material-icons">people</i>Nutzer</span></a>
                                 </router-link>
                             </li>
-                            <li v-if="admin"><a href="/admin-logs"><span><i class="material-icons">history</i>Logdaten</span></a></li>
+                            <li v-if="admin">
+                                <router-link to="logs" v-slot="{ href, navigate }">
+                                    <a @click="navigate" :href="href"><span><i class="material-icons">history</i>Logdaten</span></a>
+                                </router-link>
+                            </li>
                             <li class="internal-divider"></li>
 
                             <!-- cms -->

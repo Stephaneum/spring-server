@@ -3,7 +3,6 @@ package de.stephaneum.spring.rest
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.EventType
 import de.stephaneum.spring.database.LogRepo
-import de.stephaneum.spring.database.ROLE_ADMIN
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -29,18 +28,14 @@ class LogAPI (
     private var lastUpdate = 0L
 
     @GetMapping("/info")
-    fun logInfo(): Any {
-        val user = Session.get().user ?: return de.stephaneum.spring.helper.Response.Feedback(false, needLogin = true)
-        if(user.code.role != ROLE_ADMIN)
-            return de.stephaneum.spring.helper.Response.Feedback(false, message = "not allowed")
+    fun logInfo(): LogResponse.LogInfo {
+        Session.getUser(adminOnly = true)
         return LogResponse.LogInfo(logRepo.count())
     }
 
     @GetMapping("/{amount}")
-    fun logs(@PathVariable amount: Int): Any {
-        val user = Session.get().user ?: return de.stephaneum.spring.helper.Response.Feedback(false, needLogin = true)
-        if(user.code.role != ROLE_ADMIN)
-            return de.stephaneum.spring.helper.Response.Feedback(false, message = "not allowed")
+    fun logs(@PathVariable amount: Int): List<LogResponse.Log> {
+        Session.getUser(adminOnly = true)
 
         if(System.currentTimeMillis() - lastUpdate >= updateInterval) {
             logs = logRepo.findByOrderByTimestampDesc().map { log ->
