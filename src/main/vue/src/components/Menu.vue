@@ -148,7 +148,11 @@
 
                             <!-- internal -->
                             <li><a href="/groups"><span><i class="material-icons">people</i>Gruppen</span></a></li>
-                            <li><a href="/cloud"><span><i class="material-icons">folder</i>Dateien</span></a></li>
+                            <li>
+                                <router-link to="cloud" v-slot="{ href, navigate }">
+                                    <a @click="navigate" :href="href"><span><i class="material-icons">folder</i>Dateien</span></a>
+                                </router-link>
+                            </li>
                             <li>
                                 <router-link to="account" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">account_circle</i>Account</span></a>

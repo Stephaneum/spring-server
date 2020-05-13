@@ -1,3 +1,5 @@
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+
 module.exports = {
     assetsDir: 'static',
     devServer: {
@@ -7,5 +9,10 @@ module.exports = {
             changeOrigin: true
           }
         }
+    },
+    configureWebpack: {
+        plugins: [
+            new MomentLocalesPlugin({ localesToKeep: ['de'] })
+        ]
     }
 }

@@ -59,6 +59,12 @@ const routes = [
         import(/* webpackChunkName: "static-manager" */ "./views/StaticManager.vue"),
   },
   {
+    path: "/cloud",
+    name: "cloud",
+    component: () =>
+        import(/* webpackChunkName: "cloud" */ "./views/Cloud.vue"),
+  },
+  {
     path: "/account",
     name: "account",
     component: () =>
