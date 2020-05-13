@@ -2,15 +2,10 @@ package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
-import de.stephaneum.spring.helper.JsfService
-import de.stephaneum.spring.helper.JsfEvent
-import de.stephaneum.spring.helper.FileService
-import de.stephaneum.spring.helper.LogService
-import de.stephaneum.spring.helper.PlanService
-import de.stephaneum.spring.helper.Response
+import de.stephaneum.spring.helper.*
+import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
@@ -19,95 +14,74 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+data class LastModified(val lastModified: String)
+
 @RestController
 @RequestMapping("/api/plan")
-class PlanAPI {
+class PlanAPI (
+        private val jsfService: JsfService,
+        private val planService: PlanService,
+        private val configScheduler: ConfigScheduler,
+        private val fileService: FileService,
+        private val logService: LogService
+) {
 
     private val lastModifiedFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm (EEEE)", Locale.GERMANY).withZone(ZoneId.systemDefault())
     private val finalFileName = "vertretungsplan.pdf"
 
-    @Autowired
-    private lateinit var jsfService: JsfService
-
-    @Autowired
-    private lateinit var planService: PlanService
-
-    @Autowired
-    private lateinit var configScheduler: ConfigScheduler
-
-    @Autowired
-    private lateinit var fileService: FileService
-
-    @Autowired
-    private lateinit var logService: LogService
-
     @GetMapping("/last-modified")
-    fun lastModified(): Response.Feedback {
-        val path = configScheduler.get(Element.planLocation)
-        if(path != null) {
-            val file = File(path)
-            if(file.exists()) {
-                return Response.Feedback(true, message = lastModifiedFormat.format(Instant.ofEpochMilli(file.lastModified())))
-            }
-        }
-        return Response.Feedback(false)
+    fun lastModified(): LastModified {
+        val path = configScheduler.get(Element.planLocation) ?: throw ErrorCode(409, "no plan")
+        val file = File(path)
+        if(!file.exists())
+            throw ErrorCode(500, "file does not exists")
+
+        return LastModified(lastModifiedFormat.format(Instant.ofEpochMilli(file.lastModified())))
     }
 
     @PostMapping("/text")
-    fun updateText(@RequestParam(required = false) text: String?): Response.Feedback {
-
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        if(user.code.role != ROLE_ADMIN && user.managePlans != true)
-            return Response.Feedback(false, message = "not allowed")
+    fun updateText(@RequestParam(required = false) text: String?) {
+        val me = Session.getUser()
+        if(me.code.role != ROLE_ADMIN && me.managePlans != true)
+            throw ErrorCode(403, "not allowed")
 
         configScheduler.save(Element.planInfo, text)
         jsfService.send(JsfEvent.SYNC_PLAN)
-
-        return Response.Feedback(true)
     }
 
     @PostMapping("/upload")
     fun uploadFile(@RequestParam("file") file: MultipartFile): Response.Feedback {
+        val me = Session.getUser()
+        if(me.code.role != ROLE_ADMIN && me.managePlans != true)
+            throw ErrorCode(403, "not allowed")
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        if(user.code.role != ROLE_ADMIN && user.managePlans != true)
-            return Response.Feedback(false, message = "not allowed")
-
-        val fileName = file.originalFilename ?: return Response.Feedback(false, message = "Dateiname unbekannt")
+        val fileName = file.originalFilename ?: throw ErrorCode(400, "unknown filename")
 
         if(!fileName.toLowerCase().endsWith(".pdf"))
-            return Response.Feedback(false, message = "Nur PDF-Dateien erlaubt")
+            throw ErrorCode(409, "only pdf allowed")
 
-        val path = fileService.storeFile(file.bytes, "${configScheduler.get(Element.fileLocation)}/$finalFileName")
-        if(path != null) {
-            val info = planService.resolveDate(File(path))
-            if(info != null)
-                configScheduler.save(Element.planInfo, info)
-            configScheduler.save(Element.planLocation, path)
-            jsfService.send(JsfEvent.SYNC_PLAN)
-            logService.log(EventType.UPLOAD, "Vertretungsplan", user)
-            return Response.Feedback(true, message = if(info != null) "Änderungen gespeichert.<br>Datum wurde erkannt und aktualisiert." else "Änderungen gespeichert.")
-        } else {
-            return Response.Feedback(false, message = "Ein Fehler ist aufgetreten")
-        }
+        val path = fileService.storeFile(file.bytes, "${configScheduler.get(Element.fileLocation)}/$finalFileName") ?: throw ErrorCode(500, "file could not be saved")
+        val info = planService.resolveDate(File(path))
+        if(info != null)
+            configScheduler.save(Element.planInfo, info)
+        configScheduler.save(Element.planLocation, path)
+        jsfService.send(JsfEvent.SYNC_PLAN)
+        logService.log(EventType.UPLOAD, "Vertretungsplan", me)
+        return Response.Feedback(true, message = if(info != null) "Änderungen gespeichert.<br>Datum wurde erkannt und aktualisiert." else "Änderungen gespeichert.")
     }
 
     @PostMapping("/delete")
-    fun delete(): Response.Feedback {
+    fun delete() {
+        val me = Session.getUser()
+        if(me.code.role != ROLE_ADMIN && me.managePlans != true)
+            throw ErrorCode(403, "not allowed")
 
-        val user = Session.get().user ?: return Response.Feedback(false, needLogin = true)
-        if(user.code.role != ROLE_ADMIN && user.managePlans != true)
-            return Response.Feedback(false, message = "not allowed")
+        val path = configScheduler.get(Element.planLocation) ?: throw ErrorCode(404, "no plan")
+        val success = fileService.deleteFile(path)
+        if(!success)
+            throw ErrorCode(500, "file could not be deleted")
 
-        val path = configScheduler.get(Element.planLocation)
-        if(path != null) {
-            val success = fileService.deleteFile(path)
-            if(success) {
-                configScheduler.save(Element.planLocation, null)
-                jsfService.send(JsfEvent.SYNC_PLAN)
-                return Response.Feedback(true)
-            }
-        }
-        return Response.Feedback(false)
+        configScheduler.save(Element.planLocation, null)
+        jsfService.send(JsfEvent.SYNC_PLAN)
     }
 }

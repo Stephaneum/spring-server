@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="display: inline-block">
         <slot :upload="showUpload"></slot>
         <form method="POST" enctype="multipart/form-data">
             <input name="file" type="file" id="input-upload" @change="upload" style="display: none">
