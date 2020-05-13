@@ -66,8 +66,8 @@ task<Exec>("buildVue") {
 }
 
 task<Copy>("updateVue") {
-	dependsOn("buildVue")
-	from("src/main/vue/dist")
+	//dependsOn("buildVue")
+	from("src/main/vue/dist/static", "src/main/vue/dist/index.html")
 	into("$buildDir/resources/main/static")
 }
 

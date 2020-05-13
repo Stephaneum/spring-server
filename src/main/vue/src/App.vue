@@ -1,32 +1,94 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <Menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></Menu>
+    <div style="min-height: calc(100vh - 200px)">
+      <router-view/>
     </div>
-    <router-view/>
+    <Footer :copyright="info.copyright"></Footer>
   </div>
 </template>
 
+<script>
+// @ is an alias to /src
+import Axios from "axios"
+import M from "materialize-css"
+import Menu from '@/components/Menu.vue'
+import Footer from '@/components/Footer.vue'
+
+export default {
+  name: 'Home',
+  components: {
+    Menu,
+    Footer
+  },
+  data: () => ({
+      info: { user: null, hasMenuWriteAccess: false, menu: null, plan: null, copyright: null, unapproved: null }
+  }),
+  mounted: async function() {
+    try {
+      const res = await Axios.get('/api/info');
+      this.info = res.data;
+    } catch(e) {
+      M.toast({html: 'Ein Fehler ist aufgetreten.'});
+    }
+  }
+}
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+  body {
+    background-color: #f0f0f0;
+    overflow-y: scroll;
+  }
 
-#nav {
-  padding: 30px;
-}
+  .modal {
+    max-width: 600px;
+  }
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+  #main-row {
+    max-width: 1600px;
+  }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
+  .margin-1 {
+    margin-left: 10px;
+  }
+
+  .text-hover {
+    cursor: pointer;
+    padding: 0 10px 0 10px;
+  }
+
+  .text-hover:hover {
+    background-color: #00C853;
+    border-radius: 20px;
+  }
+
+  .green-badge {
+    background-color: #4caf50;
+    border-radius: 10px;
+    padding: 0 10px 0 10px;
+    font-size: 0.8em;
+    display: inline-block;
+    color: white;
+  }
+
+  .green-badge-light {
+    background-color: #dcedc8;
+    border-radius: 10px;
+    padding: 0 10px 0 10px;
+    font-size: 0.8em;
+    display: inline-block;
+    color: black;
+  }
+
+  .empty-hint {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 2em;
+    color: #e0e0e0;
+    font-weight: bold;
+  }
 </style>
