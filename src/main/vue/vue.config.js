@@ -1,18 +1,20 @@
-const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+const MomentLocalesPlugin = require("moment-locales-webpack-plugin");
 
 module.exports = {
-    assetsDir: 'static',
-    devServer: {
-        proxy: {
-          "/api": {
-            target: 'http://localhost:9050',
-            changeOrigin: true
-          }
-        }
+  assetsDir: "static",
+  devServer: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:9050",
+        changeOrigin: true,
+      },
+      "/files": {
+        target: "http://localhost:9050",
+        changeOrigin: true,
+      },
     },
-    configureWebpack: {
-        plugins: [
-            new MomentLocalesPlugin({ localesToKeep: ['de'] })
-        ]
-    }
-}
+  },
+  configureWebpack: {
+    plugins: [new MomentLocalesPlugin({ localesToKeep: ["de"] })],
+  },
+};
