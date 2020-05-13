@@ -17,6 +17,12 @@ const routes = [
       import(/* webpackChunkName: "login" */ "@/views/Login.vue"),
   },
   {
+    path: "/config-manager",
+    name: "config-manager",
+    component: () =>
+        import(/* webpackChunkName: "config-manager" */ "@/views/ConfigManager.vue"),
+  },
+  {
     path: "/user-manager",
     name: "user-manager",
     component: () =>

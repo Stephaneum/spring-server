@@ -20,7 +20,6 @@
 </template>
 
 <script>
-  // @ is an alias to /src
   import M from "materialize-css"
   import UserBatchActions from '@/components/managers/UserBatchActions.vue'
   import UserSearchAndManage from '@/components/managers/UserSearchAndManage.vue'
@@ -44,10 +43,3 @@
     }
   }
 </script>
-
-<style scoped>
-  .info {
-    margin-top: 20px;
-    font-style: italic;
-  }
-</style>
