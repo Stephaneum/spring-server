@@ -2,7 +2,7 @@
   <div id="app">
     <Menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></Menu>
     <div style="min-height: calc(100vh - 150px)">
-      <router-view :info="info"/>
+      <router-view :info="info" @update="fetchData"/>
     </div>
     <Footer :copyright="info.copyright"></Footer>
   </div>
@@ -24,13 +24,18 @@ export default {
   data: () => ({
       info: { user: null, hasMenuWriteAccess: false, menu: null, plan: null, copyright: null, unapproved: null }
   }),
+  methods: {
+    fetchData: async function () {
+      try {
+        const res = await Axios.get('/api/info');
+        this.info = res.data;
+      } catch(e) {
+        M.toast({html: 'Ein Fehler ist aufgetreten.'});
+      }
+    },
+  },
   mounted: async function() {
-    try {
-      const res = await Axios.get('/api/info');
-      this.info = res.data;
-    } catch(e) {
-      M.toast({html: 'Ein Fehler ist aufgetreten.'});
-    }
+    await this.fetchData();
   }
 }
 </script>
