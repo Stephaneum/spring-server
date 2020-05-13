@@ -47,6 +47,12 @@ const routes = [
         import(/* webpackChunkName: "plan-manager" */ "./views/PlanManager.vue"),
   },
   {
+    path: "/static-manager",
+    name: "static-manager",
+    component: () =>
+        import(/* webpackChunkName: "static-manager" */ "./views/StaticManager.vue"),
+  },
+  {
     path: "/account",
     name: "account",
     component: () =>

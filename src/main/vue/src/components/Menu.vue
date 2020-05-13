@@ -134,7 +134,11 @@
                                     <a @click="navigate" :href="href"><span><i class="material-icons">description</i>Vertretungsplan</span></a>
                                 </router-link>
                             </li>
-                            <li v-if="admin"><a href="/admin-static"><span><i class="material-icons">note_add</i>Seiten</span></a></li>
+                            <li v-if="admin">
+                                <router-link to="static-manager" v-slot="{ href, navigate }">
+                                    <a @click="navigate" :href="href"><span><i class="material-icons">note_add</i>Seiten</span></a>
+                                </router-link>
+                            </li>
                             <li><a href="/post-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
                             <li class="internal-divider"></li>
 
