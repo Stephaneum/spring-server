@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam
 import javax.servlet.http.HttpServletRequest
 
 @Controller
-class PublicController (
+class VueController (
         private val jwtService: JwtService
 ) {
 
-    @GetMapping("/", "/login")
+    @GetMapping("/", "/login", "/user-manager")
     fun html(@RequestParam(required = false) key: String?, request: HttpServletRequest): String {
         if(checkIE(request))
             return "forward:/static/no-support-ie.html"

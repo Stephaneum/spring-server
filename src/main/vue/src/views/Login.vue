@@ -69,8 +69,8 @@
 </script>
 
 <style scoped>
-.info {
-  margin-top: 20px;
-  font-style: italic;
-}
+  .info {
+    margin-top: 20px;
+    font-style: italic;
+  }
 </style>
