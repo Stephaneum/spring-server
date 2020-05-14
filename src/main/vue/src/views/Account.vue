@@ -1,10 +1,7 @@
 <template>
-  <div v-if="allowed" style="margin: 50px auto 0 auto; max-width: 1200px; min-height: calc(100vh - 350px)">
+  <div v-if="allowed" class="internal-container">
 
-    <div style="text-align: center; margin: 60px 0 60px 0">
-      <i class="material-icons" style="font-size: 4em">account_circle</i>
-      <h4 style="margin: 0">Account</h4>
-    </div>
+    <InternalHeader title="Account" icon="account_circle"></InternalHeader>
 
     <div class="row">
       <div class="col s4" style="padding: 20px">
@@ -88,9 +85,11 @@
   import Axios from "axios"
   import M from "materialize-css"
   import { storageReadable, showLoadingInvisible, hideLoading } from '@/helper/utils.js';
+  import InternalHeader from "../components/InternalHeader";
 
   export default {
     name: 'Account',
+    components: {InternalHeader},
     props: ['info'],
     data: () => ({
       additionalInfo: { schoolClass: null, used: 1, total: 1, storage: null },

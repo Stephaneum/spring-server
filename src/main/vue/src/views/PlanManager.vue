@@ -1,71 +1,65 @@
 <template>
-  <div v-if="allowed" style="min-height: inherit; display: flex; align-items: center; justify-content: center">
-    <div style="width: 900px;">
-      <div style="text-align: center; margin-bottom: 40px">
-        <i class="material-icons" style="font-size: 4em">description</i>
-        <h4 style="margin: 5px 0 0 0">Vertretungsplan</h4>
-      </div>
+  <div v-if="allowed" class="internal-container" style="max-width: 900px">
 
-      <div class="card-panel" style="display: flex; padding: 30px 0 30px 30px">
-        <div style="flex: 50%">
-          <div class="round-area">
-            <i class="material-icons">description</i>
-            <div>
-              <h5 style="margin-bottom: 10px">PDF-Datei</h5>
-              <file-upload url="/api/plan/upload" @upload="uploaded" @error="uploadError" v-slot:default="slot">
-                <a @click="slot.upload" class="waves-effect waves-light tooltipped green darken-3 btn"
-                   data-tooltip="Hochladen" data-position="bottom">
-                  <i class="material-icons">cloud_upload</i>
-                </a>
-              </file-upload>
-              <a class="waves-effect waves-light tooltipped red darken-3 btn" style="margin-left: 10px"
-                 @click="showDelete" :disabled="!info.plan.exists" data-tooltip="Löschen" data-position="bottom">
-                <i class="material-icons">delete</i>
+    <InternalHeader title="Vertretungsplan" icon="description"></InternalHeader>
+
+    <div class="card-panel" style="display: flex; padding: 30px 0 30px 30px">
+      <div style="flex: 50%">
+        <div class="round-area">
+          <i class="material-icons">description</i>
+          <div>
+            <h5 style="margin-bottom: 10px">PDF-Datei</h5>
+            <file-upload url="/api/plan/upload" @upload="uploaded" @error="uploadError" v-slot:default="slot">
+              <a @click="slot.upload" class="waves-effect waves-light tooltipped green darken-3 btn"
+                 data-tooltip="Hochladen" data-position="bottom">
+                <i class="material-icons">cloud_upload</i>
               </a>
-              <br>
-              <span v-if="lastModified" class="info-text">Stand: {{ lastModified }}</span>
-              <span v-else class="info-text">(keine Datei bereitgestellt)</span>
-            </div>
+            </file-upload>
+            <a class="waves-effect waves-light tooltipped red darken-3 btn" style="margin-left: 10px"
+               @click="showDelete" :disabled="!info.plan.exists" data-tooltip="Löschen" data-position="bottom">
+              <i class="material-icons">delete</i>
+            </a>
+            <br>
+            <span v-if="lastModified" class="info-text">Stand: {{ lastModified }}</span>
+            <span v-else class="info-text">(keine Datei bereitgestellt)</span>
           </div>
-          <div class="round-area" style="margin-top: 30px">
-            <i class="material-icons">info</i>
-            <div>
-              <h5>Zusatzinformation</h5>
-              <div style="display: flex; align-items: center;">
-                <div class="input-field" style="width: 200px; margin-bottom: 0">
-                  <input v-model="planInfo" type="text" id="plan-info" />
-                </div>
-                <a v-show="planInfo !== info.plan.info" style="margin-left: 20px" class="waves-effect waves-light tooltipped green darken-3 btn"
-                   @click="updateText" data-tooltip="Speichern" data-position="bottom">
-                  <i class="material-icons">save</i>
-                </a>
+        </div>
+        <div class="round-area" style="margin-top: 30px">
+          <i class="material-icons">info</i>
+          <div>
+            <h5>Zusatzinformation</h5>
+            <div style="display: flex; align-items: center;">
+              <div class="input-field" style="width: 200px; margin-bottom: 0">
+                <input v-model="planInfo" type="text" id="plan-info" />
               </div>
+              <a v-show="planInfo !== info.plan.info" style="margin-left: 20px" class="waves-effect waves-light tooltipped green darken-3 btn"
+                 @click="updateText" data-tooltip="Speichern" data-position="bottom">
+                <i class="material-icons">save</i>
+              </a>
             </div>
           </div>
         </div>
-        <div style="flex: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column">
-          <h5 style="text-align: center; margin-bottom: 30px">Vorschau</h5>
-          <div v-if="info.plan.exists" style="width: 330px">
-            <a href="vertretungsplan.pdf" target="_blank">
-              <div class="quick-button card">
-                <div class="card-content white-text">
-                  <div class="row" style="margin-bottom:0">
-                    <div class="col s12 m12 l8">
-                      <span class="card-title">Vertretungsplan</span>
-                      <p>{{ planInfo }}</p>
-                    </div>
-                    <div class="col l4 right-align hide-on-med-and-down">
-                      <i id="quick-icon" class="material-icons" style="font-size:50pt">description</i>
-                    </div>
+      </div>
+      <div style="flex: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column">
+        <h5 style="text-align: center; margin-bottom: 30px">Vorschau</h5>
+        <div v-if="info.plan.exists" style="width: 330px">
+          <a href="vertretungsplan.pdf" target="_blank">
+            <div class="quick-button card">
+              <div class="card-content white-text">
+                <div class="row" style="margin-bottom:0">
+                  <div class="col s12 m12 l8">
+                    <span class="card-title">Vertretungsplan</span>
+                    <p>{{ planInfo }}</p>
+                  </div>
+                  <div class="col l4 right-align hide-on-med-and-down">
+                    <i id="quick-icon" class="material-icons" style="font-size:50pt">description</i>
                   </div>
                 </div>
               </div>
-            </a>
-          </div>
-          <span class="green-badge-light" style="font-size: 1em; margin-top: 20px" v-else>ausgeblendet</span>
+            </div>
+          </a>
         </div>
-
-
+        <span class="green-badge-light" style="font-size: 1em; margin-top: 20px" v-else>ausgeblendet</span>
       </div>
     </div>
 
@@ -91,10 +85,12 @@
   import M from "materialize-css"
   import FileUpload from '@/components/FileUpload.vue'
   import { showLoadingInvisible, hideLoading } from '@/helper/utils.js';
+  import InternalHeader from "../components/InternalHeader";
 
   export default {
     name: 'PlanManager',
     components: {
+      InternalHeader,
       FileUpload
     },
     props: ['info'],

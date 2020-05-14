@@ -1,11 +1,7 @@
 <template>
-  <div v-if="allowed" id="main-row" style="margin: 50px auto 0 auto;">
+  <div v-if="allowed" class="internal-container" style="max-width: 1600px">
 
-    <div class="row">
-      <div class="col s10 offset-s2">
-        <h4 style="margin: 20px 0 20px 0">Deine persönliche Cloud</h4>
-      </div>
-    </div>
+    <InternalHeader title="Deine persönliche Cloud" icon="cloud" left="true"></InternalHeader>
 
     <cloud-view :my-id="info.user.id" :shared-mode="false" :modify-all="true" root-url="/api/cloud/view/user" upload-url="/api/cloud/upload/user" folder-url="/api/cloud/create-folder/user" :teacherchat="hasTeacherChat"></cloud-view>
   </div>
@@ -14,11 +10,12 @@
 <script>
   import M from "materialize-css"
   import CloudView from '@/components/cloud/CloudView.vue'
+  import InternalHeader from "../components/InternalHeader";
 
   export default {
     name: 'Account',
     props: ['info'],
-    components: { CloudView },
+    components: {InternalHeader, CloudView },
     computed: {
       allowed: function() {
         return this.info.user && this.info.user.code.role >= 0;

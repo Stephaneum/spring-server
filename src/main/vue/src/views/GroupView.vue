@@ -1,11 +1,7 @@
 <template>
-  <div v-if="group" style="margin: 50px auto 0 auto; max-width: 1600px; min-height: calc(100vh - 350px)">
+  <div v-if="group" class="internal-container" style="max-width: 1600px">
 
-    <div class="row">
-      <div class="col s10 offset-s2">
-        <h4 style="margin: 20px 0 20px 0">{{ group.name }}</h4>
-      </div>
-    </div>
+    <InternalHeader :title="group.name" icon="people"></InternalHeader>
 
     <div class="row">
 
@@ -227,6 +223,7 @@
   import TabBar from "../components/TabBar";
   import UserAddList from "../components/UserAddList";
   import UserSearch from "../components/UserSearch";
+  import InternalHeader from "../components/InternalHeader";
 
   const parentGroup = { id: -1, icon: 'chat', special: true, name: 'Chat' };
   const addSubGroup = { id: -2, icon: 'add', name: 'Chatraum' };
@@ -234,7 +231,7 @@
 
   export default {
     name: 'GroupView',
-    components: {UserSearch, UserAddList, TabBar, MemberList, ChatView, GroupBoard, CloudView },
+    components: {InternalHeader, UserSearch, UserAddList, TabBar, MemberList, ChatView, GroupBoard, CloudView },
     props: ['info'],
     data: () => ({
       group: null, // main group

@@ -1,8 +1,8 @@
 <template>
-  <div v-if="currMode" id="main-row" class="row" style="min-height: 100vh; margin-top: 50px">
-    <div class="col s10 offset-s2">
-      <h4 id="post-manager-title" style="margin: 20px 0 40px 0">{{ currMode.description }}</h4>
-    </div>
+  <div v-if="currMode" class="internal-container row" style="max-width: 1600px">
+
+    <InternalHeader :title="currMode.description" :icon="currMode.icon" left="true"></InternalHeader>
+
     <!-- TABS -->
     <div class="col s10 offset-s2">
       <tab-bar :tabs="currTabs" :curr-tab="currTab" @selected="setTab"></tab-bar>
@@ -283,11 +283,12 @@
   import PostPreview from '@/components/cms/PostPreview.vue'
   import { TEXT_EDITOR_CONFIG, storageReadable, uploadMultipleFiles, showLoading, showLoadingInvisible, hideLoading } from '@/helper/utils.js';
   import { modes, tabs, postLayouts, previewLayouts, specialData, specialFragments, specialSites,  } from '@/helper/postManagerConstants.js';
+  import InternalHeader from "../components/InternalHeader";
 
   export default {
     name: 'PostManager',
     props: ['info'],
-    components: { Trumbowyg, Menu, TabBar, Post, PostList, PostPreview },
+    components: {InternalHeader, Trumbowyg, Menu, TabBar, Post, PostList, PostPreview },
     data: () => ({
       initialized: false,
       currentDate: moment().format('DD.MM.YYYY'),

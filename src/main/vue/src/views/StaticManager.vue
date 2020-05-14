@@ -1,9 +1,7 @@
 <template>
-  <div v-if="allowed" style="margin: auto; min-height: calc(100vh - 200px); max-width: 1200px">
-    <div style="text-align: center; margin: 60px 0 40px 0">
-      <i class="material-icons" style="font-size: 4em">note_add</i>
-      <h4 style="margin: 0">Benutzerdefinierte Seiten</h4>
-    </div>
+  <div v-if="allowed" class="internal-container">
+
+    <InternalHeader title="Benutzerdefinierte Seiten" icon="note_add"></InternalHeader>
 
     <div class="card-panel">
       <div style="display: flex; align-items: center; justify-content: space-evenly; margin-top: 10px; margin-bottom: 40px">
@@ -70,10 +68,12 @@
   import Axios from "axios"
   import M from "materialize-css"
   import FileUpload from '@/components/FileUpload.vue'
+  import InternalHeader from "../components/InternalHeader";
 
   export default {
     name: 'PlanManager',
     components: {
+      InternalHeader,
       FileUpload
     },
     props: ['info'],

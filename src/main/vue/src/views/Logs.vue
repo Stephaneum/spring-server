@@ -1,9 +1,7 @@
 <template>
-  <div v-if="allowed" style="margin: auto; min-height: calc(100vh - 200px); max-width: 1200px">
-    <div style="text-align: center; margin: 60px 0 40px 0">
-      <i class="material-icons" style="font-size: 4em">history</i>
-      <h4 style="margin: 0">Logdaten</h4>
-    </div>
+  <div v-if="allowed" class="internal-container">
+
+    <InternalHeader title="Logdaten" icon="history"></InternalHeader>
 
     <div class="card-panel">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px">
@@ -50,11 +48,13 @@
 <script>
   import Axios from "axios"
   import M from "materialize-css"
+  import InternalHeader from "../components/InternalHeader";
 
   const amounts = [ 200, 1000, 5000 ];
 
   export default {
     name: 'Logs',
+    components: {InternalHeader},
     props: ['info'],
     data: () => ({
       amounts: amounts,

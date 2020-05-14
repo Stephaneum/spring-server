@@ -1,9 +1,7 @@
 <template>
-  <div v-if="allowed" style="margin: auto; min-height: calc(100vh - 200px); max-width: 1200px">
-    <div style="text-align: center; margin: 60px 0 40px 0">
-      <i class="material-icons" style="font-size: 4em">vpn_key</i>
-      <h4 style="margin: 0">Zugangscodes</h4>
-    </div>
+  <div v-if="allowed" class="internal-container">
+
+    <InternalHeader title="Zugangscodes" icon="vpn_key"></InternalHeader>
 
     <div style="display: flex; justify-content: space-between">
       <div v-for="r in roles" :key="r.id" class="card-panel code-panel">
@@ -46,6 +44,7 @@
   import Axios from "axios"
   import M from "materialize-css"
   import { showLoadingInvisible, hideLoading } from '@/helper/utils.js';
+  import InternalHeader from "../components/InternalHeader";
 
   const roles = {
     student: {
@@ -67,6 +66,7 @@
 
   export default {
     name: 'CodeManager',
+    components: {InternalHeader},
     props: ['info'],
     data: () => ({
       roles: roles,

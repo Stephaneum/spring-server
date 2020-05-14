@@ -4,6 +4,7 @@
     <div style="min-height: calc(100vh - 150px)">
       <router-view :info="info" @update="fetchData"/>
     </div>
+    <div style="height: 50px"></div>
     <Footer :copyright="info.copyright"></Footer>
   </div>
 </template>
@@ -48,6 +49,12 @@ export default {
 
   .modal {
     max-width: 600px;
+  }
+
+  .internal-container {
+    margin: auto;
+    min-height: inherit;
+    max-width: 1200px;
   }
 
   #main-row {

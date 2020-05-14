@@ -1,10 +1,7 @@
 <template>
-  <div v-show="allowed" style="margin: 50px auto 0 auto; max-width: 1200px; min-height: calc(100vh - 350px)">
+  <div v-show="allowed" class="internal-container">
 
-    <div style="text-align: center; margin: 60px 0 40px 0">
-      <i class="material-icons" style="font-size: 4em">people</i>
-      <h4 style="margin: 0">Gruppen</h4>
-    </div>
+    <InternalHeader title="Gruppen" icon="people"></InternalHeader>
 
     <div class="card-panel">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px">
@@ -132,9 +129,11 @@
   import Axios from "axios"
   import M from "materialize-css"
   import { showLoading, showLoadingInvisible, hideLoading } from '@/helper/utils.js';
+  import InternalHeader from "../components/InternalHeader";
 
   export default {
     name: 'GroupList',
+    components: {InternalHeader},
     props: ['info'],
     data: () => ({
       groups: [],

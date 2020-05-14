@@ -1,11 +1,8 @@
 <template>
   <div>
-    <div v-if="allowed" style="margin: 50px auto 0 auto; max-width: 1200px;">
+    <div v-if="allowed" class="internal-container">
 
-      <div style="text-align: center; margin: 60px 0 60px 0">
-        <i class="material-icons" style="font-size: 4em">people</i>
-        <h4 style="margin: 0">Nutzerverwaltung</h4>
-      </div>
+      <InternalHeader title="Nutzerverwaltung" icon="people"></InternalHeader>
 
       <UserBatchActions></UserBatchActions>
 
@@ -14,8 +11,6 @@
       <UserImport></UserImport>
 
     </div>
-
-    <div style="height: 100px"></div>
   </div>
 </template>
 
@@ -24,11 +19,13 @@
   import UserBatchActions from '@/components/managers/UserBatchActions.vue'
   import UserSearchAndManage from '@/components/managers/UserSearchAndManage.vue'
   import UserImport from '@/components/managers/UserImport.vue'
+  import InternalHeader from "../components/InternalHeader";
 
   export default {
     name: 'UserManager',
     props: ['info'],
     components: {
+      InternalHeader,
       UserBatchActions,
       UserSearchAndManage,
       UserImport

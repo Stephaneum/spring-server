@@ -1,10 +1,7 @@
 <template>
-  <div v-show="allowed" style="margin: 50px auto 0 auto; max-width: 1200px; min-height: calc(100vh - 350px)">
+  <div v-show="allowed" class="internal-container">
 
-    <div style="text-align: center; margin: 60px 0 60px 0">
-      <i class="material-icons" style="font-size: 4em">device_hub</i>
-      <h4 style="margin: 0">Menü konfigurieren</h4>
-    </div>
+    <InternalHeader title="Menü konfigurieren" icon="device_hub"></InternalHeader>
 
     <Menu :menu="menu" unreal="true" edit-mode="true" :edit-root-level="menuAdmin" @select="selectMenu" @group="showCreateGroup" @link="showCreateLink"></Menu>
 
@@ -234,11 +231,13 @@
   import UserAddList from '@/components/UserAddList.vue'
   import UserSearch from '@/components/UserSearch.vue'
   import { showLoadingInvisible, hideLoading } from '@/helper/utils.js';
+  import InternalHeader from "../components/InternalHeader";
 
   export default {
-    name: 'Account',
+    name: 'MenuManager',
     props: ['info'],
     components: {
+      InternalHeader,
       Menu,
       UserAddList,
       UserSearch
