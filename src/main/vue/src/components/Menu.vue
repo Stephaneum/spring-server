@@ -106,22 +106,22 @@
                         <ul id="internal-menu" class="z-depth-1" style="z-index: 200">
                             <!-- admin -->
                             <li v-if="admin">
-                                <router-link to="config-manager" v-slot="{ href, navigate }">
+                                <router-link to="/config-manager" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">build</i>Konfiguration</span></a>
                                 </router-link>
                             </li>
                             <li v-if="admin">
-                                <router-link to="code-manager" v-slot="{ href, navigate }">
+                                <router-link to="/code-manager" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a>
                                 </router-link>
                             </li>
                             <li v-if="admin">
-                                <router-link to="user-manager" v-slot="{ href, navigate }">
+                                <router-link to="/user-manager" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">people</i>Nutzer</span></a>
                                 </router-link>
                             </li>
                             <li v-if="admin">
-                                <router-link to="logs" v-slot="{ href, navigate }">
+                                <router-link to="/logs" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">history</i>Logdaten</span></a>
                                 </router-link>
                             </li>
@@ -129,22 +129,22 @@
 
                             <!-- cms -->
                             <li v-if="hasMenuWriteAccess">
-                                <router-link to="menu-manager" v-slot="{ href, navigate }">
+                                <router-link to="/menu-manager" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">device_hub</i>Menü</span></a>
                                 </router-link>
                             </li>
                             <li v-if="admin || managePlans">
-                                <router-link to="plan-manager" v-slot="{ href, navigate }">
+                                <router-link to="/plan-manager" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">description</i>Vertretungsplan</span></a>
                                 </router-link>
                             </li>
                             <li v-if="admin">
-                                <router-link to="static-manager" v-slot="{ href, navigate }">
+                                <router-link to="/static-manager" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">note_add</i>Seiten</span></a>
                                 </router-link>
                             </li>
                             <li>
-                                <router-link to="post-manager" v-slot="{ href, navigate }">
+                                <router-link to="/post-manager" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a>
                                 </router-link>
                             </li>
@@ -152,17 +152,17 @@
 
                             <!-- internal -->
                             <li>
-                                <router-link to="groups" v-slot="{ href, navigate }">
+                                <router-link to="/groups" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">people</i>Gruppen</span></a>
                                 </router-link>
                             </li>
                             <li>
-                                <router-link to="cloud" v-slot="{ href, navigate }">
+                                <router-link to="/cloud" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">folder</i>Dateien</span></a>
                                 </router-link>
                             </li>
                             <li>
-                                <router-link to="account" v-slot="{ href, navigate }">
+                                <router-link to="/account" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">account_circle</i>Account</span></a>
                                 </router-link>
                             </li>

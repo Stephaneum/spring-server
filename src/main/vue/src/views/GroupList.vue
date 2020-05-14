@@ -17,11 +17,13 @@
 
       <div style="display: flex; flex-wrap: wrap; align-items: stretch; justify-content: space-evenly; margin-bottom: 30px">
         <template v-for="g in groups">
-          <a v-if="g.accepted" :key="'g'+g.id" :href="'/groups/' + g.id" class="group-rect card white-text">
-            <i class="material-icons" style="font-size: 50px">people</i>
-            <span style="font-weight: bold; font-size: 20px; text-align: center; line-height: 20px; margin-bottom: 5px">{{ g.name }}</span>
-            <span>{{ g.leader.firstName }} {{ g.leader.lastName }}</span>
-          </a>
+          <router-link v-if="g.accepted" :to="'/groups/'+g.id" :key="'g'+g.id" v-slot="{ href, navigate }">
+            <a @click="navigate" :href="href" class="group-rect card white-text">
+              <i class="material-icons" style="font-size: 50px">people</i>
+              <span style="font-weight: bold; font-size: 20px; text-align: center; line-height: 20px; margin-bottom: 5px">{{ g.name }}</span>
+              <span>{{ g.leader.firstName }} {{ g.leader.lastName }}</span>
+            </a>
+          </router-link>
 
           <div v-else :key="'u'+g.id" class="group-rect card white-text" style="cursor: default; background-color: #455a64 !important;">
             <span style="font-weight: bold; font-size: 20px; text-align: center; line-height: 20px; margin-bottom: 5px">{{ g.name }}</span>

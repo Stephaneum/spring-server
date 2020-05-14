@@ -80,6 +80,13 @@ const routes = [
         import(/* webpackChunkName: "group-list" */ "./views/GroupList.vue"),
   },
   {
+    path: "/groups/:id",
+    name: "group-view",
+    meta: { title: 'Gruppen - Stephaneum' },
+    component: () =>
+        import(/* webpackChunkName: "group-view" */ "./views/GroupView.vue"),
+  },
+  {
     path: "/cloud",
     name: "cloud",
     meta: { title: 'Cloud - Stephaneum' },

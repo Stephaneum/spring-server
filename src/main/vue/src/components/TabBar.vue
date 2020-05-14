@@ -19,7 +19,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .tab-btn {
         display: inline-flex;
         align-items: center;
