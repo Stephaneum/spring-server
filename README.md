@@ -34,15 +34,15 @@ Hier werden nur Funktionen aufgeführt, die ursprünglich in JSF implementiert w
 
 Bereich | Seite(n) | JSF | Spring
 ---|---|---|---
-Öffentlich|Startseite|X|
-Öffentlich|Beiträge|X|
-Öffentlich|Login/Registrierung|X|
-Öffentlich|Impressum, Kontakt, etc.|X|
+Öffentlich|Startseite|X|N
+Öffentlich|Beiträge|X|N
+Öffentlich|Login/Registrierung|X|N
+Öffentlich|Impressum, Kontakt, etc.|X|N
 Admin|Konfiguration| |X
 Admin|Benutzerdefinierte Seiten| |X
 Admin|Rubriken| |D
 Admin|Zugangscodes| |X
-Admin|Nutzerdaten-Manager|X|N
+Admin|Nutzerdaten-Manager| |X
 Admin|Logdaten| |X
 Verwaltung|Vertretungsplan-Manager| |X
 Gemeinschaft|Beitrag-Manager| |X
