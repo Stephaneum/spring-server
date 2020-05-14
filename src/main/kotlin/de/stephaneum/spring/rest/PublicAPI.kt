@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-data class Imprint(val imprint: String)
+data class TextResponse(val text: String)
 
 @RestController
 @RequestMapping("/api")
@@ -39,8 +39,14 @@ class PublicAPI (
     }
 
     @GetMapping("/imprint")
-    fun imprint(): Imprint {
+    fun imprint(): TextResponse {
         val content = configScheduler.get(Element.imprint) ?: ""
-        return Imprint(content)
+        return TextResponse(content)
+    }
+
+    @GetMapping("/contact")
+    fun contact(): TextResponse {
+        val content = configScheduler.get(Element.contact) ?: ""
+        return TextResponse(content)
     }
 }

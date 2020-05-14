@@ -1,6 +1,6 @@
 <template>
-  <CenterLayout title="Impressum" :plan="info.plan" :history="info.history" :eu-sa="info.euSa">
-    <span v-html="imprint"></span>
+  <CenterLayout title="Kontakt" :plan="info.plan" :history="info.history" :eu-sa="info.euSa">
+    <span v-html="contact"></span>
   </CenterLayout>
 </template>
 
@@ -9,15 +9,15 @@
   import CenterLayout from "../components/CenterLayout";
 
   export default {
-    name: 'Imprint',
+    name: 'Contact',
     components: { CenterLayout },
     props: ['info'],
     data: () => ({
-      imprint: null
+      contact: null
     }),
     async mounted() {
-      const imprint = await Axios.get('/api/imprint');
-      this.imprint = imprint.data.text;
+      const contact = await Axios.get('/api/contact');
+      this.contact = contact.data.text;
     }
   }
 </script>

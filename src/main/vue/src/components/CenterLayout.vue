@@ -41,7 +41,7 @@
             </div>
 
             <div class="col s12 m8">
-                <div class="card-panel white">
+                <div class="card-panel white" style="min-height: 800px">
                     <h5>{{ title }}</h5>
                     <br>
                     <slot></slot>
