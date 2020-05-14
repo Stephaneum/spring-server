@@ -1,5 +1,5 @@
 <template>
-  <CenterLayout title="Kontakt" :plan="info.plan" :history="info.history" :eu-sa="info.euSa">
+  <CenterLayout title="Sitemap" :plan="info.plan" :history="info.history" :eu-sa="info.euSa">
     <span v-for="m in info.menu" :key="m.id">
       <router-link :to="'/home?id='+m.id" v-slot="{ href, navigate }">
           <a @click="navigate" :href="href" class="item">- {{ m.name }}</a>

@@ -5,7 +5,9 @@
             <div class="col m4 l2 hide-on-small-only"></div>
             <div class="col s12 m8">
                 <div style="display: flex; align-items: center;">
-                    <a href="/" class="green-text" style="margin-left: 20px">Startseite</a>
+                    <router-link to="/" v-slot="{ href, navigate }">
+                        <a @click="navigate" :href="href" class="green-text" style="margin-left: 20px">Startseite</a>
+                    </router-link>
                     <i class="material-icons">chevron_right</i>
                     <a href="#" class="green-text">{{ title }}</a>
                 </div>
