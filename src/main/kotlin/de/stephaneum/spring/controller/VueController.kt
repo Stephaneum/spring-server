@@ -14,12 +14,10 @@ class VueController (
         private val jwtService: JwtService
 ) {
 
-    @GetMapping("/", "/login", "/user-manager", "/config-manager", "/static-manager", "/code-manager", "/logs",
+    @GetMapping("/", "/home", "/beitrag/{id}", "/statistiken", "/termine", "/kontakt", "/impressum", "/sitemap",
+            "/login", "/user-manager", "/config-manager", "/static-manager", "/code-manager", "/logs",
             "/plan-manager", "/menu-manager", "/post-manager", "/groups", "/groups/{id}", "/cloud", "/account")
     fun html(@RequestParam(required = false) key: String?, request: HttpServletRequest, @PathVariable(required = false) id: Int?): String {
-        if(checkIE(request))
-            return "forward:/static/no-support-ie.html"
-
         // login
         if(key != null) {
             Session.get().user = jwtService.getUser(key)
