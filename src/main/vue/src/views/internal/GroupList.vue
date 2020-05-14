@@ -132,7 +132,7 @@
   import Axios from "axios"
   import M from "materialize-css"
   import { showLoading, showLoadingInvisible, hideLoading } from '@/helper/utils.js';
-  import InternalHeader from "../components/InternalHeader";
+  import InternalHeader from "../../components/InternalHeader";
 
   export default {
     name: 'GroupList',

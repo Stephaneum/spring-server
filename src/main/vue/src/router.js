@@ -5,6 +5,7 @@ import Login from "./views/Login.vue";
 import Imprint from "./views/Imprint.vue";
 import Contact from "./views/Contact.vue";
 import Sitemap from "./views/Sitemap";
+import EuSa from "./views/EuSa";
 
 Vue.use(VueRouter);
 
@@ -13,6 +14,11 @@ const routes = [
     path: "/",
     name: "home",
     component: Home,
+  },
+  {
+    path: "/eu-sa",
+    name: "eu-sa",
+    component: EuSa,
   },
   {
     path: "/kontakt",
@@ -39,84 +45,84 @@ const routes = [
     name: "config-manager",
     meta: { title: 'Konfiguration - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "config-manager" */ "./views/ConfigManager.vue"),
+        import(/* webpackChunkName: "config-manager" */ "./views/internal/ConfigManager.vue"),
   },
   {
     path: "/code-manager",
     name: "code-manager",
     meta: { title: 'Zugangscodes - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "code-manager" */ "./views/CodeManager.vue"),
+        import(/* webpackChunkName: "code-manager" */ "./views/internal/CodeManager.vue"),
   },
   {
     path: "/user-manager",
     name: "user-manager",
     meta: { title: 'Nutzerverwaltung - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "user-manager" */ "./views/UserManager.vue"),
+        import(/* webpackChunkName: "user-manager" */ "./views/internal/UserManager.vue"),
   },
   {
     path: "/logs",
     name: "logs",
     meta: { title: 'Logdaten - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "logs" */ "./views/Logs.vue"),
+        import(/* webpackChunkName: "logs" */ "./views/internal/Logs.vue"),
   },
   {
     path: "/menu-manager",
     name: "menu-manager",
     meta: { title: 'Menüverwaltung - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "menu-manager" */ "./views/MenuManager.vue"),
+        import(/* webpackChunkName: "menu-manager" */ "./views/internal/MenuManager.vue"),
   },
   {
     path: "/plan-manager",
     name: "plan-manager",
     meta: { title: 'Vertretungsplan - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "plan-manager" */ "./views/PlanManager.vue"),
+        import(/* webpackChunkName: "plan-manager" */ "./views/internal/PlanManager.vue"),
   },
   {
     path: "/static-manager",
     name: "static-manager",
     meta: { title: 'Seiten - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "static-manager" */ "./views/StaticManager.vue"),
+        import(/* webpackChunkName: "static-manager" */ "./views/internal/StaticManager.vue"),
   },
   {
     path: "/post-manager",
     name: "post-manager",
     meta: { title: 'Beiträge - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "post-manager" */ "./views/PostManager.vue"),
+        import(/* webpackChunkName: "post-manager" */ "./views/internal/PostManager.vue"),
   },
   {
     path: "/groups",
     name: "group-list",
     meta: { title: 'Gruppen - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "group-list" */ "./views/GroupList.vue"),
+        import(/* webpackChunkName: "group-list" */ "./views/internal/GroupList.vue"),
   },
   {
     path: "/groups/:id",
     name: "group-view",
     meta: { title: 'Gruppen - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "group-view" */ "./views/GroupView.vue"),
+        import(/* webpackChunkName: "group-view" */ "./views/internal/GroupView.vue"),
   },
   {
     path: "/cloud",
     name: "cloud",
     meta: { title: 'Cloud - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "cloud" */ "./views/Cloud.vue"),
+        import(/* webpackChunkName: "cloud" */ "./views/internal/Cloud.vue"),
   },
   {
     path: "/account",
     name: "account",
     meta: { title: 'Account - Stephaneum' },
     component: () =>
-        import(/* webpackChunkName: "account" */ "./views/Account.vue"),
+        import(/* webpackChunkName: "account" */ "./views/internal/Account.vue"),
   },
 ];
 

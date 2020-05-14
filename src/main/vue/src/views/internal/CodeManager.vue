@@ -44,7 +44,7 @@
   import Axios from "axios"
   import M from "materialize-css"
   import { showLoadingInvisible, hideLoading } from '@/helper/utils.js';
-  import InternalHeader from "../components/InternalHeader";
+  import InternalHeader from "../../components/InternalHeader";
 
   const roles = {
     student: {

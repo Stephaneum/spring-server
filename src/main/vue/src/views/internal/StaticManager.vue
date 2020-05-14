@@ -68,7 +68,7 @@
   import Axios from "axios"
   import M from "materialize-css"
   import FileUpload from '@/components/FileUpload.vue'
-  import InternalHeader from "../components/InternalHeader";
+  import InternalHeader from "../../components/InternalHeader";
 
   export default {
     name: 'PlanManager',

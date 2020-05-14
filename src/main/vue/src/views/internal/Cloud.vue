@@ -10,7 +10,7 @@
 <script>
   import M from "materialize-css"
   import CloudView from '@/components/cloud/CloudView.vue'
-  import InternalHeader from "../components/InternalHeader";
+  import InternalHeader from "../../components/InternalHeader";
 
   export default {
     name: 'Account',

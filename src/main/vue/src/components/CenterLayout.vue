@@ -1,7 +1,7 @@
 <template>
     <div style="min-height: inherit; margin: auto; max-width: 1600px">
-        <br>
-        <div class="row" style="margin: 0">
+
+        <div class="row" style="margin: 40px 0 0 0">
             <div class="col m4 l2 hide-on-small-only"></div>
             <div class="col s12 m8">
                 <div style="display: flex; align-items: center;">
@@ -48,6 +48,13 @@
                     <br>
                     <slot></slot>
                 </div>
+                <br>
+                <router-link to="/" v-slot="{ href, navigate }">
+                    <a @click="navigate" :href="href" class="waves-effect waves-light btn green darken-4" style="margin-left:30px;">
+                        <i class="material-icons left">arrow_back</i>
+                        zurück zur Startseite
+                    </a>
+                </router-link>
             </div>
 
             <div class="col m2 hide-on-med-and-down">

@@ -215,15 +215,15 @@
   import Axios from "axios"
   import M from "materialize-css"
   import moment from "moment"
-  import { showLoading, showLoadingInvisible, hideLoading } from "../helper/utils";
-  import CloudView from "../components/cloud/CloudView";
-  import GroupBoard from "../components/group/GroupBoard";
-  import ChatView from "../components/group/ChatView";
-  import MemberList from "../components/group/MemberList";
-  import TabBar from "../components/TabBar";
-  import UserAddList from "../components/UserAddList";
-  import UserSearch from "../components/UserSearch";
-  import InternalHeader from "../components/InternalHeader";
+  import { showLoading, showLoadingInvisible, hideLoading } from "../../helper/utils";
+  import CloudView from "../../components/cloud/CloudView";
+  import GroupBoard from "../../components/group/GroupBoard";
+  import ChatView from "../../components/group/ChatView";
+  import MemberList from "../../components/group/MemberList";
+  import TabBar from "../../components/TabBar";
+  import UserAddList from "../../components/UserAddList";
+  import UserSearch from "../../components/UserSearch";
+  import InternalHeader from "../../components/InternalHeader";
 
   const parentGroup = { id: -1, icon: 'chat', special: true, name: 'Chat' };
   const addSubGroup = { id: -2, icon: 'add', name: 'Chatraum' };

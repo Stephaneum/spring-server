@@ -48,7 +48,7 @@
 <script>
   import Axios from "axios"
   import M from "materialize-css"
-  import InternalHeader from "../components/InternalHeader";
+  import InternalHeader from "../../components/InternalHeader";
 
   const amounts = [ 200, 1000, 5000 ];
 

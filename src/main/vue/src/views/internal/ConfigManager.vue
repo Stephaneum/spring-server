@@ -16,9 +16,9 @@
 
 <script>
   import M from "materialize-css"
-  import SliderManager from '../components/managers/SliderManager.vue'
-  import VariableManager from '../components/managers/VariableManager.vue'
-  import InternalHeader from "../components/InternalHeader";
+  import SliderManager from '../../components/managers/SliderManager.vue'
+  import VariableManager from '../../components/managers/VariableManager.vue'
+  import InternalHeader from "../../components/InternalHeader";
 
   export default {
     name: 'ConfigManager',

@@ -19,7 +19,7 @@
   import UserBatchActions from '@/components/managers/UserBatchActions.vue'
   import UserSearchAndManage from '@/components/managers/UserSearchAndManage.vue'
   import UserImport from '@/components/managers/UserImport.vue'
-  import InternalHeader from "../components/InternalHeader";
+  import InternalHeader from "../../components/InternalHeader";
 
   export default {
     name: 'UserManager',

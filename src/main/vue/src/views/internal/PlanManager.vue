@@ -85,7 +85,7 @@
   import M from "materialize-css"
   import FileUpload from '@/components/FileUpload.vue'
   import { showLoadingInvisible, hideLoading } from '@/helper/utils.js';
-  import InternalHeader from "../components/InternalHeader";
+  import InternalHeader from "../../components/InternalHeader";
 
   export default {
     name: 'PlanManager',

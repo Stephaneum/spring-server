@@ -274,9 +274,9 @@
   import moment from 'moment'
   import Trumbowyg from 'vue-trumbowyg';
   import 'trumbowyg/dist/ui/trumbowyg.css';
-  import "../assets/trumbowyg/trumbowyg.fontsize.min.js";
-  import "../assets/trumbowyg/trumbowyg.colors.min.js";
-  import "../assets/trumbowyg/trumbowyg.colors.min.css";
+  import "../../assets/trumbowyg/trumbowyg.fontsize.min.js";
+  import "../../assets/trumbowyg/trumbowyg.colors.min.js";
+  import "../../assets/trumbowyg/trumbowyg.colors.min.css";
   import Menu from '@/components/Menu.vue'
   import TabBar from '@/components/TabBar.vue'
   import Post from '@/components/cms/Post.vue'
@@ -284,7 +284,7 @@
   import PostPreview from '@/components/cms/PostPreview.vue'
   import { TEXT_EDITOR_CONFIG, storageReadable, uploadMultipleFiles, showLoading, showLoadingInvisible, hideLoading } from '@/helper/utils.js';
   import { modes, tabs, postLayouts, previewLayouts, specialData, specialFragments, specialSites,  } from '@/helper/postManagerConstants.js';
-  import InternalHeader from "../components/InternalHeader";
+  import InternalHeader from "../../components/InternalHeader";
 
   export default {
     name: 'PostManager',

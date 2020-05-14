@@ -231,7 +231,7 @@
   import UserAddList from '@/components/UserAddList.vue'
   import UserSearch from '@/components/UserSearch.vue'
   import { showLoadingInvisible, hideLoading } from '@/helper/utils.js';
-  import InternalHeader from "../components/InternalHeader";
+  import InternalHeader from "../../components/InternalHeader";
 
   export default {
     name: 'MenuManager',
