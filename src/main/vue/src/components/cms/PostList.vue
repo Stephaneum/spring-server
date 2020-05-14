@@ -161,7 +161,6 @@ export default {
     },
     watch: {
         posts: function(newVal) {
-            console.log(newVal);
             this.postsLimited = newVal.slice(0, 10);
         }
     },
