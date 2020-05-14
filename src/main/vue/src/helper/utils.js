@@ -1,7 +1,7 @@
 import Axios from "axios";
 import M from "materialize-css";
 
-export var TEXT_EDITOR_CONFIG = {
+export const TEXT_EDITOR_CONFIG = {
   semantic: false,
   lang: "de",
   btns: [

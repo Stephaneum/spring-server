@@ -59,6 +59,12 @@ const routes = [
         import(/* webpackChunkName: "static-manager" */ "./views/StaticManager.vue"),
   },
   {
+    path: "/post-manager",
+    name: "post-manager",
+    component: () =>
+        import(/* webpackChunkName: "post-manager" */ "./views/PostManager.vue"),
+  },
+  {
     path: "/cloud",
     name: "cloud",
     component: () =>

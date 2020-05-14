@@ -143,7 +143,11 @@
                                     <a @click="navigate" :href="href"><span><i class="material-icons">note_add</i>Seiten</span></a>
                                 </router-link>
                             </li>
-                            <li><a href="/post-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
+                            <li>
+                                <router-link to="post-manager" v-slot="{ href, navigate }">
+                                    <a @click="navigate" :href="href"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a>
+                                </router-link>
+                            </li>
                             <li class="internal-divider"></li>
 
                             <!-- internal -->
