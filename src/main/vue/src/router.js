@@ -4,6 +4,7 @@ import Home from "./views/Home.vue";
 import Login from "./views/Login.vue";
 import Imprint from "./views/Imprint.vue";
 import Contact from "./views/Contact.vue";
+import Sitemap from "./views/Sitemap";
 
 Vue.use(VueRouter);
 
@@ -22,6 +23,11 @@ const routes = [
     path: "/impressum",
     name: "imprint",
     component: Imprint,
+  },
+  {
+    path: "/sitemap",
+    name: "sitemap",
+    component: Sitemap,
   },
   {
     path: "/login",
