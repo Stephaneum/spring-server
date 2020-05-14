@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+data class Imprint(val imprint: String)
+
 @RestController
 @RequestMapping("/api")
 class PublicAPI (
@@ -34,5 +36,11 @@ class PublicAPI (
             else                                                            -> null
         }
         return Response.Info(user, menuService.hasMenuWriteAccess(user), menuService.getPublic(), copyright, plan, history, euSa, unapproved)
+    }
+
+    @GetMapping("/imprint")
+    fun imprint(): Imprint {
+        val content = configScheduler.get(Element.imprint) ?: ""
+        return Imprint(content)
     }
 }

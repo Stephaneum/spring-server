@@ -38,7 +38,7 @@ class ConfigScheduler {
      * we should access these variables to reduce database calls
      */
 
-    val logger = LoggerFactory.getLogger(ConfigScheduler::class.java)
+    private val logger = LoggerFactory.getLogger(ConfigScheduler::class.java)
 
     @Autowired
     private lateinit var configRepo: ConfigRepo

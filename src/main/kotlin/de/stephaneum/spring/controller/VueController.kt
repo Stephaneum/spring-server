@@ -1,7 +1,6 @@
 package de.stephaneum.spring.controller
 
 import de.stephaneum.spring.Session
-import de.stephaneum.spring.helper.checkIE
 import de.stephaneum.spring.security.JwtService
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping

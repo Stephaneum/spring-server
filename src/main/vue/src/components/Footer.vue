@@ -1,11 +1,17 @@
 <template>
     <footer class="page-footer" style="background-color: #2a4c2c; width: 100%">
         <div class="container center-align">
-            <a href="kontakt.xhtml" class="green-text text-lighten-3">Kontakt</a>
+            <router-link to="/kontakt" v-slot="{ href, navigate }">
+                <a @click="navigate" :href="href" class="green-text text-lighten-3">Kontakt</a>
+            </router-link>
             <span class="white-text"> | </span>
-            <a href="impressum.xhtml" class="green-text text-lighten-3">Impressum</a>
+            <router-link to="/impressum" v-slot="{ href, navigate }">
+                <a @click="navigate" :href="href" class="green-text text-lighten-3">Impressum</a>
+            </router-link>
             <span class="white-text"> | </span>
-            <a href="sitemap.xhtml" class="green-text text-lighten-3">Sitemap</a>
+            <router-link to="/sitemap" v-slot="{ href, navigate }">
+                <a @click="navigate" :href="href" class="green-text text-lighten-3">Sitemap</a>
+            </router-link>
             <br/><br/>
             <span v-html="copyright" style="font-size:12pt;word-wrap: break-word;"></span>
             <br/><br/>
