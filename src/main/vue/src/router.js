@@ -73,6 +73,13 @@ const routes = [
         import(/* webpackChunkName: "post-manager" */ "./views/PostManager.vue"),
   },
   {
+    path: "/groups",
+    name: "group-list",
+    meta: { title: 'Gruppen - Stephaneum' },
+    component: () =>
+        import(/* webpackChunkName: "group-list" */ "./views/GroupList.vue"),
+  },
+  {
     path: "/cloud",
     name: "cloud",
     meta: { title: 'Cloud - Stephaneum' },

@@ -11,7 +11,7 @@
                 <ul class="right hide-on-med-and-down">
                     <li v-for="m1 in menu" :key="m1.id">
                         <a v-text="m1.name" @click="emit(m1)" :href="url(m1)" :target="target(m1)" style="color: #1b5e20"></a>
-                        <ul v-if="m1.children.length != 0 || editMode" class="z-depth-1" style="z-index: 200">
+                        <ul v-if="m1.children.length !== 0 || editMode" class="z-depth-1" style="z-index: 200">
                             <li v-for="m2 in m1.children" :key="m2.id">
                                 <a @click="emit(m2)" :href="url(m2)" :target="target(m2)">
                                     <span>
@@ -19,9 +19,9 @@
                                         <i v-else class="material-icons">stop</i>
                                         {{m2.name}}
                                     </span>
-                                    <i v-if="m2.children.length != 0 || editMode" class="material-icons">keyboard_arrow_right</i>
+                                    <i v-if="m2.children.length !== 0 || editMode" class="material-icons">keyboard_arrow_right</i>
                                 </a>
-                                <ul v-if="m2.children.length != 0 || editMode" class="z-depth-1" style="z-index: 300">
+                                <ul v-if="m2.children.length !== 0 || editMode" class="z-depth-1" style="z-index: 300">
                                     <li v-for="m3 in m2.children" :key="m3.id">
                                         <a @click="emit(m3)" :href="url(m3)" :target="target(m3)">
                                             <span>
@@ -29,9 +29,9 @@
                                                 <i v-else class="material-icons">stop</i>
                                                 {{m3.name}}
                                             </span>
-                                            <i v-if="m3.children.length != 0 || editMode" class="material-icons">keyboard_arrow_right</i>
+                                            <i v-if="m3.children.length !== 0 || editMode" class="material-icons">keyboard_arrow_right</i>
                                         </a>
-                                        <ul v-if="m3.children.length != 0 || editMode" class="z-depth-1" style="z-index: 400">
+                                        <ul v-if="m3.children.length !== 0 || editMode" class="z-depth-1" style="z-index: 400">
                                             <li v-for="m4 in m3.children" :key="m4.id">
                                                 <a @click="emit(m4)" :href="url(m4)" :target="target(m4)">
                                                     <span>
@@ -151,7 +151,11 @@
                             <li class="internal-divider"></li>
 
                             <!-- internal -->
-                            <li><a href="/groups"><span><i class="material-icons">people</i>Gruppen</span></a></li>
+                            <li>
+                                <router-link to="groups" v-slot="{ href, navigate }">
+                                    <a @click="navigate" :href="href"><span><i class="material-icons">people</i>Gruppen</span></a>
+                                </router-link>
+                            </li>
                             <li>
                                 <router-link to="cloud" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">folder</i>Dateien</span></a>
