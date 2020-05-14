@@ -1,11 +1,14 @@
 package de.stephaneum.spring.scheduler
 
 import de.stephaneum.spring.database.ConfigRepo
+import de.stephaneum.spring.helper.Event
+import de.stephaneum.spring.helper.EventParser
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
+// using lowercase because frontend uses those as keys
 enum class Element(val code: String, val info: String, var value: String? = null) {
     fileLocation("speicherort", "Speicherort"),
     backupLocation("backup_dir", "Backup-Ort"),
@@ -43,7 +46,11 @@ class ConfigScheduler {
     @Autowired
     private lateinit var configRepo: ConfigRepo
 
+    @Autowired
+    private lateinit var eventParser: EventParser
+
     private val configs = Element.values().toList()
+    private var digestedEvents: List<Event> = emptyList()
 
     @Scheduled(initialDelay=3000, fixedDelay = 10000)
     fun update() {
@@ -54,12 +61,22 @@ class ConfigScheduler {
                 val value = if(dbConfig.value?.length ?: 0 <= 100) dbConfig.value?.replace("\n", " ") else dbConfig.value?.substring(0, 100)?.replace("\n", " ") + "..."
                 logger.info("${c.name}: ${c.value} -> $value")
                 c.value = dbConfig.value
+
+                // update digested
+                when (c) {
+                    Element.events -> digestedEvents = eventParser.parse(dbConfig.value ?: "")
+                    else -> {}
+                }
             }
         }
     }
 
     fun get(element: Element): String? {
         return configs.first { it == element }.value
+    }
+
+    fun getDigestedEvents(): List<Event> {
+        return digestedEvents
     }
 
     fun save(element: Element, value: String?) {
