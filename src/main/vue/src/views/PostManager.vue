@@ -2,6 +2,7 @@
   <div v-if="currMode" class="internal-container row" style="max-width: 1600px">
 
     <InternalHeader :title="currMode.description" :icon="currMode.icon" left="true"></InternalHeader>
+    <div id="post-manager-title"></div>
 
     <!-- TABS -->
     <div class="col s10 offset-s2">
