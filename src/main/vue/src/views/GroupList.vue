@@ -46,7 +46,7 @@
           <li v-for="g in allGroups" :key="g.id" class="collection-item">
             <div style="display: flex; align-items: center;">
               <span style="flex-grow: 1; display: flex; align-items: center; ">
-                <router-link v-if="g.accepted" :to="'/groups/'+g.id" v-slot="{ href, navigate }">
+                <router-link :to="'/groups/'+g.id" v-slot="{ href, navigate }">
                   <a @click="navigate" :href="href" class="group-link">{{ g.name }}</a>
                 </router-link>
 
