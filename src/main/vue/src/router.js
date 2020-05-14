@@ -7,6 +7,7 @@ import Contact from "./views/Contact.vue";
 import Sitemap from "./views/Sitemap";
 import EuSa from "./views/EuSa";
 import HistoryView from "./views/HistoryView";
+import Events from "./views/Events";
 
 Vue.use(VueRouter);
 
@@ -15,6 +16,11 @@ const routes = [
     path: "/",
     name: "home",
     component: Home,
+  },
+  {
+    path: "/termine",
+    name: "events",
+    component: Events,
   },
   {
     path: "/geschichte",

@@ -44,8 +44,7 @@
 
             <div class="col s12 m8">
                 <div class="card-panel white" style="min-height: 800px">
-                    <h5>{{ title }}</h5>
-                    <br>
+                    <h5 v-if="!hideTitle" style="margin-bottom: 30px">{{ title }}</h5>
                     <slot></slot>
                 </div>
                 <br>
@@ -70,7 +69,7 @@ import Logos from "./Logos";
 export default {
     name: 'CenterLayout',
     components: { Logos },
-    props: ['title', 'plan', 'history', 'euSa']
+    props: ['title', 'hideTitle', 'plan', 'history', 'euSa']
 }
 </script>
 

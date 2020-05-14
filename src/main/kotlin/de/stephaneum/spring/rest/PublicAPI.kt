@@ -5,6 +5,8 @@ import de.stephaneum.spring.database.EMPTY_USER
 import de.stephaneum.spring.database.PostRepo
 import de.stephaneum.spring.database.ROLE_ADMIN
 import de.stephaneum.spring.database.ROLE_NO_LOGIN
+import de.stephaneum.spring.helper.Event
+import de.stephaneum.spring.helper.EventParser
 import de.stephaneum.spring.helper.MenuService
 import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
@@ -20,6 +22,7 @@ data class TextResponse(val text: String)
 class PublicAPI (
         private val configScheduler: ConfigScheduler,
         private val menuService: MenuService,
+        private val eventParser: EventParser,
         private val postRepo: PostRepo
 ) {
 
@@ -48,5 +51,11 @@ class PublicAPI (
     fun contact(): TextResponse {
         val content = configScheduler.get(Element.contact) ?: ""
         return TextResponse(content)
+    }
+
+    @GetMapping("/events")
+    fun events(): List<Event> {
+        val eventsRaw = configScheduler.get(Element.events) ?: ""
+        return eventParser.parse(eventsRaw)
     }
 }
