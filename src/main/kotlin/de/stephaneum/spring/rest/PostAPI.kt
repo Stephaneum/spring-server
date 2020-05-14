@@ -60,7 +60,7 @@ class PostAPI (
         when {
             postID != null -> {
                 // single post
-                val post = postRepo.findByIdOrNull(postID) ?: return PostResponse.Feedback(false, message = "post not found")
+                val post = postRepo.findByIdOrNull(postID) ?: throw ErrorCode(404, "post not found")
                 post.simplify()
                 post.menu?.simplify()
                 post.images = filePostRepo.findByPostId(post.id).map { it.file.apply { simplifyForPosts() } }

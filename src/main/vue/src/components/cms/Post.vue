@@ -1,7 +1,14 @@
 <template>
     <div class="card-panel white">
         <h5>{{ title }}</h5>
-        <p>{{ date }}</p>
+        <p v-if="menu">
+            {{ date }}
+            <span> / </span>
+            <router-link :to="'/menu/'+menu.id" v-slot="{ href, navigate }">
+                <a @click="navigate" :href="href" class="green-text">{{ menu.name }}</a>
+            </router-link>
+        </p>
+        <p v-else>{{ date }}</p>
         <br/>
         <div v-if="!hasImages">
             <span v-html="text" style="word-wrap: break-word"></span>
@@ -61,9 +68,11 @@
 </template>
 
 <script>
+    import M from "materialize-css";
+
 export default {
     name: 'Post',
-    props: ['date' ,'title', 'text', 'layout', 'images'],
+    props: ['date', 'menu', 'title', 'text', 'layout', 'images'],
     computed: {
         hasImages: function () {
             return this.images.length !== 0;
@@ -72,6 +81,14 @@ export default {
             return (image) => '/files/image/'+image.id+'_'+image.fileName;
         }
     },
+    watch: {
+        layout: function() {
+            this.$nextTick(() => {
+                M.Slider.init(document.querySelectorAll('.slider'), {});
+                M.Materialbox.init(document.querySelectorAll('.materialboxed'), {});
+            });
+        }
+    }
 }
 </script>
 
