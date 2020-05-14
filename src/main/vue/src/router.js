@@ -6,6 +6,7 @@ import Imprint from "./views/Imprint.vue";
 import Contact from "./views/Contact.vue";
 import Sitemap from "./views/Sitemap";
 import EuSa from "./views/EuSa";
+import HistoryView from "./views/HistoryView";
 
 Vue.use(VueRouter);
 
@@ -14,6 +15,11 @@ const routes = [
     path: "/",
     name: "home",
     component: Home,
+  },
+  {
+    path: "/geschichte",
+    name: "history",
+    component: HistoryView,
   },
   {
     path: "/eu-sa",
