@@ -3,7 +3,7 @@ export const modes = {
         id: 0,
         name: "Erstellen",
         description: "Beitrag erstellen",
-        icon: "add"
+        icon: "post_add"
     },
     edit: {
         id: 1,
