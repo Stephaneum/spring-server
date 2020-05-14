@@ -273,6 +273,9 @@
   import moment from 'moment'
   import Trumbowyg from 'vue-trumbowyg';
   import 'trumbowyg/dist/ui/trumbowyg.css';
+  import "../assets/trumbowyg/trumbowyg.fontsize.min.js";
+  import "../assets/trumbowyg/trumbowyg.colors.min.js";
+  import "../assets/trumbowyg/trumbowyg.colors.min.css";
   import Menu from '@/components/Menu.vue'
   import TabBar from '@/components/TabBar.vue'
   import Post from '@/components/cms/Post.vue'

@@ -79,6 +79,9 @@
     import M from "materialize-css"
     import Trumbowyg from 'vue-trumbowyg';
     import 'trumbowyg/dist/ui/trumbowyg.css';
+    import "../../assets/trumbowyg/trumbowyg.fontsize.min.js";
+    import "../../assets/trumbowyg/trumbowyg.colors.min.js";
+    import "../../assets/trumbowyg/trumbowyg.colors.min.css";
     import { TEXT_EDITOR_CONFIG, uploadMultipleFiles, showLoadingInvisible, hideLoading } from '../../helper/utils.js';
 
 export default {
