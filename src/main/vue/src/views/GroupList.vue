@@ -46,9 +46,12 @@
           <li v-for="g in allGroups" :key="g.id" class="collection-item">
             <div style="display: flex; align-items: center;">
               <span style="flex-grow: 1; display: flex; align-items: center; ">
-                  <a :href="'/groups/' + g.id" class="group-link">{{ g.name }}</a>
-                  <i v-if="!g.accepted" class="material-icons grey-text text-darken-2" style="margin-left: 15px">report_problem</i>
-                  <span v-if="!g.accepted" class="grey-text text-darken-2" style="margin-left: 5px">Warten auf Genehmigung des Betreuers</span>
+                <router-link v-if="g.accepted" :to="'/groups/'+g.id" v-slot="{ href, navigate }">
+                  <a @click="navigate" :href="href" class="group-link">{{ g.name }}</a>
+                </router-link>
+
+                <i v-if="!g.accepted" class="material-icons grey-text text-darken-2" style="margin-left: 15px">report_problem</i>
+                <span v-if="!g.accepted" class="grey-text text-darken-2" style="margin-left: 5px">Warten auf Genehmigung des Betreuers</span>
               </span>
               <span style="flex: 0 0 320px; text-align: right;">
                   <span class="green-badge-light">{{ g.members }} Mitglieder</span>
