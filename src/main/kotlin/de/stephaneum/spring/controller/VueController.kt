@@ -13,8 +13,9 @@ class VueController (
         private val jwtService: JwtService
 ) {
 
-    @GetMapping("/", "/menu/{id}", "/beitrag/{id}", "/statistiken", "/termine", "/geschichte", "/eu-sa", "/kontakt", "/impressum", "/sitemap",
-            "/login", "/user-manager", "/config-manager", "/static-manager", "/code-manager", "/logs",
+    @GetMapping("/", "/menu/{id}", "/beitrag/{id}", "/login",
+            "/statistiken", "/termine", "/geschichte", "/eu-sa", "/kontakt", "/impressum", "/sitemap",
+            "/home", "/user-manager", "/config-manager", "/static-manager", "/code-manager", "/logs",
             "/plan-manager", "/menu-manager", "/post-manager", "/groups", "/groups/{id}", "/cloud", "/account")
     fun html(@RequestParam(required = false) key: String?, request: HttpServletRequest, @PathVariable(required = false) id: Int?): String {
         // login

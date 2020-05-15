@@ -185,11 +185,11 @@
         <div>
           <h5>Beitrag</h5>
           <div v-for="l in postLayouts" :key="'post'+l" @click="setLayoutPost(l)" style="height: 200px" class="layout-btn z-depth-1" :class="{ 'layout-btn-active': l === currPost.layoutPost }">
-            <img :src="'/static/img/layout-post-'+l+'.png'">
+            <img :src="require('../../assets/img/layout-post-'+l+'.png')">
           </div>
           <h5>Vorschau</h5>
           <div v-for="l in previewLayouts" :key="'preview'+l" @click="setLayoutPreview(l)" style="height: 100px" class="layout-btn z-depth-1" :class="{ 'layout-btn-active': l === currPost.layoutPreview }">
-            <img :src="'/static/img/layout-preview-'+l+'.png'">
+            <img :src="require('../../assets/img/layout-preview-'+l+'.png')">
           </div>
           <div style="margin-top: 30px" class="input-field">
             <i class="material-icons prefix">crop</i>

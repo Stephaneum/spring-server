@@ -5,9 +5,11 @@
                 <a href="#" data-target="sidenav" class="sidenav-trigger hide-on-large-only">
                     <i class="material-icons" style="color: #1b5e20">menu</i>
                 </a>
-                <a v-if="!editRootLevel" :href="unreal ? '#!' : '/home.xhtml'" class="brand-logo" :style="unreal ? { 'opacity': 0.05 } : {}">
-                    <img src="@/assets/img/logo-banner-green.png" style="height:50px;margin-top:5px;margin-left:10px"/>
-                </a>
+                <router-link v-if="!editRootLevel" :to="home" v-slot="{ href, navigate }">
+                    <a @click="navigate" :href="href" class="brand-logo" :style="unreal ? { 'opacity': 0.05 } : {}">
+                        <img src="../assets/img/logo-banner-green.png" style="height:50px;margin-top:5px;margin-left:10px"/>
+                    </a>
+                </router-link>
                 <ul class="right hide-on-med-and-down">
                     <li v-for="m1 in menu" :key="m1.id">
                         <a v-text="m1.name" @click="emit(m1)" :href="url(m1)" :target="target(m1)" style="color: #1b5e20"></a>
@@ -270,6 +272,11 @@ export default {
                     }
                 }
                 return "?"
+            },
+            home: function() {
+                if(this.unreal)
+                    return '#!';
+                return this.loggedIn ? '/home' : '/';
             },
             admin: function () {
                 return this.user && this.user.code.role === 100;
