@@ -98,7 +98,7 @@ class PostAPI (
     @PostMapping
     fun update(@RequestBody request: PostRequest.UpdatePost): Post {
 
-        val user = Session.get().user ?: throw ErrorCode(401, "Login")
+        val user = Session.getUser()
         val oldPost: Post?
         if(request.id != null) {
             // update post -> check

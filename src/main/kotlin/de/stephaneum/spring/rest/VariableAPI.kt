@@ -33,9 +33,7 @@ class VariableAPI (
 
     @PostMapping("/update")
     fun updateDirection(@RequestBody request: Config) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
-        if(user.code.role != ROLE_ADMIN)
-            throw ErrorCode(403, "admin only")
+        Session.getUser(adminOnly = true)
 
         val element = Element.valueOf(request.key)
 

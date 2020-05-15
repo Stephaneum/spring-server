@@ -22,9 +22,7 @@ class StaticAPI (
 
     @GetMapping
     fun getFiles(): AdminStaticInfo {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
-        if(user.code.role != ROLE_ADMIN)
-            throw ErrorCode(403, "admin only")
+        Session.getUser(adminOnly = true)
 
         val location = configScheduler.get(Element.fileLocation) ?: throw ErrorCode(500, "unknown file location")
         return AdminStaticInfo(staticPath = "$location/${Static.FOLDER_NAME}", pages = staticRepo.findAll().toList())
@@ -33,9 +31,7 @@ class StaticAPI (
     // storing a file in root static-level
     @PostMapping("/upload")
     fun upload(@RequestParam("file") file: MultipartFile) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
-        if(user.code.role != ROLE_ADMIN)
-            throw ErrorCode(403, "admin only")
+        Session.getUser(adminOnly = true)
 
         val fileName = file.originalFilename?.toLowerCase() ?: throw ErrorCode(400, message = "unknown filename")
         if(!fileName.endsWith(".htm") && !fileName.endsWith("html"))
@@ -55,9 +51,7 @@ class StaticAPI (
 
     @PostMapping("/toggle-mode/{id}")
     fun toggleMode(@PathVariable id: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
-        if(user.code.role != ROLE_ADMIN)
-            throw ErrorCode(403, "admin only")
+        Session.getUser(adminOnly = true)
 
         val page = staticRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
         page.mode = when(page.mode) {
@@ -70,9 +64,7 @@ class StaticAPI (
 
     @PostMapping("/delete/{id}")
     fun delete(@PathVariable id: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
-        if(user.code.role != ROLE_ADMIN)
-            throw ErrorCode(403, "admin only")
+        Session.getUser(adminOnly = true)
 
         val page = staticRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
         val location = configScheduler.get(Element.fileLocation) ?: throw ErrorCode(500, "unknown file location")

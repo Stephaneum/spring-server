@@ -54,7 +54,7 @@ class BoardAPI (
     @PostMapping("/{groupID}/board/add-area-file")
     fun addAreaFile(@PathVariable groupID: Int, @RequestParam("file") file: MultipartFile) {
 
-        val user = Session.get().user ?: throw ErrorCode(401, "Login")
+        val user = Session.getUser()
         var fileName = file.originalFilename ?: throw ErrorCode(400, "Unknown filename")
         var contentType = file.contentType ?: throw ErrorCode(400, "Unknown content type")
         val areaType = when {
@@ -87,7 +87,7 @@ class BoardAPI (
 
     @PostMapping("/board/delete-area/{areaID}")
     fun deleteArea(@PathVariable areaID: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "Login")
+        val user = Session.getUser()
         val area = boardAreaRepo.findByIdOrNull(areaID) ?: throw ErrorCode(404, "Area not found")
         val file = area.file
         if(file != null) {

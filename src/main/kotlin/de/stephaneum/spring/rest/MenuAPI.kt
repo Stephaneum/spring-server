@@ -30,7 +30,7 @@ class MenuAPI (
 
     @GetMapping("/info")
     fun getInfo(): Response.MenuInfo {
-        val me = Session.get().user ?: throw ErrorCode(401, "Login")
+        val me = Session.getUser()
         val menuAdmin = menuService.isMenuAdmin(me)
         val menuID = configScheduler.get(Element.defaultMenu)
         val menu = menuRepo.findByIdOrNull(menuID?.toInt() ?: 0) ?: throw ErrorCode(500, "menu not found")
@@ -39,7 +39,7 @@ class MenuAPI (
 
     @GetMapping("/writable")
     fun getMenu(): List<Menu> {
-        val me = Session.get().user ?: throw ErrorCode(401, "Login")
+        val me = Session.getUser()
         return menuService.getWritable(me)
     }
 
@@ -51,7 +51,7 @@ class MenuAPI (
 
     @PostMapping("/create", "/create/{parentID}")
     fun createMenu(@PathVariable(required = false) parentID: Int?, @RequestBody request: Menu) {
-        val me = Session.get().user ?: throw ErrorCode(401, "Login")
+        val me = Session.getUser()
 
         if(request.name.isBlank())
             throw ErrorCode(400, "empty name")
@@ -84,7 +84,7 @@ class MenuAPI (
 
     @PostMapping("/update")
     fun updateMenu(@RequestBody request: Menu) {
-        val me = Session.get().user ?: throw ErrorCode(401, "Login")
+        val me = Session.getUser()
 
         // check
         val menu = menuRepo.findByIdOrNull(request.id) ?: throw ErrorCode(404, "menu not found")
@@ -106,7 +106,7 @@ class MenuAPI (
     @ExperimentalUnsignedTypes
     @PostMapping("/delete/{menuID}")
     fun deleteMenu(@PathVariable menuID: Int, @RequestBody request: Request.Password) {
-        val me = Session.get().user ?: throw ErrorCode(401, "Login")
+        val me = Session.getUser()
 
         // check
         val menu = menuRepo.findByIdOrNull(menuID) ?: throw ErrorCode(404, "menu not found")
@@ -124,7 +124,7 @@ class MenuAPI (
 
     @PostMapping("/default/{menuID}")
     fun setDefaultMenu(@PathVariable menuID: Int) {
-        val me = Session.get().user ?: throw ErrorCode(401, "Login")
+        val me = Session.getUser()
 
         // check
         if(!menuService.isMenuAdmin(me))
@@ -139,18 +139,13 @@ class MenuAPI (
 
     @GetMapping("/rules")
     fun getWriteRules(): List<UserMenu> {
-        val me = Session.get().user ?: throw ErrorCode(401, "Login")
-        if(me.code.role != ROLE_ADMIN)
-            throw ErrorCode(403, "you are not admin")
-
+        Session.getUser(adminOnly = true)
         return userMenuRepo.findAll().sortedWith(compareBy({ it.menu != null }, {it.user.firstName}, {it.user.lastName}))
     }
 
     @PostMapping("/rules/add")
     fun addWriteRule(@RequestBody request: Request.MenuWriteRule) {
-        val me = Session.get().user ?: throw ErrorCode(401, "Login")
-        if(me.code.role != ROLE_ADMIN)
-            throw ErrorCode(403, "you are not admin")
+        Session.getUser(adminOnly = true)
 
         val user = userRepo.findByIdOrNull(request.user) ?: throw ErrorCode(404, "user not found")
         val menu = when {
@@ -173,9 +168,7 @@ class MenuAPI (
 
     @PostMapping("/rules/delete")
     fun deleteWriteRule(@RequestBody request: Request.MenuWriteRule) {
-        val me = Session.get().user ?: throw ErrorCode(401, "Login")
-        if(me.code.role != ROLE_ADMIN)
-            throw ErrorCode(403, "you are not admin")
+        Session.getUser(adminOnly = true)
 
         val user = userRepo.findByIdOrNull(request.user) ?: throw ErrorCode(404, "user not found")
         val menu = when {

@@ -22,7 +22,7 @@ class AccountAPI (
     // additional info
     @GetMapping("/info")
     fun getInfo(): Response.AccountInfo {
-        val me = Session.get().user ?: throw ErrorCode(401, "login")
+        val me = Session.getUser()
         val schoolClass = when (val c = me.schoolClass) {
             null -> "keine"
             else -> "${c.grade}${c.suffix}"
@@ -36,7 +36,7 @@ class AccountAPI (
 
     @PostMapping("/email")
     fun updateEmail(@RequestBody request: Request.Email) {
-        val me = Session.get().user ?: throw ErrorCode(401, "login")
+        val me = Session.getUser()
 
         if(request.email.isBlank())
             throw ErrorCode(400, "empty email")
@@ -55,7 +55,7 @@ class AccountAPI (
     @ExperimentalUnsignedTypes
     @PostMapping("/password")
     fun updatePassword(@RequestBody request: Request.ChangePassword) {
-        val me = Session.get().user ?: throw ErrorCode(401, "login")
+        val me = Session.getUser()
 
         if(!cryptoService.checkPassword(request.oldPassword, me.password))
             throw ErrorCode(403, "wrong password")

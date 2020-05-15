@@ -26,7 +26,7 @@ class SliderAPI (
 
     @PostMapping("/upload")
     fun upload(@RequestParam("file") file: MultipartFile) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         if(user.code.role != ROLE_ADMIN)
             throw ErrorCode(403, "admin only")
 
@@ -47,7 +47,7 @@ class SliderAPI (
 
     @PostMapping("/update")
     fun deleteSlider(@RequestBody request: Slider) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         if(user.code.role != ROLE_ADMIN)
             throw ErrorCode(403, "admin only")
 
@@ -68,7 +68,7 @@ class SliderAPI (
     }
 
     fun move(id: Int, up: Boolean) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         if(user.code.role != ROLE_ADMIN)
             throw ErrorCode(403, "admin only")
 
@@ -92,7 +92,7 @@ class SliderAPI (
 
     @PostMapping("/direction/{id}")
     fun updateDirection(@PathVariable id: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         if(user.code.role != ROLE_ADMIN)
             throw ErrorCode(403, "admin only")
 
@@ -108,7 +108,7 @@ class SliderAPI (
 
     @PostMapping("/delete/{id}")
     fun deleteSlider(@PathVariable id: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         if(user.code.role != ROLE_ADMIN)
             throw ErrorCode(403, "admin only")
 

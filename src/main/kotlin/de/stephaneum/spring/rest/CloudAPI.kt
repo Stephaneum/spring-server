@@ -55,7 +55,7 @@ class CloudAPI {
 
     @GetMapping("/info")
     fun getInfo(): CloudResponse.CloudInfo {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         val used = fileRepo.calcStorageUsed(user.id)
         val total = user.storage
@@ -70,7 +70,7 @@ class CloudAPI {
 
     @GetMapping("/view/user")
     fun getRootViewUser(): List<Any> {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         val folders = folderRepo.findPrivateFolderInRoot(user)
         val files = fileRepo.findPrivateInRoot(user)
@@ -80,7 +80,7 @@ class CloudAPI {
 
     @GetMapping("/view/group/{id}")
     fun getRootViewGroup(@PathVariable id: Int): List<Any> {
-        Session.get().user ?: throw ErrorCode(401, "login")
+        Session.getUser()
         val group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "group not found")
         val folders = folderRepo.findGroupFolderInRoot(group)
         val files = fileRepo.findGroupInRoot(group)
@@ -90,7 +90,7 @@ class CloudAPI {
 
     @GetMapping("/view/class/{id}")
     fun getRootViewClass(@PathVariable id: Int): List<Any> {
-        Session.get().user ?: throw ErrorCode(401, "login")
+        Session.getUser()
         val schoolClass = classRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "class not found")
         val folders = folderRepo.findClassFolderInRoot(schoolClass)
         val files = fileRepo.findClassInRoot(schoolClass)
@@ -100,7 +100,7 @@ class CloudAPI {
 
     @GetMapping("/view/teacher")
     fun getRootViewTeacher(): List<Any> {
-        Session.get().user ?: throw ErrorCode(401, "login")
+        Session.getUser()
         val folders = folderRepo.findTeacherFolderInRoot()
         val files = fileRepo.findTeacherInRoot()
 
@@ -109,7 +109,7 @@ class CloudAPI {
 
     @GetMapping("/view/{folder}")
     fun getViewSubFolder(@PathVariable folder: Int): List<Any> {
-        Session.get().user ?: throw ErrorCode(401, "login")
+        Session.getUser()
 
         val folders = folderRepo.findByParent(folder.obj())
         val files = fileRepo.findByFolderOrderByIdDesc(folder.obj())
@@ -172,7 +172,7 @@ class CloudAPI {
         if(request.name.isNullOrBlank())
             throw ErrorCode(400, "missing name")
 
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         val folder = if(request.parentID != null) {
             folderRepo.findByIdOrNull(request.parentID) ?: throw ErrorCode(404, "folder not found")

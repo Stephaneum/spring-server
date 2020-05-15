@@ -37,7 +37,7 @@ class ChatAPI (
     fun getMessages(@PathVariable(required = false) groupID: Int?,
                     @PathVariable(required = false) classID: Int?): List<SimpleMessage> {
 
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         val messages = doWhenNormalAccess(user, groupID, classID) { group, schoolClass, teacherChat ->
             when {
@@ -55,7 +55,7 @@ class ChatAPI (
                    @PathVariable(required = false) classID: Int?,
                    @RequestBody request: AddMessage) {
 
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         if(request.message.isBlank())
             throw ErrorCode(400, "empty message")
@@ -74,7 +74,7 @@ class ChatAPI (
     fun clear(@PathVariable(required = false) groupID: Int?,
               @PathVariable(required = false) classID: Int?) {
 
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         doWhenAdminAccess(user, groupID, classID) { group, schoolClass, teacherChat ->
             when {
@@ -89,7 +89,7 @@ class ChatAPI (
     @PostMapping("/delete/{id}")
     fun deleteMessage(@PathVariable id: Int) {
 
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         val message = messageRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "message not found")
 
         doWhenAdminAccess(user, message.group?.id, message.schoolClass?.id) { _, _, _ ->

@@ -24,22 +24,19 @@ class GroupAPI (
 
     @GetMapping
     fun getMyProjects(): List<GroupInfo> {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         return userGroupRepo.findByUserAndGroupParentOrderByGroupName(user, null).map { it.group.toGroupInfo() }
     }
 
     @GetMapping("/all")
     fun getAllProjects(): List<GroupInfo> {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
-        if(user.code.role != ROLE_ADMIN)
-            throw ErrorCode(403, "Admin only")
-
+        Session.getUser(adminOnly = true)
         return groupRepo.findByParentOrderByName(null).map { it.toGroupInfo() }
     }
 
     @GetMapping("/{id}")
     fun getProject(@PathVariable id: Int): GroupInfoDetailed {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         val group: Group
         if (user.code.role == ROLE_ADMIN) {
@@ -63,7 +60,7 @@ class GroupAPI (
 
     @PostMapping("/create")
     fun create(@RequestBody request: UpdateGroup) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         if(request.name.isNullOrBlank())
             throw ErrorCode(400, "missing name")
@@ -121,7 +118,7 @@ class GroupAPI (
 
     @PostMapping("/{id}/chat/{chat}")
     fun updateChat(@PathVariable id: Int, @PathVariable chat: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         val group: Group
         if (user.code.role == ROLE_ADMIN) {
@@ -136,7 +133,7 @@ class GroupAPI (
 
     @PostMapping("/{id}/show-board-first/{show}")
     fun updateShowBoardFirst(@PathVariable id: Int, @PathVariable show: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         val group: Group
         if (user.code.role == ROLE_ADMIN) {
@@ -151,7 +148,7 @@ class GroupAPI (
 
     @PostMapping("/{id}/update")
     fun renameGroup(@PathVariable id: Int, @RequestBody request: UpdateGroup) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         if(request.name.isNullOrBlank())
             throw ErrorCode(400, "missing name")
@@ -167,7 +164,7 @@ class GroupAPI (
 
     @PostMapping("/{id}/delete")
     fun delete(@PathVariable id: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         if(!checkAdminPermission(user, id))
             throw ErrorCode(403, "you are not teacher or (group) admin")
@@ -179,7 +176,7 @@ class GroupAPI (
 
     @PostMapping("/{id}/accept")
     fun accept(@PathVariable id: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         val connection = userGroupRepo.findByUserAndGroup(user, id.obj()) ?: throw ErrorCode(404, "no user-group connection found")
         if(!connection.teacher)
             throw ErrorCode(403, "you are not teacher")
@@ -191,7 +188,7 @@ class GroupAPI (
 
     @PostMapping("/{id}/reject")
     fun reject(@PathVariable id: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         val connection = userGroupRepo.findByUserAndGroup(user, id.obj()) ?: throw ErrorCode(404, "no user-group connection found")
         if(!connection.teacher)
             throw ErrorCode(403, "you are not teacher")
@@ -202,7 +199,7 @@ class GroupAPI (
 
     @PostMapping("/{groupID}/add-user/{userID}")
     fun addUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         if(!checkAdminPermission(user, groupID))
             throw ErrorCode(403, "you are not teacher or (group) admin")
@@ -219,7 +216,7 @@ class GroupAPI (
 
     @PostMapping("/{groupID}/toggle-chat/{userID}")
     fun toggleChatUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         if(!checkAdminPermission(user, groupID))
             throw ErrorCode(403, "you are not teacher or (group) admin")
 
@@ -232,7 +229,7 @@ class GroupAPI (
 
     @PostMapping("/{groupID}/toggle-write-board/{userID}")
     fun toggleWriteBoardUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         if(!checkAdminPermission(user, groupID))
             throw ErrorCode(403, "you are not teacher or (group) admin")
 
@@ -245,7 +242,7 @@ class GroupAPI (
 
     @PostMapping("/{groupID}/kick/{userID}")
     fun kickUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
         if(!checkAdminPermission(user, groupID))
             throw ErrorCode(403, "you are not teacher or (group) admin")
 
@@ -258,7 +255,7 @@ class GroupAPI (
 
     @PostMapping("/{groupID}/leave")
     fun leave(@PathVariable groupID: Int) {
-        val user = Session.get().user ?: throw ErrorCode(401, "login")
+        val user = Session.getUser()
 
         val connection = userGroupRepo.findByUserAndGroup(user, groupID.obj()) ?: throw ErrorCode(404, "you are not member of this group")
         if(user.id == connection.group.id || connection.teacher)
