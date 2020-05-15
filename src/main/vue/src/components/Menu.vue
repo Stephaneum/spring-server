@@ -229,7 +229,7 @@
 <script>
 import Axios from "axios";
 import M from "materialize-css";
-import { showLoading } from '../helper/utils';
+import { showLoading, hideLoading } from '../helper/utils';
 
 export default {
     name: 'Menu',
@@ -252,9 +252,12 @@ export default {
                 if(this.loggedIn) {
                     showLoading("Abmelden...");
                     await Axios.post('/api/logout');
-                    window.location = '/logout.xhtml'; // continue with jsf
+                    await this.$emit('update-info');
+                    await this.$router.push('/').catch(() => {});
+                    hideLoading();
+                    M.toast({html: 'Abgemeldet.'});
                 } else {
-                    await this.$router.push('login');
+                    await this.$router.push('/login');
                 }
             }
         },

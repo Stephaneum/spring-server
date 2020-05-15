@@ -103,7 +103,7 @@
         document.getElementById('upload-pdf').click();
       },
       uploaded: async function() {
-        await this.$emit('update');
+        await this.$emit('update-info');
         await this.fetchData();
       },
       uploadError: function(e) {
@@ -130,7 +130,7 @@
         showLoadingInvisible();
         try {
           await Axios.post('/api/plan/delete');
-          await this.$emit('update');
+          await this.$emit('update-info');
           await this.fetchData();
           M.toast({ html: 'PDF Gelöscht.' });
         } catch (e) {
@@ -143,7 +143,7 @@
         showLoadingInvisible();
         try {
           await Axios.post('/api/plan/text?text='+this.planInfo);
-          await this.$emit('update');
+          await this.$emit('update-info');
           M.toast({ html: 'Text aktualisiert.' });
         } catch (e) {
           M.toast({ html: 'Ein Fehler ist aufgetreten.' });

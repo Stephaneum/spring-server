@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <Menu :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></Menu>
+    <Menu @update-info="fetchData" :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></Menu>
     <div style="min-height: calc(100vh - 150px)">
-      <router-view :info="info" @update="fetchData"/>
+      <router-view :info="info" @update-info="fetchData"/>
     </div>
     <div style="height: 50px"></div>
     <Footer :copyright="info.copyright"></Footer>

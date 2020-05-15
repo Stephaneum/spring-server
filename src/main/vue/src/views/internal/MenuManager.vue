@@ -320,7 +320,7 @@
           };
           await Axios.post('/api/menu/create' + (this.selectedMenu.parent ? '/' + this.selectedMenu.parent.id : ''), data);
           await this.fetchData();
-          await this.$emit('update');
+          await this.$emit('update-info');
           M.toast({html: 'Gruppe erstellt.<br>'+this.selectedMenu.name});
           M.Modal.getInstance(document.getElementById('modal-create-menu')).close();
         } catch (e) {
@@ -368,7 +368,7 @@
           };
           await Axios.post('/api/menu/update', data);
           await this.fetchData();
-          await this.$emit('update');
+          await this.$emit('update-info');
           M.toast({html: 'Eintrag aktualisiert.<br>'+this.selectedMenu.name});
           M.Modal.getInstance(document.getElementById('modal-update-menu')).close();
         } catch (e) {
@@ -389,7 +389,7 @@
         try {
           await Axios.post('/api/menu/delete/' + this.selectedMenu.id, { password: this.deletePassword });
           await this.fetchData();
-          await this.$emit('update');
+          await this.$emit('update-info');
           M.toast({html: 'Eintrag gelöscht.<br>'+this.selectedMenu.name});
           M.Modal.getInstance(document.getElementById('modal-delete-menu')).close();
         } catch (e) {

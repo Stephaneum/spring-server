@@ -121,7 +121,7 @@
         try {
           await Axios.post('/api/account/email', { email: this.email });
           await this.fetchData();
-          await this.$emit('update');
+          await this.$emit('update-info');
           M.toast({html: 'E-Mail geändert.'});
           this.email = null;
           this.$nextTick(() => M.updateTextFields());

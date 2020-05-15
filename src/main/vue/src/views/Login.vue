@@ -30,7 +30,6 @@
 </template>
 
 <script>
-  // @ is an alias to /src
   import Axios from "axios"
   import M from "materialize-css"
 
@@ -57,7 +56,9 @@
         try {
           await Axios.post('/api/login', { email: this.email, password: this.password });
           this.loginFailed = false;
-          window.location = '/user-manager';
+          await this.$emit('update-info');
+          await this.$router.push('/home');
+          M.toast({html: 'Willkommen'});
         } catch (e) {
           this.loginFailed = true;
           this.loggingIn = false;
