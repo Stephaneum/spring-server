@@ -19,6 +19,7 @@ enum class Element(val code: String, val info: String, var value: String? = null
     storageTeacher("storage_lehrer", "Speicherplatz Lehrer"),
     storageStudent("storage_schueler", "Speicherplatz Schueler"),
     passwordResetTimeout("timeout_passwort_vergessen", "Timeout Passwort Zuruecksetzen"),
+    indexStatsHour("stats_stunden_index", "Index stats-hour"),
 
     // special
     contact("str_kontakt", "Kontakt"),
