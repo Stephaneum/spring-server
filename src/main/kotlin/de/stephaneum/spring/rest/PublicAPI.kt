@@ -1,10 +1,7 @@
 package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.Session
-import de.stephaneum.spring.database.EMPTY_USER
-import de.stephaneum.spring.database.PostRepo
-import de.stephaneum.spring.database.ROLE_ADMIN
-import de.stephaneum.spring.database.ROLE_NO_LOGIN
+import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.Event
 import de.stephaneum.spring.helper.MenuService
 import de.stephaneum.spring.rest.objects.Response
@@ -15,13 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 data class TextResponse(val text: String)
+data class Stats(val studentCount: Int, val teacherCount: Int, val postCount: Int, val visitCount: Int)
 
 @RestController
 @RequestMapping("/api")
 class PublicAPI (
         private val configScheduler: ConfigScheduler,
         private val menuService: MenuService,
-        private val postRepo: PostRepo
+        private val postRepo: PostRepo,
+        private val userRepo: UserRepo
 ) {
 
     @GetMapping("/info")
@@ -54,5 +53,18 @@ class PublicAPI (
     @GetMapping("/events")
     fun events(): List<Event> {
         return configScheduler.getDigestedEvents()
+    }
+
+    @GetMapping("/stats")
+    fun stats(): Stats {
+        val studentCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_STUDENT, true)
+        val teacherCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_TEACHER, true)
+        val postCount = postRepo.countByApproved(true)
+        return Stats(
+                studentCount = studentCount,
+                teacherCount = teacherCount,
+                postCount = postCount,
+                visitCount = 420
+        )
     }
 }

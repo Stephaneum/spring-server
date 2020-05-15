@@ -79,6 +79,8 @@ interface UserRepo: CrudRepository<User, Int> {
     fun findBySchoolClassGrade(grade: Int): List<User>
     fun existsByEmail(email: String): Boolean
 
+    fun countByCodeRoleAndCodeUsed(role: Int, used: Boolean): Int
+
     // search
     fun findByOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(): List<User>
     fun findByCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(role: Int): List<User>
