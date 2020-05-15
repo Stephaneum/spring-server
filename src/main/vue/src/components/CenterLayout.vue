@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            <div class="col s12 m8">
+            <div class="col" :class="hideLogos ? ['s12', 'm12', 'l10'] : ['s12', 'm8']">
                 <slot v-if="customCard"></slot>
                 <div v-else class="card-panel white" style="min-height: 800px">
                     <h5 v-if="!hideTitle" style="margin-bottom: 30px">{{ title }}</h5>
@@ -57,7 +57,7 @@
                 </router-link>
             </div>
 
-            <div class="col m2 hide-on-med-and-down">
+            <div v-if="!hideLogos" class="col m2 hide-on-med-and-down">
                 <br/><br/>
                 <Logos :history="history" :eu-sa="euSa"></Logos>
             </div>
@@ -70,7 +70,7 @@ import Logos from "./Logos";
 export default {
     name: 'CenterLayout',
     components: { Logos },
-    props: ['title', 'hideTitle', 'customCard', 'plan', 'history', 'euSa']
+    props: ['title', 'hideTitle', 'hideLogos', 'customCard', 'plan', 'history', 'euSa']
 }
 </script>
 

@@ -9,6 +9,7 @@ import EuSa from "./views/EuSa";
 import HistoryView from "./views/HistoryView";
 import Events from "./views/Events";
 import PostView from "./views/PostView";
+import Stats from "./views/Stats";
 
 Vue.use(VueRouter);
 
@@ -22,6 +23,11 @@ const routes = [
     path: "/beitrag/:id",
     name: "post-view",
     component: PostView,
+  },
+  {
+    path: "/statistiken",
+    name: "stats",
+    component: Stats,
   },
   {
     path: "/termine",
