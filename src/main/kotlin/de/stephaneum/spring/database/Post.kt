@@ -3,6 +3,7 @@ package de.stephaneum.spring.database
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
@@ -81,6 +82,7 @@ interface PostRepo: CrudRepository<Post, Int> {
     fun countByApprovedAndUser(approved: Boolean, user: User): Int
 
     fun findByMenuIdOrderByTimestampDesc(menuID: Int): List<Post>
+    fun findByMenuIdOrderByTimestampDesc(menuID: Int, pageable: Pageable): List<Post>
     fun findByUserAndApproved(user: User, approved: Boolean): List<Post>
 
     @Query("SELECT p FROM Post p WHERE p.approved = FALSE ORDER BY p.timestamp")

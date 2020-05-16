@@ -40,6 +40,7 @@ object PostResponse {
 @RequestMapping("/api/post")
 class PostAPI (
         private val jsfService: JsfService,
+        private val postService: PostService,
         private val cryptoService: CryptoService,
         private val imageService: ImageService,
         private val fileService: FileService,
@@ -71,24 +72,10 @@ class PostAPI (
             unapproved == true || menuID != null -> {
                 // multiple posts
                 val user = Session.get().user ?: User()
-                val posts = when {
-                    menuID != null -> postRepo.findByMenuIdOrderByTimestampDesc(menuID) // get posts from a menu
-                    user.code.role == ROLE_ADMIN || menuService.isMenuAdmin(user) -> postRepo.findUnapproved() // get all unapproved posts
-                    else -> postRepo.findUnapproved(user.id) // get only unapproved posts from the current user
-                }
-
-                if(posts.isEmpty())
-                    return emptyList<Post>()
-
-                val images = filePostRepo.findImagesByPostIdIn(posts.map { it.id })
-                return posts.apply {
-                    forEach { p ->
-                        p.simplify()
-                        p.menu?.simplify()
-                        p.images = images.filter { it.postID == p.id }.map { it.file.apply { simplifyForPosts() } }
-                        if(noContent == true)
-                            p.content = null
-                    }
+                return when {
+                    menuID != null -> postService.getPosts(menuID, noContent == true) // get posts from a menu
+                    user.code.role == ROLE_ADMIN || menuService.isMenuAdmin(user) -> postService.getAllUnapprovedPosts(noContent == true) // get all unapproved posts
+                    else -> postService.getUnapprovedPosts(user, noContent = true) // get only unapproved posts from the current user
                 }
             }
             else -> return PostResponse.Feedback(false, message = "Empty request body")

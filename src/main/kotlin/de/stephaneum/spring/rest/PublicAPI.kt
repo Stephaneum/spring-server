@@ -8,6 +8,7 @@ import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Coop
 import de.stephaneum.spring.scheduler.Element
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -28,7 +29,7 @@ data class HomeData(val slider: List<Slider>, val menu: Menu, val posts: List<Po
 @RestController
 @RequestMapping("/api")
 class PublicAPI (
-        private val postAPI: PostAPI,
+        private val postService: PostService,
         private val configScheduler: ConfigScheduler,
         private val countService: CountService,
         private val menuService: MenuService,
@@ -56,9 +57,7 @@ class PublicAPI (
     @GetMapping("/home")
     fun home(): HomeData {
         val menu = configScheduler.get(Element.defaultMenu)?.toIntOrNull() ?: 0
-        var posts = postAPI.get(null, null, menu, false) as List<Post>
-        if(posts.size > 3)
-            posts = posts.subList(0, 3)
+        val posts = postService.getPosts(menu, pageable = PageRequest.of(0, 3))
         return HomeData(
                 slider = sliderRepo.findByOrderByIndex(),
                 menu = menuRepo.findByIdOrNull(menu) ?: Menu(name = "Error"),
