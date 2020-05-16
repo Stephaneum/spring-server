@@ -38,6 +38,7 @@ interface UserGroupRepo: CrudRepository<UserGroup, Int> {
 
     fun findByUserAndGroupParent(user: User, parent: Group?): List<UserGroup>
     fun findByUserAndGroupParentOrderByGroupName(user: User, parent: Group?): List<UserGroup>
+    fun findByUserAndGroupParentAndAcceptedOrderByGroupName(user: User, parent: Group?, accepted: Boolean): List<UserGroup>
     fun findByUserAndGroup(user: User, group: Group): UserGroup?
     fun findByGroupOrderByUserFirstNameAscUserLastNameAsc(group: Group): List<UserGroup>
     fun countByGroup(group: Group): Int

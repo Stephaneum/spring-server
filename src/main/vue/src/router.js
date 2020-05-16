@@ -65,88 +65,81 @@ const routes = [
     component: Login,
   },
   {
+    path: "/home",
+    name: "home",
+    component: () => import(/* webpackChunkName: "home" */ "./views/internal/Home.vue"),
+  },
+  {
     path: "/config-manager",
     name: "config-manager",
     meta: { title: 'Konfiguration - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "config-manager" */ "./views/internal/ConfigManager.vue"),
+    component: () => import(/* webpackChunkName: "config-manager" */ "./views/internal/ConfigManager.vue"),
   },
   {
     path: "/code-manager",
     name: "code-manager",
     meta: { title: 'Zugangscodes - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "code-manager" */ "./views/internal/CodeManager.vue"),
+    component: () => import(/* webpackChunkName: "code-manager" */ "./views/internal/CodeManager.vue"),
   },
   {
     path: "/user-manager",
     name: "user-manager",
     meta: { title: 'Nutzerverwaltung - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "user-manager" */ "./views/internal/UserManager.vue"),
+    component: () => import(/* webpackChunkName: "user-manager" */ "./views/internal/UserManager.vue"),
   },
   {
     path: "/logs",
     name: "logs",
     meta: { title: 'Logdaten - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "logs" */ "./views/internal/Logs.vue"),
+    component: () => import(/* webpackChunkName: "logs" */ "./views/internal/Logs.vue"),
   },
   {
     path: "/menu-manager",
     name: "menu-manager",
     meta: { title: 'Menüverwaltung - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "menu-manager" */ "./views/internal/MenuManager.vue"),
+    component: () => import(/* webpackChunkName: "menu-manager" */ "./views/internal/MenuManager.vue"),
   },
   {
     path: "/plan-manager",
     name: "plan-manager",
     meta: { title: 'Vertretungsplan - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "plan-manager" */ "./views/internal/PlanManager.vue"),
+    component: () => import(/* webpackChunkName: "plan-manager" */ "./views/internal/PlanManager.vue"),
   },
   {
     path: "/static-manager",
     name: "static-manager",
     meta: { title: 'Seiten - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "static-manager" */ "./views/internal/StaticManager.vue"),
+    component: () => import(/* webpackChunkName: "static-manager" */ "./views/internal/StaticManager.vue"),
   },
   {
     path: "/post-manager",
     name: "post-manager",
     meta: { title: 'Beiträge - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "post-manager" */ "./views/internal/PostManager.vue"),
+    component: () => import(/* webpackChunkName: "post-manager" */ "./views/internal/PostManager.vue"),
   },
   {
     path: "/groups",
     name: "group-list",
     meta: { title: 'Gruppen - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "group-list" */ "./views/internal/GroupList.vue"),
+    component: () => import(/* webpackChunkName: "group-list" */ "./views/internal/GroupList.vue"),
   },
   {
     path: "/groups/:id",
     name: "group-view",
     meta: { title: 'Gruppen - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "group-view" */ "./views/internal/GroupView.vue"),
+    component: () => import(/* webpackChunkName: "group-view" */ "./views/internal/GroupView.vue"),
   },
   {
     path: "/cloud",
     name: "cloud",
     meta: { title: 'Cloud - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "cloud" */ "./views/internal/Cloud.vue"),
+    component: () => import(/* webpackChunkName: "cloud" */ "./views/internal/Cloud.vue"),
   },
   {
     path: "/account",
     name: "account",
     meta: { title: 'Account - Stephaneum' },
-    component: () =>
-        import(/* webpackChunkName: "account" */ "./views/internal/Account.vue"),
+    component: () => import(/* webpackChunkName: "account" */ "./views/internal/Account.vue"),
   },
 ];
 

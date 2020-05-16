@@ -216,8 +216,8 @@
       changeAccount: async function() {
         showLoading('Account wechseln...');
         try {
-          const response = await Axios.post('/api/users/change-account/' + this.selected.id);
-          window.location.href = '/change_account.xhtml?key=' + response.data.token;
+          await Axios.post('/api/users/change-account/' + this.selected.id);
+          window.location.href = '/home';
         } catch (e) {
           M.toast({html: 'Ein Fehler ist aufgetreten.'});
           hideLoading();

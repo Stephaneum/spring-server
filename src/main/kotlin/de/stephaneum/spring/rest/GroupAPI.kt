@@ -23,9 +23,13 @@ class GroupAPI (
 ) {
 
     @GetMapping
-    fun getMyProjects(): List<GroupInfo> {
+    fun getMyProjects(@RequestParam(required = false) accepted: Boolean?): List<GroupInfo> {
         val user = Session.getUser()
-        return userGroupRepo.findByUserAndGroupParentOrderByGroupName(user, null).map { it.group.toGroupInfo() }
+        val connections = if (accepted == true)
+            userGroupRepo.findByUserAndGroupParentAndAcceptedOrderByGroupName(user, null, true)
+        else
+            userGroupRepo.findByUserAndGroupParentOrderByGroupName(user, null)
+        return connections.map { it.group.toGroupInfo() }
     }
 
     @GetMapping("/all")
