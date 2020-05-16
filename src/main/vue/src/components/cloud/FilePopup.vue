@@ -155,7 +155,7 @@
             officeLink: function() {
                 return (file) => {
                     if(this.key)
-                        return 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(window.location.origin + '/api/cloud/download/file/'+ file.id+'?download=true&key='+this.key);
+                        return 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(window.location.origin + '/files/internal/'+ file.id+'?download=true&key='+this.key);
                     else
                         return '';
                 }

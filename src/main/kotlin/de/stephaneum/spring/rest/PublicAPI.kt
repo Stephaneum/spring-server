@@ -6,11 +6,14 @@ import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.*
 import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
+import de.stephaneum.spring.scheduler.Coop
 import de.stephaneum.spring.scheduler.Element
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.Duration
+import java.time.LocalDate
 import java.time.ZonedDateTime
 
 data class TextResponse(val text: String)
@@ -20,15 +23,19 @@ data class Stats(
         val upTime: Long, val startTime: ZonedDateTime,
         val dev: String?
 )
+data class HomeData(val slider: List<Slider>, val menu: Menu, val posts: List<Post>, val events: List<Event>, val studentCount: Int, val teacherCount: Int, val years: Int, val coop: List<Coop>)
 
 @RestController
 @RequestMapping("/api")
 class PublicAPI (
+        private val postAPI: PostAPI,
         private val configScheduler: ConfigScheduler,
         private val countService: CountService,
         private val menuService: MenuService,
         private val postRepo: PostRepo,
-        private val userRepo: UserRepo
+        private val userRepo: UserRepo,
+        private val sliderRepo: SliderRepo,
+        private val menuRepo: MenuRepo
 ) {
 
     @GetMapping("/info")
@@ -44,6 +51,24 @@ class PublicAPI (
             else                                                            -> null
         }
         return Response.Info(user, menuService.hasMenuWriteAccess(user), menuService.getPublic(), copyright, plan, history, euSa, unapproved)
+    }
+
+    @GetMapping("/home")
+    fun home(): HomeData {
+        val menu = configScheduler.get(Element.defaultMenu)?.toIntOrNull() ?: 0
+        var posts = postAPI.get(null, null, menu, false) as List<Post>
+        if(posts.size > 3)
+            posts = posts.subList(0, 3)
+        return HomeData(
+                slider = sliderRepo.findByOrderByIndex(),
+                menu = menuRepo.findByIdOrNull(menu) ?: Menu(name = "Error"),
+                posts = posts,
+                events = configScheduler.getDigestedEvents(),
+                studentCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_STUDENT, true),
+                teacherCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_TEACHER, true),
+                years = LocalDate.now().year - 1325,
+                coop = configScheduler.getDigestedCoop()
+        )
     }
 
     @GetMapping("/imprint")

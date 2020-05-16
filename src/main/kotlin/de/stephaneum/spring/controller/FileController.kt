@@ -26,7 +26,7 @@ class FileController (
         private val fileRepo: FileRepo
 ) {
 
-    @GetMapping("/api/cloud/download/file/{fileID}")
+    @GetMapping("/files/internal/{fileID}")
     fun download(@PathVariable fileID: Int, @RequestParam(required = false) download: Boolean?, @RequestParam(required = false) key: String?, @RequestParam(required = false) txt: Boolean?): Any {
 
         val file = fileRepo.findByIdOrNull(fileID) ?: return "404"
@@ -66,7 +66,7 @@ class FileController (
         }
     }
 
-    @GetMapping("/files/image/{fileName}")
+    @GetMapping("/files/images/{fileName}")
     fun image(@PathVariable fileName: String, request: HttpServletRequest): ResponseEntity<*> {
 
         // get file content

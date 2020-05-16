@@ -261,9 +261,9 @@
                     f.sizeReadable = storageReadable(f.size);
 
                     if(f.isFolder)
-                        f.link = '/api/cloud/download/folder/'+f.id;
+                        f.link = '/api/cloud/download/folder/'+f.id; // TODO
                     else
-                        f.link = '/api/cloud/download/file/'+f.id;
+                        f.link = '/files/internal/'+f.id;
 
                     f.canModify = !f.locked && (!this.sharedMode || this.modifyAll || f.user.id === this.myId);
                 });

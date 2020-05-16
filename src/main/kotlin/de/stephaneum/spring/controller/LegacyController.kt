@@ -25,4 +25,9 @@ class LegacyController {
     fun file(@RequestParam file: String): String {
         return "redirect:/files/public/$file"
     }
+
+    @GetMapping("/impressum.xhtml")
+    fun imprint(): String {
+        return "redirect:/impressum"
+    }
 }

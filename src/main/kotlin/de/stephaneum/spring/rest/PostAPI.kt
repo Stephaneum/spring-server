@@ -70,7 +70,7 @@ class PostAPI (
             }
             unapproved == true || menuID != null -> {
                 // multiple posts
-                val user = Session.get().user ?: return PostResponse.Feedback(false, needLogin = true)
+                val user = Session.get().user ?: User()
                 val posts = when {
                     menuID != null -> postRepo.findByMenuIdOrderByTimestampDesc(menuID) // get posts from a menu
                     user.code.role == ROLE_ADMIN || menuService.isMenuAdmin(user) -> postRepo.findUnapproved() // get all unapproved posts

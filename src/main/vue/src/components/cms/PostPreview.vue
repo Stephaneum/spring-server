@@ -56,7 +56,7 @@ export default {
             return this.images.length !== 0;
         },
         imageURL: function () {
-            return (image) => '/files/image/'+image.id+'_'+image.fileName;
+            return (image) => '/files/images/'+image.id+'_'+image.fileName;
         },
         postURL: function () {
             if(this.post_id > 1)

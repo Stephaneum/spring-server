@@ -172,7 +172,7 @@ export default {
                 return this.areas[0];
         },
         downloadLink: function() {
-            return (file) => '/api/cloud/download/file/'+file.id;
+            return (file) => '/files/internal/'+file.id;
         }
     },
     watch: {

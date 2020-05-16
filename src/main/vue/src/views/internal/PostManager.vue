@@ -711,7 +711,7 @@
         return this.info.user && this.info.user.code.role === 100;
       },
       imageURL: function() {
-        return (image) => '/files/image/'+image.id+'_'+image.fileName;
+        return (image) => '/files/images/'+image.id+'_'+image.fileName;
       },
       editModeText: function() {
         return (unapproved) => unapproved ? 'Bearbeiten (' + unapproved + ')' : 'Bearbeiten';

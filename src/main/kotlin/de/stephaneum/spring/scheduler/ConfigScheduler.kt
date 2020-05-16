@@ -34,6 +34,8 @@ enum class Element(val code: String, val info: String, var value: String? = null
     coopURL("str_koop_url", "Koop.-partner (URL)")
 }
 
+data class Coop(val country: String, val tooltip: String?, val link: String?)
+
 @Service
 class ConfigScheduler {
 
@@ -52,6 +54,7 @@ class ConfigScheduler {
 
     private val configs = Element.values().toList()
     private var digestedEvents: List<Event> = emptyList()
+    private var digestedCoop: List<Coop> = emptyList()
 
     @Scheduled(initialDelay=3000, fixedDelay = 10000)
     fun update() {
@@ -66,6 +69,28 @@ class ConfigScheduler {
                 // update digested
                 when (c) {
                     Element.events -> digestedEvents = eventParser.parse(dbConfig.value ?: "")
+                    Element.coop -> {
+                        val raw = dbConfig.value ?: ""
+                        raw.split(";").map { coopRaw ->
+                            val link = when(val index = coopRaw.indexOf('[')) {
+                                -1 -> null
+                                else -> coopRaw.substring(index + 1, coopRaw.length - 1)
+                            }
+                            val tooltip = when(val index = coopRaw.indexOf('(')) {
+                                -1 -> null
+                                else -> when(val closeIndex = coopRaw.indexOf(')')) {
+                                    -1 -> coopRaw.substring(index + 1)
+                                    else -> coopRaw.substring(index + 1, closeIndex)
+                                }
+                            }
+                            val country = when {
+                                tooltip != null -> coopRaw.substring(0, coopRaw.indexOf('('))
+                                link != null -> coopRaw.substring(0, coopRaw.indexOf('['))
+                                else -> coopRaw
+                            }
+                            Coop(country, tooltip, link)
+                        }
+                    }
                     else -> {}
                 }
             }
@@ -78,6 +103,10 @@ class ConfigScheduler {
 
     fun getDigestedEvents(): List<Event> {
         return digestedEvents
+    }
+
+    fun getDigestedCoop(): List<Coop> {
+        return digestedCoop
     }
 
     fun save(element: Element, value: String?) {
