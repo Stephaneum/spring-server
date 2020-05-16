@@ -31,7 +31,7 @@
     const standardOptions = {
         height: 250,
         legend: 'none',
-        colors: ['#66bb6a'],
+        colors: ['#85b56e'],
         chartArea: {
             top: 10,
             right: 0,

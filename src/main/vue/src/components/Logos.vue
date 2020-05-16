@@ -9,6 +9,8 @@
             </a>
         </router-link>
 
+        <br>
+
         <img src="../assets/img/europaschule.png" style="margin-top: 50px;" alt="logo"/>
 
         <a href="http://www.unesco.de/bildung/ups.html" target="_blank">

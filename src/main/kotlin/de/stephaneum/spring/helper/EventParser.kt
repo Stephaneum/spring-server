@@ -61,7 +61,7 @@ class EventParser {
                     null
                 }
             }
-        }.filterNotNull()
+        }.filterNotNull().sortedBy { it.start }
     }
 
     private fun parseTime(time: String): LocalDateTime {

@@ -71,7 +71,7 @@ class ConfigScheduler {
                     Element.events -> digestedEvents = eventParser.parse(dbConfig.value ?: "")
                     Element.coop -> {
                         val raw = dbConfig.value ?: ""
-                        raw.split(";").map { coopRaw ->
+                        digestedCoop = raw.split(";").map { coopRaw ->
                             val link = when(val index = coopRaw.indexOf('[')) {
                                 -1 -> null
                                 else -> coopRaw.substring(index + 1, coopRaw.length - 1)
