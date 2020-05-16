@@ -26,6 +26,11 @@ class LegacyController {
         return "redirect:/files/public/$file"
     }
 
+    @GetMapping("/kontakt.xhtml")
+    fun contact(): String {
+        return "redirect:/kontakt"
+    }
+
     @GetMapping("/impressum.xhtml")
     fun imprint(): String {
         return "redirect:/impressum"
