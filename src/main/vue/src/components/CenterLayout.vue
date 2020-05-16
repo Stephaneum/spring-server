@@ -16,7 +16,7 @@
         </div>
 
         <div class="row">
-            <div class="col m4 l2 hide-on-small-only">
+            <div class="col l2 hide-on-med-and-down">
                 <br/><br/>
                 <div>
                     <span v-if="plan && plan.exists">

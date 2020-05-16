@@ -1,5 +1,6 @@
 package de.stephaneum.spring.rest
 
+import de.stephaneum.spring.START_TIME
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.Event
@@ -10,9 +11,15 @@ import de.stephaneum.spring.scheduler.Element
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.Duration
+import java.time.ZonedDateTime
 
 data class TextResponse(val text: String)
-data class Stats(val studentCount: Int, val teacherCount: Int, val postCount: Int, val visitCount: Int)
+data class Stats(
+        val studentCount: Int, val teacherCount: Int, val postCount: Int, val visitCount: Int,
+        val upTime: Long, val startTime: ZonedDateTime,
+        val dev: String?
+)
 
 @RestController
 @RequestMapping("/api")
@@ -60,11 +67,11 @@ class PublicAPI (
         val studentCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_STUDENT, true)
         val teacherCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_TEACHER, true)
         val postCount = postRepo.countByApproved(true)
+        val dev = configScheduler.get(Element.dev)
         return Stats(
-                studentCount = studentCount,
-                teacherCount = teacherCount,
-                postCount = postCount,
-                visitCount = 420
+                studentCount = studentCount, teacherCount = teacherCount, postCount = postCount, visitCount = 420,
+                upTime = Duration.between(START_TIME, ZonedDateTime.now()).toSeconds(), startTime = START_TIME,
+                dev = dev
         )
     }
 }

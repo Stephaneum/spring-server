@@ -6,6 +6,9 @@ import org.springframework.boot.runApplication
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
+import java.time.ZonedDateTime
+
+val START_TIME = ZonedDateTime.now()
 
 @SpringBootApplication
 @EnableScheduling
