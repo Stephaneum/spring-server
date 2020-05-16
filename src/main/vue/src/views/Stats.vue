@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <StatsChartPanel></StatsChartPanel>
+    <StatsChartPanel :stats-day="statsDay" :stats-hour="statsHour" :stats-browser="statsBrowser" :stats-o-s="statsOS"></StatsChartPanel>
 
     <StatsPanel title="Technologien" icon="settings">
       <div style="margin: 30px 0 20px 0; display: flex; align-items: end; justify-content: space-evenly">
@@ -57,19 +57,31 @@
       teacherCount: null,
       postCount: null,
       visitCount: null,
+
+      statsDay: null,
+      statsHour: null,
+      statsBrowser: null,
+      statsOS: null,
+
       upTime: null,
       startTime: null,
       dev: null
     }),
     async mounted() {
-      const stats = await Axios.get('/api/stats');
-      this.studentCount = stats.data.studentCount;
-      this.teacherCount = stats.data.teacherCount;
-      this.postCount = stats.data.postCount;
-      this.visitCount = stats.data.visitCount;
-      this.upTime = stats.data.upTime;
-      this.startTime = moment(stats.data.startTime).format('dddd, [den] DD.MMMM yyyy');
-      this.dev = stats.data.dev;
+      const stats = (await Axios.get('/api/stats')).data;
+      this.studentCount = stats.studentCount;
+      this.teacherCount = stats.teacherCount;
+      this.postCount = stats.postCount;
+      this.visitCount = stats.visitCount;
+
+      this.statsDay = stats.statsDay;
+      this.statsHour = stats.statsHour;
+      this.statsBrowser = stats.statsBrowser;
+      this.statsOS = stats.statsOS;
+
+      this.upTime = stats.upTime;
+      this.startTime = moment(stats.startTime).format('dddd, [den] DD.MMMM yyyy');
+      this.dev = stats.dev;
     }
   }
 </script>

@@ -8,9 +8,15 @@ import de.stephaneum.spring.scheduler.Element
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+
+data class DayCount(val day: String, val count: Int)
+data class HourCount(val hour: Int, val count: Long)
+data class BrowserCount(val browser: Browser, val count: Int)
+data class OSCount(val os: OS, val count: Int)
 
 @Service
 class CountService (
@@ -35,33 +41,52 @@ class CountService (
      */
     fun count(ip: String, userAgent: String) {
 
+        val ua = userAgent.toLowerCase()
+
         if (lastIP == ip) {
-            logger.info("same ip: $ip ($userAgent)")
+            logger.info("same ip: $ip ($ua)")
             return
         }
 
         val now = LocalDateTime.now(germanTimezone)
 
-        if (userAgentDetector.isBot(userAgent)) {
-            logBot(now, ip, userAgent)
+        if (userAgentDetector.isBot(ua)) {
+            logBot(now, ip, ua)
             return
         }
 
         countHour(now)
         countDay(now)
-        val browser = countBrowser(userAgent)
-        val os = countOS(userAgent)
+        val browser = countBrowser(ua)
+        val os = countOS(ua)
 
-        log(now, ip, userAgent, os, browser)
+        log(now, ip, ua, os, browser)
         lastIP = ip
     }
 
-    fun getStatsBrowser(): Map<Browser, Int> {
-        return statsBrowser
+    fun getStatsDay(): List<DayCount> {
+        val start = LocalDate.now().minusDays(29) // include today
+        val days = statsDayRepo.findByDateGreaterThanEqual(start)
+        return List(30) { index ->
+            val currDay = start.plusDays(index.toLong())
+            val currDayString = when (currDay.dayOfMonth) {
+                1 -> "1.${currDay.monthValue}"
+                else -> currDay.dayOfMonth.toString()
+            }
+            DayCount(currDayString, days.firstOrNull { it.date == currDay }?.count ?: 0)
+        }
     }
 
-    fun getStatsOS(): Map<OS, Int> {
-        return statsOS
+    fun getStatsHour(): List<HourCount> {
+        return statsHourRepo.getStats()
+    }
+
+    fun getStatsBrowser(): List<BrowserCount> {
+        return Browser.values().map { browser -> BrowserCount(browser, statsBrowser[browser] ?: 0) }
+    }
+
+    fun getStatsOS(): List<OSCount> {
+        return OS.values().map { os -> OSCount(os, statsOS[os] ?: 0) }
     }
 
     fun getHistory(): Array<String?> {

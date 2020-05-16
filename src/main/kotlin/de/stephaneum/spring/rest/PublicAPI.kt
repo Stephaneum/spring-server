@@ -3,8 +3,7 @@ package de.stephaneum.spring.rest
 import de.stephaneum.spring.START_TIME
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
-import de.stephaneum.spring.helper.Event
-import de.stephaneum.spring.helper.MenuService
+import de.stephaneum.spring.helper.*
 import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
@@ -17,6 +16,7 @@ import java.time.ZonedDateTime
 data class TextResponse(val text: String)
 data class Stats(
         val studentCount: Int, val teacherCount: Int, val postCount: Int, val visitCount: Int,
+        val statsDay: List<DayCount>, val statsHour: List<HourCount>, val statsBrowser: List<BrowserCount>, val statsOS: List<OSCount>,
         val upTime: Long, val startTime: ZonedDateTime,
         val dev: String?
 )
@@ -25,6 +25,7 @@ data class Stats(
 @RequestMapping("/api")
 class PublicAPI (
         private val configScheduler: ConfigScheduler,
+        private val countService: CountService,
         private val menuService: MenuService,
         private val postRepo: PostRepo,
         private val userRepo: UserRepo
@@ -68,8 +69,11 @@ class PublicAPI (
         val teacherCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_TEACHER, true)
         val postCount = postRepo.countByApproved(true)
         val dev = configScheduler.get(Element.dev)
+        val statsDay = countService.getStatsDay()
+        val visitCount = statsDay.sumBy { it.count }
         return Stats(
-                studentCount = studentCount, teacherCount = teacherCount, postCount = postCount, visitCount = 420,
+                studentCount = studentCount, teacherCount = teacherCount, postCount = postCount, visitCount = visitCount,
+                statsDay = statsDay, statsHour = countService.getStatsHour(), statsBrowser = countService.getStatsBrowser(), statsOS = countService.getStatsOS(),
                 upTime = Duration.between(START_TIME, ZonedDateTime.now()).toSeconds(), startTime = START_TIME,
                 dev = dev
         )

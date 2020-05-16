@@ -21,5 +21,6 @@ data class StatsDay(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Repository
 interface StatsDayRepo: CrudRepository<StatsDay, Int> {
 
-    fun findByDate(timestamp: LocalDate): StatsDay?
+    fun findByDate(date: LocalDate): StatsDay?
+    fun findByDateGreaterThanEqual(date: LocalDate): List<StatsDay>
 }

@@ -6,7 +6,7 @@ import de.stephaneum.spring.helper.ErrorCode
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
-data class StephSession(var permission: Permission = Permission.NONE, var user: User? = null, var toast: Toast? = null)
+data class StephSession(var permission: Permission = Permission.NONE, var user: User? = null)
 data class Toast(var title: String, var content: String? = null)
 enum class Permission { NONE, BLACKBOARD, BACKUP }
 
@@ -26,6 +26,23 @@ object Session {
         return voteSession
     }
 
+    /**
+     * @return true if session has been created during method call
+     */
+    fun createIfNotExists(): Boolean {
+        val attr = RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes
+        val session = attr.request.getSession(true)
+        var stephSession = session.getAttribute(KEY) as StephSession?
+        return if (stephSession == null) {
+            // create new if not exists
+            stephSession = StephSession()
+            session.setAttribute(KEY, stephSession)
+            true
+        } else {
+            false
+        }
+    }
+
     fun getUser(adminOnly: Boolean = false): User {
         val user = get().user ?: throw ErrorCode(401, "Unauthorized")
         if(adminOnly && user.code.role != ROLE_ADMIN)
@@ -43,19 +60,6 @@ object Session {
         val session = get()
         session.permission = Permission.NONE
         session.user = null
-    }
-
-    fun addToast(title: String) = addToast(title, null)
-
-    fun addToast(title: String, content: String?) {
-        get().toast = Toast(title, content)
-    }
-
-    fun getAndDeleteToast(): Toast? {
-        val session = get()
-        val toast = session.toast
-        session.toast = null
-        return toast
     }
 }
 
