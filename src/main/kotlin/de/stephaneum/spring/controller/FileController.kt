@@ -101,4 +101,24 @@ class FileController (
     fun slider(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<*> {
         return image("slider_$id.jpg", request)
     }
+
+    @GetMapping("/files/public/{argument}")
+    fun publicFile(@PathVariable argument: String): Any {
+        val split = argument.split('_')
+        val id = split[0].toIntOrNull() ?: return "403"
+        val file = fileRepo.findByIdOrNull(id) ?: return "403"
+
+        if(split.size == 1 || file.generateFileName() != split.subList(1, split.size).joinToString(separator = ""))
+            return "403"
+
+        if(!file.public)
+            return "403"
+
+        val resource = fileService.loadFileAsResource(file.path) ?: return "500"
+        return ResponseEntity.ok()
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.parseMediaType(fileService.getMimeFromPath(file.path)))
+                .header("Content-Disposition", "inline; filename=\"" + file.generateFileName() + "\"")
+                .body(resource)
+    }
 }

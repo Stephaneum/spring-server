@@ -404,7 +404,7 @@
         computed: {
             publicLink: function () {
                 return (file) => {
-                    return window.location.origin + '/public/?file='+ file.id +'_' + encodeURI(file.fileName);
+                    return window.location.origin + '/files/public/'+ file.id +'_' + encodeURI(file.fileName);
                 };
             }
         },
