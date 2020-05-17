@@ -5,7 +5,8 @@
     <div class="row" style="max-width: 1500px">
 
       <div class="col s12 m9 offset-m3">
-        <h3 class="center-align">{{ menu.name }}</h3>
+        <h3 v-if="menu.name" class="center-align">{{ menu.name }}</h3>
+        <h3 v-else style="visibility: hidden">placeholder</h3>
       </div>
 
       <div class="col m3 hide-on-small-only">
@@ -15,7 +16,9 @@
       </div>
 
       <div class="col s12 m9">
-        <PostListHome :posts="posts"></PostListHome>
+        <div v-if="fetching" style="height: 600px; text-align: center; font-size: 2rem;">Lade Beiträge..</div>
+        <PostListHome v-else :posts="posts"></PostListHome>
+
         <ul class="pagination center-align">
           <router-link v-if="page !== 0" :to="{path:'/m/'+menu.id, query: { 'page': page-1 }}" v-slot="{ href, navigate }">
             <li class="waves-effect">
@@ -62,6 +65,7 @@ export default {
   components: {Slider, PostListHome, Logos, QuickLinks},
   props: ['info'],
   data: () => ({
+    fetching: true,
     slider: [],
     menu: {},
     posts: [],
@@ -71,6 +75,7 @@ export default {
   }),
   methods: {
     async fetchData() {
+      this.fetching = true;
       const id = this.$route.params.id;
       this.page = this.$route.query.page || 0;
       const response = (await Axios.get('/api/section/'+id+'?page='+this.page)).data;
@@ -79,6 +84,7 @@ export default {
       this.posts = response.posts;
       this.events= response.events;
       this.lastPage = response.postCount / 5;
+      this.fetching = false;
 
       this.$nextTick(() => {
         M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
