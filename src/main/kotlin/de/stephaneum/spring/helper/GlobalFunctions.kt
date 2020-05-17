@@ -50,3 +50,7 @@ fun Any.toJSON(): String {
 inline fun <reified T> String.parseJSON(): T {
     return mapper.readValue(this)
 }
+
+fun resolveIP(forwardedIP: String?, request: HttpServletRequest): String {
+    return forwardedIP?.split(",")?.first()?.trim() ?: request.remoteAddr
+}

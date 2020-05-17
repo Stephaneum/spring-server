@@ -2,6 +2,7 @@ package de.stephaneum.spring.blackboard
 
 import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session
+import de.stephaneum.spring.helper.resolveIP
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.*
@@ -51,9 +52,5 @@ class BlackboardPublicAPI {
             return Response.Timestamp(null)
         else
             return Response.Timestamp(blackboardScheduler.active.lastUpdate.time)
-    }
-
-    private fun resolveIP(forwardedIP: String?, request: HttpServletRequest): String {
-        return forwardedIP?.split(",")?.first()?.trim() ?: request.remoteAddr
     }
 }

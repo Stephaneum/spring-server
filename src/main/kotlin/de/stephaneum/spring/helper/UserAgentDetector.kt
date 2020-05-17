@@ -39,6 +39,9 @@ class UserAgentDetector {
         }
     }
 
+    /**
+     * userAgent must be in lowercase beforehand!
+     */
     fun getOS(userAgent: String): OS {
         return when {
             userAgent.contains("windows nt 5.1") || userAgent.contains("windows nt 5.2") -> OS.WINDOWS_XP
@@ -52,6 +55,9 @@ class UserAgentDetector {
         }
     }
 
+    /**
+     * userAgent must be in lowercase beforehand!
+     */
     fun isMobile(userAgent: String): Boolean {
         return ((userAgent.contains("android") ||
                 userAgent.contains("iphone") ||
@@ -61,6 +67,9 @@ class UserAgentDetector {
                 && !userAgent.contains("ipad"))
     }
 
+    /**
+     * userAgent must be in lowercase beforehand!
+     */
     fun isBot(userAgent: String): Boolean {
         return userAgent.contains("liebaofast") ||
                 userAgent.contains("mb2345browser") ||
