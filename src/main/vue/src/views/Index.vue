@@ -6,7 +6,8 @@
 
     <div class="row" style="max-width: 1500px">
       <div class="col s12 m9 offset-m3">
-        <h3 class="center-align">{{ menu.name }}</h3>
+        <h3 v-if="menu.name" class="center-align">{{ menu.name }}</h3>
+        <h3 v-else style="visibility: hidden">placeholder</h3>
       </div>
 
       <div class="col m3 hide-on-small-only">
@@ -16,7 +17,9 @@
       </div>
 
       <div class="col s12 m9">
-        <PostListHome :posts="posts"></PostListHome>
+        <PostListHome v-if="posts.length !== 0" :posts="posts"></PostListHome>
+        <div v-else style="height: 600px; text-align: center; font-size: 2rem;">Lade Beiträge..</div>
+
         <div style="text-align: center; margin-top: 20px">
           <router-link :to="'/m/'+menu.id" v-slot="{ href, navigate }">
             <a @click="navigate" :href="href" class="waves-effect waves-light btn green darken-4">

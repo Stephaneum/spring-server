@@ -59,7 +59,7 @@ export default {
     }),
     methods: {
         tick() {
-            if(this.events === null)
+            if(this.events === null || this.events.length === 0)
                 return;
 
             this.currIndex = (this.currIndex + 1) % this.events.length;
