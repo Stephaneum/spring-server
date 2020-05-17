@@ -21,7 +21,7 @@ const routes = [
     component: Index,
   },
   {
-    path: "/menu/:id",
+    path: "/m/:id",
     name: "section",
     component: Section,
   },

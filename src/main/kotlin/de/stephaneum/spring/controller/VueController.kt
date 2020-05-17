@@ -16,7 +16,7 @@ class VueController (
         private val countService: CountService
 ) {
 
-    @GetMapping("/", "/menu/{id}", "/beitrag/{id}", "/login",
+    @GetMapping("/", "/m/{id}", "/beitrag/{id}", "/login",
             "/statistiken", "/termine", "/geschichte", "/eu-sa", "/kontakt", "/impressum", "/sitemap",
             "/home", "/user-manager", "/config-manager", "/static-manager", "/code-manager", "/logs",
             "/plan-manager", "/menu-manager", "/post-manager", "/groups", "/groups/{id}", "/cloud", "/account")

@@ -17,7 +17,7 @@
       <div class="col s12 m9">
         <PostListHome :posts="posts"></PostListHome>
         <ul class="pagination center-align">
-          <router-link v-if="page !== 0" :to="{path:'/menu/'+menu.id, query: { 'page': page-1 }}" v-slot="{ href, navigate }">
+          <router-link v-if="page !== 0" :to="{path:'/m/'+menu.id, query: { 'page': page-1 }}" v-slot="{ href, navigate }">
             <li class="waves-effect">
               <a @click="navigate" :href="href">
                 <i class="material-icons">chevron_left</i>
@@ -26,7 +26,7 @@
           </router-link>
           <li v-else class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
 
-          <router-link v-for="i in 10" :key="i" :to="{path:'/menu/'+menu.id, query: { 'page': i-1 }}" v-slot="{ href, navigate }">
+          <router-link v-for="i in 10" :key="i" :to="{path:'/m/'+menu.id, query: { 'page': i-1 }}" v-slot="{ href, navigate }">
             <li class="waves-effect" :class="i-1 === page ? ['active', 'green', 'darken-1'] : []">
               <a @click="navigate" :href="href">
                 {{ i }}
@@ -34,7 +34,7 @@
             </li>
           </router-link>
 
-          <router-link v-if="page !== lastPage" :to="{path:'/menu/'+menu.id, query: { 'page': page+1 }}" v-slot="{ href, navigate }">
+          <router-link v-if="page !== lastPage" :to="{path:'/m/'+menu.id, query: { 'page': page+1 }}" v-slot="{ href, navigate }">
             <li class="waves-effect">
               <a @click="navigate" :href="href">
                 <i class="material-icons">chevron_right</i>

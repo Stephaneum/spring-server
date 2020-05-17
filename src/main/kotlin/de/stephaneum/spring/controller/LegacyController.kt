@@ -10,7 +10,7 @@ class LegacyController {
     @GetMapping("/home.xhtml")
     fun home(@RequestParam(required = false) id: Int?): String {
         if(id != null) {
-            return "redirect:/menu/$id"
+            return "redirect:/m/$id"
         } else {
             return "redirect:/"
         }

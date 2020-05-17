@@ -62,7 +62,7 @@ export default {
     },
     computed: {
         menuUrl: function () {
-            return (menu) => '/menu/'+menu.id;
+            return (menu) => '/m/'+menu.id;
         },
         link: function() {
             return (menu) => this.unreal ? null : menu.link

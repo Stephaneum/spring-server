@@ -4,7 +4,7 @@
         <p v-if="menu">
             {{ date }}
             <span> / </span>
-            <router-link :to="'/menu/'+menu.id" v-slot="{ href, navigate }">
+            <router-link :to="'/m/'+menu.id" v-slot="{ href, navigate }">
                 <a @click="navigate" :href="href" class="green-text">{{ menu.name }}</a>
             </router-link>
         </p>

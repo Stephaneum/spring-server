@@ -18,7 +18,7 @@
       <div class="col s12 m9">
         <PostListHome :posts="posts"></PostListHome>
         <div style="text-align: center; margin-top: 20px">
-          <router-link :to="'/menu/'+menu.id" v-slot="{ href, navigate }">
+          <router-link :to="'/m/'+menu.id" v-slot="{ href, navigate }">
             <a @click="navigate" :href="href" class="waves-effect waves-light btn green darken-4">
               <i class="material-icons right">arrow_forward</i>mehr Nachrichten
             </a>
