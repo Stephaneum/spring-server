@@ -109,16 +109,16 @@
                             <a id="internal-btn">Intern</a>
                             <ul id="internal-menu" class="z-depth-1" style="z-index: 200">
                                 <!-- admin -->
-                                <li v-if="admin"><a href="/admin-config"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
-                                <li v-if="admin"><a href="/admin-codes"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
+                                <li v-if="admin"><a href="/config-manager"><span><i class="material-icons">build</i>Konfiguration</span></a></li>
+                                <li v-if="admin"><a href="/code-manager"><span><i class="material-icons">vpn_key</i>Zugangscodes</span></a></li>
                                 <li v-if="admin"><a href="/user-manager"><span><i class="material-icons">people</i>Nutzer</span></a></li>
-                                <li v-if="admin"><a href="/admin-logs"><span><i class="material-icons">history</i>Logdaten</span></a></li>
+                                <li v-if="admin"><a href="/logs"><span><i class="material-icons">history</i>Logdaten</span></a></li>
                                 <li class="internal-divider"></li>
 
                                 <!-- cms -->
                                 <li v-if="hasMenuWriteAccess"><a href="/menu-manager"><span><i class="material-icons">device_hub</i>Menü</span></a></li>
                                 <li v-if="admin || managePlans"><a href="/plan-manager"><span><i class="material-icons">description</i>Vertretungsplan</span></a></li>
-                                <li v-if="admin"><a href="/admin-static"><span><i class="material-icons">note_add</i>Seiten</span></a></li>
+                                <li v-if="admin"><a href="/static-manager"><span><i class="material-icons">note_add</i>Seiten</span></a></li>
                                 <li><a href="/post-manager"><span><i class="material-icons">edit</i>Beiträge{{ unapproved ? ' ('+unapproved+')' : null}}</span></a></li>
                                 <li class="internal-divider"></li>
 
@@ -205,7 +205,7 @@
                         showLoading("Abmelden...");
                         axios.post('/api/logout')
                             .then((response) => {
-                                window.location = '/logout.xhtml'; // continue with jsf
+                                window.location = '/'; // continue with jsf
                             });
                     } else {
                         window.location = '/login';
@@ -237,7 +237,7 @@
                     return this.user && this.user.createCategories;
                 },
                 url: function () {
-                    return (menu) => this.unreal ? null : menu.link ? menu.link : '/home.xhtml?id='+menu.id;
+                    return (menu) => this.unreal ? null : menu.link ? menu.link : '/m/'+menu.id;
                 },
                 target: function () {
                     return (menu) => this.unreal ? null : menu.link ? '_blank' : '_self';
