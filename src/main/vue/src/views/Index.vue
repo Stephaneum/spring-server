@@ -26,8 +26,15 @@
       </div>
 
       <div class="col s12 m9">
-        <br>
-        <Locations></Locations>
+        <PostListHome :posts="posts"></PostListHome>
+        <div style="text-align: center; margin-top: 20px">
+          <router-link :to="'/menu/'+menu.id" v-slot="{ href, navigate }">
+            <a @click="navigate" :href="href" class="waves-effect waves-light btn green darken-4">
+              <i class="material-icons right">arrow_forward</i>mehr Nachrichten
+            </a>
+          </router-link>
+        </div>
+        <Locations style="margin-top: 50px"></Locations>
       </div>
     </div>
 
@@ -104,10 +111,11 @@
   import QuickLinks from "../components/QuickLinks";
   import Logos from "../components/Logos";
   import Locations from "../components/Locations";
+  import PostListHome from "../components/cms/PostListHome";
 
 export default {
   name: 'Index',
-  components: {Locations, Logos, QuickLinks},
+  components: {PostListHome, Locations, Logos, QuickLinks},
   props: ['info'],
   data: () => ({
     slider: [],
