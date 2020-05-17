@@ -10,6 +10,7 @@ import HistoryView from "./views/HistoryView";
 import Events from "./views/Events";
 import PostView from "./views/PostView";
 import Stats from "./views/Stats";
+import Section from "./views/Section";
 
 Vue.use(VueRouter);
 
@@ -18,6 +19,11 @@ const routes = [
     path: "/",
     name: "index",
     component: Index,
+  },
+  {
+    path: "/menu/:id",
+    name: "section",
+    component: Section,
   },
   {
     path: "/beitrag/:id",

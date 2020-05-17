@@ -1,16 +1,6 @@
 <template>
   <div>
-    <div class="slider">
-      <ul class="slides">
-        <li v-for="i in slider" :key="i.id">
-          <img :src="sliderURL(i)" />
-          <div class="caption" :class="[ i.direction ]">
-            <h3>{{ i.title }}</h3>
-            <h5 class="light grey-text text-lighten-3">{{ i.subTitle }}</h5>
-          </div>
-        </li>
-      </ul>
-    </div>
+    <Slider :slider="slider"></Slider>
 
     <br>
 
@@ -112,10 +102,11 @@
   import Logos from "../components/Logos";
   import Locations from "../components/Locations";
   import PostListHome from "../components/cms/PostListHome";
+  import Slider from "../components/Slider";
 
 export default {
   name: 'Index',
-  components: {PostListHome, Locations, Logos, QuickLinks},
+  components: {Slider, PostListHome, Locations, Logos, QuickLinks},
   props: ['info'],
   data: () => ({
     slider: [],
@@ -128,11 +119,6 @@ export default {
     coop: [],
     coopLink: null
   }),
-  computed: {
-    sliderURL: function() {
-      return (slider) => '/files/slider/'+slider.name;
-    },
-  },
   async mounted() {
     const response = (await Axios.get('/api/home')).data;
     this.slider = response.slider;
@@ -146,7 +132,6 @@ export default {
     this.coopLink = response.coopLink;
 
     this.$nextTick(() => {
-      M.Slider.init(document.querySelectorAll('.slider'), {});
       M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
     });
   }

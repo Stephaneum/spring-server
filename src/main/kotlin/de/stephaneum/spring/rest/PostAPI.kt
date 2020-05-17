@@ -7,7 +7,6 @@ import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.security.CryptoService
 import org.jsoup.Jsoup
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -58,8 +57,7 @@ class PostAPI (
     fun get(@RequestParam(required = false) unapproved: Boolean?,
             @RequestParam(required = false) postID: Int?,
             @RequestParam(required = false) menuID: Int?,
-            @RequestParam(required = false) noContent: Boolean?,
-            @RequestParam(required = false) page: Int?): Any {
+            @RequestParam(required = false) noContent: Boolean?): Any {
         when {
             postID != null -> {
                 // single post
@@ -75,7 +73,7 @@ class PostAPI (
                 // multiple posts
                 val user = Session.get().user ?: User()
                 return when {
-                    menuID != null -> postService.getPosts(menuID, noContent == true, if(page != null) PageRequest.of(page, 5) else null) // get posts from a menu
+                    menuID != null -> postService.getPosts(menuID, noContent == true) // get posts from a menu
                     user.code.role == ROLE_ADMIN || menuService.isMenuAdmin(user) -> postService.getAllUnapprovedPosts(noContent == true) // get all unapproved posts
                     else -> postService.getUnapprovedPosts(user, noContent = true) // get only unapproved posts from the current user
                 }
