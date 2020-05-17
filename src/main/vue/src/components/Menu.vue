@@ -118,13 +118,13 @@
         <ul v-if="!unreal" id="sidenav" class="sidenav">
             <br />
             <li>
-                <a href="home.xhtml"><i class="material-icons">home</i>Startseite</a>
+                <a href="/"><i class="material-icons">home</i>Startseite</a>
             </li>
             <li>
                 <a :href="loggedIn ? 'logout' : 'login'"><i class="material-icons">exit_to_app</i>{{ loggedIn ? 'Abmelden' : 'Login' }}</a>
             </li>
             <li>
-                <a href="termine.xhtml"><i class="material-icons">date_range</i>Termine</a>
+                <a href="/termine"><i class="material-icons">date_range</i>Termine</a>
             </li>
 
             <li v-if="plan && plan.exists"><div class="divider"></div></li>
@@ -132,7 +132,7 @@
                 <a class="subheader">Vertretungsplan</a>
             </li>
             <li v-if="plan && plan.exists">
-                <a href="vertretungsplan.pdf"><i class="material-icons">description</i>{{ plan.info }}</a>
+                <a href="/vertretungsplan.pdf"><i class="material-icons">description</i>{{ plan.info }}</a>
             </li>
 
             <li><div class="divider"></div></li>
