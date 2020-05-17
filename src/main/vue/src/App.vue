@@ -103,4 +103,19 @@ export default {
     color: #e0e0e0;
     font-weight: bold;
   }
+
+  /* move toasts to bottom right */
+  #toast-container {
+    top: auto !important;
+    left: auto !important;
+    right: 50px !important;
+    bottom: 50px !important;
+  }
+
+  @media screen and (max-width: 900px) {
+    #toast-container {
+      right: 0 !important;
+      bottom: 0 !important;
+    }
+  }
 </style>
