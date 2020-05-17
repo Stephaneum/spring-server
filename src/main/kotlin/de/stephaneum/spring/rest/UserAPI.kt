@@ -19,6 +19,7 @@ class UserAPI (
         private val fileService: FileService,
         private val groupService: GroupService,
         private val codeService: CodeService,
+        private val classService: ClassService,
         private val configScheduler: ConfigScheduler,
         private val userRepo: UserRepo,
         private val postRepo: PostRepo,
@@ -28,7 +29,6 @@ class UserAPI (
 ) {
 
     private val emailSuffix = "@stephaneum.de"
-    private val classRegex = Regex("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)")
 
     @ExperimentalStdlibApi
     @ExperimentalUnsignedTypes
@@ -210,7 +210,7 @@ class UserAPI (
                     throw ErrorCode(417, "missing password")
 
                 raw.map { row ->
-                    User(firstName = row[0], lastName = row[1], email = digestEmail(row[2]+emailSuffix, emailMap), password = row[3], schoolClass = parseClass(row[4]))
+                    User(firstName = row[0], lastName = row[1], email = digestEmail(row[2]+emailSuffix, emailMap), password = row[3], schoolClass = classService.parse(row[4]))
                 }
             }
             1 -> {
@@ -248,21 +248,11 @@ class UserAPI (
                     val firstName = row[2]
                     val lastName = row[1]
                     val email = firstName.toLowerCase().substring(0, 1) + "." + lastName.toLowerCase().replace(" ", "") + emailSuffix
-                    User(firstName = firstName, lastName = lastName, email = digestEmail(email, emailMap), password = import.password, schoolClass = parseClass(row[0]))
+                    User(firstName = firstName, lastName = lastName, email = digestEmail(email, emailMap), password = import.password, schoolClass = classService.parse(row[0]))
                 }
             }
             else -> throw ErrorCode(400, "invalid format id")
         }
-    }
-
-    private fun parseClass(raw: String): SchoolClass {
-        val split = raw.split(classRegex)
-        if (split.size <= 1)
-            throw ErrorCode(418, "invalid school class")
-
-        val grade = split.first().toIntOrNull() ?: throw ErrorCode(412, "invalid school class")
-        val suffix = split.subList(1, split.size).joinToString(separator = "")
-        return SchoolClass(grade = grade, suffix = suffix)
     }
 
     /**

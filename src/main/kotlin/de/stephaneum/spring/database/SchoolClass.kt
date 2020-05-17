@@ -18,4 +18,7 @@ data class SchoolClass(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                        var suffix: String = "")
 
 @Repository
-interface SchoolClassRepo: CrudRepository<SchoolClass, Int>
+interface SchoolClassRepo: CrudRepository<SchoolClass, Int> {
+
+    fun findByGradeAndSuffix(grade: Int, suffix: String): SchoolClass?
+}

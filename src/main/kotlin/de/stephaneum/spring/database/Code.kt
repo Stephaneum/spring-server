@@ -45,6 +45,8 @@ interface CodeRepo: CrudRepository<Code, Int> {
     fun findByUsed(used: Boolean): List<Code>
     fun findByUsedAndRole(used: Boolean, role: Int): List<Code>
 
+    fun findByCodeAndUsed(code: String, used: Boolean): Code?
+
     @Transactional
     fun deleteByCode(code: String)
 }
