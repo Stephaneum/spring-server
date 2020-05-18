@@ -2,18 +2,17 @@
 
 ## Voraussetzungen
 
-- JSF-Projekt (Authentifizierung läuft noch darüber)
-- Java 8
-- Tomcat 8.5+
+- Java 8+
 - MariaDB oder MySQL
-- IntelliJ CE / UE (empfohlen)
+- Node (wird zum kompilieren der Vue-App benötigt)
+- IntelliJ CE / UE (alternativ über Konsole kompilieren)
 
 ## Projekt starten
 
 1. rechts den Gradle-Reiter öffnen
 2. Doppelklick: Tasks > application > bootRun
 
-## Export als .war-Datei
+## Export als .jar-Datei
 
 1. rechts den Gradle-Reiter öffnen
 2. Doppelklick: Tasks > build > assemble
@@ -21,66 +20,53 @@
 
 ## Migration von JSF nach Spring
 
-Stück für Stück werden Komponent von JSF nach Spring migriert.
-Zuerst wird der interne Bereich inklusive Login / Registrierung übernommen.
-Danach folgt der öffentliche Bereich.
-
-Blackboard und Backup sind bereits in Spring implementiert.
-Hier werden nur Funktionen aufgeführt, die ursprünglich in JSF implementiert wurden:
-
-**X** - zur Zeit implementiert und aktiv
-
-**N** - nächstes Ziel
-
-Bereich | Seite(n) | JSF | Spring
----|---|---|---
-Öffentlich|Startseite|X|N
-Öffentlich|Beiträge|X|N
-Öffentlich|Login/Registrierung|X|N
-Öffentlich|Impressum, Kontakt, etc.|X|N
-Admin|Konfiguration| |X
-Admin|Benutzerdefinierte Seiten| |X
-Admin|Rubriken| |D
-Admin|Zugangscodes| |X
-Admin|Nutzerdaten-Manager| |X
-Admin|Logdaten| |X
-Verwaltung|Vertretungsplan-Manager| |X
-Gemeinschaft|Beitrag-Manager| |X
-Gemeinschaft|Klassen-Cloud| |X
-Gemeinschaft|Projekt-Cloud| |X
-Nutzer|Nutzer-Cloud| |X
-Nutzer|Account-Einstellungen| |X
-
-#### Kommunikation JSF nach Spring
-
-Authorisierung über `?key=<JWT>`. Zum Beispiel `https://stephaneum.de/beitrag-manager?key=eyJhbG....`
-
-#### Kommunikation Spring nach JSF
-
-Falls Modifikationen an der Datenbank durchgeführt wurde, dann müssen die Änderungen JSF mitgeteilt werden, da JSF vieles im Cache speichert.
-
-Events werden an `https://stephaneum.de/event?event=<JWT>` gesendet.
-
-Im JWT-Token ist das Event einkodiert.
-
-Logout erfolgt in 2 Schritten:
-1. `/api/logout` Logout in Spring
-2. `/logout.xhtml` Logout in JSF und Weiterleitung zur Startseite
+Die Migration fand zwischen 25.05.2019 - 17.05.2020 statt und ist nun abgeschlossen.
+Das JSF-Projekt wird nicht mehr verwendet.
+- Blackboard (Mai 2019)
+- Backup System (August 2019)
+- Beitrag-Manager (Oktober 2019)
+- Cloud (Februar 2020)
+- Gruppen (März 2020)
+- restliche Seiten (Mai 2020)
 
 ## Routen (GET)
 
-Hier werden Adressen (Routen) aufgeführt, wo der Server mit einer HTML-Datei antwortet.
+Hier werden Adressen (Routen) aufgeführt, wo der Server mit einer HTML-Datei antwortet, oder mit bestimmten Dateien.
 
 ### Homepage
-Route|Info
----|---
-`/login`|Login (wird momentan nicht genutzt)
-`/beitrag-manager`|Beitrag-Manager
-`/cloud`|Nutzer-Cloud
-`/admin-static`|Verwaltung der benutzerdefinierten Seiten
-`/admin-codes`|Verwaltung der Zugangscodes
-`/admin-logs`|Logdaten
-`/vertretungsplan-manager`|Verwaltung des Vertretungsplans
+Route|Info|Bereich
+---|---|---
+`/`|Homepage|öffentlich
+`/m/:id`|Homepage (bestimmtes Menü)|
+`/beitrag/:id`|Beitrag|
+`/login`|Login|
+`/statistiken`|Statistiken|
+`/termine`|Termine|
+`/geschichte`|Geschichte|
+`/eu-sa`|Europa Förderung|
+`/kontakt`|Kontakt|
+`/impressum`|Impressum|
+`/sitemap`|Sitemap|
+`/s/*`|statische Seiten|
+`/home`|Homepage (eingeloggt)|intern
+`/user-manager`|Nutzerverwaltung|
+`/config-manager`|Konfiguration|
+`/static-manager`|Seiten|
+`/code-manager`|Zugangscodes|
+`/logs`|Logdaten|
+`/plan-manager`|Vertretungsplan|
+`/menu-manager`|Menü|
+`/post-manager`|Beiträge|
+`/groups`|Gruppen|
+`/groups/:id`|eine bestimmte Gruppe|
+`/cloud`|Cloud|
+`/account`|Accounteinstellungen|
+`/vertretungsplan.pdf`|Vertretungsplan|Dateien
+`/files/public/:file`|öffentliche Datei|
+`/files/slider/:id`|Diashow|
+`/files/images/:file`|Bild in Beiträgen|
+`/files/internal/:id`|Dateien aus der Cloud|
+
 
 ### Blackboard
 Route|Info
