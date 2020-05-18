@@ -17,6 +17,8 @@
       </div>
 
       <div class="col s12 m9">
+        <LiveTicker v-if="liveticker" :text="liveticker" style="margin-bottom: 40px"></LiveTicker>
+
         <PostListHome v-if="posts.length !== 0" :posts="posts"></PostListHome>
         <div v-else style="height: 600px; text-align: center; font-size: 2rem;">Lade Beiträge..</div>
 
@@ -106,14 +108,16 @@
   import Locations from "../components/Locations";
   import PostListHome from "../components/cms/PostListHome";
   import Slider from "../components/Slider";
+  import LiveTicker from "../components/LiveTicker";
 
 export default {
   name: 'Index',
-  components: {Slider, PostListHome, Locations, Logos, QuickLinks},
+  components: {LiveTicker, Slider, PostListHome, Locations, Logos, QuickLinks},
   props: ['info'],
   data: () => ({
     slider: [],
     menu: {},
+    liveticker: null,
     posts: [],
     events: [],
     studentCount: 0,
@@ -126,6 +130,7 @@ export default {
     const response = (await Axios.get('/api/home')).data;
     this.slider = response.slider;
     this.menu = response.menu;
+    this.liveticker = response.liveticker;
     this.posts = response.posts;
     this.events = response.events;
     this.studentCount = response.studentCount;

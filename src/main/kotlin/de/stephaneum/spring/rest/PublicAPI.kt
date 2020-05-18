@@ -23,7 +23,7 @@ data class Stats(
         val upTime: Long, val startTime: ZonedDateTime,
         val dev: String?
 )
-data class HomeData(val slider: List<Slider>, val menu: Menu, val posts: List<Post>, val events: List<Event>, val studentCount: Int, val teacherCount: Int, val years: Int, val coop: List<Coop>, val coopLink: String?)
+data class HomeData(val slider: List<Slider>, val menu: Menu, val liveticker: String?, val posts: List<Post>, val events: List<Event>, val studentCount: Int, val teacherCount: Int, val years: Int, val coop: List<Coop>, val coopLink: String?)
 data class SectionData(val slider: List<Slider>, val menu: Menu, val posts: List<Post>, val postCount: Int, val events: List<Event>)
 
 @RestController
@@ -57,12 +57,11 @@ class PublicAPI (
     @GetMapping("/home")
     fun home(): HomeData {
         val menu = configScheduler.get(Element.defaultMenu)?.toIntOrNull() ?: 0
-        val posts = postService.getPosts(menu, pageable = PageRequest.of(0, 3))
-
         return HomeData(
                 slider = sliderRepo.findByOrderByIndex(),
                 menu = menuRepo.findByIdOrNull(menu) ?: Menu(name = "Error"),
-                posts = posts,
+                liveticker = configScheduler.get(Element.liveticker),
+                posts = postService.getPosts(menu, pageable = PageRequest.of(0, 3)),
                 events = getNextEvents(),
                 studentCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_STUDENT, true),
                 teacherCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_TEACHER, true),
