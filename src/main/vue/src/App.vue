@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Menu @update-info="fetchData" :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></Menu>
-    <div style="min-height: calc(100vh - 150px)">
+    <div>
       <router-view :info="info" @update-info="fetchData"/>
     </div>
     <div style="height: 50px"></div>
@@ -45,6 +45,7 @@ export default {
   body {
     background-color: #f0f0f0;
     overflow-y: scroll;
+    height: 100%;
   }
 
   .modal {
