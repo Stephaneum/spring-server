@@ -112,7 +112,7 @@ class PublicAPI (
         return Stats(
                 studentCount = studentCount, teacherCount = teacherCount, postCount = postCount, visitCount = visitCount,
                 statsDay = statsDay, statsHour = countService.getStatsHour(), statsBrowser = countService.getStatsBrowser(), statsOS = countService.getStatsOS(),
-                upTime = Duration.between(START_TIME, ZonedDateTime.now()).toSeconds(), startTime = START_TIME,
+                upTime = Duration.between(START_TIME, ZonedDateTime.now()).seconds, startTime = START_TIME,
                 dev = dev
         )
     }
