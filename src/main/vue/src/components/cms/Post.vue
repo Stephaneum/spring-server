@@ -82,11 +82,14 @@ export default {
         }
     },
     watch: {
-        layout: function() {
-            this.$nextTick(() => {
-                M.Slider.init(document.querySelectorAll('.slider'), {});
-                M.Materialbox.init(document.querySelectorAll('.materialboxed'), {});
-            });
+        images: {
+            immediate: true,
+            handler() {
+                this.$nextTick(() => {
+                    M.Slider.init(document.querySelectorAll('.slider'), {});
+                    M.Materialbox.init(document.querySelectorAll('.materialboxed'), {});
+                });
+            }
         }
     }
 }
