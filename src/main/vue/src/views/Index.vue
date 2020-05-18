@@ -42,22 +42,22 @@
         <div class="col s3"><br/></div>
       </div>
 
-      <div class="row">
+      <div class="row" v-observe-visibility="{ callback: startNumberAnimation, once: true}">
         <div class="col s4 m3 center-align">
           <i style="font-size: 4rem" class="material-icons" aria-hidden="true">people</i><br/>
-          <span id="stats-schueler" style="font-size: 3rem;">{{ studentCount }}</span>
+          <Counter ref="counterStudent" :number="studentCount" style="font-size: 3rem"></Counter>
           <p>Schüler/innen*</p>
         </div>
 
         <div class="col s4 m3 center-align">
           <i style="font-size: 4rem" class="material-icons" aria-hidden="true">people</i><br/>
-          <span id="stats-lehrer" style="font-size: 3rem;">{{ teacherCount }}</span>
+          <Counter ref="counterTeacher" :number="teacherCount" style="font-size: 3rem"></Counter>
           <p>Lehrer/innen*</p>
         </div>
 
         <div class="col s4 m3 center-align">
           <i style="font-size: 4rem" class="material-icons" aria-hidden="true">schedule</i><br/>
-          <span id="stats-alter" style="font-size: 3rem;">{{ years }}</span>
+          <Counter ref="counterYears" :number="years" style="font-size: 3rem"></Counter>
           <p>Jahre seit Gründung</p>
         </div>
 
@@ -103,17 +103,22 @@
 <script>
   import Axios from 'axios'
   import M from "materialize-css";
+  import { ObserveVisibility } from "vue-observe-visibility";
   import QuickLinks from "../components/QuickLinks";
   import Logos from "../components/Logos";
   import Locations from "../components/Locations";
   import PostListHome from "../components/cms/PostListHome";
   import Slider from "../components/Slider";
   import LiveTicker from "../components/LiveTicker";
+  import Counter from "../components/Counter";
 
 export default {
   name: 'Index',
-  components: {LiveTicker, Slider, PostListHome, Locations, Logos, QuickLinks},
+  components: {Counter, LiveTicker, Slider, PostListHome, Locations, Logos, QuickLinks},
   props: ['info'],
+  directives: {
+      ObserveVisibility
+  },
   data: () => ({
     slider: [],
     menu: {},
@@ -126,6 +131,15 @@ export default {
     coop: [],
     coopLink: null
   }),
+  methods: {
+      startNumberAnimation(visible) {
+          if(visible) {
+              this.$refs.counterStudent.startCounter();
+              this.$refs.counterTeacher.startCounter();
+              this.$refs.counterYears.startCounter();
+          }
+      }
+  },
   async mounted() {
     const response = (await Axios.get('/api/home')).data;
     this.slider = response.slider;
