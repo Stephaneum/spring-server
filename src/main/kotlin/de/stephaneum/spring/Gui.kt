@@ -12,6 +12,8 @@ object Gui {
     private val regexColor = Regex("\u001B\\[[;\\d]*m")
 
     fun open(args: Array<String>) {
+        println("starting GUI")
+
         val frame = JFrame("Stephaneum-Server")
         frame.setSize(500, 400)
         frame.setLocationRelativeTo(null)
@@ -26,12 +28,15 @@ object Gui {
         val textArea = JTextArea()
         textArea.border = BorderFactory.createCompoundBorder(textArea.border, BorderFactory.createEmptyBorder(5, 5, 5, 5))
         textArea.font = Font(Font.MONOSPACED, Font.PLAIN, 14)
+        textArea.isEditable = false
         frame.add(JScrollPane(textArea), BorderLayout.CENTER)
 
         val consoleOutput = ByteArrayOutputStream()
         System.setOut(PrintStream(consoleOutput))
         Timer(1000) {
-            textArea.text = consoleOutput.toString().replace(regexColor, "")
+            val newText = consoleOutput.toString().replace(regexColor, "")
+            if(textArea.text.length != newText.length)
+                textArea.text = newText
         }.start()
 
         frame.isVisible = true
