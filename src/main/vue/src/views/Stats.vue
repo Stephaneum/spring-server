@@ -13,10 +13,10 @@
 
     <StatsPanel title="Technologien" icon="settings">
       <div style="margin: 30px 0 20px 0; display: flex; align-items: end; justify-content: space-evenly">
-        <Tech title="Frontend-Framework" name="Vue" img="vue.png" width="200" info="Blablabla"></Tech>
-        <Tech title="Backend-Framework" name="Spring" img="spring.png" width="130" info="Blablabla"></Tech>
-        <Tech title="Datenbanksystem" name="MySQL" img="mysql.png" width="130" info="Blablabla"></Tech>
-        <Tech title="Betriebssystem" name="Ubuntu" img="ubuntu.png" width="200" info="Blablabla"></Tech>
+        <Tech title="Frontend-Framework" name="Vue" img="vue.png" width="200" info="Blablabla" link="https://vuejs.org"></Tech>
+        <Tech title="Backend-Framework" name="Spring" img="spring.png" width="130" info="Blablabla" link="https://spring.io"></Tech>
+        <Tech title="Datenbanksystem" name="MySQL" img="mysql.png" width="130" info="Blablabla" link="https://www.mysql.com"></Tech>
+        <Tech title="Betriebssystem" name="Ubuntu" img="ubuntu.png" width="200" info="Blablabla" link="https://ubuntu.com"></Tech>
       </div>
     </StatsPanel>
 
