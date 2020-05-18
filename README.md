@@ -14,9 +14,15 @@
 
 ## Export als .jar-Datei
 
-1. rechts den Gradle-Reiter öffnen
-2. Doppelklick: Tasks > build > assemble
-3. die Datei liegt nun in <Projekt-Ordner>/build/libs/
+1. Vue App kompilieren
+    1. `cd Projekt-Order/src/main/vue` (in Vue-Ordner gelangen)
+    2. `npm i` (Bibliotheken herunterladen)
+    3. `npm run build` (Kompilieren)
+    4. das Ergebnis liegt nun in `Projekt-Ordner/src/main/vue/dist`
+2. Spring App kompilieren
+    1. rechts den Gradle-Reiter öffnen
+    2. Tasks > build > assemble (dabei wird das Ergebnis der Vue App kopiert)
+    3. die Datei liegt nun in `Projekt-Ordner/build/libs/`
 
 ## Migration von JSF nach Spring
 
