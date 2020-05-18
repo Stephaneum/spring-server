@@ -19,7 +19,6 @@ data class LastModified(val lastModified: String)
 @RestController
 @RequestMapping("/api/plan")
 class PlanAPI (
-        private val jsfService: JsfService,
         private val planService: PlanService,
         private val configScheduler: ConfigScheduler,
         private val fileService: FileService,
@@ -46,7 +45,6 @@ class PlanAPI (
             throw ErrorCode(403, "not allowed")
 
         configScheduler.save(Element.planInfo, text)
-        jsfService.send(JsfEvent.SYNC_PLAN)
     }
 
     @PostMapping("/upload")
@@ -65,7 +63,6 @@ class PlanAPI (
         if(info != null)
             configScheduler.save(Element.planInfo, info)
         configScheduler.save(Element.planLocation, path)
-        jsfService.send(JsfEvent.SYNC_PLAN)
         logService.log(EventType.UPLOAD, "Vertretungsplan", me)
         return Response.Feedback(true, message = if(info != null) "Änderungen gespeichert.<br>Datum wurde erkannt und aktualisiert." else "Änderungen gespeichert.")
     }
@@ -82,6 +79,5 @@ class PlanAPI (
             throw ErrorCode(500, "file could not be deleted")
 
         configScheduler.save(Element.planLocation, null)
-        jsfService.send(JsfEvent.SYNC_PLAN)
     }
 }

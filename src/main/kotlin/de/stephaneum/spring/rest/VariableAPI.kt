@@ -4,8 +4,6 @@ import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.DBHelper
 import de.stephaneum.spring.helper.ErrorCode
-import de.stephaneum.spring.helper.JsfEvent
-import de.stephaneum.spring.helper.JsfService
 import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/variable")
 class VariableAPI (
-        private val jsfService: JsfService,
         private val dbService: DBHelper,
         private val configScheduler: ConfigScheduler
 ) {
@@ -43,6 +40,5 @@ class VariableAPI (
                     newPath = request.value ?: throw ErrorCode(400, "empty path"))
 
         configScheduler.save(element, request.value)
-        jsfService.send(JsfEvent.SYNC_VARIABLES)
     }
 }

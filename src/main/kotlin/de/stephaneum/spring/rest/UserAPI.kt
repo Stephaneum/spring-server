@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/users")
 class UserAPI (
-        private val jsfService: JsfService,
         private val cryptoService: CryptoService,
         private val fileService: FileService,
         private val groupService: GroupService,
@@ -90,14 +89,11 @@ class UserAPI (
     }
 
     @PostMapping("/change-account/{id}")
-    fun changeAccount(@PathVariable id: Int): Response.Token {
+    fun changeAccount(@PathVariable id: Int) {
         Session.getUser(adminOnly = true)
 
         val user = userRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "user not found")
-        val token = jsfService.getChangeAccountToken(user)
-
         Session.get().user = user
-        return Response.Token(token)
     }
 
     @ExperimentalUnsignedTypes

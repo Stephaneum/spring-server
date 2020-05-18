@@ -30,5 +30,4 @@ object Response {
 
     // user api
     data class UserInfo(val firstName: String, val lastName: String, val email: String, val role: Int, val storage: Int, val permissionLogin: Boolean, val permissionPlan: Boolean)
-    data class Token(val token: String)
 }

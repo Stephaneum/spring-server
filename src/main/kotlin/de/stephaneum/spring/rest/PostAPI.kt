@@ -39,7 +39,6 @@ object PostResponse {
 @RestController
 @RequestMapping("/api/post")
 class PostAPI (
-        private val jsfService: JsfService,
         private val postService: PostService,
         private val cryptoService: CryptoService,
         private val imageService: ImageService,
@@ -257,7 +256,6 @@ class PostAPI (
             }
             configScheduler.save(type, finalText)
             logService.log(EventType.EDIT_POST, user, "${type.info} (spezieller Text)")
-            jsfService.send(JsfEvent.SYNC_SPECIAL_TEXT)
             return PostResponse.Feedback(true)
         } else {
             return PostResponse.Feedback(false, message = "only admin or post manager")
