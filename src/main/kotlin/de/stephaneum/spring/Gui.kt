@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import javax.swing.*
 
+
 object Gui {
 
     private val regexColor = Regex("\u001B\\[[;\\d]*m")
@@ -15,7 +16,7 @@ object Gui {
         println("starting GUI")
 
         val frame = JFrame("Stephaneum-Server")
-        frame.setSize(500, 400)
+        frame.setSize(800, 500)
         frame.setLocationRelativeTo(null)
         frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         frame.layout = BorderLayout()
@@ -40,6 +41,7 @@ object Gui {
         }.start()
 
         frame.isVisible = true
+        frame.extendedState = frame.extendedState or JFrame.MAXIMIZED_BOTH
         runApplication<BackendApplication>(*args)
     }
 }
