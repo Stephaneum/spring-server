@@ -77,6 +77,9 @@ export default {
             this.$refs.map.mapObject.flyTo(posB);
             this.$refs.markerB.mapObject.openPopup();
         }
+    },
+    mounted() {
+        this.$refs.map.mapObject.scrollWheelZoom.disable();
     }
 }
 </script>
