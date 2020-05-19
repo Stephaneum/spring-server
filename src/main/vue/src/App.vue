@@ -6,6 +6,7 @@
       <router-view :info="info" @update-info="fetchData"/>
     </div>
     <div style="height: 50px"></div>
+    <PrivacyPopup></PrivacyPopup>
     <Footer :copyright="info.copyright"></Footer>
   </div>
 </template>
@@ -17,10 +18,12 @@ import M from "materialize-css"
 import Menu from '@/components/Menu.vue'
 import Footer from '@/components/Footer.vue'
 import InternetExplorerNotice from "./components/InternetExplorerNotice";
+import PrivacyPopup from "./components/PrivacyPopup";
 
 export default {
   name: 'Home',
   components: {
+    PrivacyPopup,
     InternetExplorerNotice,
     Menu,
     Footer
