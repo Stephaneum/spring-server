@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <Menu @update-info="fetchData" :menu="info.menu" :has-menu-write-access="info.hasMenuWriteAccess" :user="info.user" :plan="info.plan" :unapproved="info.unapproved"></Menu>
+    <InternetExplorerNotice></InternetExplorerNotice>
     <div style="min-height: calc(100vh - 150px)">
       <router-view :info="info" @update-info="fetchData"/>
     </div>
@@ -15,10 +16,12 @@ import Axios from "axios"
 import M from "materialize-css"
 import Menu from '@/components/Menu.vue'
 import Footer from '@/components/Footer.vue'
+import InternetExplorerNotice from "./components/InternetExplorerNotice";
 
 export default {
   name: 'Home',
   components: {
+    InternetExplorerNotice,
     Menu,
     Footer
   },
