@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Slider :slider="slider"></Slider>
+    <Slider :slider="slider" class="hide-on-small-only"></Slider>
 
     <br>
 
