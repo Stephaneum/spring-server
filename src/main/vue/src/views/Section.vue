@@ -35,17 +35,17 @@
         <PostListHome v-else :posts="posts"></PostListHome>
 
         <ul v-if="!fetching && !locked" class="pagination center-align">
-          <router-link v-if="page !== 0" :to="{path:'/m/'+menu.id, query: { 'page': page-1 }}" v-slot="{ href, navigate }">
+          <router-link v-if="page !== 1" :to="{path:'/m/'+menu.id, query: { 'page': page-1 }}" v-slot="{ href, navigate }">
             <li class="waves-effect">
               <a @click="navigate" :href="href">
                 <i class="material-icons">chevron_left</i>
               </a>
             </li>
           </router-link>
-          <li v-else class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+          <li v-else class="disabled"><a><i class="material-icons">chevron_left</i></a></li>
 
-          <router-link v-for="i in 10" :key="i" :to="{path:'/m/'+menu.id, query: { 'page': i-1 }}" v-slot="{ href, navigate }">
-            <li class="waves-effect" :class="i-1 === page ? ['active', 'green', 'darken-1'] : []">
+          <router-link v-for="i in pages" :key="i" :to="{path:'/m/'+menu.id, query: { 'page': i }}" v-slot="{ href, navigate }">
+            <li class="waves-effect" :class="i === page ? ['active', 'green', 'darken-1'] : []">
               <a @click="navigate" :href="href">
                 {{ i }}
               </a>
@@ -59,7 +59,7 @@
               </a>
             </li>
           </router-link>
-          <li v-else class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+          <li v-else class="disabled"><a><i class="material-icons">chevron_right</i></a></li>
         </ul>
       </div>
     </div>
@@ -88,21 +88,46 @@ export default {
     menu: {},
     posts: [],
     events: [],
+
+    // page management
     page: 0,
+    pages: [],
     lastPage: 0,
   }),
   methods: {
     async fetchData() {
       this.fetching = true;
       const id = this.$route.params.id;
-      this.page = this.$route.query.page || 0;
+      this.page = Math.max(parseInt(this.$route.query.page || 1), 1);
       const response = (await Axios.get('/api/section/'+id+'?page='+this.page)).data;
       this.slider = response.slider;
       this.menu = response.menu;
       this.locked = response.locked;
       this.posts = response.posts;
       this.events= response.events;
-      this.lastPage = response.postCount / 5;
+
+      // page
+      this.lastPage = Math.ceil(response.postCount / 5);
+      if (this.page < 5) {
+        // in the beginning
+        this.pages = [];
+        for (let i = 1; i <= 10 && i <= this.lastPage; i++) {
+          this.pages.push(i);
+        }
+      } else if(this.page >= this.lastPage - 5) {
+        // in the end
+        this.pages = [];
+        for (let i = this.lastPage; i >= this.lastPage - 9 && i >= 1; i--) {
+          this.pages.unshift(i);
+        }
+      } else {
+        // in the middle
+        this.pages = [];
+        for (let i = this.page - 4; i <= this.page + 5; i++) {
+          this.pages.push(i);
+        }
+      }
+
       this.fetching = false;
 
       this.$nextTick(() => {

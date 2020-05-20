@@ -81,7 +81,7 @@ class PublicAPI (
     fun section(@PathVariable menuId: Int, @RequestParam(required = false) page: Int?): SectionData {
         val menu = menuRepo.findByIdOrNull(menuId) ?: throw ErrorCode(404, "menu not found")
         val locked = menu.password != null && !Session.hasAccess(menu)
-        val posts = if (locked) emptyList() else postService.getPosts(menu.id, pageable = PageRequest.of(page ?: 0, 5))
+        val posts = if (locked) emptyList() else postService.getPosts(menu.id, pageable = PageRequest.of(page?.minus(1) ?: 0, 5))
         menu.password = null // remove password, so that client cannot see it
         posts.filter { post -> post.password != null && !Session.hasAccess(post) }
              .forEach { post -> post.content = "" }
