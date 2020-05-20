@@ -1,5 +1,5 @@
 <template>
-  <CenterLayout :title="post.title" :custom-card="true" :plan="info.plan" :history="info.history" :eu-sa="info.euSa">
+  <CenterLayout title="Beitrag" :custom-card="true" :plan="info.plan" :history="info.history" :eu-sa="info.euSa">
     <div v-if="fetching" class="card-panel white" style="height: 500px">
       <div class="empty-hint">
         Lade Beitrag...
