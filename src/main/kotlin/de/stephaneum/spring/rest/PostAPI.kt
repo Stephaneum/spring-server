@@ -60,12 +60,20 @@ class PostAPI (
         when {
             postID != null -> {
                 // single post
+                val (session, _) = Session.createIfNotExists()
+                val me = session.user
                 val post = postRepo.findByIdOrNull(postID) ?: throw ErrorCode(404, "post not found")
+
                 post.simplify()
                 post.menu?.simplify()
                 post.images = filePostRepo.findByPostId(post.id).map { it.file.apply { simplifyForPosts() } }
                 if(noContent == true)
                     post.content = null
+
+                if(post.password != null && !((me != null && hasAccessToPost(me, post)) || Session.hasAccess(post)))
+                    throw ErrorCode(403, "no access")
+
+                post.password = null
                 return post
             }
             unapproved == true || menuID != null -> {
