@@ -27,25 +27,25 @@
                     </div>
                 </div>
                 <div v-else-if="layout === 1" style="text-align: center">
-                    <a v-for="i in imagesSliced" :key="i.id" :href="postURL">
-                        <router-link v-if="postId" :to="postLink" v-slot="{ href, navigate }">
+                    <template v-for="i in imagesSliced">
+                        <router-link :key="i.id" v-if="postId" :to="postLink" v-slot="{ href, navigate }">
                             <a @click="navigate" :href="href">
                                 <img :src="imageURL(i)" width="150" style="margin-left: 10px; margin-right: 10px"/>
                             </a>
                         </router-link>
-                        <img v-else :src="imageURL(i)" width="150" style="margin-left: 10px; margin-right: 10px"/>
-                    </a>
+                        <img v-else :key="i.id" :src="imageURL(i)" width="150" style="margin-left: 10px; margin-right: 10px"/>
+                    </template>
                 </div>
                 <div v-else>
                     <div style="text-align: center">
-                        <a v-for="i in imagesSliced" :key="i.id" :href="postURL">
-                            <router-link v-if="postId" :to="postLink" v-slot="{ href, navigate }">
+                        <template v-for="i in imagesSliced">
+                            <router-link :key="i.id" v-if="postId" :to="postLink" v-slot="{ href, navigate }">
                                 <a @click="navigate" :href="href">
                                     <img :src="imageURL(i)" width="150" style="margin-left: 10px; margin-right: 10px" />
                                 </a>
                             </router-link>
-                            <img v-else :src="imageURL(i)" width="150" style="margin-left: 10px; margin-right: 10px" />
-                        </a>
+                            <img v-else :key="i.id" :src="imageURL(i)" width="150" style="margin-left: 10px; margin-right: 10px" />
+                        </template>
                     </div>
                     <br />
                     <span>{{ textPreview }}</span>
