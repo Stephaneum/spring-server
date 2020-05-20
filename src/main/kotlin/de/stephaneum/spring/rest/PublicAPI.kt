@@ -61,11 +61,13 @@ class PublicAPI (
     @GetMapping("/home")
     fun home(): HomeData {
         val menu = configScheduler.get(Element.defaultMenu)?.toIntOrNull() ?: 0
+        val posts = postService.getPosts(menu, pageable = PageRequest.of(0, 3))
+                               .onEach { post -> if(post.password != null && !Session.hasAccess(post)) post.content = "" }
         return HomeData(
                 slider = sliderRepo.findByOrderByIndex(),
                 menu = menuRepo.findByIdOrNull(menu) ?: Menu(name = "Error"),
                 liveticker = configScheduler.get(Element.liveticker),
-                posts = postService.getPosts(menu, pageable = PageRequest.of(0, 3)),
+                posts = posts,
                 events = getNextEvents(),
                 studentCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_STUDENT, true),
                 teacherCount = userRepo.countByCodeRoleAndCodeUsed(ROLE_TEACHER, true),
@@ -81,6 +83,8 @@ class PublicAPI (
         val locked = menu.password != null && !Session.hasAccess(menu)
         val posts = if (locked) emptyList() else postService.getPosts(menu.id, pageable = PageRequest.of(page ?: 0, 5))
         menu.password = null // remove password, so that client cannot see it
+        posts.filter { post -> post.password != null && !Session.hasAccess(post) }
+             .forEach { post -> post.content = "" }
         return SectionData(
                 slider = sliderRepo.findByOrderByIndex(),
                 menu = menu,
