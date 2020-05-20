@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <StatsChartPanel :stats-day="statsDay" :stats-hour="statsHour" :stats-browser="statsBrowser" :stats-o-s="statsOS"></StatsChartPanel>
+    <StatsChartPanel v-if="fetched" :stats-day="statsDay" :stats-hour="statsHour" :stats-browser="statsBrowser" :stats-o-s="statsOS"></StatsChartPanel>
 
     <StatsPanel title="Technologien" icon="settings">
       <div style="margin: 30px 0 20px 0; display: flex; align-items: end; justify-content: space-evenly">
@@ -53,6 +53,7 @@
     components: {StatsChartPanel, StatsPanel, LiveTimer, Tech, StatsNumber, CenterLayout },
     props: ['info'],
     data: () => ({
+      fetched: false,
       studentCount: null,
       teacherCount: null,
       postCount: null,
@@ -82,6 +83,8 @@
       this.upTime = stats.upTime;
       this.startTime = moment(stats.startTime).format('dddd, [den] DD.MMMM yyyy');
       this.dev = stats.dev;
+
+      this.fetched = true;
     }
   }
 </script>

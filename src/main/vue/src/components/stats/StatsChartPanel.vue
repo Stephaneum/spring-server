@@ -90,8 +90,11 @@ export default {
         }
     },
     watch: {
-        statsDay() {
-            this.updateChart();
+        statsDay: {
+            immediate: true,
+            handler() {
+                this.updateChart();
+            }
         }
     }
 }
