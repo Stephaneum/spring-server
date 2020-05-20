@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Slider :slider="slider"></Slider>
+    <Slider :slider="slider" class="hide-on-small-only"></Slider>
     <br>
     <div class="row" style="max-width: 1500px">
 
@@ -17,9 +17,24 @@
 
       <div class="col s12 m9">
         <div v-if="fetching" style="height: 600px; text-align: center; font-size: 2rem;">Lade Beiträge..</div>
+        <div v-else-if="locked" style="padding-top: 100px; text-align: center">
+          <p style="font-size: 1.4rem; margin-bottom: 50px">Dieser Bereich ist passwortgeschützt.</p>
+
+          <div class="input-field" style="display: inline-block">
+            <i class="material-icons prefix">vpn_key</i>
+            <label for="input-section-password">Passwort</label>
+            <input v-model="password" type="password" id="input-section-password" autocomplete="off"/>
+          </div>
+
+          <a @click="unlock" class="btn waves-effect green darken-4" style="margin-left: 40px">
+            <i class="material-icons left">lock_open</i>
+            Entsperren
+          </a>
+
+        </div>
         <PostListHome v-else :posts="posts"></PostListHome>
 
-        <ul class="pagination center-align">
+        <ul v-if="!fetching && !locked" class="pagination center-align">
           <router-link v-if="page !== 0" :to="{path:'/m/'+menu.id, query: { 'page': page-1 }}" v-slot="{ href, navigate }">
             <li class="waves-effect">
               <a @click="navigate" :href="href">
@@ -59,13 +74,16 @@
   import Logos from "../components/Logos";
   import PostListHome from "../components/cms/PostListHome";
   import Slider from "../components/Slider";
+  import { showLoadingInvisible, hideLoading } from '../helper/utils';
 
 export default {
-  name: 'Index',
+  name: 'Section',
   components: {Slider, PostListHome, Logos, QuickLinks},
   props: ['info'],
   data: () => ({
     fetching: true,
+    locked: false,
+    password: null, // input to unlock section
     slider: [],
     menu: {},
     posts: [],
@@ -81,6 +99,7 @@ export default {
       const response = (await Axios.get('/api/section/'+id+'?page='+this.page)).data;
       this.slider = response.slider;
       this.menu = response.menu;
+      this.locked = response.locked;
       this.posts = response.posts;
       this.events= response.events;
       this.lastPage = response.postCount / 5;
@@ -89,6 +108,31 @@ export default {
       this.$nextTick(() => {
         M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
       });
+
+      hideLoading();
+    },
+    async unlock() {
+
+      if(!this.password) {
+        M.toast({html: 'Bitte Passwort eingeben'});
+        return;
+      }
+
+      showLoadingInvisible();
+      try {
+        await Axios.post('/api/unlock/section',{ menu: this.menu.id, password: this.password });
+        await this.fetchData();
+        M.toast({html: 'Bereich freigeschaltet'});
+      } catch (e) {
+        switch(e.response.status) {
+          case 403:
+            M.toast({html: 'Falsches Passwort'});
+            break;
+          default:
+            M.toast({html: 'Ein Fehler ist aufgetreten'});
+        }
+        hideLoading();
+      }
     }
   },
   watch: {

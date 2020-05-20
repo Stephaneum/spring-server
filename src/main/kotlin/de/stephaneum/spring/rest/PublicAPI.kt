@@ -8,6 +8,7 @@ import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Coop
 import de.stephaneum.spring.scheduler.Element
+import de.stephaneum.spring.security.CryptoService
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
@@ -24,11 +25,14 @@ data class Stats(
         val dev: String?
 )
 data class HomeData(val slider: List<Slider>, val menu: Menu, val liveticker: String?, val posts: List<Post>, val events: List<Event>, val studentCount: Int, val teacherCount: Int, val years: Int, val coop: List<Coop>, val coopLink: String?)
-data class SectionData(val slider: List<Slider>, val menu: Menu, val posts: List<Post>, val postCount: Int, val events: List<Event>)
+data class SectionData(val slider: List<Slider>, val menu: Menu, val locked: Boolean, val posts: List<Post>, val postCount: Int, val events: List<Event>)
+data class UnlockSection(val menu: Int, val password: String)
+data class UnlockPost(val post: Int, val password: String)
 
 @RestController
 @RequestMapping("/api")
 class PublicAPI (
+        private val cryptoService: CryptoService,
         private val postService: PostService,
         private val configScheduler: ConfigScheduler,
         private val countService: CountService,
@@ -74,13 +78,38 @@ class PublicAPI (
     @GetMapping("/section/{menuId}")
     fun section(@PathVariable menuId: Int, @RequestParam(required = false) page: Int?): SectionData {
         val menu = menuRepo.findByIdOrNull(menuId) ?: throw ErrorCode(404, "menu not found")
+        val locked = menu.password != null && !Session.hasAccess(menu)
+        val posts = if (locked) emptyList() else postService.getPosts(menu.id, pageable = PageRequest.of(page ?: 0, 5))
+        menu.password = null // remove password, so that client cannot see it
         return SectionData(
                 slider = sliderRepo.findByOrderByIndex(),
                 menu = menu,
-                posts = postService.getPosts(menu.id, pageable = PageRequest.of(page ?: 0, 5)),
+                locked = locked,
+                posts = posts,
                 postCount = postRepo.countByMenuAndApproved(menu, true),
                 events = getNextEvents()
         )
+    }
+
+    @PostMapping("/unlock/section")
+    fun unlockSection(@RequestBody request: UnlockSection) {
+        val (session, _) = Session.createIfNotExists()
+        val menu = menuRepo.findByIdOrNull(request.menu) ?: throw ErrorCode(404, "menu not found")
+        if(request.password != menu.password)
+            throw ErrorCode(403, "invalid password")
+
+        session.unlockedSections.add(menu.id)
+    }
+
+    @ExperimentalUnsignedTypes
+    @PostMapping("/unlock/post")
+    fun unlockPost(@RequestBody request: UnlockPost) {
+        val (session, _) = Session.createIfNotExists()
+        val post = postRepo.findByIdOrNull(request.post) ?: throw ErrorCode(404, "post not found")
+        if(cryptoService.hashMD5(request.password) != post.password)
+            throw ErrorCode(403, "invalid password")
+
+        session.unlockedPosts.add(post.id)
     }
 
     @GetMapping("/imprint")

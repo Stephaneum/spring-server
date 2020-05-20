@@ -33,7 +33,7 @@ class VueController (
             }
         }
 
-        val created = Session.createIfNotExists()
+        val (_, created) = Session.createIfNotExists()
         if (created) {
             val ip = resolveIP(forwardedIP, request)
             countService.count(ip, userAgent ?: "")
