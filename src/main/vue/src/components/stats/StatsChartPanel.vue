@@ -52,7 +52,7 @@ export default {
             ...stdOptions,
             legend: { display: false },
             scales: {
-                yAxes: [{ scaleLabel: { display: true, labelString: 'Aufrufe pro Tag' }}]
+                yAxes: [{ scaleLabel: { display: true, labelString: 'Aufrufe' }}]
             }
         },
         hourData: {},
@@ -60,7 +60,7 @@ export default {
             ...stdOptions,
             legend: { display: false },
             scales: {
-                yAxes: [{ scaleLabel: { display: true, labelString: 'Aufrufe pro Stunde' }}]
+                yAxes: [{ scaleLabel: { display: true, labelString: 'Aufrufe' }}]
             }
         },
         browserData: {},
