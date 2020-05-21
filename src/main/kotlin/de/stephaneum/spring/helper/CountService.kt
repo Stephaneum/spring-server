@@ -15,8 +15,8 @@ import java.time.format.DateTimeFormatter
 
 data class DayCount(val day: String, val count: Int)
 data class HourCount(val hour: Int, val count: Long)
-data class BrowserCount(val browser: Browser, val count: Int)
-data class OSCount(val os: OS, val count: Int)
+data class BrowserCount(val browser: String, val count: Int)
+data class OSCount(val os: String, val count: Int)
 
 @Service
 class CountService (
@@ -82,11 +82,11 @@ class CountService (
     }
 
     fun getStatsBrowser(): List<BrowserCount> {
-        return Browser.values().map { browser -> BrowserCount(browser, statsBrowser[browser] ?: 0) }
+        return Browser.values().map { browser -> BrowserCount(browser.repr, statsBrowser[browser] ?: 0) }
     }
 
     fun getStatsOS(): List<OSCount> {
-        return OS.values().map { os -> OSCount(os, statsOS[os] ?: 0) }
+        return OS.values().map { os -> OSCount(os.repr, statsOS[os] ?: 0) }
     }
 
     fun getHistory(): Array<String?> {

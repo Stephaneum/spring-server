@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <StatsChartPanel v-if="fetched" :stats-day="statsDay" :stats-hour="statsHour" :stats-browser="statsBrowser" :stats-o-s="statsOS"></StatsChartPanel>
+    <StatsChartPanel v-if="fetched" :stats-day="statsDay" :stats-hour="statsHour" :stats-browser="statsBrowser" :stats-o-s="statsOS" :stats-cloud="statsCloud"></StatsChartPanel>
 
     <StatsPanel title="Technologien" icon="settings">
       <div style="margin: 30px 0 20px 0; display: flex; align-items: end; justify-content: space-evenly">
@@ -63,6 +63,7 @@
       statsHour: null,
       statsBrowser: null,
       statsOS: null,
+      statsCloud: null,
 
       upTime: null,
       startTime: null,
@@ -79,6 +80,7 @@
       this.statsHour = stats.statsHour;
       this.statsBrowser = stats.statsBrowser;
       this.statsOS = stats.statsOS;
+      this.statsCloud = stats.statsCloud;
 
       this.upTime = stats.upTime;
       this.startTime = moment(stats.startTime).format('dddd, [den] DD.MMMM yyyy');

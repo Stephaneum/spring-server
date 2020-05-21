@@ -53,7 +53,7 @@ class FileService {
     private lateinit var menuRepo: MenuRepo
 
     @Autowired
-    private lateinit var statsCloudRepo: StatsCloudRepo
+    private lateinit var cloudStatsService: CloudStatsService
 
     @Autowired
     private lateinit var logService: LogService
@@ -150,7 +150,7 @@ class FileService {
         Files.copy(ByteArrayInputStream(content), targetLocation, StandardCopyOption.REPLACE_EXISTING)
 
         // update stats
-        statsCloudRepo.save(StatsCloud(0, now(), file.size))
+        cloudStatsService.add(file.size)
 
         // log
         logService.log(EventType.UPLOAD, mode.description, user, filename)
@@ -231,7 +231,7 @@ class FileService {
         deleteFile(file.path)
 
         // update stats
-        statsCloudRepo.save(StatsCloud(0, now(), -file.size))
+        cloudStatsService.add(-file.size)
 
         logger.info("File deleted: '${file.generateFileName()}'")
     }

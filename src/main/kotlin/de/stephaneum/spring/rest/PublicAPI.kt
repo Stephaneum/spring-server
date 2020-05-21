@@ -20,7 +20,7 @@ import java.time.ZonedDateTime
 data class TextResponse(val text: String)
 data class Stats(
         val studentCount: Int, val teacherCount: Int, val postCount: Int, val visitCount: Int,
-        val statsDay: List<DayCount>, val statsHour: List<HourCount>, val statsBrowser: List<BrowserCount>, val statsOS: List<OSCount>,
+        val statsDay: List<DayCount>, val statsHour: List<HourCount>, val statsBrowser: List<BrowserCount>, val statsOS: List<OSCount>, val statsCloud: List<CloudCount>,
         val upTime: Long, val startTime: ZonedDateTime,
         val dev: String?
 )
@@ -33,6 +33,7 @@ data class UnlockPost(val post: Int, val password: String)
 @RequestMapping("/api")
 class PublicAPI (
         private val cryptoService: CryptoService,
+        private val cloudStatsService: CloudStatsService,
         private val postService: PostService,
         private val configScheduler: ConfigScheduler,
         private val countService: CountService,
@@ -143,7 +144,7 @@ class PublicAPI (
         val visitCount = statsDay.sumBy { it.count }
         return Stats(
                 studentCount = studentCount, teacherCount = teacherCount, postCount = postCount, visitCount = visitCount,
-                statsDay = statsDay, statsHour = countService.getStatsHour(), statsBrowser = countService.getStatsBrowser(), statsOS = countService.getStatsOS(),
+                statsDay = statsDay, statsHour = countService.getStatsHour(), statsBrowser = countService.getStatsBrowser(), statsOS = countService.getStatsOS(), statsCloud = cloudStatsService.getStats(),
                 upTime = Duration.between(START_TIME, ZonedDateTime.now()).seconds, startTime = START_TIME,
                 dev = dev
         )

@@ -2,60 +2,88 @@
     <div style="margin-top: 50px">
         <TabBar :tabs="tabs" :curr-tab="currTab" @selected="selectTab"></TabBar>
         <div class="card-panel white" style="margin-top: 0">
-            <GChart v-show="currTab.id === tabs.days.id || currTab.id === tabs.hour.id" type="ColumnChart" :data="barData" :options="barOptions" />
+            <BarChart v-show="currTab.id === tabs.days.id" :chart-data="dayData" :options="dayOptions" :height="300"></BarChart>
+            <BarChart v-show="currTab.id === tabs.hour.id" :chart-data="hourData" :options="hourOptions" :height="300"></BarChart>
 
             <div v-show="currTab.id === tabs.system.id" class="row">
                 <div class="col s6">
-                    <GChart type="PieChart" :data="pieData1" :options="pieOptions1" />
+                    <PieChart :chart-data="browserData" :options="browserOptions" :height="200" />
                 </div>
                 <div class="col s6">
-                    <GChart type="PieChart" :data="pieData2" :options="pieOptions2" />
+                    <PieChart :chart-data="osData" :options="osOptions" :height="200" />
                 </div>
             </div>
+
+            <LineChart v-show="currTab.id === tabs.cloud.id" :chart-data="lineData" :options="lineOptions" :height="300"></LineChart>
         </div>
     </div>
 
 </template>
 
 <script>
-    import { GChart } from 'vue-google-charts'
     import TabBar from "../TabBar";
+    import LineChart from "./charts/LineChart";
+    import BarChart from "./charts/BarChart";
+    import PieChart from "./charts/PieChart";
 
     const tabs = {
       days: { id: 0, name: 'Aufrufe (30 Tagen)', icon: 'today' },
       hour: { id: 1, name: 'Aufrufe (Uhrzeit)', icon: 'schedule' },
       system: { id: 2, name: 'Systeme', icon: 'devices' },
-      // cloud: { id: 3, name: 'Cloud', icon: 'cloud' } TODO
+      cloud: { id: 3, name: 'Cloud', icon: 'cloud' }
     };
 
-    const standardOptions = {
-        height: 250,
-        legend: 'none',
-        colors: ['#85b56e'],
-        chartArea: {
-            top: 10,
-            right: 0,
-            bottom: 20,
-            left: 50
-        }
+    const stdColor = '#85b56e'
+
+    const stdOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
     };
 
 export default {
     name: 'StatsChartPanel',
-    components: { TabBar, GChart },
-    props: ['statsDay', 'statsHour', 'statsBrowser', 'statsOS'],
+    components: { PieChart, BarChart, LineChart, TabBar },
+    props: ['statsDay', 'statsHour', 'statsBrowser', 'statsOS', 'statsCloud'],
     data: () => ({
         currTab: tabs.days,
         tabs: tabs,
-        barData: [
-            ['Tag', 'Aufrufe'],
-            ['0', 0]
-        ],
-        barOptions: { ...standardOptions },
-        pieData1: null,
-        pieOptions1: null,
-        pieData2: null,
-        pieOptions2: null
+        dayData: {},
+        dayOptions: {
+            ...stdOptions,
+            legend: { display: false },
+            scales: {
+                yAxes: [{ scaleLabel: { display: true, labelString: 'Aufrufe pro Tag' }}]
+            }
+        },
+        hourData: {},
+        hourOptions: {
+            ...stdOptions,
+            legend: { display: false },
+            scales: {
+                yAxes: [{ scaleLabel: { display: true, labelString: 'Aufrufe pro Stunde' }}]
+            }
+        },
+        browserData: {},
+        browserOptions: {
+            ...stdOptions,
+            title: { display: true, text: 'Browser'},
+            legend: { position: 'right' }
+        },
+        osData: {},
+        osOptions: {
+            ...stdOptions,
+            title: { display: true, text: 'Betriebssystem'},
+            legend: { position: 'right' }
+        },
+        lineData: {},
+        lineOptions: {
+            ...stdOptions,
+            legend: { display: false },
+            scales: {
+                xAxes: [{type: 'time'}],
+                yAxes: [{ scaleLabel: { display: true, labelString: 'Speicher in MB' }}]
+            }
+        }
     }),
     methods: {
         selectTab(t) {
@@ -65,26 +93,49 @@ export default {
         updateChart() {
             switch(this.currTab.id) {
                 case tabs.days.id:
-                    this.barData = [
-                        ['Tag', 'Aufrufe'],
-                        ...this.statsDay.map((s) => [s.day, s.count])
-                    ];
+                    this.dayData = {
+                        labels: this.statsDay.map((s) => s.day),
+                        datasets: [{
+                            data: this.statsDay.map((s) => s.count),
+                            backgroundColor: stdColor
+                        }]
+                    };
                     break;
                 case tabs.hour.id:
-                    this.barData = [
-                        ['Uhrzeit', 'Aufrufe'],
-                        ...this.statsHour.map((s) => [s.hour, s.count])
-                    ];
+                    this.hourData = {
+                        labels: this.statsHour.map((s) => s.hour),
+                        datasets: [{
+                            data: this.statsHour.map((s) => s.count),
+                            backgroundColor: stdColor
+                        }]
+                    };
                     break;
                 case tabs.system.id:
-                    this.pieData1 = [
-                        ['Browser', 'Aufrufe'],
-                        ...this.statsBrowser.map((s) => [s.browser, s.count])
-                    ];
-                    this.pieData2 = [
-                        ['OS', 'Aufrufe'],
-                        ...this.statsOS.map((s) => [s.os, s.count])
-                    ];
+                    this.browserData = {
+                        labels: this.statsBrowser.map((s) => s.browser),
+                        datasets: [{
+                            data: this.statsBrowser.map((s) => s.count),
+                            backgroundColor: ['#ff9800', '#ffeb3b', '#2196f3', '#0d47a1', '#607d8b', '#673ab7']
+                        }]
+                    };
+                    this.osData = {
+                        labels: this.statsOS.map((s) => s.os),
+                        datasets: [{
+                            data: this.statsOS.map((s) => s.count),
+                            backgroundColor: ['#ff9800', '#2196f3', '#0d47a1', '#607d8b', '#263238', '#cfd8dc', '#4caf50', '#673ab7']
+                        }]
+                    };
+                    break;
+                case tabs.cloud.id:
+                    this.lineData = {
+                        labels: this.statsCloud.map((s) => new Date(s.date)),
+                        datasets: [{
+                            data: this.statsCloud.map((s) => s.size),
+                            borderColor: stdColor,
+                            pointRadius: 1,
+                            fill: false
+                        }]
+                    };
                     break;
             }
         }
@@ -99,7 +150,3 @@ export default {
     }
 }
 </script>
-
-<style>
-    svg > g > g:last-child { pointer-events: none }
-</style>
