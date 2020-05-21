@@ -2,10 +2,10 @@
     <div style="margin-top: 50px">
         <TabBar :tabs="tabs" :curr-tab="currTab" @selected="selectTab"></TabBar>
         <div class="card-panel white" style="margin-top: 0">
-            <BarChart v-show="currTab.id === tabs.days.id" :chart-data="dayData" :options="dayOptions" :height="300"></BarChart>
-            <BarChart v-show="currTab.id === tabs.hour.id" :chart-data="hourData" :options="hourOptions" :height="300"></BarChart>
+            <BarChart v-if="currTab.id === tabs.days.id" :chart-data="dayData" :options="dayOptions" :height="300"></BarChart>
+            <BarChart v-if="currTab.id === tabs.hour.id" :chart-data="hourData" :options="hourOptions" :height="300"></BarChart>
 
-            <div v-show="currTab.id === tabs.system.id" class="row">
+            <div v-if="currTab.id === tabs.system.id" class="row">
                 <div class="col s6">
                     <PieChart :chart-data="browserData" :options="browserOptions" :height="200" />
                 </div>
@@ -14,7 +14,7 @@
                 </div>
             </div>
 
-            <LineChart v-show="currTab.id === tabs.cloud.id" :chart-data="lineData" :options="lineOptions" :height="300"></LineChart>
+            <LineChart v-if="currTab.id === tabs.cloud.id" :chart-data="lineData" :options="lineOptions" :height="300"></LineChart>
         </div>
     </div>
 
