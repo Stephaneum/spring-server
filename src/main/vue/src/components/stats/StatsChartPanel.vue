@@ -144,7 +144,8 @@ export default {
         statsDay: {
             immediate: true,
             handler() {
-                this.updateChart();
+                if(this.statsDay)
+                    this.updateChart();
             }
         }
     }

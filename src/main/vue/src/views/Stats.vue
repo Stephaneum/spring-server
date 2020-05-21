@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <StatsChartPanel v-if="fetched" :stats-day="statsDay" :stats-hour="statsHour" :stats-browser="statsBrowser" :stats-o-s="statsOS" :stats-cloud="statsCloud"></StatsChartPanel>
+    <StatsChartPanel :stats-day="statsDay" :stats-hour="statsHour" :stats-browser="statsBrowser" :stats-o-s="statsOS" :stats-cloud="statsCloud"></StatsChartPanel>
 
     <StatsPanel title="Technologien" icon="settings">
       <div style="margin: 30px 0 20px 0; display: flex; align-items: end; justify-content: space-evenly">
