@@ -43,7 +43,7 @@ export default {
     name: 'CloudStats',
     props: ['info', 'teacherchat'],
     methods: {
-        exit: function() {
+        exit() {
             this.$emit('onexit');
         }
     }

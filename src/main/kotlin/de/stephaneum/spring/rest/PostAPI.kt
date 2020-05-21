@@ -213,11 +213,10 @@ class PostAPI (
             contentType = Files.probeContentType(Paths.get(fileName))
         }
 
-        val result = fileService.storeFileStephaneum(user, fileName, contentType, bytes ?: file.bytes, "Beiträge", -1, FileService.StoreMode.PRIVATE)
-        if(result is File)
-            result.simplifyForPosts()
+        val result = fileService.storeFileStephaneum(user, fileName, contentType, bytes ?: file.bytes, "Beiträge", null)
+        result.simplifyForPosts()
 
-        return if(result is String) PostResponse.Feedback(false, message = result) else result
+        return result
     }
 
     private fun hasAccessToPost(user: User, post: Post): Boolean {

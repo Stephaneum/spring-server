@@ -63,6 +63,8 @@ class BoardAPI (
             else -> throw ErrorCode(400, "only images or pdfs are allowed")
         }
 
+        val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "group not found")
+
         // ensure that the image is rotated properly
         var bytes = file.bytes
         if(areaType == AreaType.IMAGE) {
@@ -74,10 +76,7 @@ class BoardAPI (
             }
         }
 
-        val result = fileService.storeFileStephaneum(user, fileName, contentType, bytes, "Tafel", groupID, FileService.StoreMode.GROUP, lockedFolder = true)
-
-        if(result !is File)
-            throw ErrorCode(500, "File could not be saved")
+        val result = fileService.storeFileStephaneum(user, fileName, contentType, bytes, "Tafel", group, lockedFolder = true)
 
         val board = getOrCreateBoard(groupID)
         val area = BoardArea(0, board, 0, 0, 0, 0, null, result, areaType)

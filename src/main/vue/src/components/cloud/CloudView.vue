@@ -81,8 +81,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a @click="closeCreateFolder" href="#!"
-                   class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
                 <button @click="createFolder" type="button" class="btn waves-effect waves-light green darken-3">
                     <i class="material-icons left">save</i>
                     Erstellen
@@ -114,7 +113,7 @@
 
             </div>
             <div class="modal-footer">
-                <a @click="closePublic" href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+                <a @click="closePublic" href="#!" class="waves-effect waves-green btn-flat">Schließen</a>
             </div>
         </div>
 
@@ -127,7 +126,7 @@
 
             </div>
             <div class="modal-footer">
-                <a @click="closeEdit" href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+                <a @click="closeEdit" href="#!" class="waves-effect waves-green btn-flat">Schließen</a>
             </div>
         </div>
 
@@ -140,8 +139,8 @@
                 <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
             </div>
             <div class="modal-footer">
-                <a @click="closeDelete" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
-                <a @click="deleteItem" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+                <a @click="deleteItem" href="#!" class="waves-effect waves-red btn red darken-4">
                     <i class="material-icons left">delete</i>
                     Löschen
                 </a>
@@ -168,7 +167,7 @@
             CloudStats, FileGrid, FileList, FilePopup
         },
         props: ['myId', 'sharedMode', 'modifyAll', 'rootUrl', 'uploadUrl', 'folderUrl', 'teacherchat'],
-        data: function () {
+        data() {
             return {
                 fetching: true,
                 statsMode: false,
@@ -198,15 +197,15 @@
             }
         },
         methods: {
-            reset: async function() {
+            async reset() {
                 this.statsMode = false;
                 this.fetching = true;
                 await this.toHomeFolder();
             },
-            toggleStatsMode: function() {
+            toggleStatsMode() {
                 this.statsMode = !this.statsMode;
             },
-            setGridView: function(grid) {
+            setGridView(grid) {
 
                 if(this.statsMode)
                     return;
@@ -216,20 +215,20 @@
                     M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
                 });
             },
-            action: function(action) {
+            action(action) {
                 console.log(action);
             },
-            select: async function(file) {
+            async select(file) {
                 if(file.isFolder) {
                     await this.openFolder(file);
                 } else {
                     this.file = file;
                 }
             },
-            closeFilePopup: function() {
+            closeFilePopup() {
                 this.file = null;
             },
-            openFolder: async function(folder) {
+            async openFolder(folder) {
 
                 if(this.statsMode)
                     return;
@@ -244,7 +243,7 @@
                 this.folderID = folder.id;
                 await this.fetchData();
             },
-            toHomeFolder: async function() {
+            async toHomeFolder() {
                 if(this.statsMode)
                     return;
 
@@ -253,7 +252,7 @@
                 this.folderID = null;
                 await this.fetchData();
             },
-            digestFiles: function(files) {
+            digestFiles(files) {
                 files.forEach((f) => {
                     if(f.timestamp)
                         f.time = moment(f.timestamp).format('DD.MM.YYYY');
@@ -269,7 +268,7 @@
                 });
                 return files;
             },
-            count: function() {
+            count() {
                 this.fileCount = 0;
                 this.folderCount = 0;
                 this.files.forEach((f) => {
@@ -279,10 +278,10 @@
                         this.fileCount++;
                 });
             },
-            showUpload: function() {
+            showUpload() {
                 document.getElementById('upload-files').click();
             },
-            uploadFiles: function(event) {
+            uploadFiles(event) {
                 event.preventDefault();
                 this.filesDragging = false; // TODO: drag and drop
                 var files = event.dataTransfer ? event.dataTransfer.files : event.currentTarget.files;
@@ -294,14 +293,11 @@
                     }
                 });
             },
-            showCreateFolder: function() {
+            showCreateFolder() {
                 this.createFolderName = null;
                 M.Modal.getInstance(document.getElementById('modal-folder')).open();
             },
-            closeCreateFolder: function() {
-                M.Modal.getInstance(document.getElementById('modal-folder')).close();
-            },
-            createFolder: async function() {
+            async createFolder() {
                 if(!this.createFolderName) {
                     M.toast({html: 'Fehler<br>Bitte gib dem Ordner einen Namen.'});
                     return;
@@ -315,68 +311,60 @@
                 } catch (e) {
                     M.toast({html: 'Fehlgeschlagen.<br>'+this.selected.fileName});
                 }
-                this.fetchData();
+                await this.fetchData();
             },
-            showPublic: function(f) {
+            showPublic(f) {
                 this.selected = f;
                 M.Modal.getInstance(document.getElementById('modal-public')).open();
             },
-            closePublic: function() {
+            closePublic() {
                 M.Modal.getInstance(document.getElementById('modal-public')).close();
                 showLoadingInvisible();
                 this.fetchData();
             },
-            updatePublic: function(isPublic) {
+            async updatePublic(isPublic) {
                 showLoadingInvisible();
-                Axios.post( '/api/cloud/update-public-file', { fileID: this.selected.id, isPublic })
-                    .then((response) => {
-                        if(response.data.success) {
-                            this.selected.public = isPublic;
-                        } else if(response.data.message) {
-                            M.toast({html: 'Fehlgeschlagen.<br>'+response.data.message});
-                        } else {
-                            M.toast({html: 'Fehlgeschlagen.<br>'+this.selected.fileName});
-                        }
-                        this.fetchData();
-                    });
+                try {
+                    await Axios.post( '/api/cloud/update-public-file', { fileID: this.selected.id, isPublic });
+                    await this.fetchData();
+                    this.selected.public = isPublic;
+                } catch (e) {
+                    M.toast({html: 'Fehlgeschlagen.<br>'+this.selected.fileName});
+                    hideLoading();
+                }
             },
-            showEdit: function(f) {
+            showEdit(f) {
                 this.selected = f;
                 M.Modal.getInstance(document.getElementById('modal-edit')).open();
             },
-            closeEdit: function() {
+            closeEdit() {
                 M.Modal.getInstance(document.getElementById('modal-edit')).close();
                 showLoadingInvisible();
                 this.fetchData();
             },
-            showDelete: function(f) {
+            showDelete(f) {
                 this.selected = f;
                 M.Modal.getInstance(document.getElementById('modal-delete')).open();
             },
-            closeDelete: function() {
-                M.Modal.getInstance(document.getElementById('modal-delete')).close();
-            },
-            deleteItem: function() {
-                M.Modal.getInstance(document.getElementById('modal-delete')).close();
-                var isFolder = this.selected.isFolder;
-                var typeString = isFolder ? 'Ordner' : 'Datei';
-                var name = this.selected.fileName || this.selected.name;
-                var route = isFolder ? '/api/cloud/delete-folder/' : '/api/cloud/delete-file/';
+            async deleteItem() {
+                const isFolder = this.selected.isFolder;
+                const typeString = isFolder ? 'Ordner' : 'Datei';
+                const name = this.selected.fileName || this.selected.name;
+                const route = isFolder ? '/api/cloud/delete-folder/' : '/api/cloud/delete-file/';
+
                 showLoading(typeString + ' löschen...');
-                Axios.post( route + this.selected.id)
-                    .then((response) => {
-                        if(response.data.success) {
-                            M.toast({html: typeString + ' gelöscht.<br>'+name});
-                        } else if(response.data.message) {
-                            M.toast({html: 'Löschen fehlgeschlagen.<br>'+response.data.message});
-                        } else {
-                            M.toast({html: 'Löschen fehlgeschlagen.<br>'+name});
-                        }
-                        this.closeFilePopup();
-                        this.fetchData();
-                    });
+                try {
+                    await Axios.post( route + this.selected.id);
+                    M.toast({html: typeString + ' gelöscht.<br>'+name});
+                    this.closeFilePopup();
+                    M.Modal.getInstance(document.getElementById('modal-delete')).close();
+                    await this.fetchData();
+                } catch (e) {
+                    M.toast({html: 'Löschen fehlgeschlagen.<br>'+name});
+                    hideLoading();
+                }
             },
-            fetchData: async function () {
+            async fetchData() {
                 this.fetching = true;
                 var url = this.folderID ? '/api/cloud/view/' + this.folderID : this.rootUrl;
                 var res = await Axios.get(url);
@@ -402,13 +390,13 @@
             },
         },
         computed: {
-            publicLink: function () {
+            publicLink() {
                 return (file) => {
                     return window.location.origin + '/files/public/'+ file.id +'_' + encodeURI(file.fileName);
                 };
             }
         },
-        mounted: function() {
+        mounted() {
             M.AutoInit();
             this.fetchData();
         }

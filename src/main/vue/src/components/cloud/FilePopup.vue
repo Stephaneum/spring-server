@@ -96,63 +96,64 @@
 <script>
     import Axios from "axios"
     import M from "materialize-css"
+
     export default {
         name: 'FilePopup',
         props: ['file'],
-        data: function () {
+        data() {
             return {
                 key: null // used for office documents
             }
         },
         methods: {
-            exit: function() {
+            exit() {
                 this.$emit('onexit');
             },
-            onPublic: function() {
+            onPublic() {
                 this.$emit('onpublic');
             },
-            onEdit: function() {
+            onEdit() {
                 this.$emit('onedit');
             },
-            onDelete: function() {
+            onDelete() {
                 this.$emit('ondelete');
             }
         },
         computed: {
-            image: function() {
+            image() {
                 return (file) => {
                     return !file.isFolder && file.mime.startsWith('image');
                 }
             },
-            pdf: function() {
+            pdf() {
                 return (file) => {
                     return !file.isFolder && (file.mime === 'application/pdf' || file.fileName.toLowerCase().endsWith('.pdf'));
                 }
             },
-            docx: function() {
+            docx() {
                 return (file) => {
                     return !file.isFolder && (file.fileName.toLowerCase().endsWith('.docx') || file.fileName.toLowerCase().endsWith('.doc'));
                 }
             },
-            text: function() {
+            text() {
                 return (file) => {
-                    var lowerCase = file.fileName.toLowerCase();
+                    const lowerCase = file.fileName.toLowerCase();
                     return !file.isFolder && (file.mime.startsWith('text') || lowerCase.endsWith('.txt') || lowerCase.endsWith('.html') || lowerCase.endsWith('.htm') || lowerCase.endsWith('.js'));
                 }
             },
-            video: function() {
+            video() {
                 return (file) => {
-                    var lowerCase = file.fileName.toLowerCase();
+                    const lowerCase = file.fileName.toLowerCase();
                     return !file.isFolder && (file.mime.startsWith('video') || lowerCase.endsWith('.mpeg') || lowerCase.endsWith('.mp4') || lowerCase.endsWith('.avi') || lowerCase.endsWith('.webm'));
                 }
             },
-            audio: function() {
+            audio() {
                 return (file) => {
-                    var lowerCase = file.fileName.toLowerCase();
+                    const lowerCase = file.fileName.toLowerCase();
                     return !file.isFolder && (file.mime.startsWith('audio') || lowerCase.endsWith('.mp3') || lowerCase.endsWith('.ogg') || lowerCase.endsWith('.wav'));
                 }
             },
-            officeLink: function() {
+            officeLink() {
                 return (file) => {
                     if(this.key)
                         return 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(window.location.origin + '/files/internal/'+ file.id+'?download=true&key='+this.key);
@@ -161,8 +162,8 @@
                 }
             }
         },
-        mounted: function() {
-            var instance = this;
+        async mounted() {
+            const instance = this;
             M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
             document.onkeydown = function(evt) {
                 evt = evt || window.event;
@@ -178,16 +179,14 @@
                 }
             };
 
-            Axios.get('/api/cloud/key/' + this.file.id)
-                .then((res) => {
-                    if(res.data) {
-                        this.key = res.data.key;
-                    } else {
-                        M.toast({html: 'Interner Fehler.'});
-                    }
-                });
+            try {
+                const response = await Axios.get('/api/cloud/key/' + this.file.id);
+                this.key = response.data.key;
+            } catch (e) {
+                M.toast({html: 'Interner Fehler.'});
+            }
         },
-        destroyed: function() {
+        destroyed() {
             document.onkeydown = null;
         }
     }

@@ -17,12 +17,12 @@ export default {
     name: 'FileGrid',
     props: ['files', 'sharedMode'],
     methods: {
-        select: function(f) {
+        select(f) {
             this.$emit('onselect', f);
         }
     },
     computed: {
-        icon: function () {
+        icon() {
             return (file) => {
                 if(file.isFolder)
                     return 'folder';
@@ -34,7 +34,7 @@ export default {
                 }
             };
         },
-        image: function() {
+        image() {
             return (file) => {
                 return !file.isFolder && file.mime.startsWith('image');
             }

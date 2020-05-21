@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.io.*
 import java.io.File
@@ -23,16 +22,9 @@ import java.util.zip.ZipOutputStream
 @Service
 class FileService {
 
-    final val logger = LoggerFactory.getLogger(FileService::class.java)
+    private val logger = LoggerFactory.getLogger(FileService::class.java)
 
     val formatter = DecimalFormat("#.#")
-    enum class StoreMode(val description: String) {
-        PRIVATE("Privatspeicher"),
-        SCHOOL_CLASS("Klassenspeicher"),
-        GROUP("Projektspeicher"),
-        CATEGORY("Rubrik"),
-        TEACHER_CHAT("Lehrerchat")
-    }
 
     @Autowired
     private lateinit var configScheduler: ConfigScheduler
@@ -86,64 +78,43 @@ class FileService {
      * @param mime mime type
      * @param content byte array which should be saved
      * @param folder the folder (if Integer, then used as ID, else used as root folder name)
-     * @param classProjectCategoryID depends on the mode
-     * @param mode will be used to determine where to store and what ID to be used
-     * @return the file if success, else a string representing the error
+     * @param group if specified, then file is saved in group
+     * @param lockedFolder if true, then folder is not removable
+     * @return the saved file
      */
-    fun storeFileStephaneum(user: User, filename: String, mime: String, content: ByteArray, folder: Any?, classProjectCategoryID: Int?, mode: StoreMode, lockedFolder: Boolean = false): Any {
+    fun storeFileStephaneum(user: User, filename: String, mime: String, content: ByteArray, folder: Any?, group: Group?, lockedFolder: Boolean = false): de.stephaneum.spring.database.File {
 
         // check if enough space
         if(user.storage - fileRepo.calcStorageUsed(user.id) < content.size)
-            return "Nicht genügend Speicher"
+            throw ErrorCode(409, "Not enough storage")
 
         // resolve folder
-        val mainPath = configScheduler.get(Element.fileLocation) ?: return "Interner Fehler"
+        val mainPath = configScheduler.get(Element.fileLocation) ?: throw ErrorCode(500, "unknown file location")
         val savingFolder = when (folder) {
             is Int -> Folder(folder)
-            is String -> when (mode) {
-                StoreMode.PRIVATE -> folderRepo.findPrivateFolderInRoot(user, folder).firstOrNull() ?: folderRepo.save(Folder(0, folder, user, null, null, false, null, lockedFolder))
-                StoreMode.GROUP -> folderRepo.findGroupFolderInRoot(classProjectCategoryID.obj(), folder).firstOrNull() ?: folderRepo.save(Folder(0, folder, user, classProjectCategoryID.obj(), null, false, null, lockedFolder))
-                else -> throw ErrorCode(400, "StoreMode $mode with folder as string is not possible.")
+            is String -> when (group) {
+                null -> folderRepo.findPrivateFolderInRoot(user, folder).firstOrNull() ?: folderRepo.save(Folder(0, folder, user, null, null, false, null, lockedFolder))
+                else -> folderRepo.findGroupFolderInRoot(group, folder).firstOrNull() ?: folderRepo.save(Folder(0, folder, user, group, null, false, null, lockedFolder))
             }
             else -> null
         }
 
-        // resolve the additional id
-        var group: Group? = null
-        var schoolClass: SchoolClass? = null
-        if(mode == StoreMode.SCHOOL_CLASS || mode == StoreMode.GROUP || mode == StoreMode.CATEGORY) {
-            if(classProjectCategoryID == null)
-                return "unknown class/project/category ID"
-
-            if(mode == StoreMode.SCHOOL_CLASS)
-                schoolClass = SchoolClass(classProjectCategoryID)
-            else if(mode == StoreMode.GROUP)
-                group = Group(classProjectCategoryID)
-        }
-
         val file = fileRepo.save(de.stephaneum.spring.database.File(
                 id = 0,
-                user = if(mode == StoreMode.CATEGORY) null else user,
+                user = user,
                 path = "", // will be set in the next step
                 group = group,
-                schoolClass = schoolClass,
+                schoolClass = null,
                 timestamp = now(),
                 size = content.size,
                 mime = mime,
                 public = false,
-                teacherChat = mode == StoreMode.TEACHER_CHAT,
+                teacherChat = false,
                 folder = savingFolder))
 
         // now set the filename with the id
         file.path = "$mainPath/${file.id}_$filename"
         fileRepo.save(file)
-
-        // set category picture
-        if(mode == StoreMode.CATEGORY) {
-            val menu = menuRepo.findByIdOrNull(classProjectCategoryID!!) ?: return "Datei gespeichert, aber Verknüpfung mit Gruppe gescheitert"
-            menu.image = file
-            menuRepo.save(menu)
-        }
 
         // save file
         val targetLocation = Paths.get(file.path)
@@ -153,7 +124,10 @@ class FileService {
         cloudStatsService.add(file.size)
 
         // log
-        logService.log(EventType.UPLOAD, mode.description, user, filename)
+        if(group != null)
+            logService.log(EventType.UPLOAD, "Gruppenspeicher", user, "${group.name}, $filename")
+        else
+            logService.log(EventType.UPLOAD, "Privatspeicher", user, filename)
 
         return file
     }
@@ -196,13 +170,7 @@ class FileService {
      * @param file the file to be deleted
      */
     fun deleteFileStephaneum(user: User, file: de.stephaneum.spring.database.File) {
-
-        val mode = when {
-            file.group != null -> StoreMode.GROUP
-            file.schoolClass != null -> StoreMode.SCHOOL_CLASS
-            file.teacherChat -> StoreMode.TEACHER_CHAT
-            else -> StoreMode.PRIVATE
-        }
+        val group = file.group
 
         if(hasConnections(file)) {
             // has connections just remove the other connections
@@ -217,7 +185,10 @@ class FileService {
         }
 
         // log
-        logService.log(EventType.DELETE_FILE, mode.description, user, file.generateFileName())
+        if(group != null)
+            logService.log(EventType.DELETE_FILE, "Gruppenspeicher", user, "${group.name}, ${file.generateFileName()}")
+        else
+            logService.log(EventType.DELETE_FILE, "Privatspeicher", user, file.generateFileName())
     }
 
     /**
@@ -257,8 +228,6 @@ class FileService {
             file.user?.id == user.id -> true // user owns this file
             user.code.role == ROLE_ADMIN -> true // user is admin
             file.group?.let { group -> userGroupRepo.existsByUserAndGroup(user, group) } ?: false -> true // user is inside group
-            file.schoolClass != null && user.schoolClass?.id == file.schoolClass?.id -> true // user is inside school class
-            file.teacherChat && user.code.role == ROLE_TEACHER -> true // teacher chat
             else -> false
         }
     }

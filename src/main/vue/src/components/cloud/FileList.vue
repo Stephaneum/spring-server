@@ -41,16 +41,16 @@ export default {
     name: 'FileList',
     props: ['files', 'sharedMode', 'modifyAll'],
     methods: {
-        select: function(f) {
+        select(f) {
             this.$emit('onselect', f);
         },
-        onPublic: function(f) {
+        onPublic(f) {
             this.$emit('onpublic', f);
         },
-        onEdit: function(f) {
+        onEdit(f) {
             this.$emit('onedit', f);
         },
-        onDelete: function(f) {
+        onDelete(f) {
             this.$emit('ondelete', f);
         }
     },
