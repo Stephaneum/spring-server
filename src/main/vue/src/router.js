@@ -7,10 +7,16 @@ import Contact from "./views/Contact.vue";
 import Sitemap from "./views/Sitemap";
 import EuSa from "./views/EuSa";
 import HistoryView from "./views/HistoryView";
-import Events from "./views/Events";
 import PostView from "./views/PostView";
-import Stats from "./views/Stats";
 import Section from "./views/Section";
+import Home from "./views/internal/Home";
+import Account from "./views/internal/Account";
+import CodeManager from "./views/internal/CodeManager";
+import PlanManager from "./views/internal/PlanManager";
+import StaticManager from "./views/internal/StaticManager";
+import Cloud from "./views/internal/Cloud";
+import Logs from "./views/internal/Logs";
+import GroupList from "./views/internal/GroupList";
 
 Vue.use(VueRouter);
 
@@ -33,12 +39,12 @@ const routes = [
   {
     path: "/statistiken",
     name: "stats",
-    component: Stats,
+    component: () => import(/* webpackChunkName: "stats" */ "./views/Stats.vue"),
   },
   {
     path: "/termine",
     name: "events",
-    component: Events,
+    component: () => import(/* webpackChunkName: "events" */ "./views/Events.vue"),
   },
   {
     path: "/geschichte",
@@ -73,7 +79,7 @@ const routes = [
   {
     path: "/home",
     name: "home",
-    component: () => import(/* webpackChunkName: "home" */ "./views/internal/Home.vue"),
+    component: Home,
   },
   {
     path: "/config-manager",
@@ -85,7 +91,7 @@ const routes = [
     path: "/code-manager",
     name: "code-manager",
     meta: { title: 'Zugangscodes - Stephaneum' },
-    component: () => import(/* webpackChunkName: "code-manager" */ "./views/internal/CodeManager.vue"),
+    component: CodeManager,
   },
   {
     path: "/user-manager",
@@ -97,7 +103,7 @@ const routes = [
     path: "/logs",
     name: "logs",
     meta: { title: 'Logdaten - Stephaneum' },
-    component: () => import(/* webpackChunkName: "logs" */ "./views/internal/Logs.vue"),
+    component: Logs,
   },
   {
     path: "/menu-manager",
@@ -109,13 +115,13 @@ const routes = [
     path: "/plan-manager",
     name: "plan-manager",
     meta: { title: 'Vertretungsplan - Stephaneum' },
-    component: () => import(/* webpackChunkName: "plan-manager" */ "./views/internal/PlanManager.vue"),
+    component: PlanManager,
   },
   {
     path: "/static-manager",
     name: "static-manager",
     meta: { title: 'Seiten - Stephaneum' },
-    component: () => import(/* webpackChunkName: "static-manager" */ "./views/internal/StaticManager.vue"),
+    component: StaticManager,
   },
   {
     path: "/post-manager",
@@ -127,7 +133,7 @@ const routes = [
     path: "/groups",
     name: "group-list",
     meta: { title: 'Gruppen - Stephaneum' },
-    component: () => import(/* webpackChunkName: "group-list" */ "./views/internal/GroupList.vue"),
+    component: GroupList,
   },
   {
     path: "/groups/:id",
@@ -139,13 +145,13 @@ const routes = [
     path: "/cloud",
     name: "cloud",
     meta: { title: 'Cloud - Stephaneum' },
-    component: () => import(/* webpackChunkName: "cloud" */ "./views/internal/Cloud.vue"),
+    component: Cloud,
   },
   {
     path: "/account",
     name: "account",
     meta: { title: 'Account - Stephaneum' },
-    component: () => import(/* webpackChunkName: "account" */ "./views/internal/Account.vue"),
+    component: () => Account,
   },
 ];
 
