@@ -24,7 +24,7 @@
             <span @click="select(f)" class="file-text"><i v-if="f.locked" class="material-icons file-lock-icon">lock</i>{{ f.isFolder ? f.name : f.fileName }}</span>
 
             <!-- Info -->
-            <div style="margin-bottom: 10px;">
+            <div style="margin-bottom: 10px; text-align: center">
                 <span v-if="f.locked" class="grey-text lighten-2">System</span>
                 <span v-else-if="sharedMode" class="grey-text lighten-2">{{ f.user.firstName }} {{ f.user.lastName }}</span>
             </div>
