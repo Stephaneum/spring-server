@@ -1,5 +1,17 @@
 <template>
     <div style="display: flex; flex-wrap: wrap">
+
+        <div v-if="hasParent"
+             @drop="drop" @dragover="(e) => dragOver(e, parent)" @dragleave="dragLeave(parent)"
+             class="file-rect" :class="{ 'drag-over': draggingTarget && parent === draggingTarget }">
+
+            <!-- Icon -->
+            <i @click="openParent" style="color: rgb(125, 125, 125)" class="file-icon material-icons">arrow_upward</i>
+
+            <!-- Name -->
+            <span @click="openParent" class="file-text">Ebene hoch</span>
+        </div>
+
         <div v-for="f in files" :key="f.id"
              @drop="drop" @dragstart="dragStart(f)" @dragend="dragEnd" @dragover="(e) => dragOver(e, f)" @dragleave="dragLeave(f)" draggable="true"
              class="file-rect" :class="{ 'transparent': draggingFile && !f.isFolder && f !== draggingFile, 'drag-over': draggingTarget && f === draggingTarget }">
@@ -21,11 +33,15 @@
 </template>
 
 <script>
+
+    const parent = { isParent: true };
+
 export default {
     name: 'FileGrid',
-    props: ['files', 'sharedMode'],
+    props: ['files', 'hasParent', 'sharedMode'],
     data() {
         return {
+            parent: parent,
             draggingFile: null,
             draggingTarget: null
         };
@@ -33,6 +49,9 @@ export default {
     methods: {
         select(f) {
             this.$emit('select', f);
+        },
+        openParent() {
+            this.$emit('open-parent');
         },
         dragStart(f) {
             this.draggingFile = f;
@@ -42,7 +61,7 @@ export default {
         },
         dragOver(e, f) {
             e.preventDefault();
-            if(this.draggingFile && this.draggingFile !== f && f.isFolder) {
+            if(this.draggingFile && this.draggingFile !== f && (f === parent || f.isFolder)) {
                 this.draggingTarget = f;
             }
         },
@@ -53,7 +72,10 @@ export default {
         drop(e) {
             e.preventDefault();
             if(this.draggingFile && this.draggingTarget) {
-                this.$emit('move', this.draggingFile, this.draggingTarget);
+                if (this.draggingTarget === parent)
+                    this.$emit('move-parent', this.draggingFile);
+                else
+                    this.$emit('move', this.draggingFile, this.draggingTarget);
                 this.draggingFile = null;
                 this.draggingTarget = null;
             }

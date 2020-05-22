@@ -183,11 +183,12 @@ class CloudAPI (
     @PostMapping("/move")
     fun move(@RequestBody request: CloudRequest.Move) {
 
-        if(request.targetFolderId == null)
-            throw ErrorCode(400, "missing arguments")
-
         val me = Session.getUser()
-        val target = folderRepo.findByIdOrNull(request.targetFolderId) ?: throw ErrorCode(404, "target folder not found")
+
+        val target = if (request.targetFolderId != null)
+            folderRepo.findByIdOrNull(request.targetFolderId) ?: throw ErrorCode(404, "target folder not found")
+        else
+            null
 
         when {
             request.fileId != null -> {
@@ -202,7 +203,7 @@ class CloudAPI (
             request.folderId != null -> {
                 val folder = folderRepo.findByIdOrNull(request.folderId) ?: throw ErrorCode(404, "source folder not found")
 
-                if(isChild(target, folder))
+                if(target != null && isChild(target, folder))
                     throw ErrorCode(409, "no recursion allowed")
 
                 if(!fileService.hasAccessToFolder(me, folder))

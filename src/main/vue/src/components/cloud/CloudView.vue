@@ -51,12 +51,15 @@
             <div class="tab-panel white z-depth-1" style="margin: 0; min-height: 530px;padding: 10px">
                 <cloud-stats v-if="statsMode" :info="storage" :teacherchat="teacherchat" @onexit="toggleStatsMode"></cloud-stats>
                 <template v-else>
-                    <template v-if="files.length !== 0">
-                        <file-grid v-if="gridView" :files="files" :shared-mode="sharedMode" @select="select" @move="move"></file-grid>
+                    <div v-if="fetching" style="height: 400px;" class="empty-hint">
+                        Lade Dateien...
+                    </div>
+                    <template v-else-if="files.length !== 0">
+                        <file-grid v-if="gridView" :files="files" :has-parent="this.folderStack.length !== 0" :shared-mode="sharedMode" @select="select" @open-parent="openParentFolder" @move="move" @move-parent="moveParent"></file-grid>
                         <file-list v-else :files="files" :shared-mode="sharedMode" :modify-all="modifyAll" @select="select" @public="showPublic" @edit="showEdit" @delete="showDelete"></file-list>
                     </template>
                     <div v-else style="height: 400px;" class="empty-hint">
-                        {{ fetching ? 'Lade Dateien...' : 'Dieser Ordner ist leer.' }}
+                        Dieser Ordner ist leer.
                     </div>
                 </template>
             </div>
@@ -72,7 +75,7 @@
                 <h4>Neuer Ordner</h4>
                 <br>
                 <p>Es sind alle Zeichen erlaubt außer "/" und "\".</p>
-                <p>Wird erstellt in: <b>{{ folderStack.length != 0 ? folderStack.slice(-1)[0].name : 'Homeverzeichnis' }}</b></p>
+                <p>Wird erstellt in: <b>{{ folderStack.length !== 0 ? folderStack.slice(-1)[0].name : 'Homeverzeichnis' }}</b></p>
                 <br>
                 <div class="input-field">
                     <i class="material-icons prefix">folder</i>
@@ -243,6 +246,17 @@
                 this.folderID = folder.id;
                 await this.fetchData();
             },
+            async openParentFolder() {
+
+                if(this.statsMode)
+                    return;
+
+                if(this.folderStack.length === 1) {
+                    await this.toHomeFolder();
+                } else {
+                    await this.openFolder(this.folderStack[this.folderStack.length-2])
+                }
+            },
             async toHomeFolder() {
                 if(this.statsMode)
                     return;
@@ -370,17 +384,26 @@
                     await Axios.post('/api/cloud/move', {
                         folderId: from.isFolder ? from.id : null,
                         fileId: from.isFolder ? null : from.id,
-                        targetFolderId: to.id
+                        targetFolderId: to ? to.id : null
                     });
 
+                    const name = to ? to.name : 'Homeverzeichnis';
+
                     if(from.isFolder)
-                        M.toast({ html: 'Ordner verschoben<br>nach ' + to.name });
+                        M.toast({ html: 'Ordner verschoben<br>nach ' + name });
                     else
-                        M.toast({ html: 'Datei verschoben<br>nach ' + to.name });
+                        M.toast({ html: 'Datei verschoben<br>nach ' + name });
                     await this.fetchData();
                 } catch (e) {
                     M.toast({ html: 'Verschieben fehlgeschlagen' });
                     hideLoading();
+                }
+            },
+            async moveParent(from) {
+                if(this.folderStack.length <= 1) {
+                    await this.move(from, null);
+                } else {
+                    await this.move(from, this.folderStack[this.folderStack.length-2]);
                 }
             },
             async fetchData() {
