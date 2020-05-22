@@ -6,7 +6,7 @@
              class="file-rect" :class="{ 'drag-over': draggingTarget && parent === draggingTarget }">
 
             <!-- Icon -->
-            <i @click="openParent" style="color: rgb(125, 125, 125)" class="file-icon material-icons">arrow_upward</i>
+            <i @click="openParent" style="color: rgb(125, 125, 125); transform: rotate(90deg)" class="file-icon material-icons">subdirectory_arrow_left</i>
 
             <!-- Name -->
             <span @click="openParent" class="file-text">Ebene hoch</span>
