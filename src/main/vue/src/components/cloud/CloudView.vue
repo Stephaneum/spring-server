@@ -52,8 +52,8 @@
                 <cloud-stats v-if="statsMode" :info="storage" :teacherchat="teacherchat" @onexit="toggleStatsMode"></cloud-stats>
                 <template v-else>
                     <template v-if="files.length !== 0">
-                        <file-grid v-if="gridView" :files="files" :shared-mode="sharedMode" @onselect="select"></file-grid>
-                        <file-list v-else :files="files" :shared-mode="sharedMode" :modify-all="modifyAll" @onselect="select" @onpublic="showPublic" @onedit="showEdit" @ondelete="showDelete"></file-list>
+                        <file-grid v-if="gridView" :files="files" :shared-mode="sharedMode" @select="select" @move="move"></file-grid>
+                        <file-list v-else :files="files" :shared-mode="sharedMode" :modify-all="modifyAll" @select="select" @public="showPublic" @edit="showEdit" @delete="showDelete"></file-list>
                     </template>
                     <div v-else style="height: 400px;" class="empty-hint">
                         {{ fetching ? 'Lade Dateien...' : 'Dieser Ordner ist leer.' }}
@@ -361,6 +361,25 @@
                     await this.fetchData();
                 } catch (e) {
                     M.toast({html: 'Löschen fehlgeschlagen.<br>'+name});
+                    hideLoading();
+                }
+            },
+            async move(from, to) {
+                showLoading('Verschieben...');
+                try {
+                    await Axios.post('/api/cloud/move', {
+                        folderId: from.isFolder ? from.id : null,
+                        fileId: from.isFolder ? null : from.id,
+                        targetFolderId: to.id
+                    });
+
+                    if(from.isFolder)
+                        M.toast({ html: 'Ordner verschoben<br>nach ' + to.name });
+                    else
+                        M.toast({ html: 'Datei verschoben<br>nach ' + to.name });
+                    await this.fetchData();
+                } catch (e) {
+                    M.toast({ html: 'Verschieben fehlgeschlagen' });
                     hideLoading();
                 }
             },

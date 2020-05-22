@@ -203,11 +203,10 @@
       <div v-show="currTab.id === tabs.assign.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center; justify-content: center">
         <div style="width: 100%">
           <div style="text-align: center; font-size: 1.5em;">
-                        <span :style="{ background: !currPost.menu ? '#ffcdd2' : '#e8f5e9' }"
-                              style="padding: 20px; border-radius: 20px">
-                            Zuordnung:
-                            <span v-html="menuAssigned" style="color: #808080; margin-left: 20px"></span>
-                        </span>
+            <span :style="{ background: !currPost.menu ? '#ffcdd2' : '#e8f5e9' }" style="padding: 20px; border-radius: 20px">
+                Zuordnung:
+                <span v-html="menuAssigned" style="color: #808080; margin-left: 20px"></span>
+            </span>
           </div>
           <div v-if="!admin && !menuAdmin" style="text-align: center; margin-top: 40px">
             <span>Die Zuordnung ist optional. Der Admin ordnet dann diesen Beitrag zu, falls keine Auswahl getätigt wurde.</span>

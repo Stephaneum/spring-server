@@ -232,6 +232,18 @@ class FileService {
         }
     }
 
+    /**
+     * @return true if the user has access to the folder
+     */
+    fun hasAccessToFolder(user: User, folder: Folder): Boolean {
+        return when {
+            folder.user?.id == user.id -> true // user owns this folder
+            user.code.role == ROLE_ADMIN -> true // user is admin
+            folder.group?.let { group -> userGroupRepo.existsByUserAndGroup(user, group) } ?: false -> true // user is inside group
+            else -> false
+        }
+    }
+
     fun loadFileAsResource(path: String): Resource? {
         return try {
             val resource = UrlResource(Paths.get(path).toUri())

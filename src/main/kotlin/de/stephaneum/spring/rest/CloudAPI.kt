@@ -17,8 +17,7 @@ import javax.servlet.http.HttpServletRequest
 object CloudRequest {
     data class CreateFolder(val name: String?, val parentID: Int?)
     data class UpdatePublic(val fileID: Int?, val isPublic: Boolean?)
-    data class MoveFile(val fileID: Int?, val parentFolderID: Int?)
-    data class MoveFolder(val folderID: Int?, val parentFolderID: Int?)
+    data class Move(val fileId: Int?, val folderId: Int?, val targetFolderId: Int?)
 }
 
 object CloudResponse {
@@ -181,21 +180,38 @@ class CloudAPI (
         fileService.deleteFolderStephaneum(user, folder)
     }
 
-    @PostMapping("/move-file")
-    fun moveFile(@RequestBody request: CloudRequest.MoveFile) {
+    @PostMapping("/move")
+    fun move(@RequestBody request: CloudRequest.Move) {
 
-        if(request.fileID == null || request.parentFolderID == null)
+        if(request.targetFolderId == null)
             throw ErrorCode(400, "missing arguments")
 
-        val user = Session.getUser()
-        val file = fileRepo.findByIdOrNull(request.fileID) ?: throw ErrorCode(404, "file not found")
-        val folder = folderRepo.findByIdOrNull(request.parentFolderID) ?: throw ErrorCode(404, "folder not found")
+        val me = Session.getUser()
+        val target = folderRepo.findByIdOrNull(request.targetFolderId) ?: throw ErrorCode(404, "target folder not found")
 
-        if(!fileService.hasAccessToFile(user, file))
-            throw ErrorCode(403, "no access to this file")
+        when {
+            request.fileId != null -> {
+                val file = fileRepo.findByIdOrNull(request.fileId) ?: throw ErrorCode(404, "file not found")
 
-        file.folder = folder
-        fileRepo.save(file)
+                if(!fileService.hasAccessToFile(me, file))
+                    throw ErrorCode(403, "no access to this file")
+
+                file.folder = target
+                fileRepo.save(file)
+            }
+            request.folderId != null -> {
+                val folder = folderRepo.findByIdOrNull(request.folderId) ?: throw ErrorCode(404, "source folder not found")
+
+                if(isChild(target, folder))
+                    throw ErrorCode(409, "no recursion allowed")
+
+                if(!fileService.hasAccessToFolder(me, folder))
+                    throw ErrorCode(403, "no access to this folder")
+
+                folder.parent = target
+                folderRepo.save(folder)
+            }
+        }
     }
 
     @GetMapping("/key/{fileID}")
@@ -232,6 +248,17 @@ class CloudAPI (
             else
                 files[i-folders.size]
         }
+    }
+
+    private fun isChild(folder: Folder, possibleParent: Folder): Boolean {
+        if (folder.id == possibleParent.id)
+            return true
+
+        val parent = folder.parent
+        if (parent != null)
+            return isChild(parent, possibleParent)
+
+        return false
     }
 
 }

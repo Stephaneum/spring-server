@@ -42,16 +42,16 @@ export default {
     props: ['files', 'sharedMode', 'modifyAll'],
     methods: {
         select(f) {
-            this.$emit('onselect', f);
+            this.$emit('select', f);
         },
         onPublic(f) {
-            this.$emit('onpublic', f);
+            this.$emit('public', f);
         },
         onEdit(f) {
-            this.$emit('onedit', f);
+            this.$emit('edit', f);
         },
         onDelete(f) {
-            this.$emit('ondelete', f);
+            this.$emit('delete', f);
         }
     },
 }

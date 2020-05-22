@@ -1,9 +1,17 @@
 <template>
     <div style="display: flex; flex-wrap: wrap">
-        <div v-for="f in files" :key="f.id" class="file-rect">
+        <div v-for="f in files" :key="f.id"
+             @drop="drop" @dragstart="dragStart(f)" @dragend="dragEnd" @dragover="(e) => dragOver(e, f)" @dragleave="dragLeave(f)" draggable="true"
+             class="file-rect" :class="{ 'transparent': draggingFile && !f.isFolder && f !== draggingFile, 'drag-over': draggingTarget && f === draggingTarget }">
+
+            <!-- Icon -->
             <img v-if="image(f)" :src="f.link" @click="select(f)" class="file-image"/>
             <i v-else @click="select(f)" :style="{ color: f.isFolder ? 'rgb(125, 125, 125)' : 'rgb(175, 175, 175)'}" class="file-icon material-icons">{{ icon(f) }}</i>
+
+            <!-- File / Folder Name -->
             <span @click="select(f)" class="file-text"><i v-if="f.locked" class="material-icons file-lock-icon">lock</i>{{ f.isFolder ? f.name : f.fileName }}</span>
+
+            <!-- Info -->
             <div style="margin-bottom: 10px;">
                 <span v-if="f.locked" class="grey-text lighten-2">System</span>
                 <span v-else-if="sharedMode" class="grey-text lighten-2">{{ f.user.firstName }} {{ f.user.lastName }}</span>
@@ -16,9 +24,39 @@
 export default {
     name: 'FileGrid',
     props: ['files', 'sharedMode'],
+    data() {
+        return {
+            draggingFile: null,
+            draggingTarget: null
+        };
+    },
     methods: {
         select(f) {
-            this.$emit('onselect', f);
+            this.$emit('select', f);
+        },
+        dragStart(f) {
+            this.draggingFile = f;
+        },
+        dragEnd() {
+            this.draggingFile = null;
+        },
+        dragOver(e, f) {
+            e.preventDefault();
+            if(this.draggingFile && this.draggingFile !== f && f.isFolder) {
+                this.draggingTarget = f;
+            }
+        },
+        dragLeave(f) {
+            if(this.draggingTarget && f === this.draggingTarget)
+                this.draggingTarget = null;
+        },
+        drop(e) {
+            e.preventDefault();
+            if(this.draggingFile && this.draggingTarget) {
+                this.$emit('move', this.draggingFile, this.draggingTarget);
+                this.draggingFile = null;
+                this.draggingTarget = null;
+            }
         }
     },
     computed: {
@@ -51,6 +89,7 @@ export default {
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        border: transparent solid 2px !important; /* will be overwritten by drag-over */
     }
 
     .file-image {
@@ -76,6 +115,14 @@ export default {
         margin-top: 5px;
         text-align: center;
         cursor: pointer;
+    }
+
+    .transparent {
+        filter: opacity(0.2);
+    }
+
+    .drag-over {
+        border: #808080 dashed 2px !important;
     }
 
     @media screen and (min-width: 1301px) and (max-width: 1600px) {
