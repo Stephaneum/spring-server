@@ -125,8 +125,8 @@
             <div class="modal-content">
                 <h4>{{ selected.fileName || selected.name }}</h4>
                 <br>
-                In Arbeit
-
+                <a v-if="selected.fileName && selected.fileName.endsWith('.pdf')" :href="'microsoft-edge:'+origin+(file || {}).link+'?key='+key">in Edge bearbeiten</a>
+                <span v-else>In Arbeit</span>
             </div>
             <div class="modal-footer">
                 <a @click="closeEdit" href="#!" class="waves-effect waves-green btn-flat">Schließen</a>
@@ -142,7 +142,7 @@
                 <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
             </div>
             <div class="modal-footer">
-                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+                <a href="#!" class="modal-close waves-effect btn-flat">Abbrechen</a>
                 <a @click="deleteItem" href="#!" class="waves-effect waves-red btn red darken-4">
                     <i class="material-icons left">delete</i>
                     Löschen
@@ -150,7 +150,7 @@
             </div>
         </div>
 
-        <file-popup v-if="file" :file="file" @onexit="closeFilePopup" @onpublic="showPublic(file)" @onedit="showEdit(file)" @ondelete="showDelete(file)"></file-popup>
+        <file-popup v-if="file" :file="file" @exit="closeFilePopup" @public="showPublic(file)" @edit="showEdit(file)" @delete="showDelete(file)"></file-popup>
     </div>
 </template>
 
@@ -172,6 +172,7 @@
         props: ['myId', 'sharedMode', 'modifyAll', 'rootUrl', 'uploadUrl', 'folderUrl', 'teacherchat'],
         data() {
             return {
+                origin: window.location.origin,
                 fetching: true,
                 statsMode: false,
                 gridView: true,
@@ -196,7 +197,8 @@
                     public: false
                 },
                 createFolderName: null,
-                file: null // for the file popup
+                file: null, // for the file popup
+                key: null // for previews in another browser
             }
         },
         methods: {
@@ -347,9 +349,10 @@
                     hideLoading();
                 }
             },
-            showEdit(f) {
+            async showEdit(f) {
                 this.selected = f;
                 M.Modal.getInstance(document.getElementById('modal-edit')).open();
+                await this.updateKey();
             },
             closeEdit() {
                 M.Modal.getInstance(document.getElementById('modal-edit')).close();
@@ -404,6 +407,14 @@
                     await this.move(from, null);
                 } else {
                     await this.move(from, this.folderStack[this.folderStack.length-2]);
+                }
+            },
+            async updateKey() {
+                try {
+                    const response = await Axios.get('/api/cloud/key/' + this.selected.id);
+                    this.key = response.data.key;
+                } catch (e) {
+                    M.toast({html: 'Interner Fehler.'});
                 }
             },
             async fetchData() {

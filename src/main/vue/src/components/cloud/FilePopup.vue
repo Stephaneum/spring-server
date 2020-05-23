@@ -1,7 +1,6 @@
 <template>
     <div style="position: fixed; z-index: 500; left: 0; top: 0;width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.6);">
         <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center">
-
             <div style="width: calc(100% - 50px); height: calc(100% - 50px); display: flex">
                 <div style="height: 100%; flex: 1; display: flex; align-items: center; justify-content: center;">
                     <img v-if="image(file)" :src="file.link" style="max-width: 100%; max-height: 100%"/>
@@ -59,8 +58,6 @@
                             <div style="text-align: right">{{ file.public ? 'Ja' : 'Nein' }}</div>
                         </div>
 
-                        <div style="height: 30px"></div>
-
                         <!-- actions -->
                         <p class="file-popup-sub-header">Aktionen</p>
                         <div class="file-popup-sub-panel" style="display: flex; justify-content: space-evenly">
@@ -88,7 +85,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </template>
@@ -107,16 +103,16 @@
         },
         methods: {
             exit() {
-                this.$emit('onexit');
+                this.$emit('exit');
             },
             onPublic() {
-                this.$emit('onpublic');
+                this.$emit('public');
             },
             onEdit() {
-                this.$emit('onedit');
+                this.$emit('edit');
             },
             onDelete() {
-                this.$emit('ondelete');
+                this.$emit('delete');
             }
         },
         computed: {
