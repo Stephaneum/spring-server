@@ -6,11 +6,13 @@ import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
+import org.jsoup.Jsoup
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
 data class AdminStaticInfo(val staticPath: String, val pages: List<Static>)
+data class StaticContent(val mode: StaticMode, val title: String, val body: String)
 
 @RestController
 @RequestMapping("/api/static")
@@ -21,6 +23,22 @@ class StaticAPI (
 ) {
 
     @GetMapping
+    fun get(@RequestParam path: String): StaticContent {
+        val mainPath = configScheduler.get(Element.fileLocation) ?: throw ErrorCode(500, "unknown file location")
+        val page = staticRepo.findByPath(path)
+        val content = fileService.loadFileAsString("$mainPath/${Static.FOLDER_NAME}/$path")
+
+        if (page == null || content == null)
+            throw ErrorCode(404, "page not found")
+
+        val doc = Jsoup.parse(content)
+        val body = doc.select("body").first().html()
+        val title = doc.select("title").first()?.html() ?: "Beitrag"
+
+        return StaticContent(page.mode, title, body)
+    }
+
+    @GetMapping("/status")
     fun getFiles(): AdminStaticInfo {
         Session.getUser(adminOnly = true)
 

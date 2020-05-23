@@ -119,7 +119,7 @@
       },
       fetchData: async function() {
         try {
-          const response = await Axios.get('/api/static');
+          const response = await Axios.get('/api/static/status');
           this.staticPath = response.data.staticPath;
           this.pages = response.data.pages;
           this.waitingForData = false;

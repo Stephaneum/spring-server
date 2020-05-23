@@ -17,6 +17,7 @@ import StaticManager from "./views/internal/StaticManager";
 import Cloud from "./views/internal/Cloud";
 import Logs from "./views/internal/Logs";
 import GroupList from "./views/internal/GroupList";
+import StaticView from "./views/StaticView";
 
 Vue.use(VueRouter);
 
@@ -55,6 +56,11 @@ const routes = [
     path: "/eu-sa",
     name: "eu-sa",
     component: EuSa,
+  },
+  {
+    path: "/s/*",
+    name: "static-view",
+    component: StaticView,
   },
   {
     path: "/kontakt",

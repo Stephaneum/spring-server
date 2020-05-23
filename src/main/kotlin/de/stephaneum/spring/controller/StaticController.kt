@@ -4,15 +4,12 @@ import de.stephaneum.spring.database.Static
 import de.stephaneum.spring.database.StaticMode
 import de.stephaneum.spring.database.StaticRepo
 import de.stephaneum.spring.helper.FileService
-import de.stephaneum.spring.helper.checkIE
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
-import org.jsoup.Jsoup
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
-import org.springframework.ui.set
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import javax.servlet.http.HttpServletRequest
@@ -28,45 +25,25 @@ class StaticController (
     @GetMapping("/s/**")
     fun getPublic(@RequestParam(required = false) download: Boolean?, request: HttpServletRequest, response: HttpServletResponse, model: Model): Any? {
 
-        if(checkIE(request))
-            return "forward:/static/no-support-ie.html"
-
         val path = request.requestURI.replace("${request.contextPath}/s/","")
         val mainPath = configScheduler.get(Element.fileLocation) ?: return "500"
         if(path.endsWith(".html") || path.endsWith(".htm")) {
 
             // html request
 
-            val page = staticRepo.findByPath(path)
-            val content = fileService.loadFileAsString("$mainPath/${Static.FOLDER_NAME}/$path")
+            val page = staticRepo.findByPath(path) ?: return "404"
 
-            if (page == null || content == null)
-                return "404"
-
-            if(download == true) {
+            if(download == true || page.mode == StaticMode.FULL_SCREEN) {
+                val content = fileService.loadFileAsString("$mainPath/${Static.FOLDER_NAME}/$path")
                 val name = fileService.getFileName(path)
+                val disposition = if (download == true) "attachment" else "inline"
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType("text/html; charset=utf-8"))
-                        .header("Content-Disposition", "attachment; filename=\"$name\"")
+                        .header("Content-Disposition", "$disposition; filename=\"$name\"")
                         .body(content)
             }
 
-            val doc = Jsoup.parse(content)
-            model["head"] = doc.select("head").first().html()
-            model["body"] = doc.select("body").first().html()
-            model["title"] = doc.select("title").first()?.html() ?: "Beitrag"
-
-            return when(page.mode) {
-                StaticMode.MIDDLE -> "static-middle"
-                StaticMode.FULL_WIDTH -> "static-full-width"
-                StaticMode.FULL_SCREEN -> {
-                    // just return the html file as is
-                    response.contentType = "text/html"
-                    response.characterEncoding = "UTF-8"
-                    response.writer.println(content)
-                    null
-                }
-            }
+            return "forward:/static/index.html" // return vue
         } else {
             // other file types, e.g. images
             val resource = fileService.loadFileAsResource("$mainPath/${Static.FOLDER_NAME}/$path") ?: return "404"
