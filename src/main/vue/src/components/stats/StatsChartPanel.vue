@@ -52,7 +52,10 @@ export default {
             ...stdOptions,
             legend: { display: false },
             scales: {
-                yAxes: [{ scaleLabel: { display: true, labelString: 'Aufrufe' }}]
+                yAxes: [{
+                    scaleLabel: { display: true, labelString: 'Aufrufe' },
+                    ticks: { beginAtZero: true }
+                }]
             }
         },
         hourData: {},
@@ -60,7 +63,10 @@ export default {
             ...stdOptions,
             legend: { display: false },
             scales: {
-                yAxes: [{ scaleLabel: { display: true, labelString: 'Aufrufe' }}]
+                yAxes: [{
+                    scaleLabel: { display: true, labelString: 'Aufrufe' },
+                    ticks: { beginAtZero: true }
+                }]
             }
         },
         browserData: {},
@@ -80,8 +86,11 @@ export default {
             ...stdOptions,
             legend: { display: false },
             scales: {
-                xAxes: [{type: 'time'}],
-                yAxes: [{ scaleLabel: { display: true, labelString: 'Speicher in MB' }}]
+                xAxes: [{ type: 'time' }],
+                yAxes: [{
+                    scaleLabel: { display: true, labelString: 'Speicher in MB' },
+                    ticks: { beginAtZero: true }
+                }]
             }
         }
     }),
