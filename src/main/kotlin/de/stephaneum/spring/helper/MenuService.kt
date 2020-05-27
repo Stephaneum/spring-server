@@ -63,6 +63,12 @@ class MenuService (
         return userMenuRepo.existsByUser(user)
     }
 
+    fun addChildrenPlain(parent: Menu) {
+        parent.children = menuRepo.findByParentId(parent.id)
+                                  .onEach { child -> child.simplify() }
+                                  .let { children -> sortPriority(children) }
+    }
+
     /**
      * @param parent children will be added to the parent
      * @param menu all menu items one layer, children will be find using this list

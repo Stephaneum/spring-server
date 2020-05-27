@@ -80,12 +80,18 @@ class PublicAPI (
 
     @GetMapping("/section/{menuId}")
     fun section(@PathVariable menuId: Int, @RequestParam(required = false) page: Int?): SectionData {
+
+        // menu
         val menu = menuRepo.findByIdOrNull(menuId) ?: throw ErrorCode(404, "menu not found")
         val locked = menu.password != null && !Session.hasAccess(menu)
-        val posts = if (locked) emptyList() else postService.getPosts(menu.id, pageable = PageRequest.of(page?.minus(1) ?: 0, 5))
         menu.password = null // remove password, so that client cannot see it
+        menuService.addChildrenPlain(menu)
+
+        // posts
+        val posts = if (locked) emptyList() else postService.getPosts(menu.id, pageable = PageRequest.of(page?.minus(1) ?: 0, 5))
         posts.filter { post -> post.password != null && !Session.hasAccess(post) }
              .forEach { post -> post.content = "" }
+
         return SectionData(
                 slider = sliderRepo.findByOrderByIndex(),
                 menu = menu,

@@ -16,7 +16,11 @@
       </div>
 
       <div class="col s12 m9">
+
+        <!-- fetching -->
         <div v-if="fetching" style="height: 600px; text-align: center; font-size: 2rem;">Lade Beiträge..</div>
+
+        <!-- password protected -->
         <div v-else-if="locked" style="padding-top: 100px; text-align: center">
           <p style="font-size: 1.4rem; margin-bottom: 50px">Dieser Bereich ist passwortgeschützt.</p>
 
@@ -32,9 +36,37 @@
           </a>
 
         </div>
+
+        <!-- empty -->
+        <template v-else-if="posts.length === 0">
+
+          <!-- empty and no children -->
+          <div v-if="menu.children.length === 0" style="padding-top: 100px; text-align: center">
+            <span style="font-size: 1.4rem">Noch keine Beiträge in diesem Bereich veröffentlicht.</span>
+          </div>
+
+          <!-- empty and children (show them) -->
+          <div v-else style="padding-top: 50px; display: flex; flex-direction: column; align-items: center">
+            <div>
+              <div v-for="m in menu.children" :key="m.id" style="margin-bottom: 10px">
+                <a v-if="m.link" :href="m.link" target="_blank" class="btn-flat waves-effect">
+                  <i class="material-icons left">arrow_forward</i>{{ m.name }}
+                </a>
+
+                <router-link v-else :to="'/m/' + m.id" v-slot="{ href, navigate }">
+                  <a @click="navigate" :href="href" class="btn-flat waves-effect">
+                    <i class="material-icons left">arrow_forward</i>{{ m.name }}
+                  </a>
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- normal -->
         <PostListHome v-else :posts="posts"></PostListHome>
 
-        <ul v-if="!fetching && !locked" class="pagination center-align">
+        <ul v-if="!fetching && !locked && posts.length !== 0" class="pagination center-align">
           <router-link v-if="page !== 1" :to="{path:'/m/'+menu.id, query: { 'page': page-1 }}" v-slot="{ href, navigate }">
             <li class="waves-effect">
               <a @click="navigate" :href="href">
