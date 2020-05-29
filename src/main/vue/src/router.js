@@ -157,7 +157,7 @@ const routes = [
     path: "/account",
     name: "account",
     meta: { title: 'Account - Stephaneum' },
-    component: () => Account,
+    component: Account,
   },
 ];
 
