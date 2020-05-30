@@ -16,12 +16,13 @@ class VueController (
         private val countService: CountService
 ) {
 
-    @GetMapping("/", "/m/{id}", "/beitrag/{id}", "/login",
+    @GetMapping("/", "/m/{id}", "/m/{id}/{page}", "/beitrag/{id}", "/login",
             "/statistiken", "/termine", "/geschichte", "/eu-sa", "/kontakt", "/impressum", "/sitemap",
             "/home", "/user-manager", "/config-manager", "/static-manager", "/code-manager", "/logs",
             "/plan-manager", "/menu-manager", "/post-manager", "/groups", "/groups/{id}", "/cloud", "/account")
     fun html(@RequestParam(required = false) key: String?,
              @PathVariable(required = false) id: Int?,
+             @PathVariable(required = false) page: Int?,
              @RequestHeader(value="User-Agent", required = false) userAgent: String?,
              @RequestHeader(value="X-Forwarded-For", required = false) forwardedIP: String?,
              request: HttpServletRequest): String {

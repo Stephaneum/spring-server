@@ -28,7 +28,7 @@ const routes = [
     component: Index,
   },
   {
-    path: "/m/:id",
+    path: "/m/:id/:page?",
     name: "section",
     component: Section,
   },

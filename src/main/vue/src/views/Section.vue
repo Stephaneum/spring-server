@@ -67,7 +67,7 @@
         <PostListHome v-else :posts="posts"></PostListHome>
 
         <ul v-if="!fetching && !locked && posts.length !== 0" class="pagination center-align">
-          <router-link v-if="page !== 1" :to="{path:'/m/'+menu.id, query: { 'page': page-1 }}" v-slot="{ href, navigate }">
+          <router-link v-if="page !== 1" :to="{path:'/m/'+menu.id+'/'+(page-1)}" v-slot="{ href, navigate }">
             <li class="waves-effect">
               <a @click="navigate" :href="href">
                 <i class="material-icons">chevron_left</i>
@@ -76,7 +76,7 @@
           </router-link>
           <li v-else class="disabled"><a><i class="material-icons">chevron_left</i></a></li>
 
-          <router-link v-for="i in pages" :key="i" :to="{path:'/m/'+menu.id, query: { 'page': i }}" v-slot="{ href, navigate }">
+          <router-link v-for="i in pages" :key="i" :to="{path:'/m/'+menu.id+'/'+i}" v-slot="{ href, navigate }">
             <li class="waves-effect" :class="i === page ? ['active', 'green', 'darken-1'] : []">
               <a @click="navigate" :href="href">
                 {{ i }}
@@ -84,7 +84,7 @@
             </li>
           </router-link>
 
-          <router-link v-if="page !== lastPage" :to="{path:'/m/'+menu.id, query: { 'page': page+1 }}" v-slot="{ href, navigate }">
+          <router-link v-if="page !== lastPage" :to="{path:'/m/'+menu.id+'/'+(page+1)}" v-slot="{ href, navigate }">
             <li class="waves-effect">
               <a @click="navigate" :href="href">
                 <i class="material-icons">chevron_right</i>
@@ -130,7 +130,7 @@ export default {
     async fetchData() {
       this.fetching = true;
       const id = this.$route.params.id;
-      this.page = Math.max(parseInt(this.$route.query.page || 1), 1);
+      this.page = Math.max(parseInt(this.$route.params.page || 1), 1);
       const response = (await Axios.get('/api/section/'+id+'?page='+this.page)).data;
       this.slider = response.slider;
       this.menu = response.menu;
@@ -196,7 +196,7 @@ export default {
     '$route.params.id': async function() {
       await this.fetchData();
     },
-    '$route.query.page': async function() {
+    '$route.params.page': async function() {
       await this.fetchData();
     }
   },

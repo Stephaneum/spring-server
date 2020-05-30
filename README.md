@@ -49,7 +49,7 @@ Hier werden Adressen (Routen) aufgeführt, wo der Server mit einer HTML-Datei an
 Route|Info|Bereich
 ---|---|---
 `/`|Homepage|öffentlich
-`/m/:id`|Homepage (bestimmtes Menü)|
+`/m/:id/:page`|Homepage (bestimmtes Menü)|
 `/beitrag/:id`|Beitrag|
 `/login`|Login|
 `/statistiken`|Statistiken|
