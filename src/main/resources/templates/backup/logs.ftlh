@@ -1,5 +1,4 @@
-<#import "/spring.ftl" as spring/>
-<#import "../components/vue-loader.ftl" as vueLoader/>
+<#import "../components/vue-loader.ftlh" as vueLoader/>
 <#setting locale="de_DE">
 <#setting number_format="computer">
 

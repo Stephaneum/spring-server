@@ -1,7 +1,6 @@
 <#-- @ftlvariable name="title" type="java.lang.String" -->
 
-<#import "/spring.ftl" as spring/>
-<#import "components/vue-loader.ftl" as vueLoader/>
+<#import "components/vue-loader.ftlh" as vueLoader/>
 
 <!DOCTYPE HTML>
 <html lang="de">

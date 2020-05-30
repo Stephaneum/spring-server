@@ -1,4 +1,3 @@
-<#import "/spring.ftl" as spring/>
 <#setting number_format="computer">
 
 <!DOCTYPE HTML>
