@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/backup/api")
-class BackupAuthAPI {
-
-    @Value("\${backup.password}")
-    private lateinit var password: String
+class BackupAuthAPI (
+        @Value("\${backup.password}")
+        private val password: String
+) {
 
     @PostMapping("/login")
     fun login(@RequestBody request: Request.Password): Response.Feedback {

@@ -3,7 +3,6 @@ package de.stephaneum.spring.backup
 import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.helper.checkIE
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
@@ -14,10 +13,9 @@ import javax.servlet.http.HttpServletRequest
 
 @Controller
 @RequestMapping("/backup")
-class BackupController {
-
-    @Autowired
-    private lateinit var backupService: BackupService
+class BackupController (
+        private val backupService: BackupService
+) {
 
     @GetMapping
     fun home(): String {

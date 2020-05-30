@@ -299,7 +299,7 @@ class BackupService {
 
             // database
             BackupLogger.addLine("[2/7] Datenbank wird gesichert.")
-            var dumpPath = "$tempPath/moodle.sql"
+            val dumpPath = "$tempPath/moodle.sql"
             val result = backupDump(dbUser, dbPassword, "moodle", dumpPath)
             if(result != null)
                 return result

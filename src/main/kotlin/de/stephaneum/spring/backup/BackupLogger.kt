@@ -5,8 +5,7 @@ import java.lang.StringBuilder
 
 object BackupLogger {
 
-    val logger = LoggerFactory.getLogger(BackupLogger::class.java)
-
+    private val logger = LoggerFactory.getLogger(BackupLogger::class.java)
     private val logsHTML = StringBuilder()
 
     fun getLogsHTML(): String {

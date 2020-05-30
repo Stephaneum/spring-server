@@ -5,7 +5,6 @@ import de.stephaneum.spring.Session
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.helper.FileService
 import de.stephaneum.spring.scheduler.Element
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -15,19 +14,12 @@ import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/backup/api")
-class BackupAdminAPI {
-
-    @Autowired
-    private lateinit var configScheduler: ConfigScheduler
-
-    @Autowired
-    private lateinit var fileService: FileService
-
-    @Autowired
-    private lateinit var backupService: BackupService
-
-    @Autowired
-    private lateinit var backupScheduler: BackupScheduler
+class BackupAdminAPI (
+        private val configScheduler: ConfigScheduler,
+        private val fileService: FileService,
+        private val backupService: BackupService,
+        private val backupScheduler: BackupScheduler
+) {
 
     @GetMapping("/data")
     fun data(): Any {
@@ -42,8 +34,8 @@ class BackupAdminAPI {
                 val backups = fileService.listFiles("$backupLocation/${module.code}").map { file ->
                     totalSize += file.length()
                     Backup(file.name, fileService.convertSizeToString(file.length()))
-                }?.sortedBy { it.name }
-                Module(module.display, module.code, backups ?: emptyList(), module == ModuleType.MOODLE && backupService.sudoPassword == null)
+                }.sortedBy { it.name }
+                Module(module.display, module.code, backups, module == ModuleType.MOODLE && backupService.sudoPassword == null)
             }
         }
 

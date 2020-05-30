@@ -12,7 +12,7 @@ import java.io.File
 class DirectoryScheduler {
 
     /**
-     * this scheduler make sure that all modules have their directories
+     * this scheduler makes sure that all modules have their directories
      */
 
     private val logger = LoggerFactory.getLogger(DirectoryScheduler::class.java)

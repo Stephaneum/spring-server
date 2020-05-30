@@ -35,18 +35,12 @@ class BackupScheduler {
 
     fun getNextBackup(): String {
         val now = LocalDateTime.now()
+        val sameDay = now.hour < BACKUP_HOUR || now.hour == BACKUP_HOUR && now.minute < BACKUP_MINUTE
 
-        var sameDay = false
-        if (now.hour < BACKUP_HOUR)
-            sameDay = true
-        else if (now.hour == BACKUP_HOUR && now.minute < BACKUP_MINUTE)
-            sameDay = true
-
-        val nextDay: LocalDateTime
-        if (sameDay)
-            nextDay = now.with(TemporalAdjusters.nextOrSame(BACKUP_DAY))
+        val nextDay = if (sameDay)
+            now.with(TemporalAdjusters.nextOrSame(BACKUP_DAY))
         else
-            nextDay = now.with(TemporalAdjusters.next(BACKUP_DAY))
+            now.with(TemporalAdjusters.next(BACKUP_DAY))
 
         return dateFull.format(nextDay) + ", um " + BACKUP_HOUR + ":" + BACKUP_MINUTE + " Uhr"
     }
