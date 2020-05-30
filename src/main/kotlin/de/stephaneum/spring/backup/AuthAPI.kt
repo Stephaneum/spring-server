@@ -2,6 +2,7 @@ package de.stephaneum.spring.backup
 
 import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session
+import de.stephaneum.spring.helper.ErrorCode
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.*
 
@@ -14,20 +15,18 @@ class BackupAuthAPI (
 ) {
 
     @PostMapping("/login")
-    fun login(@RequestBody request: Request.Password): Response.Feedback {
-        if(request.password == this.password) {
-            Session.login(Permission.BACKUP)
-            return Response.Feedback(true)
-        } else {
+    fun login(@RequestBody request: Request.Password) {
+
+        if(request.password != this.password) {
             Thread.sleep(2000)
-            return Response.Feedback(false)
+            throw ErrorCode(403, "login failed")
         }
+
+        Session.login(Permission.BACKUP)
     }
 
     @PostMapping("/logout")
-    fun logout(): Response.Feedback {
+    fun logout() {
         Session.logout()
-
-        return Response.Feedback(true)
     }
 }

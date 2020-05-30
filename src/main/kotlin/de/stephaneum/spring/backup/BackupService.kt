@@ -29,6 +29,9 @@ class BackupService {
     @Autowired
     private lateinit var configScheduler: ConfigScheduler
 
+    @Autowired
+    private lateinit var dumpService: DumpService
+
     @Value("\${database}")
     private lateinit var db: String
 
@@ -161,11 +164,8 @@ class BackupService {
 
         // database
         BackupLogger.addLine("[2/5] Datenbank wird gesichert.")
-        var dumpPath = "$tempPath/datenbank.sql"
-        if(windows) {
-            dumpPath = dumpPath.replace("/", "\\")
-        }
-        val result = backupDump(dbUser, dbPassword, db, dumpPath)
+        val dumpPath = "$tempPath/datenbank.sql".normalize()
+        val result = dumpService.dumpToFile(dbUser, dbPassword, db, dumpPath)
         if(result != null)
             return result
 
@@ -242,12 +242,8 @@ class BackupService {
 
         // load db
         BackupLogger.addLine("[5/7] Datenbank wird geladen und ggf. aktualisiert.")
-        var dumpPath = tempPath+"/datenbank.sql"
-        if(windows) {
-            dumpPath = dumpPath.replace("/", "\\")
-        }
-
-        val result = restoreDump(dbUser, dbPassword, db, dumpPath)
+        val dumpPath = "$tempPath/datenbank.sql".normalize()
+        val result = dumpService.loadFromFile(dbUser, dbPassword, db, dumpPath)
         if(result != null)
             return result
         else
@@ -281,180 +277,168 @@ class BackupService {
         if(windows)
             return "Moodle wird auf Windows nicht unterstützt."
 
-        sudoPassword?.let { password ->
-            val backupPath = configScheduler.get(Element.backupLocation) ?: return "Backup-Pfad ist leer."
-            val tempPath = "$backupPath/tmp"
-            val moodlePath = File("$tempPath/moodle")
-            val moodleDataPath = File("$tempPath/moodledata")
+        val password = sudoPassword ?: return "sudo-Passwort unbekannt"
+        val backupPath = configScheduler.get(Element.backupLocation) ?: return "Backup-Pfad ist leer."
+        val tempPath = "$backupPath/tmp"
+        val moodlePath = File("$tempPath/moodle")
+        val moodleDataPath = File("$tempPath/moodledata")
 
-            // create temporary folders
-            BackupLogger.addLine("[1/7] Temporäre Ordner werden erstellt.")
+        // create temporary folders
+        BackupLogger.addLine("[1/7] Temporäre Ordner werden erstellt.")
 
-            if (!moodlePath.exists() && !moodlePath.mkdirs())
-                return "Temporäre Ordner (${moodlePath.absolutePath} konnte nicht erstellt werden."
-            if (!moodleDataPath.exists() && !moodleDataPath.mkdirs())
-                return "Temporäre Ordner (${moodleDataPath.absolutePath} konnte nicht erstellt werden."
+        if (!moodlePath.exists() && !moodlePath.mkdirs())
+            return "Temporäre Ordner (${moodlePath.absolutePath} konnte nicht erstellt werden."
+        if (!moodleDataPath.exists() && !moodleDataPath.mkdirs())
+            return "Temporäre Ordner (${moodleDataPath.absolutePath} konnte nicht erstellt werden."
 
-            Thread.sleep(2000)
+        Thread.sleep(2000)
 
-            // database
-            BackupLogger.addLine("[2/7] Datenbank wird gesichert.")
-            val dumpPath = "$tempPath/moodle.sql"
-            val result = backupDump(dbUser, dbPassword, "moodle", dumpPath)
-            if(result != null)
-                return result
+        // database
+        BackupLogger.addLine("[2/7] Datenbank wird gesichert.")
+        val dumpPath = "$tempPath/moodle.sql"
+        val result = dumpService.dumpToFile(dbUser, dbPassword, "moodle", dumpPath)
+        if(result != null)
+            return result
 
-            Thread.sleep(2000)
+        Thread.sleep(2000)
 
-            // files (moodle)
-            BackupLogger.addLine("[3/7] Moodle-Ordner wird kopiert.")
-            var exitStatus = cmd("cp -R /var/www/html/moodle $tempPath", sudoPassword = password)
-            if(exitStatus != 0)
-                return "Exit-Status: $exitStatus"
+        // files (moodle)
+        BackupLogger.addLine("[3/7] Moodle-Ordner wird kopiert.")
+        var exitStatus = cmd("cp -R /var/www/html/moodle $tempPath", sudoPassword = password)
+        if(exitStatus != 0)
+            return "Exit-Status: $exitStatus"
 
-            Thread.sleep(2000)
+        Thread.sleep(2000)
 
-            // files (moodledata)
-            BackupLogger.addLine("[4/7] Moodledata-Ordner wird kopiert.")
-            exitStatus = cmd("cp -R /var/www/html/moodledata $tempPath", sudoPassword = password)
-            if(exitStatus != 0)
-                return "Exit-Status: $exitStatus"
+        // files (moodledata)
+        BackupLogger.addLine("[4/7] Moodledata-Ordner wird kopiert.")
+        exitStatus = cmd("cp -R /var/www/html/moodledata $tempPath", sudoPassword = password)
+        if(exitStatus != 0)
+            return "Exit-Status: $exitStatus"
 
-            Thread.sleep(2000)
+        Thread.sleep(2000)
 
-            // chmod
-            BackupLogger.addLine("[5/7] Rechtevergabe wird konfiguriert.")
-            exitStatus = cmd("chmod -R 777 $tempPath", sudoPassword = password)
-            if(exitStatus != 0)
-                return "Exit-Status: $exitStatus"
+        // chmod
+        BackupLogger.addLine("[5/7] Rechtevergabe wird konfiguriert.")
+        exitStatus = cmd("chmod -R 777 $tempPath", sudoPassword = password)
+        if(exitStatus != 0)
+            return "Exit-Status: $exitStatus"
 
-            Thread.sleep(2000)
+        Thread.sleep(2000)
 
-            // zip
-            BackupLogger.addLine("[6/7] Zip-Archiv wird erstellt.")
-            val time = LocalDateTime.now().format(dateTimeFormat)
-            val destination = "$backupPath/moodle/moodle_$time.zip"
-            try {
-                fileService.zip(tempPath, destination)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                return e.message
-            }
-
-            Thread.sleep(1000)
-
-            // clear temporary files
-            BackupLogger.addLine("[7/7] Temporäre Dateien werden gelöscht.")
-            exitStatus = cmd("rm -rf $tempPath", sudoPassword = password)
-            if(exitStatus != 0)
-                return "Exit-Status: $exitStatus"
-            return null
+        // zip
+        BackupLogger.addLine("[6/7] Zip-Archiv wird erstellt.")
+        val time = LocalDateTime.now().format(dateTimeFormat)
+        val destination = "$backupPath/moodle/moodle_$time.zip"
+        try {
+            fileService.zip(tempPath, destination)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return e.message
         }
 
-        return "sudo-Passwort unbekannt"
+        Thread.sleep(1000)
+
+        // clear temporary files
+        BackupLogger.addLine("[7/7] Temporäre Dateien werden gelöscht.")
+        exitStatus = cmd("rm -rf $tempPath", sudoPassword = password)
+        if(exitStatus != 0)
+            return "Exit-Status: $exitStatus"
+        return null
     }
 
     private fun moodleRestore(zipFile: String): String? {
         if(windows)
             return "Moodle wird auf Windows nicht unterstützt."
 
-        sudoPassword?.let { password ->
-            val backupPath = configScheduler.get(Element.backupLocation) ?: return "Backup-Pfad ist leer."
-            val tempPath = "$backupPath/tmp"
+        val password = sudoPassword ?: return "sudo-Passwort unbekannt"
+        val backupPath = configScheduler.get(Element.backupLocation) ?: return "Backup-Pfad ist leer."
+        val tempPath = "$backupPath/tmp"
 
-            // create temporary folders
-            BackupLogger.addLine("[1/9] Temporäre Ordner werden erstellt.")
-            val file = File(tempPath)
-            if (!file.exists() && !file.mkdirs())
-                return "Temporäre Ordner (${file.absolutePath} konnte nicht erstellt werden."
+        // create temporary folders
+        BackupLogger.addLine("[1/9] Temporäre Ordner werden erstellt.")
+        val file = File(tempPath)
+        if (!file.exists() && !file.mkdirs())
+            return "Temporäre Ordner (${file.absolutePath} konnte nicht erstellt werden."
 
-            Thread.sleep(2000)
+        Thread.sleep(2000)
 
-            // extract zip
-            BackupLogger.addLine("[2/9] Zip-Archiv wird extrahiert.")
-            try {
-                fileService.unzip(zipFile, tempPath)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                return e.message
-            }
-
-            Thread.sleep(1000)
-
-            // clear old files (moodle)
-            BackupLogger.addLine("[3/9] Alter Moodle-Ordner wird gelöscht.")
-            var exitStatus = cmd("rm -rf /var/www/html/moodle", sudoPassword = password)
-            if(exitStatus != 0)
-                return "Exit-Status: $exitStatus"
-
-            Thread.sleep(1000)
-
-            // clear old files (moodledata)
-            BackupLogger.addLine("[4/9] Alter Moodledata-Ordner wird gelöscht.")
-            exitStatus = cmd("rm -rf /var/www/html/moodledata", sudoPassword = password)
-            if(exitStatus != 0)
-                return "Exit-Status: $exitStatus"
-
-            Thread.sleep(1000)
-
-            // copy files (moodle)
-            BackupLogger.addLine("[5/9] Moodle-Ordner wird kopiert.")
-            exitStatus = cmd("cp -R $tempPath/moodle /var/www/html", sudoPassword = password)
-            if(exitStatus != 0)
-                return "Exit-Status: $exitStatus"
-
-            Thread.sleep(1000)
-
-            // copy files (moodledata)
-            BackupLogger.addLine("[6/9] Moodledata-Ordner wird kopiert.")
-            exitStatus = cmd("cp -R $tempPath/moodledata /var/www/html", sudoPassword = password)
-            if(exitStatus != 0)
-                return "Exit-Status: $exitStatus"
-
-            Thread.sleep(1000)
-
-            // chmod
-            BackupLogger.addLine("[7/9] Rechtevergabe wird konfiguriert.")
-            exitStatus = cmd("chmod -R 777 /var/www/html/moodle", sudoPassword = password)
-            if(exitStatus != 0)
-                return "Exit-Status: $exitStatus"
-
-            exitStatus = cmd("chmod -R 777 /var/www/html/moodledata", sudoPassword = password)
-            if(exitStatus != 0)
-                return "Exit-Status: $exitStatus"
-
-            Thread.sleep(1000)
-
-            // load db
-            BackupLogger.addLine("[8/9] Datenbank wird geladen.")
-            var dumpPath = "$tempPath/moodle.sql"
-            if(windows) {
-                dumpPath = dumpPath.replace("/", "\\")
-            }
-
-            val result = restoreDump(dbUser, dbPassword, "moodle", dumpPath)
-            if(result != null)
-                return result
-
-            Thread.sleep(1000)
-
-            // clear temporary files
-            BackupLogger.addLine("[9/9] Temporäre Dateien werden gelöscht.")
-            fileService.deleteFolder(File(tempPath), true)
-            return null
+        // extract zip
+        BackupLogger.addLine("[2/9] Zip-Archiv wird extrahiert.")
+        try {
+            fileService.unzip(zipFile, tempPath)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return e.message
         }
-        return "sudo-Passwort unbekannt"
+
+        Thread.sleep(1000)
+
+        // clear old files (moodle)
+        BackupLogger.addLine("[3/9] Alter Moodle-Ordner wird gelöscht.")
+        var exitStatus = cmd("rm -rf /var/www/html/moodle", sudoPassword = password)
+        if(exitStatus != 0)
+            return "Exit-Status: $exitStatus"
+
+        Thread.sleep(1000)
+
+        // clear old files (moodledata)
+        BackupLogger.addLine("[4/9] Alter Moodledata-Ordner wird gelöscht.")
+        exitStatus = cmd("rm -rf /var/www/html/moodledata", sudoPassword = password)
+        if(exitStatus != 0)
+            return "Exit-Status: $exitStatus"
+
+        Thread.sleep(1000)
+
+        // copy files (moodle)
+        BackupLogger.addLine("[5/9] Moodle-Ordner wird kopiert.")
+        exitStatus = cmd("cp -R $tempPath/moodle /var/www/html", sudoPassword = password)
+        if(exitStatus != 0)
+            return "Exit-Status: $exitStatus"
+
+        Thread.sleep(1000)
+
+        // copy files (moodledata)
+        BackupLogger.addLine("[6/9] Moodledata-Ordner wird kopiert.")
+        exitStatus = cmd("cp -R $tempPath/moodledata /var/www/html", sudoPassword = password)
+        if(exitStatus != 0)
+            return "Exit-Status: $exitStatus"
+
+        Thread.sleep(1000)
+
+        // chmod
+        BackupLogger.addLine("[7/9] Rechtevergabe wird konfiguriert.")
+        exitStatus = cmd("chmod -R 777 /var/www/html/moodle", sudoPassword = password)
+        if(exitStatus != 0)
+            return "Exit-Status: $exitStatus"
+
+        exitStatus = cmd("chmod -R 777 /var/www/html/moodledata", sudoPassword = password)
+        if(exitStatus != 0)
+            return "Exit-Status: $exitStatus"
+
+        Thread.sleep(1000)
+
+        // load db
+        BackupLogger.addLine("[8/9] Datenbank wird geladen.")
+        val dumpPath = "$tempPath/moodle.sql"
+        val result = dumpService.loadFromFile(dbUser, dbPassword, "moodle", dumpPath)
+        if(result != null)
+            return result
+
+        Thread.sleep(1000)
+
+        // clear temporary files
+        BackupLogger.addLine("[9/9] Temporäre Dateien werden gelöscht.")
+        fileService.deleteFolder(File(tempPath), true)
+        return null
     }
 
     fun arBackup(): String? {
         val backupPath = configScheduler.get(Element.backupLocation) ?: return "Backup-Pfad ist leer."
         BackupLogger.addLine("[1/1] Datenbank wird gesichert.")
         val time = LocalDateTime.now().format(dateTimeFormat)
-        var destination = "$backupPath/ar/ar_$time.sql"
-        if(windows) {
-            destination = destination.replace("/", "\\")
-        }
-        val result = backupDump(dbUser, dbPassword, "ar", destination)
+        val destination = "$backupPath/ar/ar_$time.sql".normalize()
+        val result = dumpService.dumpToFile(dbUser, dbPassword, "ar", destination)
         if(result != null)
             return result
 
@@ -464,11 +448,9 @@ class BackupService {
 
     fun arRestore(sqlFile: String): String? {
         BackupLogger.addLine("[1/1] Datenbank wird geladen.")
-        var dump = sqlFile
-        if(windows) {
-            dump = dump.replace("/", "\\")
-        }
-        val result = restoreDump(dbUser, dbPassword, "ar", dump)
+        val dump = sqlFile.normalize()
+
+        val result = dumpService.loadFromFile(dbUser, dbPassword, "ar", dump)
         if(result != null)
             return result
 
@@ -476,68 +458,10 @@ class BackupService {
         return null
     }
 
-    /**
-     * creates a dump.sql file
-     * @param username db user
-     * @param password db password
-     * @param database the database which will be dumped
-     * @param destination the location where to store the file
-     * @return null if it was successful
-     */
-    private fun backupDump(username: String, password: String, database: String, destination: String): String? {
-
-        try {
-            val file = File(destination)
-            file.parentFile.mkdirs()
-            val exitStatus = if(windows) {
-                // on windows, dump file path cannot have spaces
-                cmd(""""${dbHelper.getDatabaseLocation()}bin\mysqldump.exe" -u"$username" -p"$password" "$database" > $destination""")
-            } else {
-                cmd("""mysqldump -u"$username" -p"$password" "$database" > "$destination"""")
-            }
-
-            return if (exitStatus == 0) {
-                null
-            } else {
-                "Error-Code: $exitStatus"
-            }
-
-        } catch (ex: IOException) {
-            return ex.message
-        } catch (ex: InterruptedException) {
-            return ex.message
-        }
-    }
-
-    /**
-     * loads the dump.sql into the database
-     * @param username db user
-     * @param password db password
-     * @param database the database which will be dumped
-     * @param source the location where the file currently is
-     * @return null if it was successful
-     */
-    private fun restoreDump(username: String, password: String, database: String, source: String): String? {
-
-        try {
-            val exitStatus = if(windows) {
-                // on windows, dump file path cannot have spaces
-                cmd(""""${dbHelper.getDatabaseLocation()}bin\mysql.exe" -u"$username" -p"$password" "$database" < $source""")
-            } else {
-                cmd("""mysql -u"$username" -p"$password" "$database" < "$source"""")
-            }
-
-            return if (exitStatus == 0) {
-                null
-            } else {
-                "Error-Status: $exitStatus"
-            }
-
-        } catch (ex: IOException) {
-            return ex.message
-        } catch (ex: InterruptedException) {
-            return ex.message
-        }
-
+    private fun String.normalize(): String {
+        if(windows)
+            return this.replace("/", "\\")
+        else
+            return this
     }
 }

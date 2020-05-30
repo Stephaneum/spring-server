@@ -53,8 +53,7 @@
 <script type="text/javascript">
 
     M.AutoInit();
-    var instance;
-    var app = new Vue({
+    new Vue({
         el: '#app',
         data: {
             logs: "",
@@ -62,40 +61,30 @@
             error: false
         },
         methods: {
-            logout: function() {
-                axios.post('./api/logout')
-                    .then((response) => {
-                        if(response.data.success) {
-                            window.location = 'login';
-                        } else {
-                            M.toast({html: 'Logout fehlgeschlagen.'});
-                        }
-                    });
+            async logout() {
+                await axios.post('./api/logout');
+                window.location = 'login';
+            },
+            async fetchLogs() {
+                const response = await axios.get('./api/log-data');
+                if(response.data) {
+                    this.logs = response.data.logs;
+                    this.running = response.data.running;
+                    this.error = response.data.error;
+
+                    if(this.running)
+                        setTimeout(this.fetchLogs, 1000);
+                    else if(!this.error)
+                        setTimeout(() => window.location = 'admin', 3000);
+                }
             }
         },
         mounted: function () {
             this.$nextTick(() => {
-                instance = this;
-                fetchLogs();
+                this.fetchLogs();
             });
         }
     });
-
-    function fetchLogs() {
-        axios.get('./api/log-data')
-            .then((response) => {
-                if(response.data) {
-                    instance.logs = response.data.logs;
-                    instance.running = response.data.running;
-                    instance.error = response.data.error;
-
-                    if(instance.running)
-                        setTimeout(fetchLogs, 1000);
-                    else if(!instance.error)
-                        setTimeout(() => window.location = 'admin', 3000);
-                }
-            });
-    }
 </script>
 </body>
 </html>

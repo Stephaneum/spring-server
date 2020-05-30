@@ -72,5 +72,10 @@ object Session {
         session.permission = Permission.NONE
         session.user = null
     }
+
+    fun mustHaveAccess(permission: Permission) {
+        if(get().permission != permission)
+            throw ErrorCode(403, "no permission")
+    }
 }
 

@@ -2,8 +2,8 @@ package de.stephaneum.spring.blackboard
 
 import de.stephaneum.spring.Permission
 import de.stephaneum.spring.Session
+import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.helper.resolveIP
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletRequest
@@ -11,26 +11,22 @@ import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("/blackboard/api")
-class BlackboardPublicAPI {
-
-    @Value("\${blackboard.password}")
-    private lateinit var password: String
-
-    @Autowired
-    private lateinit var activeClientsScheduler: ActiveClientsScheduler
-
-    @Autowired
-    private lateinit var blackboardScheduler: BlackboardScheduler
+class BlackboardPublicAPI (
+        @Value("\${blackboard.password}")
+        private val password: String,
+        private val blackboardScheduler: BlackboardScheduler,
+        private val activeClientsScheduler: ActiveClientsScheduler
+) {
 
     @PostMapping("/login")
-    fun login(@RequestBody request: Request.Login): Response.Feedback {
-        if(request.password == this.password) {
-            Session.login(Permission.BLACKBOARD)
-            return Response.Feedback(true)
-        } else {
+    fun login(@RequestBody request: Request.Login) {
+
+        if(request.password != this.password) {
             Thread.sleep(2000)
-            return Response.Feedback(false)
+            throw ErrorCode(403, "wrong password")
         }
+
+        Session.login(Permission.BLACKBOARD)
     }
 
     @PostMapping("/logout")

@@ -31,7 +31,7 @@ class BlackboardController {
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
-    @GetMapping("/")
+    @GetMapping
     fun index(model: Model): String {
 
         model["active"] = blackboardIterator.active

@@ -169,7 +169,7 @@
             <p>Dieser Vorgang kann nicht rückgangig gemacht werden.</p>
         </div>
         <div class="modal-footer">
-            <a @click="closeDelete" href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
             <a @click="deleteBackup" href="#!" class="modal-close waves-effect waves-red btn red darken-4">
                 <i class="material-icons left">delete</i>
                 Löschen
@@ -192,8 +192,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <a @click="closePassword" href="#!"
-               class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
             <button @click="setSudoPassword" type="button" class="btn waves-effect waves-light green darken-3">
                 <i class="material-icons left">save</i>
                 Speichern
@@ -208,7 +207,7 @@
 <@loading.render/>
 <script type="text/javascript">
 
-    var app = new Vue({
+    new Vue({
         el: '#app',
         data: {
             nextBackup: "",
@@ -219,130 +218,124 @@
             sudoPassword: null
         },
         methods: {
-            setSudoPassword: function() {
+            async fetchData() {
+                try {
+                    const response = await axios.get('./api/data');
+                    this.nextBackup = response.data.nextBackup;
+                    this.backupLocation = response.data.backupLocation;
+                    this.totalSize = response.data.totalSize;
+                    this.modules = response.data.modules;
+                    console.log("Data fetched.");
+                } catch (e) {
+                    M.toast({ html: 'Backups konnten nicht geladen werden' });
+                }
+            },
+            async setSudoPassword() {
                 M.Modal.getInstance(document.getElementById('modal-password')).close();
                 showLoading('Passwort setzen...');
-                axios.post( './api/set-password', { password: this.sudoPassword })
-                    .then((response) => {
-                        if(response.data.success) {
-                            M.toast({html: 'Passwort im RAM hinterlegt.'});
-                        } else {
-                            M.toast({html: 'Falsches Passwort.'});
-                        }
-                        fetchData(this);
-                        hideLoading();
-                    });
+                try {
+                    await axios.post( './api/set-password', { password: this.sudoPassword });
+                    M.toast({html: 'Passwort im RAM hinterlegt.'});
+                } catch (e) {
+                    M.toast({html: 'Falsches Passwort.'});
+                } finally {
+                    await this.fetchData();
+                    hideLoading();
+                }
             },
-            showDelete: function(moduleCode, name, size) {
+            showDelete(moduleCode, name, size) {
                 this.backupDelete = { moduleCode, name, size};
                 M.Modal.getInstance(document.getElementById('modal-delete')).open();
             },
-            closeDelete: function() {
-                M.Modal.getInstance(document.getElementById('modal-delete')).close();
-            },
-            deleteBackup: function() {
+            async deleteBackup() {
                 showLoading('Backup löschen...');
-                axios.post( './api/delete/'+this.backupDelete.moduleCode+'/'+this.backupDelete.name)
-                .then((response) => {
-                    if(response.data.success) {
-                        M.toast({html: 'Backup gelöscht.<br>'+this.backupDelete.name});
-                    } else {
-                        M.toast({html: 'Löschen fehlgeschlagen.<br>'+this.backupDelete.name});
-                    }
-                    fetchData(this);
+                try {
+                    await axios.post( './api/delete/'+this.backupDelete.moduleCode+'/'+this.backupDelete.name);
+                    M.toast({html: 'Backup gelöscht.<br>'+this.backupDelete.name});
+                } catch (e) {
+                    M.toast({html: 'Löschen fehlgeschlagen.<br>'+this.backupDelete.name});
+                } finally {
+                    await this.fetchData();
                     hideLoading();
-                });
+                }
             },
-            closePassword: function() {
-                M.Modal.getInstance(document.getElementById('modal-password')).close();
-            },
-            showUpload: function(moduleCode) {
+            showUpload(moduleCode) {
                 document.getElementById('upload-'+moduleCode).click();
             },
-            upload: function(file, moduleCode) {
+            async upload(file, moduleCode) {
                 showLoading('Hochladen (0%)');
-                var data = new FormData();
+                const data = new FormData();
                 data.append('file', file);
-                var config = {
-                    onUploadProgress: function(progressEvent) {
-                        var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
-                        showLoading('Hochladen ('+ percentCompleted +'%)', percentCompleted);
+                const config = {
+                    onUploadProgress: function (progressEvent) {
+                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        showLoading('Hochladen (' + percentCompleted + '%)', percentCompleted);
                     }
                 };
-                var instance = this;
-                axios.post('./api/upload-' + moduleCode, data, config)
-                    .then(function (res) {
-                        if(res.data.success) {
-                            fetchData(instance);
-                            M.toast({ html: 'Datei hochgeladen.' });
-                        } else if(res.data.message) {
-                            M.toast({ html: res.data.message });
-                        }
-                    })
-                    .catch(function (err) {
-                        M.toast({ html: 'Ein Fehler ist aufgetreten.' });
-                        console.log(err);
-                    })
-                    .finally(function () {
-                        hideLoading();
-                    });
+
+                try {
+                    await axios.post('./api/upload-' + moduleCode, data, config);
+                    await this.fetchData();
+                    M.toast({ html: 'Datei hochgeladen.' });
+                } catch (e) {
+                    M.toast({ html: 'Ein Fehler ist aufgetreten.' });
+                    console.log(e);
+                } finally {
+                    hideLoading();
+                }
             },
-            backupAll: function(moduleCode) {
+            async backupAll() {
                 showLoading("Backup wird gestartet...");
-                axios.post('./api/backup')
-                    .then((response) => {
-                        if(response.data.success) {
-                            window.location = 'logs';
-                        } else {
-                            M.toast({html: 'Backup fehlgeschlagen.'});
-                            hideLoading();
-                        }
-                    });
+
+                try {
+                    await axios.post('./api/backup');
+                    window.location = 'logs';
+                } catch (e) {
+                    M.toast({html: 'Backup fehlgeschlagen.'});
+                    hideLoading();
+                }
             },
-            backup: function(moduleCode) {
+            async backup(moduleCode) {
                 showLoading("Backup wird gestartet...");
-                axios.post('./api/backup-' + moduleCode)
-                .then((response) => {
-                    if(response.data.success) {
-                        window.location = 'logs';
-                    } else {
-                        M.toast({html: 'Backup fehlgeschlagen.'});
-                        hideLoading();
-                    }
-                });
+
+                try {
+                    await axios.post('./api/backup-' + moduleCode);
+                    window.location = 'logs';
+                } catch (e) {
+                    M.toast({html: 'Backup fehlgeschlagen.'});
+                    hideLoading();
+                }
             },
-            restore: function(moduleCode, name) {
+            async restore(moduleCode, name) {
                 showLoading("Wiederherstellung wird gestartet...");
-                axios.post('./api/restore/' + moduleCode + '/' + name)
-                    .then((response) => {
-                        if(response.data.success) {
-                            window.location = 'logs';
-                        } else {
-                            M.toast({html: 'Wiederherstellung fehlgeschlagen.'});
-                            hideLoading();
-                        }
-                    });
+
+                try {
+                    await axios.post('./api/restore/' + moduleCode + '/' + name);
+                    window.location = 'logs';
+                } catch (e) {
+                    M.toast({html: 'Wiederherstellung fehlgeschlagen.'});
+                    hideLoading();
+                }
             },
-            logout: function() {
+            async logout() {
                 showLoading("Abmelden...");
-                axios.post('./api/logout')
-                    .then((response) => {
-                        if(response.data.success) {
-                            window.location = 'login';
-                        } else {
-                            M.toast({html: 'Logout fehlgeschlagen.'});
-                            hideLoading();
-                        }
-                    });
+
+                try {
+                    await axios.post('./api/logout');
+                    window.location = 'login';
+                } catch (e) {
+                    M.toast({html: 'Logout fehlgeschlagen.'});
+                    hideLoading();
+                }
             }
         },
         mounted: function () {
             this.$nextTick(() => {
-                fetchData(this);
+                this.fetchData();
             });
         },
         watch: {
-            modules: function (val, oldVal) {
+            modules: function () {
                 this.$nextTick(function () {
                     M.AutoInit();
                     console.log("Materialize auto init")
@@ -350,28 +343,6 @@
             },
         }
     });
-
-    function fetchData(instance) {
-        axios.get('./api/data')
-            .then((response) => {
-            if(response.data) {
-
-                if(response.data.needLogin) {
-                    window.location = 'login';
-                    return;
-                }
-
-                instance.nextBackup = response.data.nextBackup;
-                instance.backupLocation = response.data.backupLocation;
-                instance.totalSize = response.data.totalSize;
-                instance.modules = response.data.modules;
-                
-                console.log("Data fetched.");
-            } else {
-                M.toast({ html: 'Backups konnten nicht geladen werden' });
-            }
-        });
-    }
 
     M.AutoInit();
 

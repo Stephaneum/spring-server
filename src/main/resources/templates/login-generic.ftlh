@@ -71,19 +71,17 @@
             loggingIn: false
         },
         methods: {
-            login: function() {
-                this.loggingIn = true;
-                axios.post('./api/login', { password: this.password })
-                    .then((response) => {
-                    if(response.data.success) {
-                        this.loginFailed = false;
-                        window.location = 'admin';
-                    } else {
-                        this.loginFailed = true;
-                        this.loggingIn = false;
-                        M.toast({html: 'Login fehlgeschlagen.'});
-                    }
-                });
+            async login() {
+                try {
+                    this.loggingIn = true;
+                    await axios.post('./api/login', { password: this.password });
+                    this.loginFailed = false;
+                    window.location = 'admin';
+                } catch (e) {
+                    this.loginFailed = true;
+                    this.loggingIn = false;
+                    M.toast({html: 'Login fehlgeschlagen.'});
+                }
             }
         }
     });
