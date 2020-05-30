@@ -34,7 +34,7 @@ object Gui {
 
         val consoleOutput = ByteArrayOutputStream()
         System.setOut(PrintStream(consoleOutput))
-        Timer(1000) {
+        Timer(500) {
             val newText = consoleOutput.toString().replace(regexColor, "")
             if(textArea.text.length != newText.length)
                 textArea.text = newText
@@ -42,6 +42,8 @@ object Gui {
 
         frame.isVisible = true
         frame.extendedState = frame.extendedState or JFrame.MAXIMIZED_BOTH
+
+        // start server
         runApplication<BackendApplication>(*args)
     }
 }

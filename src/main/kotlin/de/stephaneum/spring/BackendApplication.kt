@@ -4,6 +4,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
+import java.awt.GraphicsEnvironment
 import java.time.ZonedDateTime
 
 val START_TIME = ZonedDateTime.now()
@@ -14,8 +15,8 @@ val START_TIME = ZonedDateTime.now()
 class BackendApplication
 
 fun main(args: Array<String>) {
-    if(args.isEmpty())
-        Gui.open(args)
+    if (System.console() != null || GraphicsEnvironment.isHeadless())
+        runApplication<BackendApplication>(*args) // start console mode
     else
-        runApplication<BackendApplication>(*args)
+        Gui.open(args) // start graphical mode
 }
