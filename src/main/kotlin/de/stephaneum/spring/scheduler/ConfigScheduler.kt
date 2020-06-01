@@ -3,6 +3,8 @@ package de.stephaneum.spring.scheduler
 import de.stephaneum.spring.database.ConfigRepo
 import de.stephaneum.spring.helper.Event
 import de.stephaneum.spring.helper.EventParser
+import de.stephaneum.spring.helper.GlobalState
+import de.stephaneum.spring.helper.GlobalStateService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -50,10 +52,10 @@ class ConfigScheduler {
     private lateinit var configRepo: ConfigRepo
 
     @Autowired
-    private lateinit var eventParser: EventParser
+    private lateinit var globalStateService: GlobalStateService
 
-    final var initialized = false; private set
-    final var needInit = true // set true after init from outside
+    @Autowired
+    private lateinit var eventParser: EventParser
 
     private val configs = Element.values().toList()
     private var digestedEvents: List<Event> = emptyList()
@@ -63,15 +65,16 @@ class ConfigScheduler {
     fun update() {
         val db = configRepo.findAll()
 
-        if(!initialized) {
-            needInit = db.none()
-            initialized = true
-
-            if(needInit)
+        if(globalStateService.state == GlobalState.INITIALIZING) {
+            if(db.none()) {
+                globalStateService.state = GlobalState.NEED_INIT
                 logger.info("Detected empty database. Visit website to initialize!")
+            } else {
+                globalStateService.state = GlobalState.OK
+            }
         }
 
-        if(needInit)
+        if(globalStateService.noScheduler)
             return
 
         configs.forEach { c ->

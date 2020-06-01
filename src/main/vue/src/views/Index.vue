@@ -141,6 +141,12 @@ export default {
       }
   },
   async mounted() {
+
+    if(this.info.status !== 'OK') {
+      await this.$router.push('/init').catch(() => {});
+      return;
+    }
+
     const response = (await Axios.get('/api/home')).data;
     this.slider = response.slider;
     this.menu = response.menu;

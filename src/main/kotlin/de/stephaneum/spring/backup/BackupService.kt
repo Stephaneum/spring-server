@@ -1,9 +1,6 @@
 package de.stephaneum.spring.backup
 
-import de.stephaneum.spring.helper.DBHelper
-import de.stephaneum.spring.helper.FileService
-import de.stephaneum.spring.helper.cmd
-import de.stephaneum.spring.helper.windows
+import de.stephaneum.spring.helper.*
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import org.apache.commons.io.FileUtils
@@ -19,6 +16,9 @@ import java.time.format.DateTimeFormatter
 class BackupService {
 
     private val dateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm")
+
+    @Autowired
+    private lateinit var globalStateService: GlobalStateService
 
     @Autowired
     private lateinit var dbHelper: DBHelper
@@ -53,6 +53,7 @@ class BackupService {
     fun backupFull() {
         running = true
         error = false
+        globalStateService.state = GlobalState.BACKUP
         BackupLogger.clear()
         Thread {
             BackupLogger.addLine("Vollständiges Backup gestartet.")
@@ -70,6 +71,7 @@ class BackupService {
             arBackup()
             Thread.sleep(3000)
             running = false
+            globalStateService.state = GlobalState.OK
         }.start()
     }
 
@@ -79,6 +81,7 @@ class BackupService {
 
         running = true
         error = false
+        globalStateService.state = GlobalState.BACKUP
         BackupLogger.clear()
         Thread {
 
@@ -105,6 +108,7 @@ class BackupService {
                 error = true
             }
             running = false
+            globalStateService.state = GlobalState.OK
         }.start()
 
     }
@@ -115,6 +119,7 @@ class BackupService {
 
         running = true
         error = false
+        globalStateService.state = GlobalState.RESTORE
         BackupLogger.clear()
         Thread {
             val filePath = "${configScheduler.get(Element.backupLocation)}/${type.code}/$file"
@@ -141,6 +146,7 @@ class BackupService {
                 error = true
             }
             running = false
+            globalStateService.state = GlobalState.OK
         }.start()
     }
 

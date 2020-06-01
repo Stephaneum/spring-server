@@ -3,6 +3,7 @@ package de.stephaneum.spring.rest.objects
 import com.fasterxml.jackson.annotation.JsonInclude
 import de.stephaneum.spring.database.Menu
 import de.stephaneum.spring.database.User
+import de.stephaneum.spring.helper.GlobalState
 
 object Response {
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -11,7 +12,7 @@ object Response {
     data class AccountInfo(val schoolClass: String, val used: Int, val total: Int)
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    data class Info(val user: User, val hasMenuWriteAccess: Boolean, val menu: List<Menu>, val copyright: String?, val plan: Plan, val history: String?, val euSa: String?, val unapproved: Int?)
+    data class Info(val state: GlobalState, val user: User, val hasMenuWriteAccess: Boolean, val menu: List<Menu>, val copyright: String?, val plan: Plan, val history: String?, val euSa: String?, val unapproved: Int?)
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     data class Plan(val exists: Boolean, val info: String?)

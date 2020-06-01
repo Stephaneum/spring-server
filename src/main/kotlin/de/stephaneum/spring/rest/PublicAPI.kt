@@ -32,6 +32,7 @@ data class UnlockPost(val post: Int, val password: String)
 @RestController
 @RequestMapping("/api")
 class PublicAPI (
+        private val globalStateService: GlobalStateService,
         private val cryptoService: CryptoService,
         private val cloudStatsService: CloudStatsService,
         private val postService: PostService,
@@ -46,6 +47,12 @@ class PublicAPI (
 
     @GetMapping("/info")
     fun get(): Response.Info {
+
+        val state = globalStateService.state
+        if(state != GlobalState.OK) {
+            return Response.Info(state, EMPTY_USER, false, emptyList(), null, Response.Plan(false, null), null, null, null)
+        }
+
         val user = Session.get().user ?: EMPTY_USER
         val copyright = configScheduler.get(Element.copyright)
         val plan = Response.Plan(configScheduler.get(Element.planLocation) != null, configScheduler.get(Element.planInfo))
@@ -56,7 +63,7 @@ class PublicAPI (
             user.code.role != ROLE_NO_LOGIN                                 -> postRepo.countByApprovedAndUser(false, user)
             else                                                            -> null
         }
-        return Response.Info(user, menuService.hasMenuWriteAccess(user), menuService.getPublic(), copyright, plan, history, euSa, unapproved)
+        return Response.Info(state, user, menuService.hasMenuWriteAccess(user), menuService.getPublic(), copyright, plan, history, euSa, unapproved)
     }
 
     @GetMapping("/home")

@@ -1,6 +1,6 @@
 package de.stephaneum.spring.backup
 
-import de.stephaneum.spring.helper.MaintenanceService
+import de.stephaneum.spring.helper.GlobalStateService
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import org.slf4j.LoggerFactory
@@ -22,12 +22,12 @@ class DirectoryScheduler {
     private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
-    private lateinit var maintenanceService: MaintenanceService
+    private lateinit var globalStateService: GlobalStateService
 
     @Scheduled(initialDelay=5000, fixedDelay = 10000)
     fun update() {
 
-        if(maintenanceService.noScheduler)
+        if(globalStateService.noScheduler)
             return
 
         configScheduler.get(Element.backupLocation)?.let {

@@ -1,6 +1,6 @@
 package de.stephaneum.spring.backup
 
-import de.stephaneum.spring.helper.MaintenanceService
+import de.stephaneum.spring.helper.GlobalStateService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -29,12 +29,12 @@ class BackupScheduler {
     private lateinit var backupService: BackupService
 
     @Autowired
-    private lateinit var maintenanceService: MaintenanceService
+    private lateinit var globalStateService: GlobalStateService
 
     @Scheduled(cron = "0 30 4 ? * SUN")
     fun update() {
 
-        if(maintenanceService.noScheduler)
+        if(globalStateService.noScheduler)
             return
 
         logger.info("It is now BACKUP TIME!")

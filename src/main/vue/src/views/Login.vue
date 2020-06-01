@@ -1,7 +1,7 @@
 <template>
   <div style="min-height: inherit;">
 
-    <InternalHeader title="Authorisierung" icon="vpn_key"></InternalHeader>
+    <InternalHeader title="Autorisierung" icon="vpn_key"></InternalHeader>
 
     <div class="row">
       <RegisterPanel @update-info="updateInfo" class="col s12 m5 l4 offset-l1 xl3 offset-xl2"></RegisterPanel>

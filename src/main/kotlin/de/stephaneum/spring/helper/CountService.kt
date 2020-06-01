@@ -20,6 +20,7 @@ data class OSCount(val os: String, val count: Int)
 
 @Service
 class CountService (
+        private val globalStateService: GlobalStateService,
         private val configScheduler: ConfigScheduler,
         private val userAgentDetector: UserAgentDetector,
         private val statsHourRepo: StatsHourRepo,
@@ -40,6 +41,9 @@ class CountService (
      * userAgent must be in lowercase beforehand
      */
     fun count(ip: String, userAgent: String) {
+
+        if(globalStateService.noVisitCounting)
+            return
 
         val ua = userAgent.toLowerCase()
 

@@ -4,7 +4,7 @@ import de.stephaneum.spring.database.Blackboard
 import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.database.now
-import de.stephaneum.spring.helper.MaintenanceService
+import de.stephaneum.spring.helper.GlobalStateService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -26,7 +26,7 @@ class BlackboardScheduler {
     private lateinit var blackboardRepo: BlackboardRepo
 
     @Autowired
-    private lateinit var maintenanceService: MaintenanceService
+    private lateinit var globalStateService: GlobalStateService
 
     private var boards = emptyList<Blackboard>()
     private var nextBoard = 0L // the time of the next board
@@ -41,7 +41,7 @@ class BlackboardScheduler {
     @Scheduled(initialDelay=10000, fixedDelay = 1000)
     fun update() {
 
-        if(maintenanceService.noScheduler)
+        if(globalStateService.noScheduler)
             return
 
         if(paused)
