@@ -14,8 +14,8 @@
           <div v-if="currTab.id === 0" style="text-align: center">
             <h4>Willkommen!</h4>
             <br>
-            <p>Anscheinend bist du gerade dabei, auf einem neuen Server die Stephaneum-Homepage zu installieren.</p>
-            <p>Bitte wähle einer der beiden Modis aus, um fortzufahren:</p>
+            <p style="font-size: 1.2rem">Anscheinend bist du gerade dabei, auf einem neuen Server die Stephaneum-Homepage zu installieren.</p>
+            <p style="font-size: 1.2rem">Bitte wähle einer der beiden Modis aus, um fortzufahren:</p>
             <div style="margin: 50px 0 50px 0; display: flex; justify-content: space-evenly">
 
               <a class="waves-effect btn-large green darken-3"

@@ -1,5 +1,6 @@
 package de.stephaneum.spring.scheduler
 
+import de.stephaneum.spring.database.Config
 import de.stephaneum.spring.database.ConfigRepo
 import de.stephaneum.spring.helper.Event
 import de.stephaneum.spring.helper.EventParser
@@ -11,29 +12,29 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 // using lowercase because frontend uses those as keys
-enum class Element(val code: String, val info: String, var value: String? = null) {
-    fileLocation("speicherort", "Speicherort"),
-    backupLocation("backup_dir", "Backup-Ort"),
-    planLocation("str_vertretung", "Vertretungsplan"),
-    planInfo("str_vertretung_info", "Vertretungsplan-Info"),
-    maxPictureSize("picture_size", "Max. Bildgröße in Beiträgen"),
-    defaultMenu("default_gruppe_id", "Menüeintrag für die Startseite"),
-    storageTeacher("storage_lehrer", "Speicherplatz Lehrer"),
-    storageStudent("storage_schueler", "Speicherplatz Schueler"),
-    passwordResetTimeout("timeout_passwort_vergessen", "Timeout Passwort Zuruecksetzen"),
-    indexStatsHour("stats_stunden_index", "Index stats-hour"),
+enum class Element(val code: String, val info: String, val defaultValue: String?, var value: String? = null) {
+    fileLocation("speicherort", "Speicherort", null),
+    backupLocation("backup_dir", "Backup-Ort", null),
+    planLocation("str_vertretung", "Vertretungsplan", null),
+    planInfo("str_vertretung_info", "Vertretungsplan-Info", null),
+    maxPictureSize("picture_size", "Max. Bildgröße in Beiträgen", "256000"),
+    defaultMenu("default_gruppe_id", "Menüeintrag für die Startseite", null),
+    storageTeacher("storage_lehrer", "Speicherplatz Lehrer", "209715200"),
+    storageStudent("storage_schueler", "Speicherplatz Schueler", "104857600"),
+    passwordResetTimeout("timeout_passwort_vergessen", "Timeout Passwort Zuruecksetzen", "7200000"),
+    indexStatsHour("stats_stunden_index", "Index stats-hour", "0"),
 
     // special
-    contact("str_kontakt", "Kontakt"),
-    imprint("str_impressum", "Impressum"),
-    history("str_history", "Geschichte"),
-    euSa("str_eu_sa", "EU und S.-A."),
-    copyright("str_bottom", "Copyright"),
-    dev("str_entwickler", "Entwicklung"),
-    liveticker("str_liveticker", "Live-Ticker"),
-    events("str_termine", "Termine"),
-    coop("str_koop", "Koop.-partner"),
-    coopURL("str_koop_url", "Koop.-partner (URL)")
+    contact("str_kontakt", "Kontakt", null),
+    imprint("str_impressum", "Impressum", null),
+    history("str_history", "Geschichte", null),
+    euSa("str_eu_sa", "EU und S.-A.", null),
+    copyright("str_bottom", "Copyright", null),
+    dev("str_entwickler", "Entwicklung", null),
+    liveticker("str_liveticker", "Live-Ticker", null),
+    events("str_termine", "Termine", null),
+    coop("str_koop", "Koop.-partner", null),
+    coopURL("str_koop_url", "Koop.-partner (URL)", null)
 }
 
 data class Coop(val country: String, val tooltip: String?, val link: String?)
@@ -135,5 +136,22 @@ class ConfigScheduler {
         config.value = value
         configRepo.save(config)
         element.value = value // also set the locally stored one
+    }
+
+    fun initialize(fileLocation: String, backupLocation: String, defaultMenu: Int = 0) {
+
+        val configs = Element.values().map { c ->
+            val value = when (c) {
+                Element.fileLocation -> fileLocation
+                Element.backupLocation -> backupLocation
+                Element.defaultMenu -> defaultMenu.toString()
+                else -> c.defaultValue
+            }
+            Config(key = c.code, value = value)
+        }
+
+        configRepo.deleteAll()
+        configRepo.saveAll(configs)
+        update()
     }
 }

@@ -24,8 +24,6 @@ class FileService {
 
     private val logger = LoggerFactory.getLogger(FileService::class.java)
 
-    val formatter = DecimalFormat("#.#")
-
     @Autowired
     private lateinit var configScheduler: ConfigScheduler
 
@@ -304,20 +302,6 @@ class FileService {
                 files.addAll(listFilesRecursive(entity.absolutePath))
         }
         return files
-    }
-
-    /**
-     * @param bytes the amount of bytes
-     * @return human readable string
-     */
-    fun convertSizeToString(bytes: Long): String {
-        val s = when {
-            bytes < 1024                -> "$bytes Bytes"
-            bytes < 1024 * 1024         -> formatter.format(bytes.toDouble() / 1024) + " KB"
-            bytes < 1024 * 1024 * 1024  -> formatter.format(bytes.toDouble() / (1024 * 1024)) + " MB"
-            else                        -> formatter.format(bytes.toDouble() / (1024 * 1024 * 1024)) + " GB"
-        }
-        return s.replace('.', ',')
     }
 
     /**

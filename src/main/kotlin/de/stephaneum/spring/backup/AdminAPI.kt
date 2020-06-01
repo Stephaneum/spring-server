@@ -5,6 +5,7 @@ import de.stephaneum.spring.Session
 import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.helper.FileService
+import de.stephaneum.spring.helper.StorageCalculator
 import de.stephaneum.spring.scheduler.Element
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping("/backup/api")
 class BackupAdminAPI (
         private val configScheduler: ConfigScheduler,
+        private val storageCalculator: StorageCalculator,
         private val fileService: FileService,
         private val backupService: BackupService,
         private val backupScheduler: BackupScheduler
@@ -33,7 +35,7 @@ class BackupAdminAPI (
             modules = MODULES.map { module ->
                 val backups = fileService.listFiles("$backupLocation/${module.code}").map { file ->
                     totalSize += file.length()
-                    Backup(file.name, fileService.convertSizeToString(file.length()))
+                    Backup(file.name, storageCalculator.convertSizeToString(file.length()))
                 }.sortedBy { it.name }
                 Module(module.display, module.code, backups, module == ModuleType.MOODLE && backupService.sudoPassword == null)
             }
@@ -42,7 +44,7 @@ class BackupAdminAPI (
         return Response.AdminData(
                 modules = modules,
                 backupLocation = configScheduler.get(Element.backupLocation) ?: "?",
-                totalSize = fileService.convertSizeToString(totalSize),
+                totalSize = storageCalculator.convertSizeToString(totalSize),
                 nextBackup = backupScheduler.getNextBackup())
     }
 
