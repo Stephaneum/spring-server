@@ -15,7 +15,7 @@ val START_TIME = ZonedDateTime.now()
 class BackendApplication
 
 fun main(args: Array<String>) {
-    if (System.console() != null || GraphicsEnvironment.isHeadless())
+    if (System.console() != null || GraphicsEnvironment.isHeadless() || args.contains("--console"))
         runApplication<BackendApplication>(*args) // start console mode
     else
         Gui.open(args) // start graphical mode

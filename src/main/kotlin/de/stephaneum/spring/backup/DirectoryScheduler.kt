@@ -1,5 +1,6 @@
 package de.stephaneum.spring.backup
 
+import de.stephaneum.spring.helper.MaintenanceService
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import org.slf4j.LoggerFactory
@@ -20,8 +21,15 @@ class DirectoryScheduler {
     @Autowired
     private lateinit var configScheduler: ConfigScheduler
 
+    @Autowired
+    private lateinit var maintenanceService: MaintenanceService
+
     @Scheduled(initialDelay=5000, fixedDelay = 10000)
     fun update() {
+
+        if(maintenanceService.noScheduler)
+            return
+
         configScheduler.get(Element.backupLocation)?.let {
             MODULES.forEach { module ->
                 val file = File("$it/${module.code}")

@@ -3,6 +3,7 @@ package de.stephaneum.spring.scheduler
 import de.stephaneum.spring.database.Static
 import de.stephaneum.spring.database.StaticRepo
 import de.stephaneum.spring.helper.FileService
+import de.stephaneum.spring.helper.MaintenanceService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -23,6 +24,9 @@ class StaticScheduler {
     private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
+    private lateinit var maintenanceService: MaintenanceService
+
+    @Autowired
     private lateinit var fileService: FileService
 
     @Autowired
@@ -30,6 +34,10 @@ class StaticScheduler {
 
     @Scheduled(initialDelay=5000, fixedDelay = 30*1000) // check every half minute
     fun update() {
+
+        if(maintenanceService.noScheduler)
+            return
+
         configScheduler.get(Element.fileLocation)?.let {
             val staticPath = "$it/${Static.FOLDER_NAME}/"
 

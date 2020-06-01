@@ -4,6 +4,7 @@ import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.FileRepo
 import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.helper.FileService
+import de.stephaneum.spring.helper.MaintenanceService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -24,6 +25,9 @@ class GarbageCollector {
     private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
+    private lateinit var maintenanceService: MaintenanceService
+
+    @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
 
     @Autowired
@@ -35,6 +39,10 @@ class GarbageCollector {
     @Scheduled(initialDelay=10000, fixedDelay = 1000*60)
     fun update() {
 
+        if(maintenanceService.noScheduler)
+            return
+
+        // unused blackboard files
         val blackboardPath = configScheduler.get(Element.fileLocation) + "/blackboard"
         val boards = blackboardRepo.findAll()
         fileService.listFiles(blackboardPath).forEach { file ->
@@ -49,6 +57,7 @@ class GarbageCollector {
             }
         }
 
+        // unused files
         val files = fileRepo.findPotentialUnusedFiles()
         for(f in files) {
             val hasConnections = fileService.hasConnections(f)

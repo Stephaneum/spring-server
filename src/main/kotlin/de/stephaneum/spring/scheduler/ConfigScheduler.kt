@@ -52,16 +52,34 @@ class ConfigScheduler {
     @Autowired
     private lateinit var eventParser: EventParser
 
+    final var initialized = false; private set
+    final var needInit = true // set true after init from outside
+
     private val configs = Element.values().toList()
     private var digestedEvents: List<Event> = emptyList()
     private var digestedCoop: List<Coop> = emptyList()
 
-    @Scheduled(initialDelay=3000, fixedDelay = 10000)
+    @Scheduled(initialDelay=3000, fixedDelay = 5000)
     fun update() {
         val db = configRepo.findAll()
+
+        if(!initialized) {
+            needInit = db.none()
+            initialized = true
+
+            if(needInit)
+                logger.info("Detected empty database. Visit website to initialize!")
+        }
+
+        if(needInit)
+            return
+
         configs.forEach { c ->
-            val dbConfig = db.first { it.key == c.code }
-            if(c.value != dbConfig.value) {
+            val dbConfig = db.firstOrNull { it.key == c.code }
+
+            if(dbConfig == null) {
+                logger.error("${c.code} has no database entry")
+            } else if(c.value != dbConfig.value) {
                 val value = if(dbConfig.value?.length ?: 0 <= 100) dbConfig.value?.replace("\n", " ") else dbConfig.value?.substring(0, 100)?.replace("\n", " ") + "..."
                 logger.info("${c.name}: ${c.value} -> $value")
                 c.value = dbConfig.value

@@ -4,6 +4,7 @@ import de.stephaneum.spring.helper.ImageService
 import de.stephaneum.spring.database.BlackboardRepo
 import de.stephaneum.spring.database.Type
 import de.stephaneum.spring.database.now
+import de.stephaneum.spring.helper.MaintenanceService
 import de.stephaneum.spring.helper.PlanService
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.scheduler.ConfigScheduler
@@ -35,6 +36,9 @@ class PdfToImageScheduler {
     private lateinit var configScheduler: ConfigScheduler
 
     @Autowired
+    private lateinit var maintenanceService: MaintenanceService
+
+    @Autowired
     private lateinit var imageService: ImageService
 
     @Autowired
@@ -48,6 +52,9 @@ class PdfToImageScheduler {
 
     @Scheduled(initialDelay=5000, fixedDelay = 10000)
     fun update() {
+
+        if(maintenanceService.noScheduler)
+            return
 
         val boards = blackboardRepo.findByOrderByOrder()
         val nextInstances = mutableListOf<PdfImages>()
