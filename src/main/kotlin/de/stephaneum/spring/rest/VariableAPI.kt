@@ -29,7 +29,7 @@ class VariableAPI (
     }
 
     @PostMapping("/update")
-    fun updateDirection(@RequestBody request: Config) {
+    fun updateVariable(@RequestBody request: Config) {
         Session.getUser(adminOnly = true)
 
         val element = Element.valueOf(request.key)

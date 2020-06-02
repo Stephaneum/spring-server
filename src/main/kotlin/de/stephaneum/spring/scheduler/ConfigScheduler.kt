@@ -63,7 +63,7 @@ class ConfigScheduler {
     private var digestedCoop: List<Coop> = emptyList()
 
     @Scheduled(initialDelay=3000, fixedDelay = 5000)
-    fun update() {
+    fun tick() {
         val db = configRepo.findAll()
 
         if(globalStateService.state == GlobalState.INITIALIZING) {
@@ -78,6 +78,10 @@ class ConfigScheduler {
         if(globalStateService.noScheduler)
             return
 
+        update(db)
+    }
+
+    fun update(db: Iterable<Config> = configRepo.findAll()) {
         configs.forEach { c ->
             val dbConfig = db.firstOrNull { it.key == c.code }
 
@@ -132,18 +136,25 @@ class ConfigScheduler {
     }
 
     fun save(element: Element, value: String?) {
+
+        // digest value
+        val actualValue = when(element) {
+            Element.fileLocation, Element.backupLocation -> if(value != null) digestPath(value) else null
+            else -> value
+        }
+
         val config = configRepo.findByKey(element.code) ?: return
-        config.value = value
+        config.value = actualValue
         configRepo.save(config)
-        element.value = value // also set the locally stored one
+        element.value = actualValue // also set the locally stored one
     }
 
     fun initialize(fileLocation: String, backupLocation: String, defaultMenu: Int = 0) {
 
         val configs = Element.values().map { c ->
             val value = when (c) {
-                Element.fileLocation -> fileLocation
-                Element.backupLocation -> backupLocation
+                Element.fileLocation -> digestPath(fileLocation)
+                Element.backupLocation -> digestPath(backupLocation)
                 Element.defaultMenu -> defaultMenu.toString()
                 else -> c.defaultValue
             }
@@ -153,5 +164,13 @@ class ConfigScheduler {
         configRepo.deleteAll()
         configRepo.saveAll(configs)
         update()
+    }
+
+    private fun digestPath(path: String): String {
+        var curr = path.replace('\\', '/')
+        if(curr.endsWith('/')) {
+            curr = curr.dropLast(1)
+        }
+        return curr
     }
 }

@@ -1,6 +1,7 @@
 package de.stephaneum.spring.rest
 
 import de.stephaneum.spring.backup.BackupService
+import de.stephaneum.spring.backup.DirectoryScheduler
 import de.stephaneum.spring.backup.ModuleType
 import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.*
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
 object InitRequest {
-    data class Paths(val fileLocation: String, val backupLocation: String)
+    data class Locations(val fileLocation: String, val backupLocation: String)
     data class NewInstance(val fileLocation: String, val backupLocation: String, val firstName: String, val lastName: String, val email: String, val password: String, val gender: Int)
 }
 
@@ -18,21 +19,23 @@ object InitRequest {
 @RequestMapping("/api/init")
 class InitAPI (
         private val globalStateService: GlobalStateService,
+        private val directoryScheduler: DirectoryScheduler,
         private val codeService: CodeService,
         private val cryptoService: CryptoService,
         private val backupService: BackupService,
         private val fileService: FileService,
         private val storageCalculator: StorageCalculator,
+        private val configScheduler: ConfigScheduler,
         private val userRepo: UserRepo,
         private val menuRepo: MenuRepo,
-        private val configScheduler: ConfigScheduler
+        private val userMenuRepo: UserMenuRepo
 ) {
 
     private var fileLocation: String? = null
     private var backupLocation: String? = null
 
-    @PostMapping("/paths")
-    fun setPaths(@RequestBody request: InitRequest.Paths) {
+    @PostMapping("/locations")
+    fun setLocations(@RequestBody request: InitRequest.Locations) {
         fileLocation = request.fileLocation
         backupLocation = request.backupLocation
     }
@@ -51,6 +54,7 @@ class InitAPI (
             throw ErrorCode(418, "only zip files")
 
         configScheduler.initialize(currFileLocation, currBackupLocation, 0)
+        directoryScheduler.update() // create backup folders
         fileService.storeFile(file.bytes, "$currBackupLocation/${ModuleType.HOMEPAGE.code}/$fileName") ?: throw ErrorCode(500, "could not save file")
         backupService.restore(ModuleType.HOMEPAGE, fileName) // global state will be updated there
     }
@@ -75,6 +79,7 @@ class InitAPI (
 
         userRepo.save(user)
         val menu = menuRepo.save(Menu(name = "Home", priority = 10))
+        userMenuRepo.save(UserMenu(0, user, null))
         configScheduler.initialize(request.fileLocation, request.backupLocation, menu.id)
         globalStateService.state = GlobalState.OK
     }

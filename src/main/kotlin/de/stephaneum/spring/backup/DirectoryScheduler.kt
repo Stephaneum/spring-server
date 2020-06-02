@@ -25,11 +25,15 @@ class DirectoryScheduler {
     private lateinit var globalStateService: GlobalStateService
 
     @Scheduled(initialDelay=5000, fixedDelay = 10000)
-    fun update() {
+    fun tick() {
 
         if(globalStateService.noScheduler)
             return
 
+        update()
+    }
+
+    fun update() {
         configScheduler.get(Element.backupLocation)?.let {
             MODULES.forEach { module ->
                 val file = File("$it/${module.code}")

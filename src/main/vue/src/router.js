@@ -18,7 +18,9 @@ import Cloud from "./views/internal/Cloud";
 import Logs from "./views/internal/Logs";
 import GroupList from "./views/internal/GroupList";
 import StaticView from "./views/StaticView";
-import Init from "./views/Init";
+import Init from "./views/special/Init";
+import Restoring from "./views/special/Restoring";
+import Backup from "./views/special/Backup";
 
 Vue.use(VueRouter);
 
@@ -32,6 +34,16 @@ const routes = [
     path: "/init",
     name: "init",
     component: Init,
+  },
+  {
+    path: "/status/restoring",
+    name: "status-restoring",
+    component: Restoring,
+  },
+  {
+    path: "/status/backup",
+    name: "status-backup",
+    component: Backup,
   },
   {
     path: "/m/:id/:page?",
