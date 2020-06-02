@@ -83,7 +83,7 @@
       this.statsCloud = stats.statsCloud;
 
       this.upTime = stats.upTime;
-      this.startTime = moment(stats.startTime).format('dddd, [den] DD.MMMM yyyy');
+      this.startTime = moment(stats.startTime).format('dddd, [den] D.MMMM yyyy');
       this.dev = stats.dev;
 
       this.fetched = true;
