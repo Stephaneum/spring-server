@@ -658,7 +658,7 @@
 
           if(res.data.id) {
             if(res.data.menu)
-              window.location = '/beitrag.xhtml?id='+res.data.id;
+              await this.$router.push('/beitrag/'+res.data.id);
             else {
               // this post is unapproved
               if(this.currMode.id === this.modes.create.id) {
