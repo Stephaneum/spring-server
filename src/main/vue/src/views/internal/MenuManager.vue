@@ -122,7 +122,7 @@
             <i class="material-icons left">home</i>
             {{ defaultMenu && selectedMenu.id === defaultMenu.id ? 'Ist Startseite' : 'Startseite festlegen' }}
           </a>
-          <a class="waves-effect btn-flat" :href="'/home.xhtml?id='+selectedMenu.id" target="_blank" style="margin: 10px 10px 0 0">
+          <a class="waves-effect btn-flat" :href="'/m/'+selectedMenu.id" target="_blank" style="margin: 10px 10px 0 0">
             <i class="material-icons left">open_in_new</i>
             Öffnen
           </a>
