@@ -49,35 +49,38 @@ Hier werden Adressen (Routen) aufgeführt, wo der Server mit einer HTML-Datei an
 Route|Info|Bereich
 ---|---|---
 `/`|Homepage|öffentlich
-`/m/:id/:page`|Homepage (bestimmtes Menü)|
-`/beitrag/:id`|Beitrag|
-`/login`|Login|
-`/statistiken`|Statistiken|
-`/termine`|Termine|
-`/geschichte`|Geschichte|
-`/eu-sa`|Europa Förderung|
-`/kontakt`|Kontakt|
-`/impressum`|Impressum|
-`/sitemap`|Sitemap|
-`/s/*`|statische Seiten|
+`/m/:id/:page`|Homepage (bestimmtes Menü)|öffentlich
+`/beitrag/:id`|Beitrag|öffentlich
+`/login`|Login|öffentlich
+`/statistiken`|Statistiken|öffentlich
+`/termine`|Termine|öffentlich
+`/geschichte`|Geschichte|öffentlich
+`/eu-sa`|Europa Förderung|öffentlich
+`/kontakt`|Kontakt|öffentlich
+`/impressum`|Impressum|öffentlich
+`/sitemap`|Sitemap|öffentlich
+`/s/*`|statische Seiten|öffentlich
 `/home`|Homepage (eingeloggt)|intern
-`/user-manager`|Nutzerverwaltung|
-`/config-manager`|Konfiguration|
-`/static-manager`|Seiten|
-`/code-manager`|Zugangscodes|
-`/logs`|Logdaten|
-`/plan-manager`|Vertretungsplan|
-`/menu-manager`|Menü|
-`/post-manager`|Beiträge|
-`/groups`|Gruppen|
-`/groups/:id`|eine bestimmte Gruppe|
-`/cloud`|Cloud|
-`/account`|Accounteinstellungen|
+`/user-manager`|Nutzerverwaltung|intern
+`/config-manager`|Konfiguration|intern
+`/static-manager`|Seiten|intern
+`/code-manager`|Zugangscodes|intern
+`/logs`|Logdaten|intern
+`/plan-manager`|Vertretungsplan|intern
+`/menu-manager`|Menü|intern
+`/post-manager`|Beiträge|intern
+`/groups`|Gruppen|intern
+`/groups/:id`|eine bestimmte Gruppe|intern
+`/cloud`|Cloud|intern
+`/account`|Accounteinstellungen|intern
 `/vertretungsplan.pdf`|Vertretungsplan|Dateien
-`/files/public/:file`|öffentliche Datei|
-`/files/slider/:id`|Diashow|
-`/files/images/:file`|Bild in Beiträgen|
-`/files/internal/:id`|Dateien aus der Cloud|
+`/files/public/:file`|öffentliche Datei|Dateien
+`/files/slider/:id`|Diashow|Dateien
+`/files/images/:file`|Bild in Beiträgen|Dateien
+`/files/internal/:id`|Dateien aus der Cloud|Dateien
+`/init`|Erste Einrichtung|nicht direkt erreichbar
+`/status/restoring`|Infoseite: Backup laden|nicht direkt erreichbar
+`/status/backup`|Infoseite: Backup erstellen|nicht direkt erreichbar
 
 
 ### Blackboard
