@@ -42,10 +42,10 @@ class EventParser {
                     val (start, end) = if(timeSplit.size == 2) {
                         // start and end
                         val start = parseTime(timeSplit[0].trim())
-                        val end = parseTime(timeSplit[1].trim())
+                        var end = parseTime(timeSplit[1].trim())
 
                         if(end.hour == 0 && end.minute == 0)
-                            end.plusDays(1) // because last day is exclusive
+                            end = end.plusDays(1) // because last day is exclusive
 
                         Pair(start, end)
                     } else {
