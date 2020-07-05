@@ -4,9 +4,10 @@ import de.stephaneum.spring.START_TIME
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.*
+import de.stephaneum.spring.helper.parser.Coop
+import de.stephaneum.spring.helper.parser.Event
 import de.stephaneum.spring.rest.objects.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
-import de.stephaneum.spring.scheduler.Coop
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.security.CryptoService
 import org.springframework.data.domain.PageRequest

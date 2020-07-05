@@ -2,10 +2,12 @@ package de.stephaneum.spring.scheduler
 
 import de.stephaneum.spring.database.Config
 import de.stephaneum.spring.database.ConfigRepo
-import de.stephaneum.spring.helper.Event
-import de.stephaneum.spring.helper.EventParser
+import de.stephaneum.spring.helper.parser.Event
+import de.stephaneum.spring.helper.parser.EventParser
 import de.stephaneum.spring.helper.GlobalState
 import de.stephaneum.spring.helper.GlobalStateService
+import de.stephaneum.spring.helper.parser.Coop
+import de.stephaneum.spring.helper.parser.CoopParser
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -37,8 +39,6 @@ enum class Element(val code: String, val info: String, val defaultValue: String?
     coopURL("str_koop_url", "Koop.-partner (URL)", null)
 }
 
-data class Coop(val country: String, val tooltip: String?, val link: String?)
-
 @Service
 class ConfigScheduler {
 
@@ -57,6 +57,9 @@ class ConfigScheduler {
 
     @Autowired
     private lateinit var eventParser: EventParser
+
+    @Autowired
+    private lateinit var coopParser: CoopParser
 
     private val configs = Element.values().toList()
     private var digestedEvents: List<Event> = emptyList()
@@ -82,43 +85,16 @@ class ConfigScheduler {
     }
 
     fun update(db: Iterable<Config> = configRepo.findAll()) {
-        configs.forEach { c ->
-            val dbConfig = db.firstOrNull { it.key == c.code }
+        configs.forEach { element ->
+            val dbConfig = db.firstOrNull { it.key == element.code }
 
             if(dbConfig == null) {
-                logger.error("${c.code} has no database entry")
-            } else if(c.value != dbConfig.value) {
+                logger.error("${element.code} has no database entry")
+            } else if(element.value != dbConfig.value) {
                 val value = if(dbConfig.value?.length ?: 0 <= 100) dbConfig.value?.replace("\n", " ") else dbConfig.value?.substring(0, 100)?.replace("\n", " ") + "..."
-                logger.info("${c.name}: ${c.value} -> $value")
-                c.value = dbConfig.value
-
-                // update digested
-                when (c) {
-                    Element.events -> digestedEvents = eventParser.parse(dbConfig.value ?: "")
-                    Element.coop -> {
-                        val raw = dbConfig.value ?: ""
-                        digestedCoop = raw.split(";").map { coopRaw ->
-                            val link = when(val index = coopRaw.indexOf('[')) {
-                                -1 -> null
-                                else -> coopRaw.substring(index + 1, coopRaw.length - 1)
-                            }
-                            val tooltip = when(val index = coopRaw.indexOf('(')) {
-                                -1 -> null
-                                else -> when(val closeIndex = coopRaw.indexOf(')')) {
-                                    -1 -> coopRaw.substring(index + 1)
-                                    else -> coopRaw.substring(index + 1, closeIndex)
-                                }
-                            }
-                            val country = when {
-                                tooltip != null -> coopRaw.substring(0, coopRaw.indexOf('('))
-                                link != null -> coopRaw.substring(0, coopRaw.indexOf('['))
-                                else -> coopRaw
-                            }
-                            Coop(country, tooltip, link)
-                        }
-                    }
-                    else -> {}
-                }
+                logger.info("${element.name}: ${element.value} -> $value")
+                element.value = dbConfig.value
+                digest(element, dbConfig.value)
             }
         }
     }
@@ -147,8 +123,10 @@ class ConfigScheduler {
         config.value = actualValue
         configRepo.save(config)
         element.value = actualValue // also set the locally stored one
+        digest(element, value) // update the digested values (events, coop)
     }
 
+    // initialize based on backup or new instance
     fun initialize(fileLocation: String, backupLocation: String, defaultMenu: Int = 0) {
 
         val configs = Element.values().map { c ->
@@ -166,11 +144,21 @@ class ConfigScheduler {
         update()
     }
 
+    // drop last / and replace \ to /
     private fun digestPath(path: String): String {
         var curr = path.replace('\\', '/')
         if(curr.endsWith('/')) {
             curr = curr.dropLast(1)
         }
         return curr
+    }
+
+    // some elements require digestion (i.e. events, coop)
+    private fun digest(element: Element, raw: String?) {
+        when (element) {
+            Element.events -> digestedEvents = eventParser.parse(raw ?: "")
+            Element.coop -> digestedCoop = coopParser.parse(raw ?: "")
+            else -> {}
+        }
     }
 }

@@ -1,4 +1,4 @@
-package de.stephaneum.spring.helper
+package de.stephaneum.spring.helper.parser
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.stereotype.Service
