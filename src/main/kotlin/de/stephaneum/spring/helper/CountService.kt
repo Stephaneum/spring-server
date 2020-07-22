@@ -35,7 +35,7 @@ class CountService (
     // non-persistent stats
     private val statsBrowser = mutableMapOf<Browser, Int>()
     private val statsOS = mutableMapOf<OS, Int>()
-    private val history = arrayOfNulls<String>(100)
+    private val history = arrayOfNulls<String>(200)
 
     /**
      * userAgent must be in lowercase beforehand

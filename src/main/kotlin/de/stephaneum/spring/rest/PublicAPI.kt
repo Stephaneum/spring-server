@@ -164,6 +164,11 @@ class PublicAPI (
         )
     }
 
+    @GetMapping("/access-log")
+    fun accessLog(): Array<String?> {
+        return countService.getHistory()
+    }
+
     private fun getNextEvents(): List<Event> {
         val now = LocalDateTime.now()
         return configScheduler
