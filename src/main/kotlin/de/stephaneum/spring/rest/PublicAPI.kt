@@ -96,9 +96,14 @@ class PublicAPI (
         menuService.addChildrenPlain(menu)
 
         // posts
-        val posts = if (locked) emptyList() else postService.getPosts(menu.id, pageable = PageRequest.of(page?.minus(1) ?: 0, 5))
-        posts.filter { post -> post.password != null && !Session.hasAccess(post) }
-             .forEach { post -> post.content = "" }
+        val posts = when (locked) {
+            true -> emptyList()
+            false -> postService.getPosts(menu.id, pageable = PageRequest.of(page?.minus(1) ?: 0, 5))
+                                .onEach { post ->
+                                    if (post.password != null && !Session.hasAccess(post))
+                                        post.content = ""
+                                }
+        }
 
         return SectionData(
                 slider = sliderRepo.findByOrderByIndex(),
