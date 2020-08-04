@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "2.2.8.RELEASE"
+	id("org.springframework.boot") version "2.3.2.RELEASE"
 	id("io.spring.dependency-management") version "1.0.9.RELEASE"
 
 	val kotlinVersion = "1.3.72"
@@ -42,8 +42,8 @@ dependencies {
 
 	// JWT
 	implementation("io.jsonwebtoken:jjwt-api:0.10.7")
-	runtime("io.jsonwebtoken:jjwt-impl:0.10.7")
-	runtime("io.jsonwebtoken:jjwt-jackson:0.10.7")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.10.7")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.10.7")
 }
 
 tasks.withType<KotlinCompile> {
