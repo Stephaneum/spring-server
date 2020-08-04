@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <StatsChartPanel :stats-day="statsDay" :stats-hour="statsHour" :stats-browser="statsBrowser" :stats-o-s="statsOS" :stats-cloud="statsCloud"></StatsChartPanel>
+    <StatsChartPanel v-if="allowed" :stats-day="statsDay" :stats-hour="statsHour" :stats-browser="statsBrowser" :stats-o-s="statsOS" :stats-cloud="statsCloud"></StatsChartPanel>
 
     <StatsPanel title="Technologien" icon="settings">
       <div style="margin: 30px 0 20px 0; display: flex; align-items: flex-end; justify-content: space-evenly">
@@ -20,7 +20,7 @@
       </div>
     </StatsPanel>
 
-    <StatsPanel title="Laufzeit" icon="schedule">
+    <StatsPanel v-if="allowed" title="Laufzeit" icon="schedule">
       <div style="margin-top: 20px; font-size: 1.2rem">
         Der Server läuft seit <LiveTimer :seconds="upTime" style="font-size: 1.2rem; font-weight: bold"></LiveTimer>.
       </div>
@@ -69,6 +69,11 @@
       startTime: null,
       dev: null
     }),
+    computed: {
+      allowed: function() {
+        return this.info.user && this.info.user.code.role >= 0;
+      }
+    },
     async mounted() {
       const stats = (await Axios.get('/api/stats')).data;
       this.studentCount = stats.studentCount;
