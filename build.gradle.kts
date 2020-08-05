@@ -26,6 +26,7 @@ dependencies {
 
 	// DB
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.flywaydb:flyway-core")
 	runtimeOnly("mysql:mysql-connector-java")
 
 	// Kotlin

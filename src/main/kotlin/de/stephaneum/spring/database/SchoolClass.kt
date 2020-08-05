@@ -7,11 +7,10 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="klasse")
 data class SchoolClass(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                        var id: Int = 0,
 
-                       @Column(nullable = false, name="stufe")
+                       @Column(nullable = false)
                        var grade: Int = 0,
 
                        @Column(nullable = false, length=3)

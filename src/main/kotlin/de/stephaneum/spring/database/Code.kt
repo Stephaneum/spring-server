@@ -14,17 +14,16 @@ const val ROLE_ADMIN = 100
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="zugangscode")
 data class Code(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var id: Int = 0,
 
                 @Column(nullable = false, length=32)
                 var code: String = "",
 
-                @Column(nullable = false, name="rang")
+                @Column(nullable = false)
                 var role: Int = 0,
 
-                @Column(nullable = false, name="benutzt")
+                @Column(nullable = false)
                 var used: Boolean = false) {
 
     fun getRoleString(): String {
