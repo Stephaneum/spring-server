@@ -56,7 +56,7 @@ data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                 @JsonInclude
                 @Transient
-                var isFolder: Boolean = false) {
+                var isFile: Boolean = true) {
 
     fun simplifyForPosts() {
         fileName = generateFileName()

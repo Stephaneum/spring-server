@@ -39,7 +39,7 @@ data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
                   @JsonInclude
                   @Transient
-                  var isFolder: Boolean = true,
+                  var isFile: Boolean = false,
 
                   @JsonInclude
                   @Transient

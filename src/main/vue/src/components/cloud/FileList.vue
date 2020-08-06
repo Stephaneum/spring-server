@@ -3,8 +3,8 @@
         <li v-for="f in files" :key="f.id" class="collection-item">
             <div style="display: flex; align-items: center;">
                     <span style="flex-grow: 1; display: flex; align-items: center; ">
-                        <i v-if="f.isFolder" style="font-size: 1.5em; margin-right: 10px" class="material-icons">folder</i>
-                        <span class="file-link" @click="select(f)">{{ f.isFolder ? f.name : f.fileName }}</span>
+                        <i v-if="!f.isFile" style="font-size: 1.5em; margin-right: 10px" class="material-icons">folder</i>
+                        <span class="file-link" @click="select(f)">{{ f.isFile ? f.fileName : f.name }}</span>
                     </span>
 
                 <span style="text-align: right;" :style="{ 'flex' : sharedMode ? '0 0 400px' : '0 0 320px' }">
@@ -15,11 +15,11 @@
                     </span>
 
                 <span style="flex: 0 0 270px; text-align: right">
-                        <a :href="f.link + '?download=true'" class="tooltipped waves-effect waves-light green darken-3 btn margin-1" :class="{ disabled: f.isFolder }" data-tooltip="Download" data-position="bottom">
+                        <a :href="f.link + '?download=true'" class="tooltipped waves-effect waves-light green darken-3 btn margin-1" :class="{ disabled: !f.isFile }" data-tooltip="Download" data-position="bottom">
                             <i class="material-icons">arrow_downward</i>
                         </a>
 
-                        <a @click="onPublic(f)" class="tooltipped waves-effect waves-light teal btn margin-1" :class="{ disabled: f.isFolder, 'darken-2': !f.public, 'lighten-2': f.public }" href="#!" data-tooltip="Link" data-position="bottom">
+                        <a @click="onPublic(f)" class="tooltipped waves-effect waves-light teal btn margin-1" :class="{ disabled: !f.isFile, 'darken-2': !f.public, 'lighten-2': f.public }" href="#!" data-tooltip="Link" data-position="bottom">
                             <i class="material-icons">language</i>
                         </a>
 

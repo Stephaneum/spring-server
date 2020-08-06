@@ -14,14 +14,14 @@
 
         <div v-for="f in files" :key="f.id"
              @drop="drop" @dragstart="dragStart(f)" @dragend="dragEnd" @dragover="(e) => dragOver(e, f)" @dragleave="dragLeave(f)" draggable="true"
-             class="file-rect" :class="{ 'transparent': draggingFile && !f.isFolder && f !== draggingFile, 'drag-over': draggingTarget && f === draggingTarget }">
+             class="file-rect" :class="{ 'transparent': draggingFile && f.isFile && f !== draggingFile, 'drag-over': draggingTarget && f === draggingTarget }">
 
             <!-- Icon -->
             <img v-if="image(f)" :src="f.link" @click="select(f)" class="file-image"/>
-            <i v-else @click="select(f)" :style="{ color: f.isFolder ? 'rgb(125, 125, 125)' : 'rgb(175, 175, 175)'}" class="file-icon material-icons">{{ icon(f) }}</i>
+            <i v-else @click="select(f)" :style="{ color: f.isFile ? 'rgb(175, 175, 175)' : 'rgb(125, 125, 125)' }" class="file-icon material-icons">{{ icon(f) }}</i>
 
             <!-- File / Folder Name -->
-            <span @click="select(f)" class="file-text"><i v-if="f.locked" class="material-icons file-lock-icon">lock</i>{{ f.isFolder ? f.name : f.fileName }}</span>
+            <span @click="select(f)" class="file-text"><i v-if="f.locked" class="material-icons file-lock-icon">lock</i>{{ f.isFile ? f.fileName : f.name }}</span>
 
             <!-- Info -->
             <div style="margin-bottom: 10px; text-align: center">
@@ -61,7 +61,7 @@ export default {
         },
         dragOver(e, f) {
             e.preventDefault();
-            if(this.draggingFile && this.draggingFile !== f && (f === parent || f.isFolder)) {
+            if(this.draggingFile && this.draggingFile !== f && (f === parent || !f.isFile)) {
                 this.draggingTarget = f;
             }
         },
@@ -84,7 +84,7 @@ export default {
     computed: {
         icon() {
             return (file) => {
-                if(file.isFolder)
+                if(!file.isFile)
                     return 'folder';
                 else {
                     switch (file.mime) {
@@ -96,7 +96,7 @@ export default {
         },
         image() {
             return (file) => {
-                return !file.isFolder && file.mime.startsWith('image');
+                return file.isFile && file.mime.startsWith('image');
             }
         }
     }

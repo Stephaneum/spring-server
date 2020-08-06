@@ -30,7 +30,7 @@ data class Blackboard(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                       @Column(nullable = false)
                       var duration: Int = 0, // in seconds
 
-                      @Column(nullable = false, name = "\"order\"")
+                      @Column(nullable = false)
                       var order: Int = 0,
 
                       @Column(nullable = false)

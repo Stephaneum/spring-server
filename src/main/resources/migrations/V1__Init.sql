@@ -165,7 +165,7 @@ CREATE TABLE `post` (
     `user_id` INT,
     `menu_id` INT,
     `title` VARCHAR(128) NOT NULL,
-    `content` TEXT NOT NULL,
+    `content` TEXT,
     `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `user_update_id` INT,
     `password` CHAR(32),

@@ -224,10 +224,10 @@
                 console.log(action);
             },
             async select(file) {
-                if(file.isFolder) {
-                    await this.openFolder(file);
-                } else {
+                if(file.isFile) {
                     this.file = file;
+                } else {
+                    await this.openFolder(file);
                 }
             },
             closeFilePopup() {
@@ -275,10 +275,10 @@
 
                     f.sizeReadable = storageReadable(f.size);
 
-                    if(f.isFolder)
-                        f.link = '/api/cloud/download/folder/'+f.id; // TODO
-                    else
+                    if(f.isFile)
                         f.link = '/files/internal/'+f.id;
+                    else
+                        f.link = '/api/cloud/download/folder/'+f.id; // TODO
 
                     f.canModify = !f.locked && (!this.sharedMode || this.modifyAll || f.user.id === this.myId);
                 });
@@ -288,10 +288,10 @@
                 this.fileCount = 0;
                 this.folderCount = 0;
                 this.files.forEach((f) => {
-                    if(f.isFolder)
-                        this.folderCount++;
-                    else
+                    if(f.isFile)
                         this.fileCount++;
+                    else
+                        this.folderCount++;
                 });
             },
             showUpload() {
@@ -364,10 +364,10 @@
                 M.Modal.getInstance(document.getElementById('modal-delete')).open();
             },
             async deleteItem() {
-                const isFolder = this.selected.isFolder;
-                const typeString = isFolder ? 'Ordner' : 'Datei';
+                const isFile = this.selected.isFile;
+                const typeString = isFile ? 'Datei' : 'Ordner';
                 const name = this.selected.fileName || this.selected.name;
-                const route = isFolder ? '/api/cloud/delete-folder/' : '/api/cloud/delete-file/';
+                const route = isFile ? '/api/cloud/delete-file/' : '/api/cloud/delete-folder/';
 
                 showLoading(typeString + ' löschen...');
                 try {
@@ -385,17 +385,17 @@
                 showLoading('Verschieben...');
                 try {
                     await Axios.post('/api/cloud/move', {
-                        folderId: from.isFolder ? from.id : null,
-                        fileId: from.isFolder ? null : from.id,
+                        folderId: from.isFile ? null : from.id,
+                        fileId: from.isFile ? from.id : null,
                         targetFolderId: to ? to.id : null
                     });
 
                     const name = to ? to.name : 'Homeverzeichnis';
 
-                    if(from.isFolder)
-                        M.toast({ html: 'Ordner verschoben<br>nach ' + name });
-                    else
+                    if(from.isFile)
                         M.toast({ html: 'Datei verschoben<br>nach ' + name });
+                    else
+                        M.toast({ html: 'Ordner verschoben<br>nach ' + name });
                     await this.fetchData();
                 } catch (e) {
                     M.toast({ html: 'Verschieben fehlgeschlagen' });

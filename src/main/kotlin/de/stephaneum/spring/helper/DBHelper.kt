@@ -45,11 +45,11 @@ class DBHelper {
      * @param newPath new path which will be set, NO TRAILING SLASH, ONLY FORWARD SLASH
      */
     fun updateFilePath(oldPath: String, newPath: String) {
-        jdbcTemplate.execute("""UPDATE konfig SET wert = "$newPath" WHERE variable = "speicherort"""")
-        jdbcTemplate.execute("""UPDATE konfig SET wert = REPLACE(wert, "$oldPath", "$newPath") WHERE variable = "str_vertretung" """)
-        jdbcTemplate.execute("""UPDATE datei SET pfad = REPLACE(pfad, "$oldPath", "$newPath")""")
-        jdbcTemplate.execute("""UPDATE slider SET path = REPLACE(path, "$oldPath", "$newPath")""")
-
+        val newPathNormalized = newPath.replace("\\", "/")
+        jdbcTemplate.execute("""UPDATE `config` SET `value` = "$newPathNormalized" WHERE `key` = "speicherort"""")
+        jdbcTemplate.execute("""UPDATE `config` SET `value` = REPLACE(`value`, "$oldPath", "$newPathNormalized") WHERE `key` = "str_vertretung" """)
+        jdbcTemplate.execute("""UPDATE `file` SET `path` = REPLACE(`path`, "$oldPath", "$newPathNormalized")""")
+        jdbcTemplate.execute("""UPDATE `slider` SET `path` = REPLACE(path, "$oldPath", "$newPathNormalized")""")
     }
 
     /**
@@ -57,6 +57,6 @@ class DBHelper {
      * @param newPath new path which will be set, NO TRAILING SLASH, ONLY FORWARD SLASH
      */
     fun updateBackupPath(newPath: String) {
-        jdbcTemplate.execute("""UPDATE konfig SET wert = "$newPath" WHERE variable = "backup_dir"""")
+        jdbcTemplate.execute("""UPDATE `config` SET `value` = "$newPath" WHERE `key` = "backup_dir"""")
     }
 }

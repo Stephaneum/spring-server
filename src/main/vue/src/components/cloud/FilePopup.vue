@@ -118,35 +118,35 @@
         computed: {
             image() {
                 return (file) => {
-                    return !file.isFolder && file.mime.startsWith('image');
+                    return file.isFile && file.mime.startsWith('image');
                 }
             },
             pdf() {
                 return (file) => {
-                    return !file.isFolder && (file.mime === 'application/pdf' || file.fileName.toLowerCase().endsWith('.pdf'));
+                    return file.isFile && (file.mime === 'application/pdf' || file.fileName.toLowerCase().endsWith('.pdf'));
                 }
             },
             docx() {
                 return (file) => {
-                    return !file.isFolder && (file.fileName.toLowerCase().endsWith('.docx') || file.fileName.toLowerCase().endsWith('.doc'));
+                    return file.isFile && (file.fileName.toLowerCase().endsWith('.docx') || file.fileName.toLowerCase().endsWith('.doc'));
                 }
             },
             text() {
                 return (file) => {
                     const lowerCase = file.fileName.toLowerCase();
-                    return !file.isFolder && (file.mime.startsWith('text') || lowerCase.endsWith('.txt') || lowerCase.endsWith('.html') || lowerCase.endsWith('.htm') || lowerCase.endsWith('.js'));
+                    return file.isFile && (file.mime.startsWith('text') || lowerCase.endsWith('.txt') || lowerCase.endsWith('.html') || lowerCase.endsWith('.htm') || lowerCase.endsWith('.js'));
                 }
             },
             video() {
                 return (file) => {
                     const lowerCase = file.fileName.toLowerCase();
-                    return !file.isFolder && (file.mime.startsWith('video') || lowerCase.endsWith('.mpeg') || lowerCase.endsWith('.mp4') || lowerCase.endsWith('.avi') || lowerCase.endsWith('.webm'));
+                    return file.isFile && (file.mime.startsWith('video') || lowerCase.endsWith('.mpeg') || lowerCase.endsWith('.mp4') || lowerCase.endsWith('.avi') || lowerCase.endsWith('.webm'));
                 }
             },
             audio() {
                 return (file) => {
                     const lowerCase = file.fileName.toLowerCase();
-                    return !file.isFolder && (file.mime.startsWith('audio') || lowerCase.endsWith('.mp3') || lowerCase.endsWith('.ogg') || lowerCase.endsWith('.wav'));
+                    return file.isFile && (file.mime.startsWith('audio') || lowerCase.endsWith('.mp3') || lowerCase.endsWith('.ogg') || lowerCase.endsWith('.wav'));
                 }
             },
             officeLink() {
