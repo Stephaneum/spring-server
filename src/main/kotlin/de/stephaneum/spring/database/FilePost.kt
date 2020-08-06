@@ -11,16 +11,13 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="datei_beitrag")
 data class FilePost(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                     var id: Int = 0,
 
                     @ManyToOne(optional = false) @OnDelete(action = OnDeleteAction.CASCADE)
-                    @JoinColumn(name = "datei_id")
                     var file: File = File(),
 
                     @ManyToOne(optional = false) @OnDelete(action = OnDeleteAction.CASCADE)
-                    @JoinColumn(name = "beitrag_id")
                     var post: Post = Post())
 
 // simple version, post is simplified to just the id

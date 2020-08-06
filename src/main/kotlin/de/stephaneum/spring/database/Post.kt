@@ -13,47 +13,44 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="beitrag")
 data class Post(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var id: Int = 0,
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
-                @JoinColumn(name = "nutzer_id")
                 var user: User? = null,
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
-                @JoinColumn(name = "grp_id")
                 var menu: Menu? = null,
 
-                @Column(nullable = false, name = "titel", length = 128)
+                @Column(nullable = false, length = 128)
                 var title: String = "",
 
-                @Column(nullable = true, name = "text", columnDefinition = "TEXT CHARACTER SET utf8mb4")
+                @Column(nullable = true)
                 var content: String? = null,
 
-                @Column(nullable = false, name = "datum")
+                @Column(nullable = false)
                 var timestamp: Timestamp = Timestamp(0),
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
-                @JoinColumn(name = "nutzer_id_update")
                 var userUpdate: User? = null,
 
-                @Column(nullable = true, name = "passwort", length = 32)
+                @Column(nullable = true, length = 32)
                 var password: String? = null,
 
-                @Column(nullable = false, name = "genehmigt")
+                @Column(nullable = false)
                 var approved: Boolean = false,
 
-                @Column(nullable = false, name = "vorschau")
+                @Column(nullable = false)
                 var preview: Int = 0,
 
-                @Column(nullable = false, name = "show_autor")
+                // TODO: fix name
+                @Column(nullable = false, name = "show_author")
                 var showAutor: Boolean = false,
 
-                @Column(nullable = false, name = "layout_beitrag")
+                @Column(nullable = false)
                 var layoutPost: Int = 0,
 
-                @Column(nullable = false, name = "layout_vorschau")
+                @Column(nullable = false)
                 var layoutPreview: Int = 0,
 
                 @JsonInclude

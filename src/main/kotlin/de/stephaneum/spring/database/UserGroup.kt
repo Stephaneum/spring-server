@@ -9,28 +9,25 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="nutzer_projekt")
 data class UserGroup(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                      var id: Int = 0,
 
                      @ManyToOne(optional = false) @OnDelete(action = OnDeleteAction.CASCADE)
-                     @JoinColumn(name = "nutzer_id")
                      var user: User = User(),
 
                      @ManyToOne(optional = false) @OnDelete(action = OnDeleteAction.CASCADE)
-                     @JoinColumn(name = "projekt_id")
                      var group: Group = Group(),
 
-                     @Column(nullable = false, name = "betreuer")
+                     @Column(nullable = false)
                      var teacher: Boolean = false,
 
-                     @Column(nullable = false, name = "akzeptiert")
+                     @Column(nullable = false)
                      var accepted: Boolean = false,
 
-                     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
+                     @Column(nullable = false)
                      var chat: Boolean = true,
 
-                     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+                     @Column(nullable = false)
                      var writeBoard: Boolean = false)
 
 @Repository

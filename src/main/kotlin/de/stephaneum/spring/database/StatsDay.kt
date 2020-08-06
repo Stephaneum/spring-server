@@ -8,14 +8,13 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="stats_tage")
 data class StatsDay(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                     var id: Int = 0,
 
-                    @Column(nullable = false, name = "datum")
+                    @Column(nullable = false)
                     var date: LocalDate,
 
-                    @Column(nullable = false, name = "anzahl")
+                    @Column(nullable = false)
                     var count: Int = 0)
 
 @Repository

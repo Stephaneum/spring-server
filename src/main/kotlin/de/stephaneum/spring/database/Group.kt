@@ -9,7 +9,6 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="projekt")
 data class Group(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                  var id: Int = 0,
 
@@ -17,22 +16,22 @@ data class Group(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                  var name: String = "",
 
                  @ManyToOne(optional = false) @OnDelete(action = OnDeleteAction.CASCADE)
-                 @JoinColumn(name = "leiter_nutzer_id")
                  var leader: User = User(),
 
-                 @Column(nullable = false, name = "akzeptiert")
+                 @Column(nullable = false)
                  var accepted: Boolean = false, // if a student has created a project, the teacher must accept
 
                  @Column(nullable = false)
                  var chat: Boolean = false,
 
+                 // TODO: delete this column
                  @Column(nullable = false, name="lehrerchat")
                  var teacherChat: Boolean = false,
 
-                 @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+                 @Column(nullable = false)
                  var generated: Boolean = false,
 
-                 @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
+                 @Column(nullable = false)
                  var showBoardFirst: Boolean = true,
 
                  @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)

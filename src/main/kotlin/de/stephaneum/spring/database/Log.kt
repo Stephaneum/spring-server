@@ -38,17 +38,16 @@ enum class EventType(val id: Int, val description: String, val className: String
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="log")
 data class Log(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                var id: Int = 0,
 
-               @Column(nullable = false, name = "datum")
+               @Column(nullable = false)
                var timestamp: Timestamp = Timestamp(0),
 
-               @Column(nullable = false, name="typ")
+               @Column(nullable = false)
                var type: Int = 0,
 
-               @Column(nullable = false, name="ereignis")
+               @Column(nullable = false)
                var info: String = "")
 
 @Repository

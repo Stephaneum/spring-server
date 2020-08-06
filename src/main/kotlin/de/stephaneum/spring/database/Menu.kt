@@ -10,7 +10,6 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="gruppe")
 data class Menu(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var id: Int = 0,
 
@@ -18,27 +17,28 @@ data class Menu(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var name: String = "",
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
-                @JoinColumn(name = "grp_id")
                 var parent: Menu? = null,
 
-                @Column(nullable = false, name="priory")
+                @Column(nullable = false)
                 var priority: Int = 0,
 
                 @Column(nullable = true)
                 var link: String? = null,
 
+                // TODO: delete this
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.NO_ACTION)
                 @JoinColumn(name = "rubrik_leiter")
                 var user: User? = null,
 
+                // TODO: delete this
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                 @JoinColumn(name = "datei_id")
                 var image: File? = null,
 
-                @Column(nullable = true, name = "passwort", length = 32)
+                @Column(nullable = true, length = 32)
                 var password: String? = null,
 
-                @Column(nullable = true, name = "genehmigt")
+                @Column(nullable = true)
                 var approved: Boolean? = null,
 
                 @JsonInclude

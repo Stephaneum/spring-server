@@ -18,17 +18,17 @@ enum class SliderDirection (val code: String, val description: String) {
 data class Slider(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                   var id: Int = 0,
 
-                  @Column(nullable = false, name = "idx")
+                  @Column(nullable = false)
                   var index: Int = 0,
 
-                  @Column(nullable = true, length = 1024)
+                  @Column(nullable = false, length = 1024)
                   @JsonIgnore
                   var path: String = "",
 
                   @Column(nullable = true)
                   var title: String? = null,
 
-                  @Column(nullable = true, name = "sub")
+                  @Column(nullable = true)
                   var subTitle: String? = null,
 
                   @Column(nullable = false)

@@ -7,11 +7,10 @@ import org.springframework.stereotype.Repository
 import javax.persistence.*
 
 @Entity
-@Table(name="stats_stunden")
 data class StatsHour(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                      var idx: Int = 0,
 
-                     @Column(nullable = false, name = "uhrzeit")
+                     @Column(nullable = false)
                      var hour: Int = 0)
 
 @Repository

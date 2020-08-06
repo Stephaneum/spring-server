@@ -8,11 +8,10 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="stats_cloud")
 data class StatsCloud(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                       var id: Int = 0,
 
-                      @Column(nullable = false, name = "datum")
+                      @Column(nullable = false)
                       var timestamp: Timestamp = Timestamp(0),
 
                       @Column(nullable = false)

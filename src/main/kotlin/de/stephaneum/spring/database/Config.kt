@@ -7,14 +7,13 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="konfig")
 data class Config(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                   var id: Int = 0,
 
-                  @Column(nullable = false, name="variable")
+                  @Column(nullable = false)
                   var key: String = "",
 
-                  @Column(nullable = true, name="wert")
+                  @Column(nullable = true)
                   var value: String? = null)
 
 @Repository

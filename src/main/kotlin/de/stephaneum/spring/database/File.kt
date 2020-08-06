@@ -12,44 +12,42 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="datei")
 data class File(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var id: Int = 0,
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
-                @JoinColumn(name = "nutzer_id")
                 var user: User? = null,
 
-                @Column(nullable = false, name="pfad", length = 1024)
+                @Column(nullable = false, length = 1024)
                 @JsonIgnore
                 var path: String = "",
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
-                @JoinColumn(name = "projekt_id")
                 var group: Group? = null,
 
+                // TODO: delete this
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                 @JoinColumn(name = "klasse_id")
                 var schoolClass: SchoolClass? = null,
 
-                @Column(nullable = false, name = "datum")
+                @Column(nullable = false)
                 var timestamp: Timestamp = Timestamp(0),
 
                 @Column(nullable = false)
                 var size: Int = 0,
 
-                @Column(nullable = false, name="mime_type", length = 255)
+                @Column(nullable = false, length = 255)
                 var mime: String = "",
 
                 @Column(nullable = false)
                 var public: Boolean = false,
 
+                // TODO: delete this
                 @Column(nullable = false, name = "lehrerchat")
                 @JsonIgnore
                 var teacherChat: Boolean = false,
 
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
-                @JoinColumn(name = "ordner_id")
                 var folder: Folder? = null,
 
                 @JsonInclude

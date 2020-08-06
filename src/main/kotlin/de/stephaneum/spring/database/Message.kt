@@ -12,29 +12,28 @@ import javax.persistence.*
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name="nachricht")
 data class Message(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                    var id: Int = 0,
 
-                   @Column(nullable = false, name = "string")
+                   @Column(nullable = false)
                    var text: String = "",
 
                    @ManyToOne(optional = false) @OnDelete(action = OnDeleteAction.CASCADE)
-                   @JoinColumn(name = "nutzer_id")
                    var user: User = User(),
 
                    @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
-                   @JoinColumn(name = "projekt_id")
                    var group: Group? = null,
 
+                   // TODO: Delete this column
                    @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                    var schoolClass: SchoolClass? = null, // only true for the root chat room
 
+                   // TODO: Delete this column
                    @Column(nullable = false, name = "lehrerchat")
                    @JsonIgnore
                    var teacherChat: Boolean = false, // only true for root chat room
 
-                   @Column(nullable = false, name = "datum")
+                   @Column(nullable = false)
                    var timestamp: Timestamp = Timestamp(0))
 
 data class SimpleMessage(val id: Int, val text: String, val user: MiniUser, val timestamp: Timestamp)
