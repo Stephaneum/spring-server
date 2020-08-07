@@ -7,32 +7,32 @@ CREATE TABLE `code` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `school_class` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `grade` INT NOT NULL,
-  `suffix` VARCHAR(3) NOT NULL,
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `grade` INT NOT NULL,
+    `suffix` VARCHAR(3) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `user` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `code_id` INT,
-  `first_name` VARCHAR(100),
-  `last_name` VARCHAR(100),
-  `school_class_id` INT,
-  `gender` TINYINT,
-  `email` VARCHAR(100),
-  `password` VARCHAR(255),
-  `password_forgot_code` VARCHAR(32),
-  `storage` INT,
-  `banned` BIT,
-  `manage_posts` BIT,
-  `create_groups` BIT,
-  `rubrik_erstellen` BIT,
-  `manage_plans` BIT,
-  `last_online` datetime,
-  PRIMARY KEY (`id`),
-  CONSTRAINT fk_user_code FOREIGN KEY (`code_id`) REFERENCES `code` (`id`) ON DELETE CASCADE,
-  CONSTRAINT fk_user_class FOREIGN KEY (`school_class_id`) REFERENCES `school_class` (`id`) ON UPDATE CASCADE
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `code_id` INT,
+    `first_name` VARCHAR(100),
+    `last_name` VARCHAR(100),
+    `school_class_id` INT,
+    `gender` TINYINT,
+    `email` VARCHAR(100),
+    `password` VARCHAR(255),
+    `password_forgot_code` VARCHAR(32),
+    `storage` INT,
+    `banned` BIT,
+    `manage_posts` BIT,
+    `create_groups` BIT,
+    `rubrik_erstellen` BIT,
+    `manage_plans` BIT,
+    `last_online` datetime,
+    PRIMARY KEY (`id`),
+    CONSTRAINT fk_user_code FOREIGN KEY (`code_id`) REFERENCES `code` (`id`) ON DELETE CASCADE,
+    CONSTRAINT fk_user_class FOREIGN KEY (`school_class_id`) REFERENCES `school_class` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- groups
