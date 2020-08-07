@@ -99,17 +99,14 @@ CREATE TABLE `file` (
     `user_id` INT,
     `path` VARCHAR(1024),
     `group_id` INT,
-    `klasse_id` INT,
     `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `size` INT,
     `mime` VARCHAR(255),
     `public` BIT NOT NULL,
-    `lehrerchat` BIT,
     `folder_id` INT,
     PRIMARY KEY (`id`),
     CONSTRAINT fk_file_user FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
     CONSTRAINT fk_file_group FOREIGN KEY (`group_id`) REFERENCES `group` (`id`) ON DELETE CASCADE,
-    CONSTRAINT fk_file_class FOREIGN KEY (`klasse_id`) REFERENCES `school_class` (`id`) ON DELETE CASCADE,
     CONSTRAINT fk_file_folder FOREIGN KEY (`folder_id`) REFERENCES `folder` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

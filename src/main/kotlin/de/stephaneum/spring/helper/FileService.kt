@@ -102,12 +102,10 @@ class FileService {
                 user = user,
                 path = "", // will be set in the next step
                 group = group,
-                schoolClass = null,
                 timestamp = now(),
                 size = content.size,
                 mime = mime,
                 public = false,
-                teacherChat = false,
                 folder = savingFolder))
 
         // now set the filename with the id
@@ -173,9 +171,7 @@ class FileService {
         if(hasConnections(file)) {
             // has connections just remove the other connections
             file.user = null
-            file.schoolClass = null
             file.group = null
-            file.teacherChat = false
             fileRepo.save(file)
             logger.info("Connections to the file '${file.generateFileName()}' has been deleted but still exists due to connections to posts / menus")
         } else {

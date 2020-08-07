@@ -21,7 +21,7 @@ object CloudRequest {
 }
 
 object CloudResponse {
-    data class CloudInfo(val used: Int, val total: Int, val count: Int, val private: Int, val project: Int, val schoolClass: Int, val teacherChat: Int)
+    data class CloudInfo(val used: Int, val total: Int, val count: Int, val private: Int, val project: Int)
     data class FileKey(val key: String)
 }
 
@@ -45,10 +45,8 @@ class CloudAPI (
         val count = fileRepo.countByUserId(user.id)
         val privateUsage = fileRepo.calcStorageUsedPrivate(user.id)
         val projectUsage = fileRepo.calcStorageUsedProject(user.id)
-        val classUsage = fileRepo.calcStorageUsedClass(user.id)
-        val teacherChatUsage = fileRepo.calcStorageUsedTeacherChat(user.id)
 
-        return CloudResponse.CloudInfo(used, total, count, privateUsage, projectUsage, classUsage, teacherChatUsage)
+        return CloudResponse.CloudInfo(used, total, count, privateUsage, projectUsage)
     }
 
     @GetMapping("/view/user")
