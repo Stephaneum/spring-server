@@ -60,8 +60,9 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 var managePlans: Boolean? = false,
 
                 // used for teacher chat in the past, now it is a generic "last online" stamp
+                // TODO: implement this
                 @Column(nullable = true, name = "last_online")
-                var teacherChatLastOnline: Timestamp = Timestamp(0))
+                var lastOnline: Timestamp = Timestamp(0))
 
 data class SimpleUser(val id: Int, val firstName: String, val lastName: String, val email: String, val schoolClass: String?, val gender: Int, val storage: Int, val role: Int, val banned: Boolean)
 data class MiniUser(val id: Int, val firstName: String, val lastName: String, val schoolClass: String?, val gender: Int?, val role: Int)
