@@ -83,12 +83,9 @@ CREATE TABLE `folder` (
     `name` TEXT NOT NULL,
     `user_id` INT,
     `group_id` INT,
-    `klasse_id` INT,
-    `lehrerchat` BIT,
     `parent_id` INT,
     `locked` BIT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
-    CONSTRAINT fk_folder_class FOREIGN KEY (`klasse_id`) REFERENCES `school_class` (`id`) ON DELETE CASCADE,
     CONSTRAINT fk_folder_group FOREIGN KEY (`group_id`) REFERENCES `group` (`id`) ON DELETE CASCADE,
     CONSTRAINT fk_folder_user FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
     CONSTRAINT fk_folder_parent FOREIGN KEY (`parent_id`) REFERENCES `folder` (`id`) ON DELETE CASCADE

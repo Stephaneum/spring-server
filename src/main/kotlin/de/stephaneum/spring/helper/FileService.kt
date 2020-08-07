@@ -14,7 +14,6 @@ import java.net.MalformedURLException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import java.text.DecimalFormat
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -38,9 +37,6 @@ class FileService {
 
     @Autowired
     private lateinit var folderRepo: FolderRepo
-
-    @Autowired
-    private lateinit var menuRepo: MenuRepo
 
     @Autowired
     private lateinit var cloudStatsService: CloudStatsService
@@ -91,8 +87,8 @@ class FileService {
         val savingFolder = when (folder) {
             is Int -> Folder(folder)
             is String -> when (group) {
-                null -> folderRepo.findPrivateFolderInRoot(user, folder).firstOrNull() ?: folderRepo.save(Folder(0, folder, user, null, null, false, null, lockedFolder))
-                else -> folderRepo.findGroupFolderInRoot(group, folder).firstOrNull() ?: folderRepo.save(Folder(0, folder, user, group, null, false, null, lockedFolder))
+                null -> folderRepo.findPrivateFolderInRoot(user, folder).firstOrNull() ?: folderRepo.save(Folder(0, folder, user, null, null, lockedFolder))
+                else -> folderRepo.findGroupFolderInRoot(group, folder).firstOrNull() ?: folderRepo.save(Folder(0, folder, user, group, null, lockedFolder))
             }
             else -> null
         }

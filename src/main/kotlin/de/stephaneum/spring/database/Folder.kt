@@ -22,15 +22,6 @@ data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                   @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                   var group: Group? = null,
 
-                  // TODO: delete this
-                  @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
-                  @JoinColumn(name = "klasse_id")
-                  var schoolClass: SchoolClass? = null,
-
-                  // TODO: delete this
-                  @Column(nullable = false, name="lehrerchat")
-                  var teacherChat: Boolean = false,
-
                   @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
                   var parent: Folder? = null,
 
@@ -47,7 +38,6 @@ data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     fun simplifyForCloud() {
         group = null
-        schoolClass = null
         parent = null
         user?.email = ""
         user?.password = ""
@@ -57,23 +47,17 @@ data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Repository
 interface FolderRepo: CrudRepository<Folder, Int> {
 
-    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND f.name = ?2 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND f.name = ?2 AND f.group IS NULL")
     fun findPrivateFolderInRoot(user: User, folderName: String): List<Folder>
 
-    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = FALSE ORDER BY f.name")
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.user = ?1 AND f.group IS NULL ORDER BY f.name")
     fun findPrivateFolderInRoot(user: User): List<Folder>
 
-    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group = ?1 AND f.schoolClass IS NULL AND f.teacherChat = FALSE ORDER BY f.name")
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group = ?1 ORDER BY f.name")
     fun findGroupFolderInRoot(group: Group): List<Folder>
 
-    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group = ?1 AND f.name = ?2 AND f.schoolClass IS NULL AND f.teacherChat = FALSE")
+    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group = ?1 AND f.name = ?2")
     fun findGroupFolderInRoot(group: Group, folderName: String): List<Folder>
-
-    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group IS NULL AND f.schoolClass = ?1 AND f.teacherChat = FALSE ORDER BY f.name")
-    fun findClassFolderInRoot(schoolClass: SchoolClass): List<Folder>
-
-    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.group IS NULL AND f.schoolClass IS NULL AND f.teacherChat = TRUE ORDER BY f.name")
-    fun findTeacherFolderInRoot(): List<Folder>
 
     fun findByParent(parent: Folder): List<Folder>
 }

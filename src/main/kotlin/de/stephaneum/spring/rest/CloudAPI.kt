@@ -136,7 +136,7 @@ class CloudAPI (
             else -> groupRepo.findByIdOrNull(groupId) ?: throw ErrorCode(404, "group not found")
         }
 
-        folderRepo.save(Folder(0, request.name.trim(), user, group, null, false, folder))
+        folderRepo.save(Folder(0, request.name.trim(), user, group, folder))
     }
 
     @PostMapping("/update-public-file")
