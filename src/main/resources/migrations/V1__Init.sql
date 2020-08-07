@@ -92,11 +92,11 @@ CREATE TABLE `folder` (
 CREATE TABLE `file` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `user_id` INT,
-    `path` VARCHAR(1024),
+    `path` VARCHAR(1024) NOT NULL,
     `group_id` INT,
     `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `size` INT,
-    `mime` VARCHAR(255),
+    `size` INT NOT NULL,
+    `mime` VARCHAR(255) NOT NULL,
     `public` BIT NOT NULL,
     `folder_id` INT,
     PRIMARY KEY (`id`),
@@ -197,7 +197,7 @@ CREATE TABLE `stats_hour` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `stats_cloud` (
-    `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `size` INT NOT NULL,
     `id` INT NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (`id`)
@@ -242,7 +242,7 @@ CREATE TABLE `static` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `config` (
-    `key` VARCHAR(64),
+    `key` VARCHAR(64) NOT NULL,
     `value` TEXT,
     `id` INT NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (`id`)
