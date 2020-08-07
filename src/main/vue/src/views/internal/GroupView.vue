@@ -63,7 +63,7 @@
       </div>
     </div>
 
-    <CloudView ref="cloudView" :my-id="info.user.id" :shared-mode="true" :modify-all="modifyAll" :teacherchat="hasTeacherChat"
+    <CloudView ref="cloudView" :my-id="info.user.id" :shared-mode="true" :modify-all="modifyAll"
                 :root-url="'/api/cloud/view/group/' + currGroup.id" :upload-url="'/api/cloud/upload/group/' + currGroup.id" :folder-url="'/api/cloud/create-folder/group/' + currGroup.id"></CloudView>
 
     <!-- add chatroom modal -->
@@ -474,9 +474,6 @@
       },
       admin: function() {
         return this.info.user && this.info.user.code.role === 100;
-      },
-      hasTeacherChat: function() {
-        return this.allowed && (this.info.user.code.role === 1 || this.info.user.code.role === 100);
       },
       modifyAll: function() {
         return this.admin || // admin

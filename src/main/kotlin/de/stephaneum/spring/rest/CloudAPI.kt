@@ -21,7 +21,7 @@ object CloudRequest {
 }
 
 object CloudResponse {
-    data class CloudInfo(val used: Int, val total: Int, val count: Int, val private: Int, val project: Int)
+    data class CloudInfo(val used: Int, val total: Int, val count: Int, val private: Int, val group: Int)
     data class FileKey(val key: String)
 }
 

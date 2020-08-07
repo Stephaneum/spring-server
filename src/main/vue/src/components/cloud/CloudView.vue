@@ -49,7 +49,12 @@
         <!-- MAIN CONTENT -->
         <div class="col s10">
             <div class="tab-panel white z-depth-1" style="margin: 0; min-height: 530px;padding: 10px">
-                <cloud-stats v-if="statsMode" :info="storage" :teacherchat="teacherchat" @onexit="toggleStatsMode"></cloud-stats>
+                <cloud-stats v-if="statsMode"
+                             :percentage="storage.percentage"
+                             :free="storage.free" :used="storage.used" :total="storage.total" :count="storage.count"
+                             :private-used="storage.private" :private-percentage="storage.privatePercentage"
+                             :group-used="storage.group" :group-percentage="storage.groupPercentage"
+                             @onexit="toggleStatsMode"></cloud-stats>
                 <template v-else>
                     <div v-if="fetching" style="height: 400px;" class="empty-hint">
                         Lade Dateien...
@@ -169,7 +174,7 @@
         components: {
             CloudStats, FileGrid, FileList, FilePopup
         },
-        props: ['myId', 'sharedMode', 'modifyAll', 'rootUrl', 'uploadUrl', 'folderUrl', 'teacherchat'],
+        props: ['myId', 'sharedMode', 'modifyAll', 'rootUrl', 'uploadUrl', 'folderUrl'],
         data() {
             return {
                 origin: window.location.origin,
@@ -419,24 +424,20 @@
             },
             async fetchData() {
                 this.fetching = true;
-                var url = this.folderID ? '/api/cloud/view/' + this.folderID : this.rootUrl;
-                var res = await Axios.get(url);
+                const url = this.folderID ? '/api/cloud/view/' + this.folderID : this.rootUrl;
+                const res = await Axios.get(url);
                 this.files = this.digestFiles(res.data);
                 this.count();
                 this.storage = (await Axios.get('/api/cloud/info')).data;
                 this.storage.percentage = this.storage.used / (this.storage.total ? this.storage.total : 1);
                 this.storage.percentage = Math.min(Math.max(this.storage.percentage, 0.05), 0.95);
                 this.storage.privatePercentage = this.storage.private / this.storage.used;
-                this.storage.projectPercentage = this.storage.project / this.storage.used;
-                this.storage.classPercentage = this.storage.schoolClass / this.storage.used;
-                this.storage.teacherPercentage = this.storage.teacherChat / this.storage.used;
+                this.storage.groupPercentage = this.storage.group / this.storage.used;
                 this.storage.free = storageReadable(this.storage.total - this.storage.used);
                 this.storage.used = storageReadable(this.storage.used);
                 this.storage.total = storageReadable(this.storage.total);
                 this.storage.private = storageReadable(this.storage.private);
-                this.storage.project = storageReadable(this.storage.project);
-                this.storage.schoolClass = storageReadable(this.storage.schoolClass);
-                this.storage.teacherChat = storageReadable(this.storage.teacherChat);
+                this.storage.group = storageReadable(this.storage.group);
                 M.Tooltip.init(document.querySelectorAll('.tooltipped'), {});
                 hideLoading();
                 this.fetching = false;
