@@ -31,8 +31,8 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.NO_ACTION)
                 var schoolClass: SchoolClass? = null,
 
-                @Column(nullable = true, length = 4)
-                var gender: Int? = SEX_UNKNOWN,
+                @Column(nullable = false, length = 4)
+                var gender: Int = SEX_UNKNOWN,
 
                 @Column(nullable = false, length = 100)
                 var email: String = "",
@@ -46,23 +46,23 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @Column(nullable = false)
                 var storage: Int = 0,
 
-                @Column(nullable = true)
-                var banned: Boolean? = false,
+                @Column(nullable = false)
+                var banned: Boolean = false,
 
                 @Column(nullable = true)
-                var managePosts: Boolean? = false,
+                var managePosts: Boolean = false,
 
                 // TODO: rename this
                 @Column(nullable = true, name = "create_groups")
-                var createProjects: Boolean? = false,
+                var createProjects: Boolean = false,
 
                 @Column(nullable = true)
-                var managePlans: Boolean? = false,
+                var managePlans: Boolean = false,
 
                 // used for teacher chat in the past, now it is a generic "last online" stamp
                 // TODO: implement this
                 @Column(nullable = true, name = "last_online")
-                var lastOnline: Timestamp = Timestamp(0))
+                var lastOnline: Timestamp? = null)
 
 data class SimpleUser(val id: Int, val firstName: String, val lastName: String, val email: String, val schoolClass: String?, val gender: Int, val storage: Int, val role: Int, val banned: Boolean)
 data class MiniUser(val id: Int, val firstName: String, val lastName: String, val schoolClass: String?, val gender: Int?, val role: Int)

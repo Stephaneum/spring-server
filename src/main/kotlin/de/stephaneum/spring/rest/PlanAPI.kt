@@ -41,7 +41,7 @@ class PlanAPI (
     @PostMapping("/text")
     fun updateText(@RequestParam(required = false) text: String?) {
         val me = Session.getUser()
-        if(me.code.role != ROLE_ADMIN && me.managePlans != true)
+        if(me.code.role != ROLE_ADMIN && !me.managePlans)
             throw ErrorCode(403, "not allowed")
 
         configScheduler.save(Element.planInfo, text)
@@ -50,7 +50,7 @@ class PlanAPI (
     @PostMapping("/upload")
     fun uploadFile(@RequestParam("file") file: MultipartFile): Response.Feedback {
         val me = Session.getUser()
-        if(me.code.role != ROLE_ADMIN && me.managePlans != true)
+        if(me.code.role != ROLE_ADMIN && !me.managePlans)
             throw ErrorCode(403, "not allowed")
 
         val fileName = file.originalFilename ?: throw ErrorCode(400, "unknown filename")
@@ -70,7 +70,7 @@ class PlanAPI (
     @PostMapping("/delete")
     fun delete() {
         val me = Session.getUser()
-        if(me.code.role != ROLE_ADMIN && me.managePlans != true)
+        if(me.code.role != ROLE_ADMIN && !me.managePlans)
             throw ErrorCode(403, "not allowed")
 
         val path = configScheduler.get(Element.planLocation) ?: throw ErrorCode(404, "no plan")

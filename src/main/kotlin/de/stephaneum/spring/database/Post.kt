@@ -58,13 +58,11 @@ data class Post(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         user?.password = ""
         user?.storage = 0
         user?.email = ""
-        user?.gender = null
 
         userUpdate?.code?.code = ""
         userUpdate?.password = ""
         userUpdate?.storage = 0
         userUpdate?.email = ""
-        userUpdate?.gender = null
     }
 }
 

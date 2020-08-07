@@ -22,5 +22,5 @@ fun User.toMiniUser(): MiniUser {
 }
 
 fun User.toSimpleUser(): SimpleUser {
-    return SimpleUser(id, firstName, lastName, email, schoolClass?.let { schoolClass -> schoolClass.grade.toString() + schoolClass.suffix }, gender ?: SEX_UNKNOWN, storage, code.role, banned ?: false)
+    return SimpleUser(id, firstName, lastName, email, schoolClass?.let { schoolClass -> schoolClass.grade.toString() + schoolClass.suffix }, gender, storage, code.role, banned)
 }

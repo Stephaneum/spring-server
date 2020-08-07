@@ -68,7 +68,7 @@ class UserAPI (
         Session.getUser(adminOnly = true)
 
         val user = userRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "user not found")
-        return Response.UserInfo(user.firstName, user.lastName, user.email, user.code.role, user.storage, user.banned != true, user.managePlans == true)
+        return Response.UserInfo(user.firstName, user.lastName, user.email, user.code.role, user.storage, !user.banned, user.managePlans)
     }
 
     @ExperimentalUnsignedTypes
