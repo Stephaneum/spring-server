@@ -16,74 +16,58 @@ data class AddMessage(val message: String)
 class ChatAPI (
         private val messageRepo: MessageRepo,
         private val userGroupRepo: UserGroupRepo,
-        private val groupRepo: GroupRepo,
-        private val schoolClassRepo: SchoolClassRepo
+        private val groupRepo: GroupRepo
 ) {
 
-    @GetMapping("/group/{groupID}/count", "/class/{classID}/count", "/teacher/count")
-    fun getMessageCount(@PathVariable(required = false) groupID: Int?,
-                        @PathVariable(required = false) classID: Int?): MessageCount {
-
+    @GetMapping("/group/{groupID}/count")
+    fun getMessageCount(@PathVariable groupID: Int): MessageCount {
         // no checking needed, message count is not important anyway
-        val count = when {
-            groupID != null -> messageRepo.countByGroup(groupID.obj())
-            classID != null -> messageRepo.countBySchoolClass(classID.obj())
-            else -> messageRepo.countByTeacherChat(true)
-        }
-        return MessageCount(count)
+        return MessageCount(messageRepo.countByGroup(groupID.obj()))
     }
 
-    @GetMapping("/group/{groupID}", "/class/{classID}", "/teacher")
-    fun getMessages(@PathVariable(required = false) groupID: Int?,
-                    @PathVariable(required = false) classID: Int?): List<SimpleMessage> {
+    @GetMapping("/group/{groupID}")
+    fun getMessages(@PathVariable groupID: Int): List<SimpleMessage> {
 
         val user = Session.getUser()
 
-        val messages = doWhenNormalAccess(user, groupID, classID) { group, schoolClass, teacherChat ->
-            when {
-                group != null -> messageRepo.findByGroupOrderById(group)
-                schoolClass != null -> messageRepo.findBySchoolClassOrderById(schoolClass)
-                teacherChat -> messageRepo.findByTeacherChatOrderById(true)
-                else -> throw ErrorCode(500, "internal error")
-            }
-        }
-        return messages.map { SimpleMessage(it.id, it.text, it.user.toMiniUser(), it.timestamp) }
+        val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "group not found")
+        if(user.code.role != ROLE_ADMIN && !userGroupRepo.existsByUserAndGroup(user, group))
+            throw ErrorCode(403, "you are not member of this group")
+
+        return messageRepo
+                .findByGroupOrderById(group)
+                .map { SimpleMessage(it.id, it.text, it.user.toMiniUser(), it.timestamp) }
     }
 
-    @PostMapping("/group/{groupID}", "/class/{classID}", "/teacher")
-    fun addMessage(@PathVariable(required = false) groupID: Int?,
-                   @PathVariable(required = false) classID: Int?,
-                   @RequestBody request: AddMessage) {
+    @PostMapping("/group/{groupID}")
+    fun addMessage(@PathVariable groupID: Int, @RequestBody request: AddMessage) {
 
         val user = Session.getUser()
 
         if(request.message.isBlank())
             throw ErrorCode(400, "empty message")
 
-        doWhenNormalAccess(user, groupID, classID) { group, schoolClass, teacherChat ->
-            when {
-                group != null -> messageRepo.save(Message(0, request.message, user, group, null, false, now()))
-                schoolClass != null -> messageRepo.save(Message(0, request.message, user, null, schoolClass, false, now()))
-                teacherChat -> messageRepo.save(Message(0, request.message, user, null, null, true, now()))
-                else -> throw ErrorCode(500, "internal error")
-            }
-        }
+        val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "group not found")
+        if(user.code.role != ROLE_ADMIN && !userGroupRepo.existsByUserAndGroup(user, group))
+            throw ErrorCode(403, "you are not member of this group")
+
+        messageRepo.save(Message(0, user, group, request.message, now()))
     }
 
-    @PostMapping("/group/{groupID}/clear", "/class/{classID}/clear", "/teacher/clear")
-    fun clear(@PathVariable(required = false) groupID: Int?,
-              @PathVariable(required = false) classID: Int?) {
+    @PostMapping("/group/{groupID}/clear")
+    fun clear(@PathVariable groupID: Int) {
 
         val user = Session.getUser()
+        val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "group not found")
 
-        doWhenAdminAccess(user, groupID, classID) { group, schoolClass, teacherChat ->
-            when {
-                group != null -> messageRepo.deleteByGroup(group)
-                schoolClass != null -> messageRepo.deleteBySchoolClass(schoolClass)
-                teacherChat -> messageRepo.deleteByTeacherChat(true)
-                else -> throw ErrorCode(500, "internal error")
-            }
+        if (user.code.role != ROLE_ADMIN) {
+            val connection = userGroupRepo.findByUserAndGroup(user, group) ?: throw ErrorCode(404, "you are not member of this group")
+
+            if(group.leader.id != user.id && !connection.teacher)
+                throw ErrorCode(403, "you are not admin nor teacher")
         }
+
+        messageRepo.deleteByGroup(group)
     }
 
     @PostMapping("/delete/{id}")
@@ -91,73 +75,15 @@ class ChatAPI (
 
         val user = Session.getUser()
         val message = messageRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "message not found")
+        val group = groupRepo.findByIdOrNull(message.group.id) ?: throw ErrorCode(404, "group not found")
 
-        doWhenAdminAccess(user, message.group?.id, message.schoolClass?.id) { _, _, _ ->
-            messageRepo.delete(message)
+        if (user.code.role != ROLE_ADMIN) {
+            val connection = userGroupRepo.findByUserAndGroup(user, group) ?: throw ErrorCode(404, "you are not member of this group")
+
+            if(group.leader.id != user.id && !connection.teacher)
+                throw ErrorCode(403, "you are not admin nor teacher")
         }
+
+        messageRepo.delete(message)
     }
-
-    /**
-     * do something if the user has normal or administrative access to the group / class / teacher chat
-     */
-    fun<T> doWhenNormalAccess(user: User, groupID: Int?, classID: Int?, action: (group: Group?, schoolClass: SchoolClass?, teacherChat: Boolean) -> T): T {
-        return when {
-            groupID != null -> {
-                val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "group not found")
-                if(user.code.role != ROLE_ADMIN && !userGroupRepo.existsByUserAndGroup(user, groupID.obj()))
-                    throw ErrorCode(403, "you are not member of this group")
-
-                action(group, null, false)
-            }
-            classID != null -> {
-                val schoolClass = schoolClassRepo.findByIdOrNull(classID) ?: throw ErrorCode(404, "class not found")
-                if(user.code.role != ROLE_ADMIN && user.schoolClass?.id != classID)
-                    throw ErrorCode(403, "you are not member of this class")
-
-                action(null, schoolClass, false)
-            }
-            else -> {
-                if(user.code.role != ROLE_ADMIN && user.code.role != ROLE_TEACHER)
-                    throw ErrorCode(403, "you are not teacher nor admin")
-
-                action(null, null, true)
-            }
-        }
-    }
-
-    /**
-     * do something if the user has administrative access to the group / class / teacher chat
-     */
-    fun<T> doWhenAdminAccess(user: User, groupID: Int?, classID: Int?, action: (group: Group?, schoolClass: SchoolClass?, teacherChat: Boolean) -> T): T {
-        return when {
-            groupID != null -> {
-                val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "group not found")
-
-                if(user.code.role == ROLE_ADMIN) {
-                    action(group, null, false)
-                } else {
-                    val connection = userGroupRepo.findByUserAndGroup(user, groupID.obj()) ?: throw ErrorCode(404, "you are not member of this group")
-
-                    if(group.leader.id != user.id && !connection.teacher)
-                        throw ErrorCode(403, "you are not admin nor teacher")
-
-                    action(group, null, false)
-                }
-            }
-            classID != null -> {
-                val schoolClass = schoolClassRepo.findByIdOrNull(classID) ?: throw ErrorCode(404, "class not found")
-                if(user.code.role != ROLE_ADMIN && user.code.role != ROLE_TEACHER)
-                    throw ErrorCode(403, "you are not admin or teacher")
-
-                action(null, schoolClass, false)
-            }
-            else -> {
-                if(user.code.role != ROLE_ADMIN && user.code.role != ROLE_TEACHER)
-                    throw ErrorCode(403, "you are not teacher nor admin")
-
-                action(null, null, true)
-            }
-        }
-    }
-
 }

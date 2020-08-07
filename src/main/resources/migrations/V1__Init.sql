@@ -55,13 +55,10 @@ CREATE TABLE `group` (
 CREATE TABLE `message` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `user_id` INT NOT NULL,
+    `group_id` INT NOT NULL,
     `text` TEXT NOT NULL,
-    `group_id` INT,
-    `lehrerchat` BIT,
     `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `school_class_id` INT,
     PRIMARY KEY (`id`),
-    CONSTRAINT fk_message_class FOREIGN KEY (`school_class_id`) REFERENCES `school_class` (`id`) ON DELETE CASCADE,
     CONSTRAINT fk_message_user FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
     CONSTRAINT fk_message_group FOREIGN KEY (`group_id`) REFERENCES `group` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
