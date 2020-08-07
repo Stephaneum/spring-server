@@ -43,10 +43,6 @@ data class Post(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @Column(nullable = false)
                 var preview: Int = 0,
 
-                // TODO: fix name
-                @Column(nullable = false, name = "show_author")
-                var showAutor: Boolean = false,
-
                 @Column(nullable = false)
                 var layoutPost: Int = 0,
 

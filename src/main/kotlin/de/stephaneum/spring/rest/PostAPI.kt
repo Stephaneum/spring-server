@@ -123,7 +123,7 @@ class PostAPI (
 
         // save the post
         val text = if(request.text != null && (request.text.isBlank() || Jsoup.parse(request.text).text().isBlank())) null else request.text
-        val savedPost = postRepo.save(Post(request.id ?: 0, oldPost?.user ?: user, menu, request.title, text, now(), if(oldPost != null) user else null, null, request.menuID != null, request.preview, false, request.layoutPost, request.layoutPreview))
+        val savedPost = postRepo.save(Post(request.id ?: 0, oldPost?.user ?: user, menu, request.title, text, now(), if(oldPost != null) user else null, null, request.menuID != null, request.preview, request.layoutPost, request.layoutPreview))
 
         // compress images
         val maxPictureSize = configScheduler.get(Element.maxPictureSize)?.toInt() ?: 0

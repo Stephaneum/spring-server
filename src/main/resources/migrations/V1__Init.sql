@@ -168,7 +168,6 @@ CREATE TABLE `post` (
     `password` CHAR(32),
     `approved` BIT NOT NULL,
     `preview` INT NOT NULL,
-    `show_author` BIT NOT NULL,
     `layout_post` INT NOT NULL DEFAULT 0,
     `layout_preview` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
