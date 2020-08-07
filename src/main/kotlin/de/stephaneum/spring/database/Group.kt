@@ -24,10 +24,6 @@ data class Group(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                  @Column(nullable = false)
                  var chat: Boolean = false,
 
-                 // TODO: delete this column
-                 @Column(nullable = false, name="lehrerchat")
-                 var teacherChat: Boolean = false,
-
                  @Column(nullable = false)
                  var generated: Boolean = false,
 

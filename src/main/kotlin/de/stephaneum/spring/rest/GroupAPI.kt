@@ -107,7 +107,7 @@ class GroupAPI (
         }
 
         // actual group creation
-        val group = groupRepo.save(Group(0, request.name.trim(), user, parent != null || user.code.role != ROLE_STUDENT, true, false, false, true, parent))
+        val group = groupRepo.save(Group(0, request.name.trim(), user, parent != null || user.code.role != ROLE_STUDENT, true, false, false, parent))
 
         // add connections
         val connections = mutableListOf<UserGroup>()

@@ -43,7 +43,6 @@ CREATE TABLE `group` (
     `leader_id` INT NOT NULL,
     `accepted` BIT NOT NULL,
     `chat` BIT NOT NULL,
-    `lehrerchat` BIT NOT NULL,
     `generated` BIT NOT NULL,
     `parent_id` INT,
     `show_board_first` BIT NOT NULL,
