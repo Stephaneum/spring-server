@@ -56,10 +56,6 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @Column(nullable = true, name = "create_groups")
                 var createProjects: Boolean? = false,
 
-                // TODO: remove this
-                @Column(nullable = true, name = "rubrik_erstellen")
-                var createCategories: Boolean? = false,
-
                 @Column(nullable = true)
                 var managePlans: Boolean? = false,
 

@@ -213,9 +213,6 @@ export default {
             managePlans: function () {
                 return this.user && this.user.managePlans;
             },
-            createCategories: function () {
-                return this.user && this.user.createCategories;
-            },
             menuUrl: function () {
                 return (menu) => '/m/'+menu.id;
             },

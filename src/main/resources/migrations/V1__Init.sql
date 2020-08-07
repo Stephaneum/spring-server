@@ -27,7 +27,6 @@ CREATE TABLE `user` (
     `banned` BIT,
     `manage_posts` BIT,
     `create_groups` BIT,
-    `rubrik_erstellen` BIT,
     `manage_plans` BIT,
     `last_online` datetime,
     PRIMARY KEY (`id`),
