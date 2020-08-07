@@ -3,7 +3,6 @@ package de.stephaneum.spring.database
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
-import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import javax.persistence.*
@@ -25,21 +24,8 @@ data class Menu(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 @Column(nullable = true)
                 var link: String? = null,
 
-                // TODO: delete this
-                @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.NO_ACTION)
-                @JoinColumn(name = "rubrik_leiter")
-                var user: User? = null,
-
-                // TODO: delete this
-                @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.CASCADE)
-                @JoinColumn(name = "datei_id")
-                var image: File? = null,
-
                 @Column(nullable = true, length = 32)
                 var password: String? = null,
-
-                @Column(nullable = true)
-                var approved: Boolean? = null,
 
                 @JsonInclude
                 @Transient
@@ -47,9 +33,6 @@ data class Menu(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     fun simplify(keepPassword: Boolean = false) {
         parent = null
-        user = null
-        image = null
-        approved = null
         if(!keepPassword)
             password = null
         children.forEach { it.simplify(keepPassword) } // recursive call
@@ -59,13 +42,5 @@ data class Menu(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Repository
 interface MenuRepo: CrudRepository<Menu, Int> {
 
-    @Query("SELECT m FROM Menu m WHERE m.user IS NULL OR m.approved = TRUE")
-    fun findPublic(): List<Menu>
-
-    @Query("SELECT m FROM Menu m WHERE m.user.id = ?1")
-    fun findCategory(userID: Int): Menu?
-
     fun findByParentId(parentId: Int?): List<Menu>
-
-    fun countByImage(image: File): Int
 }

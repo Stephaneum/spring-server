@@ -73,7 +73,7 @@ class MenuAPI (
         if(request.password.isNullOrBlank())
             request.password = null
 
-        val menu = Menu(0, request.name, parent, request.priority, request.link, null, null, request.password, true)
+        val menu = Menu(0, request.name, parent, request.priority, request.link, request.password)
         menuRepo.save(menu)
         logService.log(EventType.CREATE_MENU, me, request.name)
     }

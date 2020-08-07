@@ -13,7 +13,7 @@ class MenuService (
 ) {
 
     fun getPublic(keepPassword: Boolean = false): List<Menu> {
-        val menu = menuRepo.findPublic()
+        val menu = menuRepo.findAll().toList()
 
         var rootMenu = menu.filter { it.parent == null } // only the top level menus
 

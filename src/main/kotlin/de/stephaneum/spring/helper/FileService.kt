@@ -212,9 +212,6 @@ class FileService {
         if(filePostRepo.countByFile(file) != 0)
             return true
 
-        if(menuRepo.countByImage(file) != 0)
-            return true
-
         return false
     }
 

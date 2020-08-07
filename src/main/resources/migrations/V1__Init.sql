@@ -147,13 +147,8 @@ CREATE TABLE `menu` (
     `parent_id` INT,
     `priority` INT NOT NULL,
     `link` TEXT,
-    `rubrik_leiter` INT,
-    `datei_id` INT,
     `password` CHAR(32),
-    `approved` BIT,
     PRIMARY KEY (`id`),
-    CONSTRAINT fk_menu_file FOREIGN KEY (`datei_id`) REFERENCES `file` (`id`) ON DELETE SET NULL,
-    CONSTRAINT fk_menu_user FOREIGN KEY (`rubrik_leiter`) REFERENCES `user` (`id`) ON DELETE SET NULL,
     CONSTRAINT fk_menu_parent FOREIGN KEY (`parent_id`) REFERENCES `menu` (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
