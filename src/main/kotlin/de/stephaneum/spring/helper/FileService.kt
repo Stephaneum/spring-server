@@ -168,6 +168,7 @@ class FileService {
             // has connections just remove the other connections
             file.user = null
             file.group = null
+            file.folder = null
             fileRepo.save(file)
             logger.info("Connections to the file '${file.generateFileName()}' has been deleted but still exists due to connections to posts / menus")
         } else {
