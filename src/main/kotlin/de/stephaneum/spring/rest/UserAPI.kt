@@ -11,6 +11,8 @@ import de.stephaneum.spring.security.CryptoService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.*
 
+private const val emailSuffix = "@stephaneum.de"
+
 @RestController
 @RequestMapping("/api/users")
 class UserAPI (
@@ -26,8 +28,6 @@ class UserAPI (
         private val codeRepo: CodeRepo,
         private val schoolClassRepo: SchoolClassRepo
 ) {
-
-    private val emailSuffix = "@stephaneum.de"
 
     @ExperimentalStdlibApi
     @ExperimentalUnsignedTypes

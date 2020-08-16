@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "2.3.2.RELEASE"
-	id("io.spring.dependency-management") version "1.0.9.RELEASE"
+	id("org.springframework.boot") version "2.3.3.RELEASE"
+	id("io.spring.dependency-management") version "1.0.10.RELEASE"
 
 	val kotlinVersion = "1.3.72"
 	kotlin("jvm") version kotlinVersion
@@ -41,9 +41,9 @@ dependencies {
 	implementation("com.drewnoakes:metadata-extractor:2.13.0")
 
 	// JWT
-	implementation("io.jsonwebtoken:jjwt-api:0.10.7")
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.10.7")
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.10.7")
+	implementation("io.jsonwebtoken:jjwt-api:0.11.2")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
 }
 
 tasks.withType<KotlinCompile> {
@@ -53,19 +53,7 @@ tasks.withType<KotlinCompile> {
 	}
 }
 
-tasks {
-	bootJar {
-		launchScript()
-	}
-}
-
-task<Exec>("buildVue") {
-	workingDir("src/main/vue")
-	commandLine("npm", "run", "build")
-}
-
 task<Copy>("updateVue") {
-	//dependsOn("buildVue")
 	from("src/main/vue/dist/static", "src/main/vue/dist/index.html")
 	into("$buildDir/resources/main/static")
 }
