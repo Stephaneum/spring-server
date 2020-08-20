@@ -108,7 +108,7 @@ class FileController (
         val id = split[0].toIntOrNull() ?: return "403"
         val file = fileRepo.findByIdOrNull(id) ?: return "403"
 
-        if(split.size == 1 || file.generateFileName() != split.subList(1, split.size).joinToString(separator = ""))
+        if(split.size == 1 || file.generateFileName() != split.subList(1, split.size).joinToString(separator = "_"))
             return "403"
 
         if(!file.public)
