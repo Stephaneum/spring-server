@@ -45,16 +45,16 @@ class FileService {
     private lateinit var logService: LogService
 
     /**
-     * @param content byte array which should be saved
+     * @param input the file as input stream which should be stored
      * @param path the path where to store the file
      * @return path to file if saving was successful
      */
-    fun storeFile(content: ByteArray, path: String): String? {
+    fun storeFile(input: InputStream, path: String): String? {
 
         try {
             // Copy file to the target location (Replacing existing file with the same name)
             val targetLocation = Paths.get(path)
-            Files.copy(ByteArrayInputStream(content), targetLocation, StandardCopyOption.REPLACE_EXISTING)
+            Files.copy(input, targetLocation, StandardCopyOption.REPLACE_EXISTING)
 
             return targetLocation.toString().replace("\\", "/")
         } catch (ex: IOException) {

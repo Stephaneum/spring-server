@@ -61,7 +61,7 @@ class StaticAPI (
             throw ErrorCode(410, "already exists")
 
         // save to hard drive
-        fileService.storeFile(file.bytes, "${configScheduler.get(Element.fileLocation)}/${Static.FOLDER_NAME}/$finalFileName") ?: throw ErrorCode(500, "storing failed")
+        fileService.storeFile(file.inputStream, "${configScheduler.get(Element.fileLocation)}/${Static.FOLDER_NAME}/$finalFileName") ?: throw ErrorCode(500, "storing failed")
 
         // save to database
         staticRepo.save(Static(path = finalFileName))

@@ -18,6 +18,7 @@ import org.springframework.web.util.HtmlUtils
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.PostMapping
+import java.io.ByteArrayInputStream
 import java.io.File
 
 
@@ -119,7 +120,7 @@ class BlackboardAdminAPI {
         if (!folder.exists())
             folder.mkdirs()
 
-        val path = fileService.storeFile(bytes, "${configScheduler.get(Element.fileLocation)}/blackboard/$finalFileName")
+        val path = fileService.storeFile(ByteArrayInputStream(bytes), "${configScheduler.get(Element.fileLocation)}/blackboard/$finalFileName")
         if(path != null) {
             board.value = path
             board.lastUpdate = now()

@@ -55,7 +55,7 @@ class InitAPI (
 
         configScheduler.initialize(currFileLocation, currBackupLocation, 0)
         directoryScheduler.update() // create backup folders
-        fileService.storeFile(file.bytes, "$currBackupLocation/${ModuleType.HOMEPAGE.code}/$fileName") ?: throw ErrorCode(500, "could not save file")
+        fileService.storeFile(file.inputStream, "$currBackupLocation/${ModuleType.HOMEPAGE.code}/$fileName") ?: throw ErrorCode(500, "could not save file")
         backupService.restore(ModuleType.HOMEPAGE, fileName) // global state will be updated there
     }
 

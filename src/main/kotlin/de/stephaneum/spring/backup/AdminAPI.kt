@@ -111,7 +111,7 @@ class BackupAdminAPI (
             else -> throw ErrorCode(400, "unknown module '$module'")
         }
 
-        fileService.storeFile(file.bytes, "${configScheduler.get(Element.backupLocation)}/$module/$fileName") ?: throw ErrorCode(500, "could not save file")
+        fileService.storeFile(file.inputStream, "${configScheduler.get(Element.backupLocation)}/$module/$fileName") ?: throw ErrorCode(500, "could not save file")
     }
 
     @GetMapping("/download/{folder}/{file}")

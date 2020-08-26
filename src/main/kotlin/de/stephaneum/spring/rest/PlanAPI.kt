@@ -58,7 +58,7 @@ class PlanAPI (
         if(!fileName.toLowerCase().endsWith(".pdf"))
             throw ErrorCode(409, "only pdf allowed")
 
-        val path = fileService.storeFile(file.bytes, "${configScheduler.get(Element.fileLocation)}/$finalFileName") ?: throw ErrorCode(500, "file could not be saved")
+        val path = fileService.storeFile(file.inputStream, "${configScheduler.get(Element.fileLocation)}/$finalFileName") ?: throw ErrorCode(500, "file could not be saved")
         val info = planService.resolveDate(File(path))
         if(info != null)
             configScheduler.save(Element.planInfo, info)
