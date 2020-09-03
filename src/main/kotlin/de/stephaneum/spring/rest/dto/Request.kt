@@ -1,4 +1,4 @@
-package de.stephaneum.spring.rest.objects
+package de.stephaneum.spring.rest.dto
 
 object Request {
     data class Login(val email: String?, val password: String?)

@@ -1,4 +1,4 @@
-package de.stephaneum.spring.rest.objects
+package de.stephaneum.spring.rest.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import de.stephaneum.spring.database.Menu

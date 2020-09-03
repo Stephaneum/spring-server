@@ -5,8 +5,8 @@ import de.stephaneum.spring.database.FileRepo
 import de.stephaneum.spring.database.UserRepo
 import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.helper.InputValidator
-import de.stephaneum.spring.rest.objects.Request
-import de.stephaneum.spring.rest.objects.Response
+import de.stephaneum.spring.rest.dto.Request
+import de.stephaneum.spring.rest.dto.Response
 import de.stephaneum.spring.security.CryptoService
 import org.springframework.web.bind.annotation.*
 

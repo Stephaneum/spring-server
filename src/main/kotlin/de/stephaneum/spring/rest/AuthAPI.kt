@@ -3,7 +3,7 @@ package de.stephaneum.spring.rest
 import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.*
-import de.stephaneum.spring.rest.objects.Request
+import de.stephaneum.spring.rest.dto.Request
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.security.CryptoService

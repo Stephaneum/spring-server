@@ -70,7 +70,10 @@ export default {
     props: ['postId', 'date' , 'title', 'text', 'preview', 'layout', 'images'],
     computed: {
         textPreview: function() {
-            return this.text ? this.text.replace(/<[^>]*>?/gm, '').replace('&nbsp;',' ').slice(0, this.preview) + '...' : null;
+            if (!this.text) return null;
+            const span = document.createElement('span');
+            span.innerHTML = this.text;
+            return (span.textContent || span.innerText).slice(0, this.preview).replace(/\s\s+/g, ' ') + '...';
         },
         imagesSliced: function() {
             return this.images.slice(0, 5);

@@ -4,7 +4,7 @@ import de.stephaneum.spring.Session
 import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.DBHelper
 import de.stephaneum.spring.helper.ErrorCode
-import de.stephaneum.spring.rest.objects.Response
+import de.stephaneum.spring.rest.dto.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
 import org.springframework.web.bind.annotation.*

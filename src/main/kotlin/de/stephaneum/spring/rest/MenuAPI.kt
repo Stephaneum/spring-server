@@ -5,8 +5,8 @@ import de.stephaneum.spring.database.*
 import de.stephaneum.spring.helper.ErrorCode
 import de.stephaneum.spring.helper.LogService
 import de.stephaneum.spring.helper.MenuService
-import de.stephaneum.spring.rest.objects.Request
-import de.stephaneum.spring.rest.objects.Response
+import de.stephaneum.spring.rest.dto.Request
+import de.stephaneum.spring.rest.dto.Response
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.security.CryptoService
