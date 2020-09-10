@@ -206,7 +206,7 @@ class UserAPI (
                     throw ErrorCode(417, "missing password")
 
                 raw.map { row ->
-                    val email = row[2].toLowerCase() + emailSuffix
+                    val email = row[2].formatEmail() + emailSuffix
                     User(firstName = row[0], lastName = row[1], email = digestEmail(email, emailMap), password = row[3], schoolClass = classService.parse(row[4]))
                 }
             }
@@ -229,7 +229,7 @@ class UserAPI (
                         "Frau" -> SEX_FEMALE
                         else -> SEX_UNKNOWN
                     }
-                    val email = row[0].toLowerCase() + emailSuffix
+                    val email = row[0].formatEmail() + emailSuffix
                     User(firstName = firstName, lastName = lastName, email = digestEmail(email, emailMap), password = import.password, gender = gender)
                 }
             }
@@ -244,14 +244,7 @@ class UserAPI (
                 raw.map { row ->
                     val firstName = row[2]
                     val lastName = row[1]
-                    val email = firstName.take(1).toLowerCase() + "." +
-                            lastName
-                                    .replace(" ", "")
-                                    .toLowerCase()
-                                    .replace("ä", "ae")
-                                    .replace("ö", "oe")
-                                    .replace("ü", "ue")
-                                    .replace("ß", "ss") + emailSuffix
+                    val email = firstName.take(1).formatEmail() + "." + lastName.formatEmail() + emailSuffix
                     User(firstName = firstName, lastName = lastName, email = digestEmail(email, emailMap), password = import.password, schoolClass = classService.parse(row[0]))
                 }
             }
@@ -272,5 +265,19 @@ class UserAPI (
             emailMap[email] = 1
             return email
         }
+    }
+
+    /**
+     * make the string suitable for using in email
+     * removes special characters and spaces and keeps the string in lowercase
+     */
+    private fun String.formatEmail(): String {
+        return this
+                .replace(" ", "")
+                .toLowerCase()
+                .replace("ä", "ae")
+                .replace("ö", "oe")
+                .replace("ü", "ue")
+                .replace("ß", "ss")
     }
 }
