@@ -206,7 +206,8 @@ class UserAPI (
                     throw ErrorCode(417, "missing password")
 
                 raw.map { row ->
-                    User(firstName = row[0], lastName = row[1], email = digestEmail(row[2]+emailSuffix, emailMap), password = row[3], schoolClass = classService.parse(row[4]))
+                    val email = row[2].toLowerCase() + emailSuffix
+                    User(firstName = row[0], lastName = row[1], email = digestEmail(email, emailMap), password = row[3], schoolClass = classService.parse(row[4]))
                 }
             }
             1 -> {
@@ -228,7 +229,7 @@ class UserAPI (
                         "Frau" -> SEX_FEMALE
                         else -> SEX_UNKNOWN
                     }
-                    val email = row[0] + emailSuffix
+                    val email = row[0].toLowerCase() + emailSuffix
                     User(firstName = firstName, lastName = lastName, email = digestEmail(email, emailMap), password = import.password, gender = gender)
                 }
             }
@@ -243,7 +244,14 @@ class UserAPI (
                 raw.map { row ->
                     val firstName = row[2]
                     val lastName = row[1]
-                    val email = firstName.toLowerCase().substring(0, 1) + "." + lastName.toLowerCase().replace(" ", "") + emailSuffix
+                    val email = firstName.take(1).toLowerCase() + "." +
+                            lastName
+                                    .replace(" ", "")
+                                    .toLowerCase()
+                                    .replace("ä", "ae")
+                                    .replace("ö", "oe")
+                                    .replace("ü", "ue")
+                                    .replace("ß", "ss") + emailSuffix
                     User(firstName = firstName, lastName = lastName, email = digestEmail(email, emailMap), password = import.password, schoolClass = classService.parse(row[0]))
                 }
             }
