@@ -70,7 +70,7 @@ class PublicAPI (
     @GetMapping("/home")
     fun home(): HomeData {
         val menu = configScheduler.get(Element.defaultMenu)?.toIntOrNull() ?: 0
-        val posts = postService.getPosts(menu, pageable = PageRequest.of(0, 3))
+        val posts = postService.getPosts(menu, pageable = PageRequest.of(0, 4))
                                .onEach { post -> if(post.password != null && !Session.hasAccess(post)) post.content = "" }
         return HomeData(
                 slider = sliderRepo.findByOrderByIndex(),

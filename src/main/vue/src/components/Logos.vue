@@ -19,6 +19,8 @@
 
         <img src="../assets/img/sor.png" style="margin-top: 50px;" alt="logo"/>
 
+        <img src="../assets/img/prime-gym.png" style="margin-top: 50px;" alt="logo"/>
+
         <a v-if="euSaLink" :href="euSa">
             <img src="../assets/img/investor-scl.png" style="margin-top: 50px;" alt="logo"/>
         </a>
