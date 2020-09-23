@@ -19,7 +19,9 @@
 
         <img src="../assets/img/sor.png" style="margin-top: 50px;" alt="logo"/>
 
-        <img src="../assets/img/prime-gym.png" style="margin-top: 50px;" alt="logo"/>
+        <a href="https://www.prologe.uni-halle.de" target="_blank">
+          <img src="../assets/img/prime-gym.png" style="margin-top: 50px;" alt="logo"/>
+        </a>
 
         <a v-if="euSaLink" :href="euSa">
             <img src="../assets/img/investor-scl.png" style="margin-top: 50px;" alt="logo"/>
