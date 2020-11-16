@@ -70,6 +70,9 @@
           this.post = post.data;
           this.post.layout = this.post.layoutPost;
           this.post.date = moment(this.post.timestamp).format('DD.MM.YYYY');
+          this.post.images.forEach((image) => {
+            image.fileNameNoExtension = image.fileName.substring(0, image.fileName.lastIndexOf('.'))
+          });
           this.locked = false;
           hideLoading();
         } catch (e) {
