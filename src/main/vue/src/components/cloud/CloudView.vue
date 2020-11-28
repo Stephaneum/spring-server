@@ -60,8 +60,10 @@
                         Lade Dateien...
                     </div>
                     <template v-else-if="files.length !== 0">
-                        <file-grid v-if="gridView" :files="files" :has-parent="this.folderStack.length !== 0" :shared-mode="sharedMode" @select="select" @open-parent="openParentFolder" @move="move" @move-parent="moveParent"></file-grid>
-                        <file-list v-else :files="files" :shared-mode="sharedMode" :modify-all="modifyAll" @select="select" @public="showPublic" @edit="showEdit" @delete="showDelete"></file-list>
+                        <file-grid v-if="gridView" :files="files" :shared-mode="sharedMode" :hidden-file-contents="isHiddenFileContents" :has-parent="this.folderStack.length !== 0"
+                                   @select="select" @open-parent="openParentFolder" @move="move" @move-parent="moveParent"></file-grid>
+                        <file-list v-else :files="files" :shared-mode="sharedMode" :hidden-file-contents="isHiddenFileContents"
+                                   @select="select" @public="showPublic" @edit="showEdit" @delete="showDelete"></file-list>
                     </template>
                     <div v-else style="height: 400px;" class="empty-hint">
                         Dieser Ordner ist leer.
@@ -77,16 +79,26 @@
         <!-- create folder modal -->
         <div id="modal-folder" class="modal">
             <div class="modal-content">
-                <h4>Neuer Ordner</h4>
-                <br>
-                <p>Es sind alle Zeichen erlaubt außer "/" und "\".</p>
-                <p>Wird erstellt in: <b>{{ folderStack.length !== 0 ? folderStack.slice(-1)[0].name : 'Homeverzeichnis' }}</b></p>
-                <br>
-                <div class="input-field">
-                    <i class="material-icons prefix">folder</i>
-                    <label for="create-folder-name">Name</label>
-                    <input v-model="createFolderName" type="text" id="create-folder-name"/>
-                </div>
+              <h4>Neuer Ordner</h4>
+              <br>
+              <p>Es sind alle Zeichen erlaubt außer "/" und "\".</p>
+              <p>Wird erstellt in: <b>{{ folderStack.length !== 0 ? folderStack.slice(-1)[0].name : 'Homeverzeichnis' }}</b></p>
+              <br>
+              <div class="input-field">
+                  <i class="material-icons prefix">folder</i>
+                  <label for="create-folder-name">Name</label>
+                  <input v-model="createFolderName" type="text" id="create-folder-name"/>
+              </div>
+
+              <a v-if="sharedMode" @click="createFolderHiddenFileContents = !createFolderHiddenFileContents" href="#!"
+                 class="waves-effect waves-light teal btn" :class="{ 'darken-3': !createFolderHiddenFileContents }" style="margin-top: 30px">
+                <i class="material-icons left">{{ createFolderHiddenFileContents ? 'visibility_off' : 'visibility' }}</i>
+                Abgabe-Ordner: {{ createFolderHiddenFileContents ? 'JA' : 'NEIN' }}
+              </a>
+
+              <p v-if="createFolderHiddenFileContents">
+                Mitglieder können nur den Inhalt ihrer eigenen Dateien einsehen.
+              </p>
             </div>
             <div class="modal-footer">
                 <a href="#!" class="modal-close waves-effect waves-green btn-flat">Abbrechen</a>
@@ -174,7 +186,14 @@
         components: {
             CloudStats, FileGrid, FileList, FilePopup
         },
-        props: ['myId', 'sharedMode', 'modifyAll', 'rootUrl', 'uploadUrl', 'folderUrl'],
+        props: {
+          myId: Number, // my user id
+          sharedMode: Boolean, // cloud storage used by groups
+          modifyAll: Boolean, // admin access (can modify everything)
+          rootUrl: String,
+          uploadUrl: String,
+          folderUrl: String
+        },
         data() {
             return {
                 origin: window.location.origin,
@@ -202,6 +221,7 @@
                     public: false
                 },
                 createFolderName: null,
+                createFolderHiddenFileContents: false,
                 file: null, // for the file popup
                 key: null // for previews in another browser
             }
@@ -316,6 +336,7 @@
             },
             showCreateFolder() {
                 this.createFolderName = null;
+                this.createFolderHiddenFileContents = false;
                 M.Modal.getInstance(document.getElementById('modal-folder')).open();
             },
             async createFolder() {
@@ -327,7 +348,11 @@
                 showLoadingInvisible();
                 M.Modal.getInstance(document.getElementById('modal-folder')).close();
                 try {
-                    await Axios.post(this.folderUrl, { name: this.createFolderName, parentID: this.folderID })
+                    await Axios.post(this.folderUrl, {
+                      name: this.createFolderName,
+                      parentID: this.folderID,
+                      hiddenFileContents: this.createFolderHiddenFileContents
+                    });
                     M.toast({html: 'Ordner erstellt<br>'+this.createFolderName});
                 } catch (e) {
                     M.toast({html: 'Fehlgeschlagen.<br>'+this.selected.fileName});
@@ -444,11 +469,14 @@
             },
         },
         computed: {
-            publicLink() {
-                return (file) => {
-                    return window.location.origin + '/files/public/'+ file.id +'_' + encodeURI(file.fileName);
-                };
-            }
+          isHiddenFileContents: function() {
+            return this.folderStack.length !== 0 && this.folderStack[this.folderStack.length - 1].hiddenFileContents;
+          },
+          publicLink() {
+              return (file) => {
+                  return window.location.origin + '/files/public/'+ file.id +'_' + encodeURI(file.fileName);
+              };
+          }
         },
         mounted() {
             M.AutoInit();

@@ -28,6 +28,9 @@ data class Folder(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                   @Column(nullable = false)
                   var locked: Boolean = false,
 
+                  @Column(nullable = false)
+                  var hiddenFileContents: Boolean = false,
+
                   @JsonInclude
                   @Transient
                   var isFile: Boolean = false,

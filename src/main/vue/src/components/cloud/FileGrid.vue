@@ -21,7 +21,13 @@
             <i v-else @click="select(f)" :style="{ color: f.isFile ? 'rgb(175, 175, 175)' : 'rgb(125, 125, 125)' }" class="file-icon material-icons">{{ icon(f) }}</i>
 
             <!-- File / Folder Name -->
-            <span @click="select(f)" class="file-text"><i v-if="f.locked" class="material-icons file-lock-icon">lock</i>{{ f.isFile ? f.fileName : f.name }}</span>
+            <span @click="select(f)" class="file-text">
+              <i v-if="f.locked" class="material-icons file-prefix-icon">lock</i>
+              <i v-if="f.hiddenFileContents" class="material-icons file-prefix-icon">how_to_vote</i>
+              <i v-else-if="hiddenFileContents && !f.canModify" class="material-icons file-prefix-icon">visibility_off</i>
+
+              {{ f.isFile ? f.fileName : f.name }}
+            </span>
 
             <!-- Info -->
             <div style="margin-bottom: 10px; text-align: center">
@@ -33,12 +39,16 @@
 </template>
 
 <script>
-
-    const parent = { isParent: true };
+const parent = { isParent: true };
 
 export default {
     name: 'FileGrid',
-    props: ['files', 'hasParent', 'sharedMode'],
+    props: {
+      files: Array,
+      hasParent: Boolean,
+      sharedMode: Boolean,
+      hiddenFileContents: Boolean // if true, then only show content if canModify is true
+    },
     data() {
         return {
             parent: parent,
@@ -48,7 +58,9 @@ export default {
     },
     methods: {
         select(f) {
-            this.$emit('select', f);
+          if (this.hiddenFileContents && !f.canModify)
+            return;
+          this.$emit('select', f);
         },
         openParent() {
             this.$emit('open-parent');
@@ -128,7 +140,7 @@ export default {
         text-shadow: 2px 2px 4px #aaa;
     }
 
-    .file-lock-icon {
+    .file-prefix-icon {
         font-size: 0.8em;
         margin-right: 4px;
     }

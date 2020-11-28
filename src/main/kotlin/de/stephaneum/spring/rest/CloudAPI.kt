@@ -15,7 +15,7 @@ import java.nio.file.Paths
 import javax.servlet.http.HttpServletRequest
 
 object CloudRequest {
-    data class CreateFolder(val name: String?, val parentID: Int?)
+    data class CreateFolder(val name: String?, val parentID: Int?, val hiddenFileContents: Boolean?)
     data class UpdatePublic(val fileID: Int?, val isPublic: Boolean?)
     data class Move(val fileId: Int?, val folderId: Int?, val targetFolderId: Int?)
 }
@@ -126,7 +126,7 @@ class CloudAPI (
 
         val user = Session.getUser()
 
-        val folder = when (request.parentID) {
+        val parent = when (request.parentID) {
             null -> null
             else -> folderRepo.findByIdOrNull(request.parentID) ?: throw ErrorCode(404, "folder not found")
         }
@@ -136,7 +136,16 @@ class CloudAPI (
             else -> groupRepo.findByIdOrNull(groupId) ?: throw ErrorCode(404, "group not found")
         }
 
-        folderRepo.save(Folder(0, request.name.trim(), user, group, folder))
+        val folder = Folder(
+                id = 0,
+                name = request.name.trim(),
+                user = user,
+                group = group,
+                parent = parent,
+                locked = false,
+                hiddenFileContents = request.hiddenFileContents ?: false
+        )
+        folderRepo.save(folder)
     }
 
     @PostMapping("/update-public-file")

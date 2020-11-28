@@ -13,7 +13,7 @@
   import InternalHeader from "../../components/InternalHeader";
 
   export default {
-    name: 'Account',
+    name: 'Cloud',
     props: ['info'],
     components: {InternalHeader, CloudView },
     computed: {
