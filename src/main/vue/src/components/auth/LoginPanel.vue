@@ -55,7 +55,14 @@
           await Axios.post('/api/login', { email: this.email, password: this.password });
           this.loginFailed = false;
           await this.$emit('update-info');
-          await this.$router.push('/home');
+
+          const nextPage = this.$route.query.next;
+          if (nextPage) {
+            await this.$router.push(nextPage);
+          } else {
+            await this.$router.push('/home');
+          }
+
           M.toast({html: 'Willkommen'});
         } catch (e) {
           this.loginFailed = true;

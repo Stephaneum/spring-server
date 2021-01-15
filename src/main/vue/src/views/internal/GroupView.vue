@@ -445,7 +445,14 @@
       },
       fetchData: async function() {
         const id = this.$route.params.id;
-        const group = await Axios.get('/api/groups/' + id);
+        let group = null;
+        try {
+          group = await Axios.get('/api/groups/' + id);
+        } catch (e) {
+          await this.$router.push('/login?next=' + encodeURIComponent('/groups/' + id));
+          return;
+        }
+
         this.group = group.data;
         this.group.children.forEach(c => c.icon = 'chat');
         if(!this.currGroup) {
