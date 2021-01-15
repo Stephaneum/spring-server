@@ -43,7 +43,7 @@ class MenuAPI (
     @GetMapping("/default-priority")
     fun getDefaultPriority(@RequestParam(required = false) id: Int?): Response.Priority {
         val children = menuRepo.findByParentId(id)
-        return Response.Priority(children.minBy { it.priority }?.priority?.minus(1) ?: 10)
+        return Response.Priority(children.minByOrNull { it.priority }?.priority?.minus(1) ?: 10)
     }
 
     @PostMapping("/create", "/create/{parentID}")

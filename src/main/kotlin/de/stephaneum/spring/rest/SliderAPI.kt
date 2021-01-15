@@ -41,7 +41,7 @@ class SliderAPI (
         val path = fileService.storeFile(file.inputStream, "${configScheduler.get(Element.fileLocation)}/$finalFileName") ?: throw ErrorCode(500, "storing failed")
 
         // save to database
-        val max = sliderRepo.findByOrderByIndex().maxBy { it.index }
+        val max = sliderRepo.findByOrderByIndex().maxByOrNull { it.index }
         sliderRepo.save(Slider(0, (max?.index ?: 0) + 1, path, null, null, SliderDirection.values().first().code))
     }
 
