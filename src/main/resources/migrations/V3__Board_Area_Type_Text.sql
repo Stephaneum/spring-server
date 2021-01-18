@@ -1,0 +1,1 @@
+ALTER TABLE `board_area` MODIFY `text` TEXT;
