@@ -16,12 +16,30 @@
       Du bist keiner Gruppe zugeordnet.
     </div>
 
-    <div style="text-align: center; margin-top: 100px">
+    <div v-if="policyAccepted" style="text-align: center; margin-top: 100px;">
+      Du hast die <a @click="showPolicy" href="#" class="green-text">datenschutzrechtlichen Bestimmungen</a> bereits akzeptiert.
+    </div>
+
+    <div style="text-align: center; margin-top: 50px">
       <router-link to="/" v-slot="{ href, navigate }">
         <a @click="navigate" :href="href" class="waves-effect waves-light btn-large teal darken-2">
           <i class="material-icons right">arrow_forward</i>öffentliche Startseite
         </a>
       </router-link>
+    </div>
+
+    <!-- policy -->
+    <div ref="modalPolicy" class="modal">
+      <div class="modal-content">
+        <h4>Rechtliches</h4>
+        <p>Mit dem Zugang akzeptieren Sie die datenrechtlichen Bestimmungen für den Datenschutz, der Datensicherheit und das Cloud-Computing für die Nutzung der vom Stephaneum angebotenen Dienste (Office 365, Stephaneum.de, Moodle und AR).</p>
+      </div>
+      <div class="modal-footer">
+        <a @click="acceptPolicy" href="#!" class="modal-close waves-effect waves-light btn green darken-4">
+          <i class="material-icons left">check_circle</i>
+          Akzeptieren
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -37,13 +55,23 @@
     props: ['info'],
     data: () => ({
       fetched: false,
-      groups: []
+      groups: [],
+      policyAccepted: document.cookie.indexOf('policyAccepted=1') !== -1
     }),
     methods: {
       fetchData: async function() {
         const groups = await Axios.get('/api/groups?accepted=true');
         this.groups = groups.data;
         this.fetched = true;
+      },
+      showPolicy: function() {
+        M.Modal.init(document.querySelectorAll('.modal'), { dismissible: false });
+        M.Modal.getInstance(this.$refs.modalPolicy).open();
+      },
+      acceptPolicy: function() {
+        const time = 60 * 60 * 24 * 30 * 3; // 3 months
+        document.cookie = 'policyAccepted=1;path=/;SameSite=Lax;Max-Age=' + time;
+        this.policyAccepted = true;
       }
     },
     computed: {
@@ -51,9 +79,26 @@
         return this.info.user && this.info.user.code.role >= 0;
       }
     },
-    mounted: function() {
+    watch: {
+      info: {
+        immediate: true,
+        handler: function(newVal) {
+          if (newVal.user && newVal.user.code.role >= 0) {
+            if(!this.policyAccepted) {
+              // show policy modal
+              this.$nextTick(() => {
+                this.showPolicy();
+              });
+            } else {
+              console.log('Policy already accepted');
+            }
+          }
+        }
+      }
+    },
+    mounted: async function() {
       M.AutoInit();
-      this.fetchData();
+      await this.fetchData();
     }
   }
 </script>
