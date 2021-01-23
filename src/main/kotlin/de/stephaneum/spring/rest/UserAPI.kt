@@ -63,6 +63,20 @@ class UserAPI (
         userRepo.saveAll(users)
     }
 
+    @ExperimentalUnsignedTypes
+    @PostMapping("/batch/delete-storage")
+    fun clearStorage(@RequestBody request: Request.DeleteByRole) {
+        val me = Session.getUser(adminOnly = true)
+
+        if(!cryptoService.checkPassword(request.password, me.password))
+            throw ErrorCode(403, "wrong password")
+
+        val users = userRepo.findByCodeRole(request.role)
+        users.forEach { user ->
+            fileService.clearStorage(user)
+        }
+    }
+
     @GetMapping("/{id}")
     fun getUserInfo(@PathVariable id: Int): Response.UserInfo {
         Session.getUser(adminOnly = true)
@@ -168,7 +182,7 @@ class UserAPI (
             }
         }
 
-        // delete code this will also delete the user
+        // delete code, this will also delete the user
         codeRepo.deleteByCode(user.code.code)
     }
 
