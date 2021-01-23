@@ -1,3 +1,18 @@
+2021-01-15
+- Weiterleitung auf Login-Seite bei Nicht-Anmeldung
+
+2020-11-28
+- Abgabe-Ordner implementiert
+
+2020-08-26
+- RAM-Verbrauch bei Datei-Hochladen verringert (vor allem während Initialisierung)
+
+2020-08-07
+- Datenbankstruktur in Flyway migriert und vereinfacht
+
+2020-06-02
+- neuer Initialisierungsprozess in Spring
+
 2020-05-17
 - alles auf Spring migriert
 
