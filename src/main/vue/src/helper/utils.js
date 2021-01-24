@@ -91,7 +91,17 @@ export function uploadMultipleFiles(
       }
     })
     .catch(function(err) {
-      M.toast({ html: "Ein Fehler ist aufgetreten." });
+      if (err.response) {
+        switch (err.response.status) {
+          case 409:
+            M.toast({ html: "Nicht genügend Speicherplatz." });
+            break;
+          default:
+            M.toast({ html: "Ein Fehler ist aufgetreten." });
+        }
+      } else {
+        M.toast({ html: "Ein Fehler ist aufgetreten." });
+      }
       console.log(err);
       hideLoading(); // frontend error
     });
