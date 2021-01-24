@@ -79,7 +79,8 @@ class FileService {
     fun storeFileStephaneum(user: User, filename: String, mime: String, content: ByteArray, folder: Any?, group: Group?, lockedFolder: Boolean = false): de.stephaneum.spring.database.File {
 
         // check if enough space
-        if(user.storage - fileRepo.calcStorageUsed(user.id) < content.size)
+        if((group == null || group.parent != null) && // if group is specified, ignore root groups
+            user.storage - fileRepo.calcStorageUsed(user.id) < content.size)
             throw ErrorCode(409, "Not enough storage")
 
         // resolve folder
