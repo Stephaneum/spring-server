@@ -32,7 +32,7 @@
     <div ref="modalPolicy" class="modal">
       <div class="modal-content">
         <h4>Rechtliches</h4>
-        <p>Mit dem Zugang werden alle datenrechtlichen Bestimmungen - Datenschutz, Datensicherheit und Cloud-Computing - für die Nutzung der angebotenen Dienste (Stephaneum.de, Moodle und AR) des Gymnasium Stephaneum Aschersleben vollständig akzeptiert.</p>
+        <p>Mit diesem Zugang werden die aktuellen datenrechtlichen Bestimmungen zum Datenschutz, der Datensicherheit und das Cloud-Computing für die Nutzung der vom Stephaneum angebotenen Dienste (Stephaneum.de, Moodle und AR) vollständig akzeptiert.</p>
       </div>
       <div class="modal-footer">
         <a @click="acceptPolicy" href="#!" class="modal-close waves-effect waves-light btn green darken-4">
