@@ -1,27 +1,27 @@
 <template>
     <div class="card" style="margin: 0; display: flex; flex-direction: column" :style="{ height: (height || 0)+'px' }">
         <div style="flex: 1; overflow-y: auto;">
-            <div v-show="textMode" style="height: 100%">
-                <trumbowyg v-model="text" :config="TEXT_EDITOR_CONFIG" style="height: auto"></trumbowyg>
+            <div v-show="textMode">
+                <trumbowyg v-model="text" :config="TEXT_EDITOR_CONFIG"></trumbowyg>
             </div>
-            <template v-show="!textMode">
+            <div v-show="!textMode" style="height: 100%">
                 <div v-if="lastUpdate && areas.length === 0" class="empty-hint">
                     Die Tafel ist leer.
                 </div>
                 <div v-else style="height: 100%; display: flex; justify-content: center; align-items: center">
                     <template v-for="a in areas">
-                        <div v-if="a.type === 'TEXT'" :key="'txt'+a.id" v-html="a.text"></div>
-                        <div v-else-if="a.type === 'IMAGE'" :key="'img'+a.id" style="padding: 20px">
-                            <img :src="downloadLink(a.file)" style="height: 100%; width: 100%"/>
+                        <div v-if="a.type === 'TEXT'" :key="'txt'+a.id" style="height: 100%" v-html="a.text"></div>
+                        <div v-else-if="a.type === 'IMAGE'" :key="'img'+a.id" style="height: 100%; padding: 20px">
+                            <img :src="downloadLink(a.file)" style="height: 100%; width: 100%; object-fit: contain"/>
                         </div>
-                        <div v-else-if="a.type === 'PDF'" :key="'pdf'+a.id" style="width: 100%; height: 100%; padding: 20px">
+                        <div v-else-if="a.type === 'PDF'" :key="'pdf'+a.id" style="width: 100%; height: 100%; padding: 10px">
                             <object :data="downloadLink(a.file)" type="application/pdf" style="width: 100%; height: 100%">
                                 Ihr Browser unterstützt kein PDF.
                             </object>
                         </div>
                     </template>
                 </div>
-            </template>
+            </div>
         </div>
         <div v-if="writeBoard" style="display: flex; align-items: center; flex-direction: row-reverse; padding: 20px; background-color: #fafafa; border-top: 1px solid #e0e0e0">
             <form method="POST" enctype="multipart/form-data" style="display: none">
@@ -82,7 +82,7 @@
     import "../../assets/trumbowyg/trumbowyg.fontsize.min.js";
     import "../../assets/trumbowyg/trumbowyg.colors.min.js";
     import "../../assets/trumbowyg/trumbowyg.colors.min.css";
-    import { TEXT_EDITOR_CONFIG, uploadMultipleFiles, showLoadingInvisible, hideLoading } from '../../helper/utils.js';
+    import { TEXT_EDITOR_CONFIG, uploadMultipleFiles, showLoadingInvisible, hideLoading } from '@/helper/utils';
 
 export default {
     name: 'GroupBoard',
