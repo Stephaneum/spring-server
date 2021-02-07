@@ -112,9 +112,9 @@ class GroupAPI (
 
         // add connections
         val connections = mutableListOf<UserGroup>()
-        connections.add(UserGroup(0, user, group, false, true, true, true))
-        connections.addAll(teachers.map { UserGroup(0, it, group, true, false, true, true) })
-        connections.addAll(members.map { UserGroup(0, it, group, false, true, true, false) })
+        connections.add(UserGroup(0, user, group, false, true, true, true, true))
+        connections.addAll(teachers.map { UserGroup(0, it, group, true, false, true, true, true) })
+        connections.addAll(members.map { UserGroup(0, it, group, false, true, true, false, true) })
         userGroupRepo.saveAll(connections)
 
         logService.log(EventType.CREATE_GROUP, user, group.name)
@@ -123,32 +123,16 @@ class GroupAPI (
 
     @PostMapping("/{id}/chat/{chat}")
     fun updateChat(@PathVariable id: Int, @PathVariable chat: Int) {
-        val user = Session.getUser()
-
-        val group: Group
-        if (user.code.role == ROLE_ADMIN) {
-            group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
-        } else {
-            group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
+        updateGroupStatus(id) { group ->
+            group.chat = chat == 1
         }
-
-        group.chat = chat == 1
-        groupRepo.save(group)
     }
 
     @PostMapping("/{id}/show-board-first/{show}")
     fun updateShowBoardFirst(@PathVariable id: Int, @PathVariable show: Int) {
-        val user = Session.getUser()
-
-        val group: Group
-        if (user.code.role == ROLE_ADMIN) {
-            group = groupRepo.findByIdOrNull(id) ?: throw ErrorCode(404, "not found")
-        } else {
-            group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
+        updateGroupStatus(id) { group ->
+            group.showBoardFirst = show == 1
         }
-
-        group.showBoardFirst = show == 1
-        groupRepo.save(group)
     }
 
     @PostMapping("/{id}/update")
@@ -221,21 +205,21 @@ class GroupAPI (
 
     @PostMapping("/{groupID}/toggle-cloud/{userID}")
     fun toggleCloudUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
-        toggleStatus(groupID, userID) { target ->
+        updateUserStatus(groupID, userID) { target ->
             target.writeCloud = !target.writeCloud
         }
     }
 
     @PostMapping("/{groupID}/toggle-chat/{userID}")
     fun toggleChatUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
-        toggleStatus(groupID, userID) { target ->
+        updateUserStatus(groupID, userID) { target ->
             target.chat = !target.chat
         }
     }
 
     @PostMapping("/{groupID}/toggle-write-board/{userID}")
     fun toggleWriteBoardUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
-        toggleStatus(groupID, userID) { target ->
+        updateUserStatus(groupID, userID) { target ->
             target.writeBoard = !target.writeBoard
         }
     }
@@ -264,7 +248,23 @@ class GroupAPI (
         groupService.removeUserFromGroupRecursive(connection)
     }
 
-    private fun toggleStatus(groupId: Int, userId: Int, action: (UserGroup) -> Unit) {
+    private fun updateGroupStatus(groupId: Int, action: (Group) -> Unit) {
+        val me = Session.getUser()
+
+        val group: Group
+        if (me.code.role == ROLE_ADMIN) {
+            group = groupRepo.findByIdOrNull(groupId) ?: throw ErrorCode(404, "not found")
+        } else {
+            group = userGroupRepo.findByUserAndGroup(me, groupId.obj())?.group ?: throw ErrorCode(403, "forbidden")
+        }
+
+        // change group attributes
+        action(group)
+
+        groupRepo.save(group)
+    }
+
+    private fun updateUserStatus(groupId: Int, userId: Int, action: (UserGroup) -> Unit) {
         val me = Session.getUser()
         if(!checkAdminPermission(me, groupId))
             throw ErrorCode(403, "you are not teacher or (group) admin")
