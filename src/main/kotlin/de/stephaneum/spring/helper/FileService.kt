@@ -83,6 +83,13 @@ class FileService {
             user.storage - fileRepo.calcStorageUsed(user.id) < content.size)
             throw ErrorCode(409, "Not enough storage")
 
+        // check group write cloud permission
+        if (group != null) {
+            val connection = userGroupRepo.findByUserAndGroup(user, group) ?: throw ErrorCode(403, "User is not member of specified group")
+            if (!connection.writeCloud)
+                throw ErrorCode(423, "User has no write access to group cloud")
+        }
+
         // resolve folder
         val mainPath = configScheduler.get(Element.fileLocation) ?: throw ErrorCode(500, "unknown file location")
         val savingFolder = when (folder) {

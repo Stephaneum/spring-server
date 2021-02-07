@@ -26,6 +26,7 @@
                         <span>{{ u.firstName }} {{ u.lastName }}</span>
                     </span>
                 <div v-if="modifyAll" style="display: flex; align-items: center">
+                    <i @click="toggleCloud(u)" class="material-icons" style="cursor: pointer; user-select: none; margin-right: 10px; font-size: 1.2em">{{ u.writeCloud ? 'cloud_upload' : 'close' }}</i>
                     <i @click="toggleWriteBoard(u)" class="material-icons" style="cursor: pointer; user-select: none; margin-right: 10px; font-size: 1.2em">{{ u.writeBoard ? 'edit' : 'close' }}</i>
                     <i @click="toggleChat(u)" class="material-icons" style="cursor: pointer; user-select: none; margin-right: 10px; font-size: 1.2em">{{ u.chat ? 'chat' : 'close' }}</i>
                     <i @click="kick(u)" class="material-icons" style="cursor: pointer; user-select: none; font-size: 1.2em">delete</i>
@@ -42,6 +43,9 @@ export default {
     methods: {
         addUser: function() {
             this.$emit('adduser');
+        },
+        toggleCloud: function(u) {
+          this.$emit('togglecloud', u);
         },
         toggleChat: function(u) {
             this.$emit('togglechat', u);

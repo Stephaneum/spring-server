@@ -96,6 +96,9 @@ export function uploadMultipleFiles(
           case 409:
             M.toast({ html: "Nicht genügend Speicherplatz." });
             break;
+          case 423:
+            M.toast({ html: "Cloud vorübergehend gesperrt." });
+            break;
           default:
             M.toast({ html: "Ein Fehler ist aufgetreten." });
         }

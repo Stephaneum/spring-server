@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 data class UpdateGroup(val name: String?, val teachers: List<Int>?, val parent: Int?, val members: List<Int>?)
 
 data class GroupInfo(val id: Int, val name: String, val leader: MiniUser, val accepted: Boolean, val chat: Boolean, val members: Int)
-data class GroupUser(val id: Int, val firstName: String, val lastName: String, val teacher: Boolean, val chat: Boolean, val writeBoard: Boolean)
+data class GroupUser(val id: Int, val firstName: String, val lastName: String, val teacher: Boolean, val chat: Boolean, val writeBoard: Boolean, val writeCloud: Boolean)
 data class GroupInfoDetailed(val id: Int, val name: String, val leader: MiniUser, val accepted: Boolean, val chat: Boolean, val showBoardFirst: Boolean, val members: List<GroupUser>, val children: List<GroupInfoDetailed>)
 
 @RestController
@@ -23,7 +23,7 @@ class GroupAPI (
 ) {
 
     @GetMapping
-    fun getMyProjects(@RequestParam(required = false) accepted: Boolean?): List<GroupInfo> {
+    fun getMyGroups(@RequestParam(required = false) accepted: Boolean?): List<GroupInfo> {
         val user = Session.getUser()
         val connections = if (accepted == true)
             userGroupRepo.findByUserAndGroupParentAndAcceptedOrderByGroupName(user, null, true)
@@ -33,13 +33,13 @@ class GroupAPI (
     }
 
     @GetMapping("/all")
-    fun getAllProjects(): List<GroupInfo> {
+    fun getAllGroups(): List<GroupInfo> {
         Session.getUser(adminOnly = true)
         return groupRepo.findByParentOrderByName(null).map { it.toGroupInfo() }
     }
 
     @GetMapping("/{id}")
-    fun getProject(@PathVariable id: Int): GroupInfoDetailed {
+    fun getGroup(@PathVariable id: Int): GroupInfoDetailed {
         val user = Session.getUser()
 
         val group: Group
@@ -48,15 +48,16 @@ class GroupAPI (
         } else {
             group = userGroupRepo.findByUserAndGroup(user, id.obj())?.group ?: throw ErrorCode(403, "forbidden")
         }
+
         val members = userGroupRepo
                 .findByGroupOrderByUserFirstNameAscUserLastNameAsc(group)
-                .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat, it.writeBoard) }
+                .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat, it.writeBoard, it.writeCloud) }
 
         val childrenRaw = if (user.code.role == ROLE_ADMIN) groupRepo.findByParent(group) else userGroupRepo.findByUserAndGroupParent(user, group).map { it.group }
         val children = childrenRaw.map { child ->
             val childMembers = userGroupRepo
                     .findByGroupOrderByUserFirstNameAscUserLastNameAsc(child)
-                    .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat, it.writeBoard) }
+                    .map { GroupUser(it.user.id, it.user.firstName, it.user.lastName, it.teacher, it.chat, it.writeBoard, it.writeCloud) }
             GroupInfoDetailed(child.id, child.name, child.leader.toMiniUser(), child.accepted, child.chat, child.showBoardFirst, childMembers, emptyList())
         }
         return GroupInfoDetailed(group.id, group.name, group.leader.toMiniUser(), group.accepted, group.chat, group.showBoardFirst, members, children)
@@ -218,30 +219,25 @@ class GroupAPI (
         logService.log(EventType.JOIN_GROUP, targetUser, group.name)
     }
 
+    @PostMapping("/{groupID}/toggle-cloud/{userID}")
+    fun toggleCloudUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
+        toggleStatus(groupID, userID) { target ->
+            target.writeCloud = !target.writeCloud
+        }
+    }
+
     @PostMapping("/{groupID}/toggle-chat/{userID}")
     fun toggleChatUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
-        val user = Session.getUser()
-        if(!checkAdminPermission(user, groupID))
-            throw ErrorCode(403, "you are not teacher or (group) admin")
-
-        val targetConnection = userGroupRepo.findByUserAndGroup(userID.obj(), groupID.obj()) ?: throw ErrorCode(404, "no target user-group connection found")
-        if(targetConnection.hasAdminPermissions())
-            throw ErrorCode(403, "this user has admin rights")
-        targetConnection.chat = !targetConnection.chat
-        userGroupRepo.save(targetConnection)
+        toggleStatus(groupID, userID) { target ->
+            target.chat = !target.chat
+        }
     }
 
     @PostMapping("/{groupID}/toggle-write-board/{userID}")
     fun toggleWriteBoardUser(@PathVariable groupID: Int, @PathVariable userID: Int) {
-        val user = Session.getUser()
-        if(!checkAdminPermission(user, groupID))
-            throw ErrorCode(403, "you are not teacher or (group) admin")
-
-        val targetConnection = userGroupRepo.findByUserAndGroup(userID.obj(), groupID.obj()) ?: throw ErrorCode(404, "no target user-group connection found")
-        if(targetConnection.hasAdminPermissions())
-            throw ErrorCode(403, "this user has admin rights")
-        targetConnection.writeBoard = !targetConnection.writeBoard
-        userGroupRepo.save(targetConnection)
+        toggleStatus(groupID, userID) { target ->
+            target.writeBoard = !target.writeBoard
+        }
     }
 
     @PostMapping("/{groupID}/kick/{userID}")
@@ -266,6 +262,21 @@ class GroupAPI (
             throw ErrorCode(409, "you are group admin or teacher")
 
         groupService.removeUserFromGroupRecursive(connection)
+    }
+
+    private fun toggleStatus(groupId: Int, userId: Int, action: (UserGroup) -> Unit) {
+        val me = Session.getUser()
+        if(!checkAdminPermission(me, groupId))
+            throw ErrorCode(403, "you are not teacher or (group) admin")
+
+        val targetConnection = userGroupRepo.findByUserAndGroup(userId.obj(), groupId.obj()) ?: throw ErrorCode(404, "no target user-group connection found")
+        if(targetConnection.hasAdminPermissions())
+            throw ErrorCode(403, "this user has admin rights")
+
+        // change connection attributes
+        action(targetConnection)
+
+        userGroupRepo.save(targetConnection)
     }
 
     private fun Group.toGroupInfo(): GroupInfo {

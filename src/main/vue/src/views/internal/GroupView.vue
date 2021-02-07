@@ -51,7 +51,7 @@
         </div>
 
         <div style="flex: 0 0 400px; padding-left: 10px">
-          <MemberList :members="currGroup.members" :leader="currGroup.leader" :modify-all="modifyAll" :show-add-user="currGroup.id === group.id" @adduser="showAddUser" @togglechat="toggleChatUser" @togglewriteboard="toggleWriteBoardUser" @kick="showKickUser" @height="setMemberListHeight"></MemberList>
+          <MemberList :members="currGroup.members" :leader="currGroup.leader" :modify-all="modifyAll" :show-add-user="currGroup.id === group.id" @adduser="showAddUser" @togglecloud="toggleCloudUser" @togglechat="toggleChatUser" @togglewriteboard="toggleWriteBoardUser" @kick="showKickUser" @height="setMemberListHeight"></MemberList>
         </div>
       </div>
     </div>
@@ -396,6 +396,19 @@
         this.$nextTick(() => {
           this.$refs.userSearch.search();
         });
+      },
+      toggleCloudUser: async function(user) {
+        try {
+          showLoadingInvisible();
+          await Axios.post('/api/groups/' + this.currGroup.id + '/toggle-cloud/' + user.id);
+          if(user.writeCloud)
+            M.toast({html: user.firstName+' darf keine Dateien hochladen.' });
+          else
+            M.toast({html: user.firstName+' darf Dateien hochladen.' });
+        } catch (e) {
+          M.toast({html: 'Ein Fehler ist aufgetreten.'});
+        }
+        await this.fetchData();
       },
       toggleChatUser: async function(user) {
         try {
