@@ -20,7 +20,6 @@ class CodeAPI (
         return codeRepo.findByUsed(false)
     }
 
-    @ExperimentalStdlibApi
     @PostMapping("/add/{role}")
     fun addCode(@PathVariable role: Int): de.stephaneum.spring.helper.Response.Feedback {
         val user = Session.get().user ?: return de.stephaneum.spring.helper.Response.Feedback(false, needLogin = true)
