@@ -10,9 +10,13 @@
       <div class="input-field">
         <i class="material-icons prefix">vpn_key</i>
         <label for="login-password">Passwort</label>
-        <input @keyup.enter="login" v-model="password" :disabled="loggingIn" type="password" id="login-password"/>
+        <input @keyup.enter="login" v-model="password" :disabled="loggingIn" :type="showPassword ? 'text' : 'password'" id="login-password"/>
       </div>
-      <div style="text-align: right">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <a v-if="password" @click="showPassword = !showPassword" class="waves-effect btn-flat">
+          Passwort {{ showPassword ? 'verstecken' : 'anzeigen' }}
+        </a>
+        <span v-else></span>
         <button @click="login" type="button" value="Login" class="btn waves-effect waves-light green darken-3" :class="{ disabled: loggingIn }">
           Login
           <i class="material-icons right">send</i>
@@ -36,6 +40,7 @@
     data: () => ({
       email: '',
       password: '',
+      showPassword: false,
       loginFailed: false,
       loggingIn: false
     }),
