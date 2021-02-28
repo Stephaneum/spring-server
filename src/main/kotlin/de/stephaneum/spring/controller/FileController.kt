@@ -58,10 +58,7 @@ class FileController (
             return ResponseEntity.ok()
                     .contentLength(resource.contentLength())
                     .contentType(MediaType.parseMediaType(fileService.getMimeFromPath(file.path)))
-                    .apply {
-                        if(download == true)
-                            header("Content-Disposition", "attachment; filename=\"" + file.generateFileName() + "\"")
-                    }
+                    .header("Content-Disposition", "${if (download == true) "attachment" else "inline"}; filename=\"" + file.generateFileName() + "\"")
                     .body(resource)
         }
     }

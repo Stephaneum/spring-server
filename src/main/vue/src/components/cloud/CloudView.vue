@@ -116,7 +116,7 @@
                 <br>
                 <a @click="updatePublic(false)" href="#!" class="waves-effect waves-light teal btn margin-1" :class="{ 'darken-3': selected.public, 'disabled': !selected.canModify }">
                     <i class="material-icons left">lock</i>
-                    Privat
+                    Intern
                 </a>
 
                 <a @click="updatePublic(true)" href="#!" class="waves-effect waves-light teal btn margin-1" :class="{ 'darken-3': !selected.public, 'disabled': !selected.canModify }">
@@ -124,11 +124,14 @@
                     Öffentlich
                 </a>
 
-                <div v-if="selected.public" style="margin-top: 40px">
-                    Link:
-                    <div class="green lighten-4" style="margin-top: 10px; padding: 10px">
-                        {{ publicLink(selected) }}
-                    </div>
+                <div style="margin-top: 40px">
+                  Link:
+                  <div class="green lighten-4" style="margin-top: 10px; padding: 10px">
+                      {{ selected.public ? publicLink(selected) : internalLink(selected) }}
+                  </div>
+                  <br>
+                  <span v-if="selected.public">Dieser Link steht <b>allen</b> verfügung.</span>
+                  <span v-else>Dieser Link steht <b>eingeloggten</b> Nutzern zur Verfügung, die <b>Zugang</b> zu dieser Datei haben.</span>
                 </div>
 
             </div>
@@ -476,6 +479,11 @@
               return (file) => {
                   return window.location.origin + '/files/public/'+ file.id +'_' + encodeURI(file.fileName);
               };
+          },
+          internalLink() {
+            return (file) => {
+              return window.location.origin + '/files/internal/'+ file.id;
+            };
           }
         },
         mounted() {
