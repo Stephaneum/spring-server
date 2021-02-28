@@ -46,8 +46,8 @@
                        :add-file-url="'/api/groups/'+currGroup.id+'/board/add-area-file'"
                        :delete-area-url="'/api/groups/board/delete-area/'"></GroupBoard>
           <ChatView v-show="!boardMode" :disabled-all="!currGroup.chat" :disabled-me="!canChat" :modify-all="modifyAll" :height="memberListHeight"
-                     :message-count-url="'/api/chat/group/'+currGroup.id+'/count'" :messages-url="'/api/chat/group/'+currGroup.id"
-                     :add-message-url="'/api/chat/group/'+currGroup.id" :clear-url="'/api/chat/group/'+currGroup.id+'/clear'"></ChatView>
+                     :message-count-url="'/api/chat/'+currGroup.id+'/count'" :messages-url="'/api/chat/'+currGroup.id"
+                     :add-message-url="'/api/chat/'+currGroup.id" :clear-url="'/api/chat/'+currGroup.id+'/clear'"></ChatView>
         </div>
 
         <div style="flex: 0 0 400px; padding-left: 10px">

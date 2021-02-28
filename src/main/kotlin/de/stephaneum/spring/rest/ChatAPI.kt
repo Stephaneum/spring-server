@@ -19,13 +19,13 @@ class ChatAPI (
         private val groupRepo: GroupRepo
 ) {
 
-    @GetMapping("/group/{groupID}/count")
+    @GetMapping("/{groupID}/count")
     fun getMessageCount(@PathVariable groupID: Int): MessageCount {
         // no checking needed, message count is not important anyway
         return MessageCount(messageRepo.countByGroup(groupID.obj()))
     }
 
-    @GetMapping("/group/{groupID}")
+    @GetMapping("/{groupID}")
     fun getMessages(@PathVariable groupID: Int): List<SimpleMessage> {
 
         val user = Session.getUser()
@@ -39,7 +39,7 @@ class ChatAPI (
                 .map { SimpleMessage(it.id, it.text, it.user.toMiniUser(), it.timestamp) }
     }
 
-    @PostMapping("/group/{groupID}")
+    @PostMapping("/{groupID}")
     fun addMessage(@PathVariable groupID: Int, @RequestBody request: AddMessage) {
 
         val user = Session.getUser()
@@ -48,13 +48,22 @@ class ChatAPI (
             throw ErrorCode(400, "empty message")
 
         val group = groupRepo.findByIdOrNull(groupID) ?: throw ErrorCode(404, "group not found")
-        if(user.code.role != ROLE_ADMIN && !userGroupRepo.existsByUserAndGroup(user, group))
-            throw ErrorCode(403, "you are not member of this group")
+
+        if (!group.chat)
+            throw ErrorCode(403, "chat for all members deactivated")
+
+        if (user.code.role != ROLE_ADMIN) {
+            val connection = userGroupRepo.findByUserAndGroup(user, group)
+                ?: throw ErrorCode(404, "you are not member of this group")
+
+            if (group.leader.id != user.id && !connection.teacher && !connection.chat)
+                throw ErrorCode(403, "not allowed to chat")
+        }
 
         messageRepo.save(Message(0, user, group, request.message, now()))
     }
 
-    @PostMapping("/group/{groupID}/clear")
+    @PostMapping("/{groupID}/clear")
     fun clear(@PathVariable groupID: Int) {
 
         val user = Session.getUser()

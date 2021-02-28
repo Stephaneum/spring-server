@@ -123,7 +123,13 @@ export default {
                 this.message = null;
                 this.sending = false;
             } catch (e) {
-                M.toast({html: 'Interner Fehler.'});
+              switch(e.response.status) {
+                case 403:
+                  M.toast({html: 'Keine Erlaubnis.'});
+                  break;
+                default:
+                  M.toast({html: 'Interner Fehler.'});
+              }
             }
         },
         showDeleteMessage: function(message) {

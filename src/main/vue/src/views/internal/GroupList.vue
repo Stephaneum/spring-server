@@ -59,11 +59,11 @@
               </span>
 
               <span style="flex: 0 0 150px; text-align: right">
-                  <a @click="toggleChat(g)" class="tooltipped waves-effect waves-light darken-2 btn margin-1" :class="g.chat ? ['teal'] : ['grey']" href="#!" data-tooltip="Chat" data-position="bottom">
+                  <a @click="toggleChat(g)" class="tooltipped waves-effect waves-light darken-2 btn margin-1" :class="g.chat ? ['teal'] : ['grey']" data-tooltip="Chat" data-position="bottom">
                       <i class="material-icons">{{ g.chat ? 'chat' : 'close' }}</i>
                   </a>
 
-                  <a @click="showDelete(g)" class="tooltipped waves-effect waves-light btn red darken-4 margin-1" href="#!" data-tooltip="Löschen" data-position="bottom">
+                  <a @click="showDelete(g)" class="tooltipped waves-effect waves-light btn red darken-4 margin-1" data-tooltip="Löschen" data-position="bottom">
                       <i class="material-icons">delete</i>
                   </a>
               </span>
