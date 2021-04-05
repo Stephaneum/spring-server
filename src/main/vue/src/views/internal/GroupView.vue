@@ -215,7 +215,7 @@
   import Axios from "axios"
   import M from "materialize-css"
   import moment from "moment"
-  import { showLoading, showLoadingInvisible, hideLoading } from "../../helper/utils";
+  import { showLoading, showLoadingInvisible, hideLoading } from "@/helper/utils";
   import CloudView from "../../components/cloud/CloudView";
   import GroupBoard from "../../components/group/GroupBoard";
   import ChatView from "../../components/group/ChatView";
