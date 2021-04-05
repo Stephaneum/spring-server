@@ -81,6 +81,7 @@ interface UserRepo: CrudRepository<User, Int> {
     // search
     fun findByOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(): List<User>
     fun findByCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(role: Int): List<User>
+    fun findBySchoolClassGradeAndSchoolClassSuffixContainingIgnoreCaseOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(grade: Int, suffix: String): List<User>
     fun findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(firstName: String, lastName: String): List<User>
     fun findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCaseAndCodeRoleOrderBySchoolClassGradeAscSchoolClassSuffixAscFirstNameAscLastNameAsc(firstName: String, lastName: String, role: Int): List<User>
 }
