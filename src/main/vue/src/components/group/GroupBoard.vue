@@ -9,12 +9,15 @@
                     Die Tafel ist leer.
                 </div>
                 <div v-else style="height: 100%; display: flex; justify-content: center; align-items: center">
+                    <a @click="fullScreen = true" style="position: absolute; top: 0; right: 0" class="waves-effect btn-flat tooltipped" data-tooltip="Vollbild" data-position="right">
+                      <i class="material-icons">fullscreen</i>
+                    </a>
                     <template v-for="a in areas">
                         <div v-if="a.type === 'TEXT'" :key="'txt'+a.id" style="height: 100%" v-html="a.text"></div>
                         <div v-else-if="a.type === 'IMAGE'" :key="'img'+a.id" style="height: 100%; padding: 20px">
                             <img :src="downloadLink(a.file)" style="height: 100%; width: 100%; object-fit: contain"/>
                         </div>
-                        <div v-else-if="a.type === 'PDF'" :key="'pdf'+a.id" style="width: 100%; height: 100%; padding: 10px">
+                        <div v-else-if="a.type === 'PDF'" :key="'pdf'+a.id" style="width: 100%; height: 100%; padding: 10px 50px 10px 10px">
                             <object :data="downloadLink(a.file)" type="application/pdf" style="width: 100%; height: 100%">
                                 Ihr Browser unterstützt kein PDF.
                             </object>
@@ -71,6 +74,22 @@
             </template>
 
         </div>
+      <div v-if="fullScreen" style="position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 999; background: white; padding: 10px">
+        <a @click="fullScreen = false" style="position: absolute; top: 10px; right: 20px" class="waves-effect btn-flat">
+          <i class="material-icons">fullscreen_exit</i>
+        </a>
+        <template v-for="a in areas">
+          <div v-if="a.type === 'TEXT'" :key="'txt'+a.id" style="height: 100%" v-html="a.text"></div>
+          <div v-else-if="a.type === 'IMAGE'" :key="'img'+a.id" style="height: 100%; padding: 20px">
+            <img :src="downloadLink(a.file)" style="height: 100%; width: 100%; object-fit: contain"/>
+          </div>
+          <div v-else-if="a.type === 'PDF'" :key="'pdf'+a.id" style="width: 100%; height: 100%; padding: 10px 70px 10px 10px">
+            <object :data="downloadLink(a.file)" type="application/pdf" style="width: 100%; height: 100%">
+              Ihr Browser unterstützt kein PDF.
+            </object>
+          </div>
+        </template>
+      </div>
     </div>
 </template>
 
@@ -94,7 +113,8 @@ export default {
         lastUpdate: null,
         areas: [],
         textMode: false,
-        text: ''
+        text: '',
+        fullScreen: false,
     }),
     methods: {
         fetchData: async function(force = false) {
