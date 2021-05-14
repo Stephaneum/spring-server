@@ -38,9 +38,13 @@ class FileController (
                 return "403"
             }
         } else {
+            Session.get().user ?: return "403"
+            /*
+            all authenticated users have access
             val user = Session.get().user ?: return "403"
             if(!fileService.hasAccessToFile(user, file))
                 return "403"
+             */
         }
 
         val resource = fileService.loadFileAsResource(file.path) ?: return "404"
