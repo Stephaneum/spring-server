@@ -131,7 +131,7 @@
                   </div>
                   <br>
                   <span v-if="selected.public">Dieser Link steht <b>allen</b> verfügung.</span>
-                  <span v-else>Dieser Link steht <b>eingeloggten</b> Nutzern zur Verfügung, die <b>Zugang</b> zu dieser Datei haben.</span>
+                  <span v-else>Dieser Link steht <b>eingeloggten</b> Nutzern zur Verfügung.</span>
                 </div>
 
             </div>
@@ -299,7 +299,7 @@
             digestFiles(files) {
                 files.forEach((f) => {
                     if(f.timestamp)
-                        f.time = moment(f.timestamp).format('DD.MM.YYYY');
+                        f.time = moment(f.timestamp).format('DD.MM.YYYY, HH:mm');
 
                     f.sizeReadable = storageReadable(f.size);
 

@@ -50,7 +50,7 @@
                         <!-- info -->
                         <p class="file-popup-sub-header">Informationen</p>
                         <div class="file-popup-sub-panel" id="file-popup-info" style="display: flex; flex-wrap: wrap;">
-                            <div>Hochgeladedatum:</div>
+                            <div>Zeitstempel:</div>
                             <div style="text-align: right">{{ file.time }}</div>
                             <div>Dateigröße:</div>
                             <div style="text-align: right">{{ file.sizeReadable }}</div>
