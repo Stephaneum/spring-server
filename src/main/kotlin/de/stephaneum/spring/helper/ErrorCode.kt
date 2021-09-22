@@ -42,10 +42,6 @@ class ErrorResponse : ErrorController {
         return Response.Feedback(success = false, message = message)
     }
 
-    override fun getErrorPath(): String {
-        return "/error"
-    }
-
     private fun Any.toInt(): Int {
         return this as Int
     }

@@ -104,7 +104,7 @@ class AuthAPI (
     }
 
     private fun logAuth(type: EventType, user: User, userAgent: String?, forwardedIP: String?, request: HttpServletRequest) {
-        val ua = userAgent?.toLowerCase() ?: ""
+        val ua = userAgent?.lowercase() ?: ""
         logService.log(type, user, "IP: ${resolveIP(forwardedIP, request)}, ${userAgentDetector.getBrowser(ua).repr}, ${userAgentDetector.getOS(ua).repr}")
     }
 }

@@ -94,17 +94,17 @@ class BackupAdminAPI (
 
         when(module) {
             ModuleType.HOMEPAGE.code -> {
-                if(!fileName.toLowerCase().endsWith(".zip")) {
+                if(!fileName.lowercase().endsWith(".zip")) {
                     throw ErrorCode(409, "only zip files")
                 }
             }
             ModuleType.MOODLE.code -> {
-                if(!fileName.toLowerCase().endsWith(".zip")) {
+                if(!fileName.lowercase().endsWith(".zip")) {
                     throw ErrorCode(409, "only .zip files")
                 }
             }
             ModuleType.AR.code -> {
-                if(!fileName.toLowerCase().endsWith(".sql")) {
+                if(!fileName.lowercase().endsWith(".sql")) {
                     throw ErrorCode(409, "only .sql files")
                 }
             }

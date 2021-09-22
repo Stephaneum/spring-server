@@ -67,7 +67,7 @@ class JwtService {
     fun getUser(token: String): User? {
         try {
             val userID = jwtParser.parseClaimsJws(token).body["userID"] as Int
-            return userRepo.findByIdOrNull(userID) ?: return null
+            return userRepo.findByIdOrNull(userID)
         } catch (e: Exception) {
             return null
         }

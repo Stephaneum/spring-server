@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 import javax.servlet.http.HttpServletRequest
 
-val windows = System.getProperty("os.name").toLowerCase().contains("windows")
+val windows = System.getProperty("os.name").lowercase().contains("windows")
 
 /**
  * @param command the linux/windows command
@@ -29,7 +29,7 @@ fun cmd(command: String, workingDir: String = if(windows) "C:/" else "/", sudoPa
  *  @return true if client is using IE, otherwise false
  */
 fun checkIE(request: HttpServletRequest): Boolean {
-    val userAgent = request.getHeader("user-agent")?.toLowerCase() ?: return false
+    val userAgent = request.getHeader("user-agent")?.lowercase() ?: return false
     return userAgent.contains("msie") || userAgent.contains("trident")
 }
 

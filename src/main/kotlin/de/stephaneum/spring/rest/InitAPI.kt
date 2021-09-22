@@ -50,7 +50,7 @@ class InitAPI (
         val currBackupLocation = backupLocation ?: throw ErrorCode(412, "backup location not set")
         val fileName = file.originalFilename ?: throw ErrorCode(417, "unknown file name")
 
-        if(!fileName.toLowerCase().endsWith(".zip"))
+        if(!fileName.lowercase().endsWith(".zip"))
             throw ErrorCode(418, "only zip files")
 
         configScheduler.initialize(currFileLocation, currBackupLocation, 0)

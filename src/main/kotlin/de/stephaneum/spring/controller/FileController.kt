@@ -84,7 +84,7 @@ class FileController (
         }
 
         // mime
-        val mime = fileService.getMime(fileName.substring(fileName.lastIndexOf('.')+1).toLowerCase())
+        val mime = fileService.getMime(fileName.substring(fileName.lastIndexOf('.')+1).lowercase())
         if(!fileService.isImage(mime)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build<Void>()
 
         // success request

@@ -26,8 +26,8 @@ import java.io.File
 @RequestMapping("/blackboard/api")
 class BlackboardAdminAPI {
 
-    final val logger = LoggerFactory.getLogger(BlackboardAdminAPI::class.java)
-    final val STANDARD_VALUE = "Hier klicken, um Text einzugeben"
+    private val logger = LoggerFactory.getLogger(BlackboardAdminAPI::class.java)
+    private val STANDARD_VALUE = "Hier klicken, um Text einzugeben"
 
     @Autowired
     private lateinit var blackboardRepo: BlackboardRepo
@@ -95,9 +95,10 @@ class BlackboardAdminAPI {
 
         val fileName = file.originalFilename ?: return Response.Feedback(false, message = "Dateiname unbekannt")
 
-        if(board.type == Type.PDF && !fileName.toLowerCase().endsWith(".pdf")) {
+        if(board.type == Type.PDF && !fileName.lowercase().endsWith(".pdf")) {
             return Response.Feedback(false, message = "Nur PDF-Dateien erlaubt")
-        } else if(board.type == Type.IMG && !fileName.toLowerCase().endsWith(".png") && !fileName.toLowerCase().endsWith("jpg") && !fileName.toLowerCase().endsWith("jpeg")) {
+        } else if(board.type == Type.IMG && !fileName.lowercase().endsWith(".png") && !fileName.lowercase()
+                .endsWith("jpg") && !fileName.lowercase().endsWith("jpeg")) {
             return Response.Feedback(false, message = "Nur PNG oder JPG Dateien erlaubt")
         }
 
@@ -107,7 +108,8 @@ class BlackboardAdminAPI {
 
         var bytes = file.bytes
         var finalFileName = fileName
-        if(board.type == Type.IMG && !finalFileName.toLowerCase().endsWith(".jpg") && !finalFileName.toLowerCase().endsWith(".jpeg")) {
+        if(board.type == Type.IMG && !finalFileName.lowercase().endsWith(".jpg") && !finalFileName.lowercase()
+                .endsWith(".jpeg")) {
             // to jpeg
             val image = imageService.convertToBufferedImage(file.bytes)
             bytes = imageService.convertToJPG(image)

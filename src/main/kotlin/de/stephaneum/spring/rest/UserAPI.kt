@@ -287,11 +287,11 @@ class UserAPI (
      */
     private fun String.formatEmail(): String {
         return this
-                .replace(" ", "")
-                .toLowerCase()
-                .replace("ä", "ae")
-                .replace("ö", "oe")
-                .replace("ü", "ue")
-                .replace("ß", "ss")
+            .replace(" ", "")
+            .lowercase()
+            .replace("ä", "ae")
+            .replace("ö", "oe")
+            .replace("ü", "ue")
+            .replace("ß", "ss")
     }
 }

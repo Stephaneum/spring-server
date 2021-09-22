@@ -51,7 +51,7 @@ class StaticAPI (
     fun upload(@RequestParam("file") file: MultipartFile) {
         Session.getUser(adminOnly = true)
 
-        val fileName = file.originalFilename?.toLowerCase() ?: throw ErrorCode(400, message = "unknown filename")
+        val fileName = file.originalFilename?.lowercase() ?: throw ErrorCode(400, message = "unknown filename")
         if(!fileName.endsWith(".htm") && !fileName.endsWith("html"))
             throw ErrorCode(409, "only html")
 

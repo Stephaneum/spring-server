@@ -30,7 +30,7 @@ class SliderAPI (
         if(user.code.role != ROLE_ADMIN)
             throw ErrorCode(403, "admin only")
 
-        val fileName = file.originalFilename?.toLowerCase() ?: throw ErrorCode(400, message = "unknown filename")
+        val fileName = file.originalFilename?.lowercase() ?: throw ErrorCode(400, message = "unknown filename")
         if(!fileName.endsWith(".jpg") && !fileName.endsWith("jpeg"))
             throw ErrorCode(409, "only jpg")
 

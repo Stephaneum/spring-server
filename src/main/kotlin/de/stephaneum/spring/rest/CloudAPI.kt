@@ -235,7 +235,7 @@ class CloudAPI (
     }
 
     private fun calcSizeRecursive(folder: Folder): Int {
-        val fileSize = fileRepo.findByFolderOrderByIdDesc(folder).sumBy { it.size }
+        val fileSize = fileRepo.findByFolderOrderByIdDesc(folder).sumOf { it.size }
         folder.size = fileSize
         folderRepo.findByParent(folder).forEach { f ->
             folder.size += calcSizeRecursive(f)

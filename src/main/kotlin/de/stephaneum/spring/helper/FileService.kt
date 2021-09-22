@@ -443,7 +443,7 @@ class FileService {
      * @return the resulting mime type or 'application/octet-stream' if it cannot be solved
      */
     fun getMime(extension: String): String {
-        return when (extension.toLowerCase()) {
+        return when (extension.lowercase()) {
             "pdf" -> "application/pdf"
             "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

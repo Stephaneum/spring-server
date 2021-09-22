@@ -160,7 +160,7 @@ class PublicAPI (
         val postCount = postRepo.countByApproved(true)
         val dev = configScheduler.get(Element.dev)
         val statsDay = countService.getStatsDay()
-        val visitCount = statsDay.sumBy { it.count }
+        val visitCount = statsDay.sumOf { it.count }
         return Stats(
                 studentCount = studentCount, teacherCount = teacherCount, postCount = postCount, visitCount = visitCount,
                 statsDay = statsDay, statsHour = countService.getStatsHour(), statsBrowser = countService.getStatsBrowser(), statsOS = countService.getStatsOS(), statsCloud = cloudStatsService.getStats(),

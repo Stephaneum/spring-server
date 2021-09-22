@@ -1,6 +1,5 @@
 package de.stephaneum.spring.database
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository

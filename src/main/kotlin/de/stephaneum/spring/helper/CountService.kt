@@ -45,7 +45,7 @@ class CountService (
         if(globalStateService.noVisitCounting)
             return
 
-        val ua = userAgent.toLowerCase()
+        val ua = userAgent.lowercase()
 
         if (lastIP == ip) {
             logger.info("same ip: $ip ($ua)")

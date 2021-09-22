@@ -18,7 +18,7 @@ class StaticScheduler {
      * this scheduler also updates the database according to the filesystem
      */
 
-    val logger = LoggerFactory.getLogger(StaticScheduler::class.java)
+    private val logger = LoggerFactory.getLogger(StaticScheduler::class.java)
 
     @Autowired
     private lateinit var configScheduler: ConfigScheduler
