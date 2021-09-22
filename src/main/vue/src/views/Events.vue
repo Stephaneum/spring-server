@@ -23,7 +23,7 @@
 
     <h5 style="margin: 40px 0 20px 0">Alle Ereignisse aufgelistet:</h5>
     <div v-for="(e, index) in monthEvents" :key="'e'+index">
-      <b>{{ e.timeString }}:</b> {{ e.title }}
+      <b>{{ e.timeString }}.</b> {{ e.title }}
     </div>
   </CenterLayout>
 </template>
@@ -71,7 +71,7 @@
       monthEvents: function() {
         if(!this.events)
           return [];
-        return this.events.filter(e => e.startMoment.month() === this.currMonth);
+        return this.events.filter(e => e.startMoment.month() === this.currMonth && e.startMoment.year() === this.currYear);
       }
     },
     async mounted() {
