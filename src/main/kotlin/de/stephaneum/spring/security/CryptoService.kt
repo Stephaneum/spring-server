@@ -11,7 +11,6 @@ class CryptoService {
         'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
         '0','1','2','3','4','5','6','7','8','9')
 
-    @ExperimentalStdlibApi
     fun getRandomSalt(length: Int): String {
         return (CharArray(length) { SALT_POOL.random() }).concatToString()
     }
@@ -22,7 +21,6 @@ class CryptoService {
         return hashMD5(password+salt+PEPPER)+salt == hash
     }
 
-    @ExperimentalStdlibApi
     @ExperimentalUnsignedTypes
     fun hashPassword(password: String): String {
         val salt = getRandomSalt(223)

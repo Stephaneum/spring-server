@@ -9,6 +9,8 @@
       </a>
     </div>
 
+    <p>Erfahrungsgemäß müssen beim Schüler-Import nur Klasse, Vorname und Nachname ausgewählt werden.</p>
+
     <div class="row">
       <div class="input-field col s2" style="padding-left: 0">
         <i class="material-icons prefix">people</i>
@@ -34,6 +36,9 @@
           <option value="0">Vorname | Nachname | Anmeldename | Passwort | Klasse</option>
           <option value="1">Anmeldename | Anrede | Nachname | Vorname</option>
           <option value="2">Klasse | Nachname | Vorname</option>
+          <option value="3">Klasse | Vorname | Nachname</option>
+          <option value="4">Vorname | Nachname | Klasse</option>
+          <option value="5">Nachname | Vorname | Klasse</option>
         </select>
         <label>Format</label>
       </div>
@@ -97,7 +102,7 @@
         } catch (e) {
           switch (e.response.status) {
             case 409:
-              M.toast({html: 'E-Mails sind vergeben.'});
+              M.toast({html: `E-Mails sind vergeben.<br>${e.response.data?.message}`});
               break;
             case 410:
               M.toast({html: 'Syntax fehlerhaft.'});
@@ -109,7 +114,7 @@
               M.toast({html: 'Standard-Passwort fehlt.'});
               break;
             case 418:
-              M.toast({html: 'Syntax der Klassen fehlerhaft.'});
+              M.toast({html: `Syntax der Klassen fehlerhaft.<br>${e.response.data?.message}`});
               break;
             default:
               M.toast({html: 'Ein Fehler ist aufgetreten.'});
@@ -127,6 +132,9 @@
           case 0: return firstName + s + lastName + s + login + s + password + s + clazz;
           case 1: return login + s + salutation + s + lastName + s + firstName;
           case 2: return clazz + s + lastName + s + firstName;
+          case 3: return clazz + s + firstName + s + lastName;
+          case 4: return firstName + s + lastName + s + clazz;
+          case 5: return lastName + s + firstName + s + clazz;
           default: return 'Error';
         }
       }

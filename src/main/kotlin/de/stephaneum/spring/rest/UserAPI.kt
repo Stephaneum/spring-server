@@ -86,7 +86,6 @@ class UserAPI (
     }
 
     @ExperimentalUnsignedTypes
-    @ExperimentalStdlibApi
     @PostMapping("/update")
     fun updateUser(@RequestBody request: Request.UpdateUser) {
         Session.getUser(adminOnly = true)
@@ -111,19 +110,24 @@ class UserAPI (
     }
 
     @ExperimentalUnsignedTypes
-    @ExperimentalStdlibApi
     @PostMapping("/import")
     fun importUsers(@RequestBody request: Request.ImportUsers) {
         Session.getUser(adminOnly = true)
 
         // parse user data
-        val newUsers = parseData(request)
+        val existingEmails = userRepo.findAll().map { it.email }
+        val newUsers = parseData(request, existingEmails)
 
         // validate email
-        val allUsers = userRepo.findAll().toMutableList()
-        allUsers.addAll(newUsers)
-        if (allUsers.distinctBy { it.email }.size != allUsers.size)
-            throw ErrorCode(409, "duplicate emails")
+        val allUsers = existingEmails + newUsers.map { it.email }
+        if (allUsers.distinct().size != allUsers.size) {
+            val tempUserList = allUsers.toMutableList()
+            val unique = tempUserList.toSet()
+
+            // the remaining emails are duplicates
+            unique.forEach { email -> tempUserList.remove(email) }
+            throw ErrorCode(409, "duplicate emails: $tempUserList")
+        }
 
         // generate missing school classes
         val classes = schoolClassRepo.findAll()
@@ -202,13 +206,15 @@ class UserAPI (
      * needed to be checked:
      * - distinct emails
      */
-    private fun parseData(import: Request.ImportUsers): List<User> {
+    private fun parseData(import: Request.ImportUsers, existingEmails: List<String>): List<User> {
         val raw = import.data
                 .lines()
-                .filter { row -> !row.isBlank() }
+                .filter { row -> row.isNotBlank() }
                 .map { row -> row.trim().split(import.separator) }
 
+        // email -> count
         val emailMap: MutableMap<String, Int> = mutableMapOf()
+        existingEmails.forEach { email -> emailMap[email] = 1 }
 
         return when (import.format) {
             0 -> {
@@ -247,8 +253,11 @@ class UserAPI (
                     User(firstName = firstName, lastName = lastName, email = digestEmail(email, emailMap), password = import.password, gender = gender)
                 }
             }
-            2 -> {
-                // class - lastName - firstName
+            2, 3, 4, 5 -> {
+                // 2: class - lastName - firstName
+                // 3: class - first - last
+                // 4: first - last - class
+                // 5: last - first - class
                 if (import.password.isNullOrBlank())
                     throw ErrorCode(417, "missing password")
 
@@ -256,10 +265,15 @@ class UserAPI (
                     throw ErrorCode(410, "syntax error")
 
                 raw.map { row ->
-                    val firstName = row[2]
-                    val lastName = row[1]
+                    val (firstName, lastName, schoolClass) = when (import.format) {
+                        2 -> Triple(row[2], row[1], row[0])
+                        3 -> Triple(row[1], row[2], row[0])
+                        4 -> Triple(row[0], row[1], row[2])
+                        5 -> Triple(row[1], row[0], row[2])
+                        else -> throw ErrorCode(500, "Not expected format code in (2, 3, 4, 5) branch, received ${import.format}")
+                    }
                     val email = firstName.take(1).formatEmail() + "." + lastName.formatEmail() + emailSuffix
-                    User(firstName = firstName, lastName = lastName, email = digestEmail(email, emailMap), password = import.password, schoolClass = classService.parse(row[0]))
+                    User(firstName = firstName, lastName = lastName, email = digestEmail(email, emailMap), password = import.password, schoolClass = classService.parse(schoolClass))
                 }
             }
             else -> throw ErrorCode(400, "invalid format id")
