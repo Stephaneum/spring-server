@@ -56,6 +56,9 @@
             <a @click="showChangeAccount(u)" class="btn waves-effect waves-light teal darken-3" style="margin-left: 10px">
               <i class="material-icons">swap_horiz</i>
             </a>
+            <a @click="showDeleteAccount(u)" class="btn waves-effect waves-light red darken-3" style="margin-left: 10px">
+              <i class="material-icons">delete</i>
+            </a>
           </td>
         </tr>
         </tbody>
@@ -136,6 +139,25 @@
         <button @click="changeAccount" type="button" class="btn waves-effect waves-light green darken-3">
           <i class="material-icons left">swap_horiz</i>
           Wechseln
+        </button>
+      </div>
+    </div>
+
+    <!-- delete account -->
+    <div id="modal-delete-account" class="modal" style="width: 500px">
+      <div class="modal-content">
+        <h4>Account löschen</h4>
+        <br>
+        Wollen Sie den Account von <b>{{ selected.firstName }} {{ selected.lastName }}</b> löschen?
+        <br><br>
+        <b>Hinweis: Alle Dateien von dieser Personen werden ebenfalls gelöscht!</b>
+        <br>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect btn-flat">Abbrechen</a>
+        <button @click="deleteAccount" type="button" class="btn waves-effect waves-light red darken-3">
+          <i class="material-icons left">delete</i>
+          Löschen
         </button>
       </div>
     </div>
@@ -220,6 +242,23 @@
           window.location.href = '/home';
         } catch (e) {
           M.toast({html: 'Ein Fehler ist aufgetreten.'});
+          hideLoading();
+        }
+      },
+      showDeleteAccount: async function(user) {
+        this.selected = user;
+        M.Modal.getInstance(document.getElementById('modal-delete-account')).open();
+      },
+      deleteAccount: async function() {
+        showLoading('Account löschen...');
+        try {
+          await Axios.post('/api/users/delete-account/' + this.selected.id);
+          await this.search();
+          M.toast({html: 'Account gelöscht.'});
+          M.Modal.getInstance(document.getElementById('modal-delete-account')).close();
+        } catch (e) {
+          M.toast({html: 'Ein Fehler ist aufgetreten.'});
+        } finally {
           hideLoading();
         }
       }

@@ -109,6 +109,14 @@ class UserAPI (
         Session.get().user = user
     }
 
+    @PostMapping("/delete-account/{userId}")
+    fun deleteUser(@PathVariable userId: Int) {
+        val me = Session.getUser(adminOnly = true)
+
+        val user = userRepo.findByIdOrNull(userId) ?: throw ErrorCode(404, "user not found")
+        deleteUser(initiator = me, user = user)
+    }
+
     @ExperimentalUnsignedTypes
     @PostMapping("/import")
     fun importUsers(@RequestBody request: Request.ImportUsers) {
