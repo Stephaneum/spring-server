@@ -32,7 +32,7 @@ class StaticScheduler {
     @Autowired
     private lateinit var staticRepo: StaticRepo
 
-    @Scheduled(initialDelay=5000, fixedDelay = 30*1000) // check every half minute
+    @Scheduled(initialDelay=5000, fixedDelay = 30L * 1000L) // check every half minute
     fun update() {
 
         if(globalStateService.noScheduler)

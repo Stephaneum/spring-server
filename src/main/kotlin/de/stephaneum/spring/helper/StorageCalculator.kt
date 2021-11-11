@@ -4,9 +4,9 @@ import org.springframework.stereotype.Service
 import java.text.DecimalFormat
 
 enum class SizeType(val bytes: Long) {
-    KB(1024),
-    MB(1024 * 1024),
-    GB(1024 * 1024 * 1024)
+    KB(1024L),
+    MB(1024L * 1024L),
+    GB(1024L * 1024L * 1024L)
 }
 
 @Service

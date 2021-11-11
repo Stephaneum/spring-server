@@ -36,7 +36,7 @@ class GarbageCollector {
     @Autowired
     private lateinit var fileRepo: FileRepo
 
-    @Scheduled(initialDelay=10000, fixedDelay = 1000*60)
+    @Scheduled(initialDelay=10000, fixedDelay = 1000L * 60L)
     fun update() {
 
         if(globalStateService.noScheduler)
