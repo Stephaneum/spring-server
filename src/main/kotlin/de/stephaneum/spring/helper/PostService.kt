@@ -30,16 +30,14 @@ class PostService (
             return emptyList()
 
         val images = filePostRepo.findImagesByPostIdIn(posts.map { it.id })
-        return posts.apply {
-            forEach { p ->
-                p.simplify()
-                p.menu?.simplify()
-                p.images = images
-                        .filter { it.postID == p.id }
-                        .map { it.file.apply { simplifyForPosts() } }
-                if(noContent)
-                    p.content = null
-            }
+        return posts.onEach { p ->
+            p.simplify()
+            p.menu?.simplify()
+            p.images = images
+                    .filter { it.postID == p.id }
+                    .map { it.file.apply { simplifyForPosts() } }
+            if(noContent)
+                p.content = null
         }
     }
 

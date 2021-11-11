@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 // using lowercase because frontend uses those as keys
+@Suppress("EnumEntryName")
 enum class Element(val code: String, val info: String, val defaultValue: String?, var value: String? = null) {
     fileLocation("speicherort", "Speicherort", null),
     backupLocation("backup_dir", "Backup-Ort", null),
@@ -91,7 +92,7 @@ class ConfigScheduler {
             if(dbConfig == null) {
                 logger.error("${element.code} has no database entry")
             } else if(element.value != dbConfig.value) {
-                val value = if(dbConfig.value?.length ?: 0 <= 100) dbConfig.value?.replace("\n", " ") else dbConfig.value?.substring(0, 100)?.replace("\n", " ") + "..."
+                val value = if((dbConfig.value?.length ?: 0) <= 100) dbConfig.value?.replace("\n", " ") else dbConfig.value?.substring(0, 100)?.replace("\n", " ") + "..."
                 logger.info("${element.name}: ${element.value} -> $value")
                 element.value = dbConfig.value
                 digest(element, dbConfig.value)

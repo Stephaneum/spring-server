@@ -3,8 +3,8 @@ package de.stephaneum.spring.blackboard
 import de.stephaneum.spring.database.Blackboard
 import de.stephaneum.spring.database.Type
 
-val REDIRECT_LOGIN = "redirect:/blackboard/login"
-val REDIRECT_ADMIN = "redirect:/blackboard/admin"
+const val REDIRECT_LOGIN = "redirect:/blackboard/login"
+const val REDIRECT_ADMIN = "redirect:/blackboard/admin"
 
 object Request {
     data class Login(val password: String?)

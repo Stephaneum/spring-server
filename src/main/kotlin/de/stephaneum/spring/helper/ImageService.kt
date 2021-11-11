@@ -15,6 +15,10 @@ import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
 import javax.imageio.ImageIO
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.floor
+import kotlin.math.sin
 
 
 @Service
@@ -213,12 +217,12 @@ class ImageService {
 
     fun rotate(img: BufferedImage, angle: Double): BufferedImage {
         val rads = Math.toRadians(angle)
-        val sin = Math.abs(Math.sin(rads))
-        val cos = Math.abs(Math.cos(rads))
+        val sin = abs(sin(rads))
+        val cos = abs(cos(rads))
         val w = img.width
         val h = img.height
-        val newWidth = Math.floor(w * cos + h * sin).toInt()
-        val newHeight = Math.floor(h * cos + w * sin).toInt()
+        val newWidth = floor(w * cos + h * sin).toInt()
+        val newHeight = floor(h * cos + w * sin).toInt()
         val rotated = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB)
         val g2d = rotated.createGraphics()
         val at = AffineTransform()

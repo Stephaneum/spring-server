@@ -67,7 +67,7 @@ class AuthAPI (
             throw ErrorCode(409, "email already exists")
 
         val schoolClass = when {
-            request.schoolClass != null && !request.schoolClass.isBlank()-> {
+            request.schoolClass != null && request.schoolClass.isNotBlank() -> {
                 val parsed = classService.parse(request.schoolClass) // throw 412 or 418
                 classRepo.findByGradeAndSuffix(parsed.grade, parsed.suffix) ?: classRepo.save(SchoolClass(0, parsed.grade, parsed.suffix))
             }

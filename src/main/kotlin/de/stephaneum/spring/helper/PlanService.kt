@@ -28,14 +28,14 @@ class PlanService {
                 var day: String? = null
                 var year: String? = null
 
-                for (i in 0 until days.size) {
+                for (i in days.indices) {
 
                     val occurenceAt = line.indexOf(days[i])
                     if (occurenceAt != -1) {
                         //Wochentag gefunden
                         weekDay = days[i]
 
-                        for (x in 0 until months.size) {
+                        for (x in months.indices) {
 
                             val occurenceMonatAt = line.indexOf(months[x])
                             if (occurenceMonatAt != -1) {

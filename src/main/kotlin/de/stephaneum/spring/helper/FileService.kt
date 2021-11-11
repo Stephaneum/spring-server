@@ -343,14 +343,14 @@ class FileService {
         val zipOut = ZipOutputStream(fos)
         val file = File(fileToZip)
 
-        _zip(file, null, zipOut)
+        zipHelper(file, null, zipOut)
         zipOut.close()
         fos.close()
     }
 
     // recursive function
     @Throws(IOException::class)
-    private fun _zip(fileToZip: File, fileName: String?, zipOut: ZipOutputStream) {
+    private fun zipHelper(fileToZip: File, fileName: String?, zipOut: ZipOutputStream) {
 
         if (fileToZip.isHidden) {
             return
@@ -367,7 +367,7 @@ class FileService {
                 else
                     current = childFile.name
 
-                _zip(childFile, current, zipOut)
+                zipHelper(childFile, current, zipOut)
             }
             return
         }
