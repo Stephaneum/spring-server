@@ -35,10 +35,10 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
 	// Specific Libraries
-	implementation("org.apache.pdfbox:pdfbox:2.0.17")
-	implementation("commons-io:commons-io:2.6")
-	implementation("org.jsoup:jsoup:1.10.3")
-	implementation("com.drewnoakes:metadata-extractor:2.13.0")
+	implementation("org.apache.pdfbox:pdfbox:2.0.25")
+	implementation("commons-io:commons-io:2.11.0")
+	implementation("org.jsoup:jsoup:1.14.3")
+	implementation("com.drewnoakes:metadata-extractor:2.17.0")
 
 	// JWT
 	implementation("io.jsonwebtoken:jjwt-api:0.11.2")

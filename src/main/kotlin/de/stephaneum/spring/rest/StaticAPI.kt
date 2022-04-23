@@ -32,7 +32,7 @@ class StaticAPI (
             throw ErrorCode(404, "page not found")
 
         val doc = Jsoup.parse(content)
-        val body = doc.select("body").first().html()
+        val body = doc.select("body").first()?.html() ?: ""
         val title = doc.select("title").first()?.html() ?: "Beitrag"
 
         return StaticContent(page.mode, title, body)
