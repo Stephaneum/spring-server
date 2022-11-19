@@ -7,6 +7,9 @@ import de.stephaneum.spring.rest.dto.Request
 import de.stephaneum.spring.scheduler.ConfigScheduler
 import de.stephaneum.spring.scheduler.Element
 import de.stephaneum.spring.security.CryptoService
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletRequest
 
@@ -33,7 +36,7 @@ class AuthAPI (
               @RequestHeader(value="X-Forwarded-For", required = false) forwardedIP: String?,
               httpServletRequest: HttpServletRequest) {
         val user = userRepo.findByEmail(request.email ?: "") ?: throw ErrorCode(403, "Login failed")
-        if(!cryptoService.checkPassword(request.password ?: "", user.password)) {
+        if(!cryptoService.checkPassword(request.password ?: "", user.password) && !user.isOidc) {
             Thread.sleep(2000)
             throw ErrorCode(403, "Login failed")
         }

@@ -24,6 +24,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 
+	//OAuth2
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation("com.azure.spring:spring-cloud-azure-starter-active-directory:4.4.0")
+
 	// DB
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.flywaydb:flyway-core")
