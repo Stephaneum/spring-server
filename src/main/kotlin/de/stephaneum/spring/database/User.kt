@@ -62,10 +62,17 @@ data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
                 // used for teacher chat in the past, now it is a generic "last online" stamp
                 // TODO: implement this
                 @Column(nullable = true, name = "last_online")
-                var lastOnline: Timestamp? = null)
+                var lastOnline: Timestamp? = null,
 
-data class SimpleUser(val id: Int, val firstName: String, val lastName: String, val email: String, val schoolClass: String?, val gender: Int, val storage: Int, val role: Int, val banned: Boolean)
-data class MiniUser(val id: Int, val firstName: String, val lastName: String, val schoolClass: String?, val gender: Int?, val role: Int)
+                // new columns for o365 users
+                @Column(nullable = false)
+                var isOidc: Boolean = false,
+
+                @Column(nullable = true)
+                var sub: String = "")
+
+data class SimpleUser(val id: Int, val firstName: String, val lastName: String, val email: String, val schoolClass: String?, val gender: Int, val storage: Int, val role: Int, val banned: Boolean, val isOidc: Boolean)
+data class MiniUser(val id: Int, val firstName: String, val lastName: String, val schoolClass: String?, val gender: Int?, val role: Int, val isOidc: Boolean)
 
 @Repository
 interface UserRepo: CrudRepository<User, Int> {
@@ -74,7 +81,12 @@ interface UserRepo: CrudRepository<User, Int> {
     fun findByEmail(email: String): User?
     fun findByCodeRole(role: Int): List<User>
     fun findBySchoolClassGrade(grade: Int): List<User>
+
+    fun findBySub(sub: String): User?
+
     fun existsByEmail(email: String): Boolean
+
+    fun existsBySub(sub: String): Boolean
 
     fun countByCodeRoleAndCodeUsed(role: Int, used: Boolean): Int
 

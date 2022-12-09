@@ -1,19 +1,31 @@
 package de.stephaneum.spring.security
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import javax.servlet.FilterChain
-import javax.servlet.ServletResponse
-import javax.servlet.ServletRequest
-import org.springframework.web.filter.GenericFilterBean
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import javax.servlet.http.HttpServletRequest
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
+import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.stereotype.Component
-import javax.servlet.http.HttpServletResponse
+import org.springframework.web.filter.GenericFilterBean
 import javax.annotation.PostConstruct
+import javax.servlet.FilterChain
+import javax.servlet.ServletRequest
+import javax.servlet.ServletResponse
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 
 @Configuration
@@ -27,6 +39,8 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         http.authorizeRequests().anyRequest().permitAll()
         http.headers().frameOptions().disable()
         http.headers().xssProtection().disable()
+        http.oauth2Login()
+        http.oauth2Login().loginPage("/oauth_login")
 
         http.addFilterAfter(corsFilter, BasicAuthenticationFilter::class.java)
     }

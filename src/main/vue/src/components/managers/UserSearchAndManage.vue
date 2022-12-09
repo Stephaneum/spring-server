@@ -37,6 +37,7 @@
           <th>Klasse</th>
           <th>Speicher</th>
           <th>Rolle</th>
+          <th>Typ</th>
           <th>Aktionen</th>
         </tr>
         </thead>
@@ -49,6 +50,7 @@
           <td>{{ u.schoolClass }}</td>
           <td>{{ u.storageReadable }}</td>
           <td>{{ roleString(u.role) }}</td>
+          <td>{{ u.isOidc ? 'OpenID Connect' : 'Manuell' }}</td>
           <td>
             <a @click="showUpdateUser(u)" class="btn waves-effect waves-light green darken-4">
               <i class="material-icons">edit</i>
