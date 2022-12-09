@@ -10,7 +10,7 @@ import de.stephaneum.spring.security.CryptoService
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletRequest
 
-data class RegisterRequest(val code: String, val email: String, val password: String, val firstName: String, val lastName: String, val sex: Int, val schoolClass: String?)
+data class RegisterRequest(val code: String, val email: String, val password: String, val firstName: String, val lastName: String)
 
 @RestController
 @RequestMapping("/api")
@@ -50,30 +50,21 @@ class AuthAPI (
     @ExperimentalUnsignedTypes
     @ExperimentalStdlibApi
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest,
+    fun register(@RequestBody payload: RegisterRequest,
                  @RequestHeader(value="User-Agent", required = false) userAgent: String?,
                  @RequestHeader(value="X-Forwarded-For", required = false) forwardedIP: String?,
                  httpServletRequest: HttpServletRequest) {
 
-        val code = codeRepo.findByCodeAndUsed(request.code, false) ?: throw ErrorCode(400, "invalid code")
+        val code = codeRepo.findByCodeAndUsed(payload.code, false) ?: throw ErrorCode(400, "invalid code")
 
-        if(request.firstName.isBlank() || request.lastName.isBlank() || request.email.isBlank() || request.password.isBlank())
+        if(payload.firstName.isBlank() || payload.lastName.isBlank() || payload.email.isBlank() || payload.password.isBlank())
             throw ErrorCode(400, "missing fields")
 
-        if(!inputValidator.validateEmail(request.email))
+        if(!inputValidator.validateEmail(payload.email))
             throw ErrorCode(423, "invalid email")
 
-        if(userRepo.existsByEmail(request.email))
+        if(userRepo.existsByEmail(payload.email))
             throw ErrorCode(409, "email already exists")
-
-        val schoolClass = when {
-            request.schoolClass != null && request.schoolClass.isNotBlank() -> {
-                val parsed = classService.parse(request.schoolClass) // throw 412 or 418
-                classRepo.findByGradeAndSuffix(parsed.grade, parsed.suffix) ?: classRepo.save(SchoolClass(0, parsed.grade, parsed.suffix))
-            }
-            code.role == ROLE_STUDENT -> throw ErrorCode(417, "students must have school class")
-            else -> null
-        }
 
         val storage = if(code.role == ROLE_STUDENT)
             configScheduler.get(Element.storageStudent)?.toIntOrNull() ?: 0
@@ -82,12 +73,12 @@ class AuthAPI (
 
         val user = userRepo.save(User(
                 code = code,
-                email = request.email,
-                password = cryptoService.hashPassword(request.password),
-                firstName = request.firstName,
-                lastName = request.lastName,
-                gender = request.sex,
-                schoolClass = schoolClass,
+                email = payload.email,
+                password = cryptoService.hashPassword(payload.password),
+                firstName = payload.firstName,
+                lastName = payload.lastName,
+                gender = SEX_UNKNOWN,
+                schoolClass = null,
                 storage = storage
         ))
 

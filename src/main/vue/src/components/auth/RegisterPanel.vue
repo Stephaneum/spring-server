@@ -40,21 +40,6 @@
           <label for="register-password">Passwort</label>
           <input @keyup.enter="action" v-model="password" :disabled="fetching" type="password" id="register-password"/>
         </div>
-
-        <div class="input-field">
-          <i class="material-icons prefix">school</i>
-          <label for="register-class">Klasse</label>
-          <input @keyup.enter="action" v-model="schoolClass" :disabled="fetching" type="text" id="register-class" placeholder="z.B. 7c"/>
-        </div>
-        <div class="input-field">
-          <i class="material-icons prefix">person</i>
-          <select v-model="sex">
-            <option value="0">männlich</option>
-            <option value="1">weiblich</option>
-            <option value="2">keine Angabe</option>
-          </select>
-          <label>Geschlecht</label>
-        </div>
       </template>
 
       <div style="text-align: right">
@@ -131,8 +116,6 @@
               password: this.password,
               firstName: this.firstName,
               lastName: this.lastName,
-              sex: this.sex,
-              schoolClass: this.schoolClass
           });
           await this.$emit('update-info');
           await this.$router.push('/home');
@@ -147,15 +130,6 @@
                   break;
               case 409:
                   this.errorMessage = 'E-Mail wird bereits verwendet';
-                  break;
-              case 418:
-                  this.errorMessage = 'Falsche Klassenangabe';
-                  break;
-              case 412:
-                  this.errorMessage = 'Klassenstufe unbekannt';
-                  break;
-              case 417:
-                  this.errorMessage = 'Klassenangabe fehlt';
                   break;
           }
           M.toast({html: this.errorMessage});
