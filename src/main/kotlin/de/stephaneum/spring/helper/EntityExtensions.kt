@@ -18,9 +18,9 @@ inline fun <reified T> Int?.obj(): T {
 }
 
 fun User.toMiniUser(): MiniUser {
-    return MiniUser(id, firstName, lastName, schoolClass?.let { schoolClass -> schoolClass.grade.toString() + schoolClass.suffix }, gender, code.role, isOidc)
+    return MiniUser(id, firstName, lastName, schoolClass?.let { schoolClass -> schoolClass.grade.toString() + schoolClass.suffix }, gender, code.role, openId)
 }
 
 fun User.toSimpleUser(): SimpleUser {
-    return SimpleUser(id, firstName, lastName, email, schoolClass?.let { schoolClass -> schoolClass.grade.toString() + schoolClass.suffix }, gender, storage, code.role, banned, isOidc)
+    return SimpleUser(id, firstName, lastName, email, schoolClass?.let { schoolClass -> schoolClass.grade.toString() + schoolClass.suffix }, gender, storage, code.role, banned, openId)
 }

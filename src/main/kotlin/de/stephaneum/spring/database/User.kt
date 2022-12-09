@@ -16,77 +16,79 @@ const val SEX_UNKNOWN = 2
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class User(@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-                var id: Int = 0,
+data class User(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Int = 0,
 
-                @ManyToOne(optional = false) @OnDelete(action = OnDeleteAction.CASCADE)
-                var code: Code = Code(),
+    @ManyToOne(optional = false) @OnDelete(action = OnDeleteAction.CASCADE)
+    var code: Code = Code(),
 
-                @Column(nullable = false, length = 100)
-                var firstName: String = "",
+    @Column(nullable = false, length = 100)
+    var firstName: String = "",
 
-                @Column(nullable = false, length = 100)
-                var lastName: String = "",
+    @Column(nullable = false, length = 100)
+    var lastName: String = "",
 
-                @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.NO_ACTION)
-                var schoolClass: SchoolClass? = null,
+    @ManyToOne(optional = true) @OnDelete(action = OnDeleteAction.NO_ACTION)
+    var schoolClass: SchoolClass? = null,
 
-                @Column(nullable = false, length = 4)
-                var gender: Int = SEX_UNKNOWN,
+    @Column(nullable = false, length = 4)
+    var gender: Int = SEX_UNKNOWN,
 
-                @Column(nullable = false, length = 100)
-                var email: String = "",
+    @Column(nullable = false, length = 100)
+    var email: String = "",
 
-                @Column(nullable = false, length = 255)
-                var password: String = "",
+    @Column(nullable = false, length = 255)
+    var password: String = "",
 
-                @Column(nullable = true, length = 32)
-                var passwordForgotCode: String? = null,
+    @Column(nullable = true, length = 32)
+    var passwordForgotCode: String? = null,
 
-                @Column(nullable = false)
-                var storage: Int = 0,
+    @Column(nullable = false)
+    var storage: Int = 0,
 
-                @Column(nullable = false)
-                var banned: Boolean = false,
+    @Column(nullable = false)
+    var banned: Boolean = false,
 
-                @Column(nullable = true)
-                var managePosts: Boolean = false,
+    @Column(nullable = true)
+    var managePosts: Boolean = false,
 
-                // TODO: rename this
-                @Column(nullable = true, name = "create_groups")
-                var createProjects: Boolean = false,
+    // TODO: rename this
+    @Column(nullable = true, name = "create_groups")
+    var createProjects: Boolean = false,
 
-                @Column(nullable = true)
-                var managePlans: Boolean = false,
+    @Column(nullable = true)
+    var managePlans: Boolean = false,
 
-                // used for teacher chat in the past, now it is a generic "last online" stamp
-                // TODO: implement this
-                @Column(nullable = true, name = "last_online")
-                var lastOnline: Timestamp? = null,
+    // used for teacher chat in the past, now it is a generic "last online" stamp
+    // TODO: implement this
+    @Column(nullable = true, name = "last_online")
+    var lastOnline: Timestamp? = null,
 
-                // new columns for o365 users
-                @Column(nullable = false)
-                var isOidc: Boolean = false,
+    // new columns for o365 users
+    @Column(nullable = false)
+    var openId: Boolean = false,
 
-                @Column(nullable = true)
-                var sub: String = "")
+    @Column(nullable = true)
+    var openIdSubject: String? = null,
+)
 
 data class SimpleUser(val id: Int, val firstName: String, val lastName: String, val email: String, val schoolClass: String?, val gender: Int, val storage: Int, val role: Int, val banned: Boolean, val isOidc: Boolean)
 data class MiniUser(val id: Int, val firstName: String, val lastName: String, val schoolClass: String?, val gender: Int?, val role: Int, val isOidc: Boolean)
 
 @Repository
-interface UserRepo: CrudRepository<User, Int> {
+interface UserRepo : CrudRepository<User, Int> {
 
     fun findByIdIn(id: List<Int>): List<User>
     fun findByEmail(email: String): User?
     fun findByCodeRole(role: Int): List<User>
     fun findBySchoolClassGrade(grade: Int): List<User>
 
-    fun findBySub(sub: String): User?
+    fun findByOpenIdSubject(sub: String): User?
 
     fun existsByEmail(email: String): Boolean
 
-    fun existsBySub(sub: String): Boolean
+    fun existsByOpenIdSubject(sub: String): Boolean
 
     fun countByCodeRoleAndCodeUsed(role: Int, used: Boolean): Int
 

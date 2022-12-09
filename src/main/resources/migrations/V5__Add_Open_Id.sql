@@ -1,0 +1,3 @@
+ALTER TABLE `user`
+    ADD COLUMN `open_id` BIT NOT NULL DEFAULT FALSE,
+    ADD COLUMN `open_id_subject` VARCHAR(100);

@@ -12,17 +12,15 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 
 @Service
-public class CustomOidcUserService (
+class CustomOidcUserService (
     private val userRepo: UserRepo,
     private val codeRepo: CodeRepo,
     private val codeService: CodeService,
 ) : OidcUserService() {
 
-
     @Override
-    public override fun loadUser(userRequest: OidcUserRequest): OidcUser {
-
-        var oidcUser = super.loadUser(userRequest);
+    override fun loadUser(userRequest: OidcUserRequest): OidcUser {
+        val oidcUser = super.loadUser(userRequest);
 
         processOidcUser(userRequest, oidcUser);
 
@@ -32,29 +30,25 @@ public class CustomOidcUserService (
     private fun processOidcUser(userRequest: OidcUserRequest, oidcUser: OidcUser) {
 
         // create user in database
-        if (!userRepo.existsBySub(oidcUser.subject)) {
+        if (!userRepo.existsByOpenIdSubject(oidcUser.subject)) {
 
             // generare new code
             //TODO: get right role!
-            var code = codeRepo.save(
+            val code = codeRepo.save(
                 codeService.generateCode(ROLE_STUDENT))
-
-
 
             val user = userRepo.save(User(
                 code = code,
                 firstName = oidcUser.givenName,
                 lastName = oidcUser.familyName,
                 email = oidcUser.email,
-                sub = oidcUser.subject,
-                isOidc = true,
+                openIdSubject = oidcUser.subject,
+                openId = true,
             ))
             Session.get().user = user
         } else {
-            var user = userRepo.findBySub(oidcUser.subject)
+            val user = userRepo.findByOpenIdSubject(oidcUser.subject)
             Session.get().user = user
         }
-
     }
-
 }

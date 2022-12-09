@@ -29,8 +29,6 @@ CREATE TABLE `user` (
     `create_groups` BIT NOT NULL,
     `manage_plans` BIT NOT NULL,
     `last_online` datetime,
-    `is_oidc` BIT NOT NULL,
-    `sub` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT fk_user_code FOREIGN KEY (`code_id`) REFERENCES `code` (`id`) ON DELETE CASCADE,
     CONSTRAINT fk_user_class FOREIGN KEY (`school_class_id`) REFERENCES `school_class` (`id`) ON UPDATE CASCADE
