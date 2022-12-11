@@ -1,15 +1,16 @@
 package de.stephaneum.spring.helper
 
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.FileSystemResource
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.datasource.init.ScriptUtils
 import org.springframework.stereotype.Service
+import javax.sql.DataSource
 
 @Service
-class DBHelper {
-
-    @Autowired
-    private lateinit var jdbcTemplate: JdbcTemplate
-
+class DBHelper(
+    private val jdbcTemplate: JdbcTemplate,
+    private val dataSource: DataSource,
+) {
     private var dbLocation: String? = null
 
     /**
@@ -21,21 +22,17 @@ class DBHelper {
     }
 
     /**
-     * @param user the db user
-     * @param password the password of db user
+     * @param filePath path to sql script
      * @return exist status
      */
-    fun sql(user: String, password: String, query: String): Int {
-        if(windows) {
-            if(dbLocation == null)
-                getDatabaseLocation()
-
-            dbLocation?.let { location ->
-                return cmd(""""${location}bin\mysqldump.exe" -u"$user" -p"$password" -e "$query"""")
-            }
-            return -1
-        } else {
-            return cmd("""mysqldump -u"$user" -p"$password" -e "$query"""")
+    fun executeSqlScript(filePath: String): String? {
+        return try {
+            jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS=0;")
+            ScriptUtils.executeSqlScript(dataSource.connection, FileSystemResource(filePath))
+            jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS=1;")
+            null
+        } catch (e: Exception) {
+            e.message
         }
     }
 

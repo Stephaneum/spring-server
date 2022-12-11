@@ -249,7 +249,7 @@ class BackupService {
         // load db
         BackupLogger.addLine("[5/7] Datenbank wird geladen und ggf. aktualisiert.")
         val dumpPath = "$tempPath/datenbank.sql".normalize()
-        val result = dumpService.loadFromFile(dbUser, dbPassword, db, dumpPath)
+        val result = dbHelper.executeSqlScript(dumpPath)
         if(result != null)
             return result
         else
@@ -427,9 +427,10 @@ class BackupService {
         // load db
         BackupLogger.addLine("[8/9] Datenbank wird geladen.")
         val dumpPath = "$tempPath/moodle.sql"
-        val result = dumpService.loadFromFile(dbUser, dbPassword, "moodle", dumpPath)
-        if(result != null)
-            return result
+        return "Noch nicht unterstützt"
+//        val result = dumpService.loadFromFile(dbUser, dbPassword, "moodle", dumpPath)
+//        if(result != null)
+//            return result
 
         Thread.sleep(1000)
 
@@ -455,10 +456,10 @@ class BackupService {
     fun arRestore(sqlFile: String): String? {
         BackupLogger.addLine("[1/1] Datenbank wird geladen.")
         val dump = sqlFile.normalize()
-
-        val result = dumpService.loadFromFile(dbUser, dbPassword, "ar", dump)
-        if(result != null)
-            return result
+        return "Noch nicht unterstützt"
+//        val result = dbHelper.executeSqlScript(dbUser, dbPassword, "ar", dump)
+//        if(result != null)
+//            return result
 
         Thread.sleep(2000)
         return null
