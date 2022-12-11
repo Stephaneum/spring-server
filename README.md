@@ -3,8 +3,8 @@
 ## Voraussetzungen
 
 - Java 8+
-- MySQL
-- Node (wird zum Kompilieren der Vue-App benötigt)
+- MySQL 5
+- Node 12 bis 16 (wird zum Kompilieren der Vue-App benötigt)
 - IntelliJ (alternativ über Konsole kompilieren)
 
 ## Projekt starten
@@ -28,18 +28,9 @@
 
 ## Migration von JSF nach Spring
 
-Die Migration fand zwischen 25.05.2019 - 17.05.2020 statt und ist nun abgeschlossen.
+Die Migration fand zwischen 25.05.2019 - 17.05.2020 statt.
+
 Das JSF-Projekt wird nicht mehr verwendet.
-- Blackboard (Mai 2019) (hier wurde das Spring-Projekt initialisiert)
-- Backup System (August 2019)
-- Beitrag-Manager (Oktober 2019)
-- Cloud (Februar 2020)
-- Gruppen (März 2020)
-- restliche Seiten (Mai 2020)
-
-Der Server kann nun ohne Tomcat gestartet werden und die Entwicklung neuer Funktionen ist wesentlicher einfacher und schneller.
-
-Die Code-Basis konnte von 35.000 Zeilen (25.000 Java + 10.000 XHTML) auf 17.000 Zeilen (8.000 Kotlin + 9.000 Vue) reduziert werden (Stand Mai 2020), obwohl das Spring-Projekt mehr Funktionen (z.B. Blackboard und Backup) enthält.
 
 ## Routen (GET)
 
