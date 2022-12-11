@@ -73,8 +73,8 @@ data class User(
     var openIdSubject: String? = null,
 )
 
-data class SimpleUser(val id: Int, val firstName: String, val lastName: String, val email: String, val schoolClass: String?, val gender: Int, val storage: Int, val role: Int, val banned: Boolean, val isOidc: Boolean)
-data class MiniUser(val id: Int, val firstName: String, val lastName: String, val schoolClass: String?, val gender: Int?, val role: Int, val isOidc: Boolean)
+data class SimpleUser(val id: Int, val firstName: String, val lastName: String, val email: String, val schoolClass: String?, val gender: Int, val storage: Int, val role: Int, val banned: Boolean, val openId: Boolean)
+data class MiniUser(val id: Int, val firstName: String, val lastName: String, val schoolClass: String?, val gender: Int?, val role: Int, val openId: Boolean)
 
 @Repository
 interface UserRepo : CrudRepository<User, Int> {

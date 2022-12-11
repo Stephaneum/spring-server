@@ -24,12 +24,12 @@
             <div style="grid-area: 6 / 1 / 6 / 1;" class="account-key">Speicherplatz:</div>
             <div style="grid-area: 6 / 2 / 6 / 2;">{{ additionalInfo.storage }}</div>
             <div style="grid-area: 7 / 1 / 7 / 1;" class="account-key">Typ:</div>
-            <div style="grid-area: 7 / 2 / 7 / 2;">{{ info.user.isOidc ? 'OpenID Connect' : 'Manuell' }}</div>
+            <div style="grid-area: 7 / 2 / 7 / 2;">{{ info.user.openId ? 'OpenID Connect' : 'Manuell' }}</div>
           </div>
         </div>
       </div>
 
-      <div class="col s4" style="padding: 20px" v-if="!info.user.isOidc">
+      <div class="col s4" style="padding: 20px" v-if="!info.user.openId">
         <div class="card-panel">
           <div class="account-section-header">
             <i class="material-icons">email</i>
@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <div class="col s4" style="padding: 20px" v-if="!info.user.isOidc">
+      <div class="col s4" style="padding: 20px" v-if="!info.user.openId">
         <div class="card-panel">
           <div class="account-section-header">
             <i class="material-icons">vpn_key</i>

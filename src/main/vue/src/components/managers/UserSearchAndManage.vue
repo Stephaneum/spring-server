@@ -50,7 +50,7 @@
           <td>{{ u.schoolClass }}</td>
           <td>{{ u.storageReadable }}</td>
           <td>{{ roleString(u.role) }}</td>
-          <td>{{ u.isOidc ? 'OpenID Connect' : 'Manuell' }}</td>
+          <td>{{ u.openId ? 'OpenID Connect' : 'Manuell' }}</td>
           <td>
             <a @click="showUpdateUser(u)" class="btn waves-effect waves-light green darken-4">
               <i class="material-icons">edit</i>
