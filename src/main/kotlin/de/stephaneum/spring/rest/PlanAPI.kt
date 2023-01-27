@@ -16,6 +16,8 @@ import java.util.*
 
 data class LastModified(val lastModified: String)
 
+data class PlanPassword(val password: String?)
+
 @RestController
 @RequestMapping("/api/plan")
 class PlanAPI (
@@ -45,6 +47,24 @@ class PlanAPI (
             throw ErrorCode(403, "not allowed")
 
         configScheduler.save(Element.planInfo, text)
+    }
+
+    @GetMapping("/password")
+    fun getPassword(@RequestParam(required = false) password: String?): PlanPassword {
+        val me = Session.getUser()
+        if(me.code.role != ROLE_ADMIN && !me.managePlans)
+            throw ErrorCode(403, "not allowed")
+
+        return PlanPassword(configScheduler.get(Element.planPassword))
+    }
+
+    @PostMapping("/password")
+    fun updatePassword(@RequestParam(required = false) password: String?) {
+        val me = Session.getUser()
+        if(me.code.role != ROLE_ADMIN && !me.managePlans)
+            throw ErrorCode(403, "not allowed")
+
+        configScheduler.save(Element.planPassword, if (password.isNullOrBlank()) null else password.trim())
     }
 
     @PostMapping("/upload")

@@ -30,10 +30,25 @@
             <h5>Zusatzinformation</h5>
             <div style="display: flex; align-items: center;">
               <div class="input-field" style="width: 200px; margin-bottom: 0">
-                <input v-model="planInfo" type="text" id="plan-info" />
+                <input v-model="planInfo" type="text" />
               </div>
               <a v-show="planInfo !== info.plan.info" style="margin-left: 20px" class="waves-effect waves-light tooltipped green darken-3 btn"
                  @click="updateText" data-tooltip="Speichern" data-position="bottom">
+                <i class="material-icons">save</i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="round-area" style="margin-top: 30px">
+          <i class="material-icons">vpn_key</i>
+          <div>
+            <h5>Passwort</h5>
+            <div style="display: flex; align-items: center;">
+              <div class="input-field" style="width: 200px; margin-bottom: 0">
+                <input v-model="planPassword" type="text" />
+              </div>
+              <a v-show="planPassword !== originalPlanPassword" style="margin-left: 20px" class="waves-effect waves-light tooltipped green darken-3 btn"
+                 @click="updatePassword" data-tooltip="Speichern" data-position="bottom">
                 <i class="material-icons">save</i>
               </a>
             </div>
@@ -96,6 +111,8 @@
     props: ['info'],
     data: () => ({
       planInfo: null,
+      planPassword: null,
+      originalPlanPassword: null,
       lastModified: null
     }),
     methods: {
@@ -151,10 +168,27 @@
           hideLoading();
         }
       },
+      updatePassword: async function() {
+        showLoadingInvisible();
+        try {
+          await Axios.post('/api/plan/password?password='+this.planPassword);
+          M.toast({ html: 'Passwort aktualisiert.' });
+          await this.fetchData();
+        } catch (e) {
+          M.toast({ html: 'Ein Fehler ist aufgetreten.' });
+        } finally {
+          hideLoading();
+        }
+      },
       fetchData: async function() {
         try {
           const lastModified = await Axios.get('/api/plan/last-modified');
           this.lastModified = lastModified.data.lastModified;
+
+          const password = await Axios.get('/api/plan/password');
+          this.planPassword = password.data.password;
+          this.originalPlanPassword = this.planPassword;
+
           hideLoading();
           this.$nextTick(() => M.Tooltip.init(document.querySelectorAll('.tooltipped'), {}));
         } catch (e) {

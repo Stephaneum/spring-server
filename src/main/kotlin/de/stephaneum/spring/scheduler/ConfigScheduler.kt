@@ -20,6 +20,7 @@ enum class Element(val code: String, val info: String, val defaultValue: String?
     backupLocation("backup_dir", "Backup-Ort", null),
     planLocation("str_vertretung", "Vertretungsplan", null),
     planInfo("str_vertretung_info", "Vertretungsplan-Info", null),
+    planPassword("str_vertretung_password", "Vertretungsplan-Passwort", null),
     maxPictureSize("picture_size", "Max. Bildgröße in Beiträgen", "256000"),
     defaultMenu("default_gruppe_id", "Menüeintrag für die Startseite", null),
     storageTeacher("storage_lehrer", "Speicherplatz Lehrer", "209715200"),
