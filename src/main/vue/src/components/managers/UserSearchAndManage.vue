@@ -34,7 +34,6 @@
           <th style="padding-left: 20px">Vorname</th>
           <th>Nachname</th>
           <th>E-Mail</th>
-          <th>Klasse</th>
           <th>Speicher</th>
           <th>Rolle</th>
           <th>Typ</th>
@@ -47,7 +46,6 @@
           <td style="padding-left: 20px">{{ u.firstName }}</td>
           <td>{{ u.lastName }}</td>
           <td>{{ u.email }}</td>
-          <td>{{ u.schoolClass }}</td>
           <td>{{ u.storageReadable }}</td>
           <td>{{ roleString(u.role) }}</td>
           <td>{{ u.openId ? 'OpenID Connect' : 'Manuell' }}</td>
