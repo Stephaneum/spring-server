@@ -2,18 +2,6 @@
   <div>
     <div class="card" style="padding: 5px 20px 40px 20px">
       <h5 class="center-align" style="padding: 10px">Login</h5>
-      <div class="card-content">
-        <p>Man kann sich entweder über den Office365-Account oder über den manuell vergebenen Account an der Stephaneum-Cloud anmelden.</p>
-      </div>
-
-      <div style="text-align: center">
-        <a href="/oauth2/authorization/azure" class="btn waves-effect waves-light green darken-3" :class="{ disabled: loggingIn }">
-          Login mit Office 365
-        </a>
-        <div style="margin-top: 20px">
-          oder
-        </div>
-      </div>
 
       <div>
         <div class="input-field">
