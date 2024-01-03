@@ -4,7 +4,7 @@
             <li v-for="u in results" :key="u.id" class="collection-item">
                 <div style="display: flex; align-items: center;">
                     <span style="flex-grow: 1; white-space: nowrap; overflow-x: hidden; text-overflow: ellipsis;">
-                        {{ u.firstName }} {{ u.lastName }} {{ u.schoolClass? '('+u.schoolClass+')' : '' }}
+                        {{ u.firstName }} {{ u.lastName }}
                     </span>
                     <span style="flex: 0 0 200px; text-align: right">
                         <a v-if="u.excluded" class="btn-flat">

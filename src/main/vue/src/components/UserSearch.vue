@@ -9,10 +9,6 @@
                 <label for="user-search-lastName">Nachname</label>
                 <input @keyup.enter="search" v-model="lastName" type="text" id="user-search-lastName"/>
             </div>
-            <div class="input-field col s4">
-              <label for="user-search-class">Klasse</label>
-              <input @keyup.enter="search" v-model="className" type="text" id="user-search-class"/>
-            </div>
         </div>
         <div style="flex: 0 0 150px; display: flex; align-items: center; justify-content: center">
             <a @click="search" class="waves-effect waves-light btn green darken-3">
