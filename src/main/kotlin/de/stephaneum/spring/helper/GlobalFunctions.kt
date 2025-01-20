@@ -17,7 +17,19 @@ fun cmd(command: String, workingDir: String = if(windows) "C:/" else "/", sudoPa
     if(sudoPassword != null) {
         commandEdited = "echo $sudoPassword | sudo -S $command"
     }
-    return ProcessBuilder(if(windows) "cmd.exe" else "/bin/sh", if(windows) "/c" else "-c", commandEdited)
+
+    val shell = when {
+        windows -> "cmd.exe"
+        else -> {
+            val shell = System.getenv("SHELL") ?: run {
+                val candidates = listOf("/bin/bash", "/bin/sh", "/usr/bin/bash", "/usr/bin/sh")
+                candidates.firstOrNull { File(it).exists() } ?: "/bin/sh"
+            }
+            shell
+        }
+    }
+
+    return ProcessBuilder(shell, if(windows) "/c" else "-c", commandEdited)
             .directory(File(workingDir))
             .redirectOutput(ProcessBuilder.Redirect.INHERIT)
             .redirectError(ProcessBuilder.Redirect.INHERIT)
