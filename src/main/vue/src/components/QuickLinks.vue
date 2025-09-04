@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="display: none">
         <a href="/vertretungsplan.pdf" target="_blank">
             <div class="quick-button card">
                 <div class="card-content white-text">
