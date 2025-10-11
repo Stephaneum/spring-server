@@ -18,28 +18,28 @@
         <div class="row">
             <div class="col l2 hide-on-med-and-down">
                 <br/><br/>
-                <div>
-                    <span v-if="plan && plan.exists">
-                        <a href="/vertretungsplan.pdf" target="_blank">
-                            <div class="quick-button card" style="padding:20px 5px 20px 10px">
-                                <div class="white-text">
-                                    <h6 style="margin:0"><i class="material-icons left" style="font-size:15pt">description</i>Vertretungsplan</h6>
-                                </div>
-                            </div>
-                        </a>
-                    </span>
+<!--                <div>-->
+<!--                    <span v-if="plan && plan.exists">-->
+<!--                        <a href="/vertretungsplan.pdf" target="_blank">-->
+<!--                            <div class="quick-button card" style="padding:20px 5px 20px 10px">-->
+<!--                                <div class="white-text">-->
+<!--                                    <h6 style="margin:0"><i class="material-icons left" style="font-size:15pt">description</i>Vertretungsplan</h6>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </a>-->
+<!--                    </span>-->
 
-                    <router-link to="/termine" v-slot="{ href, navigate }">
-                        <a @click="navigate" :href="href">
-                            <div class="quick-button card" style="padding:20px 5px 20px 10px;margin-top:30px">
-                                <div class="white-text">
-                                    <h6 style="margin:0"><i class="material-icons left" style="font-size:15pt">date_range</i>Termine</h6>
-                                </div>
-                            </div>
-                        </a>
-                    </router-link>
+<!--                    <router-link to="/termine" v-slot="{ href, navigate }">-->
+<!--                        <a @click="navigate" :href="href">-->
+<!--                            <div class="quick-button card" style="padding:20px 5px 20px 10px;margin-top:30px">-->
+<!--                                <div class="white-text">-->
+<!--                                    <h6 style="margin:0"><i class="material-icons left" style="font-size:15pt">date_range</i>Termine</h6>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </a>-->
+<!--                    </router-link>-->
 
-                </div>
+<!--                </div>-->
             </div>
 
             <div class="col" :class="hideLogos ? ['s12', 'm12', 'l10'] : ['s12', 'm8']">
