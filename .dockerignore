@@ -1,0 +1,22 @@
+# Build outputs
+/build/
+/out/
+.gradle/
+
+# Vue: rebuilt inside the image, don't ship local artifacts/deps
+/src/main/vue/node_modules/
+/src/main/vue/dist/
+
+# IDE / OS cruft
+.idea/
+.vscode/
+*.iml
+**/.DS_Store
+
+# VCS
+.git/
+.gitignore
+
+# Docker files themselves
+Dockerfile
+docker-compose*.yml
