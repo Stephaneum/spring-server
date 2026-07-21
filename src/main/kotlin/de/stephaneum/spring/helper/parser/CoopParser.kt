@@ -10,6 +10,7 @@ data class Coop(val country: String, val tooltip: String?, val link: String?)
 class CoopParser {
 
     fun parse(raw: String): List<Coop> {
+        if (raw.isBlank()) return emptyList()
         return raw.split(";").map { coopRaw ->
             val link = when(val index = coopRaw.indexOf('[')) {
                 -1 -> null
