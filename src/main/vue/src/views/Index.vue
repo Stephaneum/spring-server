@@ -33,44 +33,44 @@
       </div>
     </div>
 
-    <div class="card-panel" style="margin-top: 70px">
-      <div class="row">
-        <div class="col s12 m9 center-align">
-          <h5>Stephaneum in Zahlen...</h5>
-          <br/>
-        </div>
-        <div class="col s3"><br/></div>
-      </div>
+<!--    <div class="card-panel" style="margin-top: 70px">-->
+<!--      <div class="row">-->
+<!--        <div class="col s12 m9 center-align">-->
+<!--          <h5>Stephaneum in Zahlen...</h5>-->
+<!--          <br/>-->
+<!--        </div>-->
+<!--        <div class="col s3"><br/></div>-->
+<!--      </div>-->
 
-      <div class="row" v-observe-visibility="{ callback: startNumberAnimation, once: true}">
-        <div class="col s4 m3 center-align">
-          <i style="font-size: 4rem" class="material-icons" aria-hidden="true">people</i><br/>
-          <Counter ref="counterStudent" :number="studentCount" style="font-size: 3rem"></Counter>
-          <p>Schüler/innen*</p>
-        </div>
+<!--      <div class="row" v-observe-visibility="{ callback: startNumberAnimation, once: true}">-->
+<!--        <div class="col s4 m3 center-align">-->
+<!--          <i style="font-size: 4rem" class="material-icons" aria-hidden="true">people</i><br/>-->
+<!--          <Counter ref="counterStudent" :number="studentCount" style="font-size: 3rem"></Counter>-->
+<!--          <p>Schüler/innen*</p>-->
+<!--        </div>-->
 
-        <div class="col s4 m3 center-align">
-          <i style="font-size: 4rem" class="material-icons" aria-hidden="true">people</i><br/>
-          <Counter ref="counterTeacher" :number="teacherCount" style="font-size: 3rem"></Counter>
-          <p>Lehrer/innen*</p>
-        </div>
+<!--        <div class="col s4 m3 center-align">-->
+<!--          <i style="font-size: 4rem" class="material-icons" aria-hidden="true">people</i><br/>-->
+<!--          <Counter ref="counterTeacher" :number="teacherCount" style="font-size: 3rem"></Counter>-->
+<!--          <p>Lehrer/innen*</p>-->
+<!--        </div>-->
 
-        <div class="col s4 m3 center-align">
-          <i style="font-size: 4rem" class="material-icons" aria-hidden="true">schedule</i><br/>
-          <Counter ref="counterYears" :number="years" style="font-size: 3rem"></Counter>
-          <p>Jahre seit Gründung</p>
-        </div>
+<!--        <div class="col s4 m3 center-align">-->
+<!--          <i style="font-size: 4rem" class="material-icons" aria-hidden="true">schedule</i><br/>-->
+<!--          <Counter ref="counterYears" :number="years" style="font-size: 3rem"></Counter>-->
+<!--          <p>Jahre seit Gründung</p>-->
+<!--        </div>-->
 
-        <div class="col s12 m3 center-align">
-          <br/>
-          <router-link to="/statistiken" v-slot="{ href, navigate }">
-            <a @click="navigate" :href="href" class="waves-effect waves-light btn green darken-4">
-              <i class="material-icons right">arrow_forward</i>mehr Statistiken
-            </a>
-          </router-link>
-        </div>
-      </div>
-    </div>
+<!--        <div class="col s12 m3 center-align">-->
+<!--          <br/>-->
+<!--          <router-link to="/statistiken" v-slot="{ href, navigate }">-->
+<!--            <a @click="navigate" :href="href" class="waves-effect waves-light btn green darken-4">-->
+<!--              <i class="material-icons right">arrow_forward</i>mehr Statistiken-->
+<!--            </a>-->
+<!--          </router-link>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
     <br/><br/>
 
@@ -92,10 +92,6 @@
         <i class="material-icons right">arrow_forward</i>Kooperationspartner
       </a>
     </div>
-    <div class="center-align">
-      <br/><br/><br/><br/><br/>
-      <p style="color: grey">*momentan im System registriert</p>
-    </div>
 
   </div>
 </template>
@@ -110,11 +106,10 @@
   import PostListHome from "../components/cms/PostListHome";
   import Slider from "../components/Slider";
   import LiveTicker from "../components/LiveTicker";
-  import Counter from "../components/Counter";
 
 export default {
   name: 'Index',
-  components: {Counter, LiveTicker, Slider, PostListHome, Locations, Logos, QuickLinks},
+  components: {LiveTicker, Slider, PostListHome, Locations, Logos, QuickLinks},
   props: ['info'],
   directives: {
       ObserveVisibility
