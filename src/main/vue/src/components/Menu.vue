@@ -6,8 +6,9 @@
                     <i class="material-icons" style="color: #1b5e20">menu</i>
                 </a>
                 <router-link v-if="!editRootLevel" :to="home" v-slot="{ href, navigate }">
-                    <a @click="navigate" :href="href" class="brand-logo" :style="unreal ? { 'opacity': 0.05 } : {}">
-                        <img src="../assets/img/logo-banner-green.png" style="height:50px;margin-top:5px;margin-left:10px"/>
+                    <a @click="navigate" :href="href" class="brand-logo" style="display:flex;align-items:center" :style="unreal ? { 'opacity': 0.05 } : {}">
+                        <img src="../assets/img/logo-beg.webp" style="height:50px;margin-top:5px;margin-left:10px"/>
+                        <span style="margin-left:10px;color:#1b5e20;font-size:1.5rem">Begabungenleben.de</span>
                     </a>
                 </router-link>
                 <ul class="right hide-on-med-and-down">
