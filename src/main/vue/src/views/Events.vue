@@ -112,11 +112,11 @@
   }
 
   :root {
-    --fc-button-bg-color: #1b5e20;
-    --fc-button-active-bg-color: #388e3c;
-    --fc-button-border-color: #1b5e20;
+    --fc-button-bg-color: #163B63;
+    --fc-button-active-bg-color: #256E96;
+    --fc-button-border-color: #163B63;
     --fc-button-text-color: #fff;
-    --fc-button-hover-bg-color: #388e3c;
-    --fc-button-hover-border-color: #388e3c;
+    --fc-button-hover-bg-color: #256E96;
+    --fc-button-hover-border-color: #256E96;
   }
 </style>

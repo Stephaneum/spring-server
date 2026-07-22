@@ -33,7 +33,7 @@
       cloud: { id: 3, name: 'Cloud', icon: 'cloud' }
     };
 
-    const stdColor = '#85b56e'
+    const stdColor = '#7FC5DF'
 
     const stdOptions = {
         responsive: true,
@@ -131,7 +131,7 @@ export default {
                         labels: this.statsOS.map((s) => s.os),
                         datasets: [{
                             data: this.statsOS.map((s) => s.count),
-                            backgroundColor: ['#ff9800', '#2196f3', '#0d47a1', '#607d8b', '#263238', '#cfd8dc', '#4caf50', '#673ab7']
+                            backgroundColor: ['#ff9800', '#2196f3', '#0d47a1', '#607d8b', '#263238', '#cfd8dc', '#2FA8CC', '#673ab7']
                         }]
                     };
                     break;

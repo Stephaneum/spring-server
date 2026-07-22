@@ -95,10 +95,10 @@ export default {
 
 <style scoped>
     .quick-button {
-        background-color: #1b5e20;
+        background-color: #163B63;
     }
 
     .quick-button:hover {
-        background-color: #388e3c;
+        background-color: #256E96;
     }
 </style>

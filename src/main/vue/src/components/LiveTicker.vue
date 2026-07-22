@@ -1,5 +1,5 @@
 <template>
-    <div class="card" style="background-color: #dcedc8">
+    <div class="card" style="background-color: #D3ECF5">
         <div class="card-content">
             <div style="display: table; width: 100%; table-layout: fixed;">
                 <div style="display: table-cell; width: 80px; vertical-align: top" class="hide-on-small-only">

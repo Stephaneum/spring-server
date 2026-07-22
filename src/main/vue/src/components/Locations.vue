@@ -73,11 +73,11 @@ export default {
     }
 
     .location.location-active {
-        background-color: #a5d6a7;
+        background-color: #A9D9EA;
         cursor: pointer;
     }
 
     .location:hover {
-        background-color: #81c784;
+        background-color: #7FC5DF;
     }
 </style>

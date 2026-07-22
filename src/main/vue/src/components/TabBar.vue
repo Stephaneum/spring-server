@@ -28,32 +28,32 @@ export default {
         padding: 5px 15px 5px 10px;
         margin: 0 5px 0 5px;
         border-radius: 10px 10px 0 0;
-        background-color: #558b2f;
+        background-color: #1E4D7B;
         height: 40px;
         color: white;
         font-size: 1.2em;
     }
 
     .tab-btn:hover {
-        background-color: #689f38;
+        background-color: #2B93BE;
         cursor: pointer;
     }
 
     .tab-btn-active {
-        background-color: #43a047 !important;
+        background-color: #2B93BE !important;
         height: 45px !important;
     }
 
     .tab-btn-special {
-        background-color: #009688;
+        background-color: #2489AB;
     }
 
     .tab-btn-special:hover {
-        background-color: #26a69a;
+        background-color: #2FA8CC;
     }
 
     .tab-btn-special-active {
-        background-color: #00897b !important;
+        background-color: #2489AB !important;
         height: 45px !important;
     }
 </style>

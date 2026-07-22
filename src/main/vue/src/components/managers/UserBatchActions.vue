@@ -320,7 +320,7 @@ export default {
 
 <style scoped>
 .batch-btn {
-  background-color: #1b5e20;
+  background-color: #163B63;
   color: #ffffff;
   min-width: 210px;
   cursor: pointer;
@@ -332,7 +332,7 @@ export default {
 }
 
 .batch-btn:hover {
-  background-color: #388e3c !important;
+  background-color: #256E96 !important;
 }
 
 .batch-btn i {

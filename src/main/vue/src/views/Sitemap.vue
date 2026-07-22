@@ -43,6 +43,6 @@
   }
 
   .item:hover {
-    color: #4caf50 !important;
+    color: #2FA8CC !important;
   }
 </style>

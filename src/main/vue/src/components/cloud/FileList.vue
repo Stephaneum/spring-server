@@ -69,7 +69,7 @@ export default {
 
 <style scoped>
     .file-link:hover {
-        color: #2e7d32;
+        color: #1E4D7B;
         text-decoration: underline;
         cursor: pointer;
     }

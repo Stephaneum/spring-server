@@ -228,7 +228,7 @@
   .round-area {
     display: flex;
     align-items: center;
-    background-color: #e8f5e9;
+    background-color: #E8F4FA;
     border-radius: 20px;
     padding: 20px;
   }
@@ -249,10 +249,10 @@
   }
 
   .quick-button {
-    background: #1b5e20;
+    background: #163B63;
   }
 
   .quick-button:hover {
-    background: #2e7d32;
+    background: #1E4D7B;
   }
 </style>

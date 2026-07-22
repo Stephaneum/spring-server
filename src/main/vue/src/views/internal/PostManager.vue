@@ -99,7 +99,7 @@
             <h5>{{ specialObj.name }}</h5>
             <span v-html="specialObj.info"></span>
           </div>
-          <a class="waves-effect waves-light btn-large" style="font-size: 1.5em;background-color: #1b5e20;"
+          <a class="waves-effect waves-light btn-large" style="font-size: 1.5em;background-color: #163B63;"
              @click="sendSpecial">
             <i class="material-icons left">save</i>
             Speichern
@@ -128,7 +128,7 @@
       <!-- IMAGES -->
       <div v-show="currTab.id === tabs.images.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center;">
         <div style="width: 100%">
-          <div @drop="uploadImages" @dragover="imageDragEnter" @dragleave="imageDragExit" style="display: flex; align-items: center; background-color: #e8f5e9; border-radius: 20px; padding: 10px" :style="imageDragging ? {'border': '5px dashed #4caf50' } : {}">
+          <div @drop="uploadImages" @dragover="imageDragEnter" @dragleave="imageDragExit" style="display: flex; align-items: center; background-color: #E8F4FA; border-radius: 20px; padding: 10px" :style="imageDragging ? {'border': '5px dashed #2FA8CC' } : {}">
             <div v-show="!imageDragging" style="flex: 0 0 180px; padding-right: 10px; text-align: center">
               <p style="font-size: 3em; font-weight: bold; margin: 0">{{ currPost.imagesAdded.length }}</p>
               <h5 style="margin: 0;">
@@ -141,7 +141,7 @@
                    @click="deselectAllImages" :disabled="currPost.imagesAdded.length === 0" data-tooltip="Zurücksetzen" data-position="bottom">
                   <i class="material-icons">block</i>
                 </a>
-                <a class="waves-effect waves-light tooltipped btn" style="background-color: #1b5e20; margin-left: 10px"
+                <a class="waves-effect waves-light tooltipped btn" style="background-color: #163B63; margin-left: 10px"
                    @click="showUpload" data-tooltip="Hochladen" data-position="bottom">
                   <i class="material-icons">cloud_upload</i>
                 </a>
@@ -203,7 +203,7 @@
       <div v-show="currTab.id === tabs.assign.id " class="tab-panel white z-depth-1" style="display: flex; align-items: center; justify-content: center">
         <div style="width: 100%">
           <div style="text-align: center; font-size: 1.5em;">
-            <span :style="{ background: !currPost.menu ? '#ffcdd2' : '#e8f5e9' }" style="padding: 20px; border-radius: 20px">
+            <span :style="{ background: !currPost.menu ? '#ffcdd2' : '#E8F4FA' }" style="padding: 20px; border-radius: 20px">
                 Zuordnung:
                 <span v-html="menuAssigned" style="color: #808080; margin-left: 20px"></span>
             </span>
@@ -237,7 +237,7 @@
             </div>
           </div>
           <div style="flex: 0 0 350px;display: flex; align-items: center; justify-content: center">
-            <a class="waves-effect waves-light btn-large" style="font-size: 1.5em;background-color: #1b5e20;"
+            <a class="waves-effect waves-light btn-large" style="font-size: 1.5em;background-color: #163B63;"
                @click="sendPost" :disabled="this.currPost.error.error">
               <i class="material-icons left">check_circle</i>
               {{ finalButtonText }}
@@ -786,7 +786,7 @@
         else
           return {
             text: 'Alles in Ordnung.',
-            background: '#e8f5e9',
+            background: '#E8F4FA',
             icon: 'check'
           };
       }
@@ -834,17 +834,17 @@
     width: 100%;
     height: 120px;
     margin-bottom: 30px;
-    background-color: #1b5e20;
+    background-color: #163B63;
     color: white;
   }
 
   .mode-btn:hover {
-    background-color: #2e7d32;
+    background-color: #1E4D7B;
     cursor: pointer;
   }
 
   .mode-btn-active {
-    background-color: #43a047 !important;
+    background-color: #2B93BE !important;
   }
 
   .tab-panel {
@@ -867,7 +867,7 @@
     margin: 20px;
     padding: 10px;
     cursor: pointer;
-    background-color: #f1f8e9;
+    background-color: #EAF6FC;
   }
 
   .image-number {
@@ -877,7 +877,7 @@
     width: 25px;
     height: 25px;
 
-    background-color: #43a047;
+    background-color: #2B93BE;
     color: white;
     border-radius: 50%;
   }
@@ -895,7 +895,7 @@
     justify-content: center;
     width: 200px;
     margin: 20px;
-    background-color: #43a047;
+    background-color: #2B93BE;
     filter: grayscale(100%);
   }
 
@@ -924,7 +924,7 @@
 
   .special-container {
     text-align: center !important;
-    background-color: #e8f5e9;
+    background-color: #E8F4FA;
     padding: 30px 20px 20px 20px;
     border-radius: 20px
   }
@@ -941,10 +941,10 @@
     width: 240px;
     margin: 10px;
     font-size: 1em;
-    background-color: #2e7d32 !important;
+    background-color: #1E4D7B !important;
   }
 
   .special-btn-active {
-    background-color: #4caf50 !important;
+    background-color: #2FA8CC !important;
   }
 </style>

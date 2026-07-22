@@ -1,24 +1,24 @@
 <template id="nav-menu">
     <div style="width: 100%">
         <nav>
-            <div class="nav-wrapper" :style="{ 'z-index': unreal ? 'auto' : 100 }" style="background-color: white">
+            <div class="nav-wrapper" :style="{ 'z-index': unreal ? 'auto' : 100 }" style="background-color: #163B63">
                 <a href="#" data-target="sidenav" class="sidenav-trigger hide-on-large-only">
-                    <i class="material-icons" style="color: #1b5e20">menu</i>
+                    <i class="material-icons" style="color: #FFFFFF">menu</i>
                 </a>
                 <router-link v-if="!editRootLevel" :to="home" v-slot="{ href, navigate }">
                     <a @click="navigate" :href="href" class="brand-logo" style="display:flex;align-items:center" :style="unreal ? { 'opacity': 0.05 } : {}">
                         <img src="../assets/img/logo-beg.webp" style="height:50px;margin-top:5px;margin-left:10px"/>
-                        <span style="margin-left:10px;color:#1b5e20;font-size:1.5rem">Begabungenleben.de</span>
+                        <span style="margin-left:10px;color:#FFFFFF;font-size:1.5rem;font-weight:500">Begabungenleben.de</span>
                     </a>
                 </router-link>
                 <ul class="right hide-on-med-and-down">
                     <li v-for="m1 in menu" :key="m1.id">
                         <router-link v-if="!unreal && !m1.link" :to="menuUrl(m1)" v-slot="{ href, navigate }">
-                            <a @click="navigate" :href="href" style="color: #1b5e20">
+                            <a @click="navigate" :href="href" style="color: #FFFFFF">
                                 {{ m1.name }}
                             </a>
                         </router-link>
-                        <a v-else v-text="m1.name" @click="emit(m1)" :href="link(m1)" target="_blank" style="color: #1b5e20">{{ m1.name }}</a>
+                        <a v-else v-text="m1.name" @click="emit(m1)" :href="link(m1)" target="_blank" style="color: #FFFFFF">{{ m1.name }}</a>
                         <MenuItem :parent="m1" :edit-mode="editMode" :unreal="unreal" @select="emit" @group="emitNewGroup" @link="emitNewLink"></MenuItem>
                     </li>
                     <li v-if="!unreal && loggedIn">
@@ -87,7 +87,7 @@
                                 </router-link>
                             </li>
                         </ul>
-                        <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: -190px; display: none; overflow: hidden;text-align: center; width: 200px; height: 160px; background-color: #f1f8e9; color: #1b5e20; line-height: normal;" class="z-depth-1">
+                        <div id="internal-menu-account" style="position: absolute; z-index: 1; top: 70px; left: -190px; display: none; overflow: hidden;text-align: center; width: 200px; height: 160px; background-color: #EAF6FC; color: #163B63; line-height: normal;" class="z-depth-1">
                             <i style="font-size: 4em; margin-top: 10px" class="material-icons">person</i>
                             <p style="white-space: nowrap">{{ user != null && user.firstName }} {{ user != null && user.lastName }}</p>
                             <p style="white-space: nowrap">({{ role }})</p>
@@ -108,7 +108,7 @@
                         </li>
                     </template>
                     <li>
-                        <a class="waves-effect waves-dark btn" style="background-color: #1b5e20" :style="unreal ? {'opacity': 0.1 } : {}" @click="toggleAuth">
+                        <a class="waves-effect waves-light btn" style="background-color: #2FA8CC" :style="unreal ? {'opacity': 0.1 } : {}" @click="toggleAuth">
                             {{ loggedIn && !unreal ? 'Abmelden' : 'Login' }}
                             <i class="material-icons right">exit_to_app</i>
                         </a>
@@ -284,7 +284,7 @@ export default {
         padding-right: 10px;
         height: 35px;
         line-height: 35px;
-        color: #1b5e20;
+        color: #163B63;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -311,20 +311,20 @@ export default {
 
     /* internal */
     #internal-btn {
-        background-color: #558b2f;
+        background-color: #1E4D7B;
     }
 
     #internal-btn:hover {
-        background-color: #689f38;
+        background-color: #2B93BE;
     }
 
     #internal-menu > li > a {
-        background-color: #e8f5e9;
+        background-color: #E8F4FA;
         padding-right: 20px;
     }
 
     #internal-menu > li > a:hover {
-        background-color: #a5d6a7;
+        background-color: #A9D9EA;
     }
 
     #internal-menu > li > a > span > i {
@@ -337,19 +337,19 @@ export default {
 
     .internal-divider {
         height: 1px;
-        background-color: #4caf50;
+        background-color: #2FA8CC;
     }
 
     /* edit mode */
 
     .edit-btn {
-        background-color: #558b2f !important;
+        background-color: #1E4D7B !important;
         color: white !important;
         border: white solid 2px;
     }
 
     .edit-btn:hover {
-        background-color: #689f38 !important;
+        background-color: #2B93BE !important;
     }
 
     /* bugfix height */

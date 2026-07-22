@@ -2,7 +2,7 @@
     <div>
         <h5 style="margin-bottom: 20px">{{ name }}:</h5>
         <ul class="collection">
-            <li v-for="p in postsLimited" :key="p.id" class="collection-item" :style="p.id === selected ? { background: '#e8f5e9' } : null">
+            <li v-for="p in postsLimited" :key="p.id" class="collection-item" :style="p.id === selected ? { background: '#E8F4FA' } : null">
                 <div style="display: flex; align-items: center;">
                         <span style="flex-grow: 1; white-space: nowrap; overflow-x: hidden; text-overflow: ellipsis;">
                             <span style="font-weight: bold; margin-right: 10px"># {{ p.number }}</span>

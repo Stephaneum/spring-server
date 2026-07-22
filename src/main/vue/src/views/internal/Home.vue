@@ -106,7 +106,7 @@
 <style scoped>
   .group-rect {
     flex-basis: calc(25% - 30px);
-    background-color: #1b5e20;
+    background-color: #163B63;
     cursor: pointer;
     padding: 15px 5px 15px 5px;
     display: flex;
@@ -116,6 +116,6 @@
   }
 
   .group-rect:hover {
-    background-color: #388e3c !important;
+    background-color: #256E96 !important;
   }
 </style>

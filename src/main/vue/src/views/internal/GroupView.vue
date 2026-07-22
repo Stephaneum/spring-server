@@ -537,12 +537,12 @@
     width: 100%;
     height: 120px;
     margin-bottom: 30px;
-    background-color: #1b5e20;
+    background-color: #163B63;
     color: white;
   }
 
   .action-btn:hover {
-    background-color: #2e7d32;
+    background-color: #1E4D7B;
     cursor: pointer;
   }
 </style>

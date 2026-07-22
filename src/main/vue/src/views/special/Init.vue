@@ -3,7 +3,7 @@
     <div>
       <div style="display: flex; align-items: center; justify-content: center">
         <img src="../../assets/img/favicon.png" style="width: 60px"/>
-        <span style="margin-left: 30px; font-size: 3rem; color: #396e3a">Erste Einrichtung</span>
+        <span style="margin-left: 30px; font-size: 3rem; color: #1E4D7B">Erste Einrichtung</span>
       </div>
 
       <div style="margin-top: 100px; width: 80vw;">

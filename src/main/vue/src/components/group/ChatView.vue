@@ -220,7 +220,7 @@ export default {
         display: inline-block;
         margin: 20px 20px 0 20px;
         min-width: 150px;
-        background-color: #dcedc8;
+        background-color: #D3ECF5;
         border-radius: 0 20px 20px 20px;
         padding: 10px;
     }

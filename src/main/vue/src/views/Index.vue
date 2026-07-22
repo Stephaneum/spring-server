@@ -158,7 +158,7 @@ export default {
 <style scoped>
   .country {
     display: inline-block;
-    background: #2e7d32;
+    background: #1E4D7B;
     color: white;
     font-size: 16pt;
     padding: 10px;

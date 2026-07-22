@@ -153,7 +153,7 @@
   }
 
   .file-badge {
-    background-color: #c8e6c9;
+    background-color: #CDE9F4;
   }
 
   .post-badge {
