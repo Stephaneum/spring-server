@@ -45,6 +45,11 @@
                                     <a @click="navigate" :href="href"><span><i class="material-icons">history</i>Logdaten</span></a>
                                 </router-link>
                             </li>
+                            <li v-if="admin">
+                                <router-link to="/statistiken" v-slot="{ href, navigate }">
+                                    <a @click="navigate" :href="href"><span><i class="material-icons">insert_chart</i>Statistiken</span></a>
+                                </router-link>
+                            </li>
                             <li class="internal-divider"></li>
 
                             <!-- cms -->
