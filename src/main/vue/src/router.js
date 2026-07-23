@@ -108,73 +108,73 @@ const routes = [
   {
     path: "/config-manager",
     name: "config-manager",
-    meta: { title: 'Konfiguration - Stephaneum' },
+    meta: { title: 'Konfiguration - Begabungen leben' },
     component: () => import(/* webpackChunkName: "config-manager" */ "./views/internal/ConfigManager.vue"),
   },
   {
     path: "/code-manager",
     name: "code-manager",
-    meta: { title: 'Zugangscodes - Stephaneum' },
+    meta: { title: 'Zugangscodes - Begabungen leben' },
     component: CodeManager,
   },
   {
     path: "/user-manager",
     name: "user-manager",
-    meta: { title: 'Nutzerverwaltung - Stephaneum' },
+    meta: { title: 'Nutzerverwaltung - Begabungen leben' },
     component: () => import(/* webpackChunkName: "user-manager" */ "./views/internal/UserManager.vue"),
   },
   {
     path: "/logs",
     name: "logs",
-    meta: { title: 'Logdaten - Stephaneum' },
+    meta: { title: 'Logdaten - Begabungen leben' },
     component: Logs,
   },
   {
     path: "/menu-manager",
     name: "menu-manager",
-    meta: { title: 'Menüverwaltung - Stephaneum' },
+    meta: { title: 'Menüverwaltung - Begabungen leben' },
     component: () => import(/* webpackChunkName: "menu-manager" */ "./views/internal/MenuManager.vue"),
   },
   {
     path: "/plan-manager",
     name: "plan-manager",
-    meta: { title: 'Vertretungsplan - Stephaneum' },
+    meta: { title: 'Vertretungsplan - Begabungen leben' },
     component: PlanManager,
   },
   {
     path: "/static-manager",
     name: "static-manager",
-    meta: { title: 'Seiten - Stephaneum' },
+    meta: { title: 'Seiten - Begabungen leben' },
     component: StaticManager,
   },
   {
     path: "/post-manager",
     name: "post-manager",
-    meta: { title: 'Beiträge - Stephaneum' },
+    meta: { title: 'Beiträge - Begabungen leben' },
     component: () => import(/* webpackChunkName: "post-manager" */ "./views/internal/PostManager.vue"),
   },
   {
     path: "/groups",
     name: "group-list",
-    meta: { title: 'Gruppen - Stephaneum' },
+    meta: { title: 'Gruppen - Begabungen leben' },
     component: GroupList,
   },
   {
     path: "/groups/:id",
     name: "group-view",
-    meta: { title: 'Gruppen - Stephaneum' },
+    meta: { title: 'Gruppen - Begabungen leben' },
     component: () => import(/* webpackChunkName: "group-view" */ "./views/internal/GroupView.vue"),
   },
   {
     path: "/cloud",
     name: "cloud",
-    meta: { title: 'Cloud - Stephaneum' },
+    meta: { title: 'Cloud - Begabungen leben' },
     component: Cloud,
   },
   {
     path: "/account",
     name: "account",
-    meta: { title: 'Account - Stephaneum' },
+    meta: { title: 'Account - Begabungen leben' },
     component: Account,
   },
 ];
@@ -192,7 +192,7 @@ router.afterEach((to) => {
   // Use next tick to handle router history correctly
   // see: https://github.com/vuejs/vue-router/issues/914#issuecomment-384477609
   Vue.nextTick(() => {
-      document.title = to.meta.title || 'Stephaneum';
+      document.title = to.meta.title || 'Begabungen leben';
   });
 });
 
