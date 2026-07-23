@@ -53,11 +53,11 @@
                                     <a @click="navigate" :href="href"><span><i class="material-icons">device_hub</i>Menü</span></a>
                                 </router-link>
                             </li>
-                            <li v-if="admin || managePlans">
-                                <router-link to="/plan-manager" v-slot="{ href, navigate }">
-                                    <a @click="navigate" :href="href"><span><i class="material-icons">description</i>Vertretungsplan</span></a>
-                                </router-link>
-                            </li>
+<!--                            <li v-if="admin || managePlans">-->
+<!--                                <router-link to="/plan-manager" v-slot="{ href, navigate }">-->
+<!--                                    <a @click="navigate" :href="href"><span><i class="material-icons">description</i>Vertretungsplan</span></a>-->
+<!--                                </router-link>-->
+<!--                            </li>-->
                             <li v-if="admin">
                                 <router-link to="/static-manager" v-slot="{ href, navigate }">
                                     <a @click="navigate" :href="href"><span><i class="material-icons">note_add</i>Seiten</span></a>

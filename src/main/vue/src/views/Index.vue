@@ -29,7 +29,7 @@
             </a>
           </router-link>
         </div>
-        <Locations style="margin-top: 50px"></Locations>
+<!--        <Locations style="margin-top: 50px"></Locations>-->
       </div>
     </div>
 
@@ -102,14 +102,13 @@
   import { ObserveVisibility } from "vue-observe-visibility";
   import QuickLinks from "../components/QuickLinks";
   import Logos from "../components/Logos";
-  import Locations from "../components/Locations";
   import PostListHome from "../components/cms/PostListHome";
   import Slider from "../components/Slider";
   import LiveTicker from "../components/LiveTicker";
 
 export default {
   name: 'Index',
-  components: {LiveTicker, Slider, PostListHome, Locations, Logos, QuickLinks},
+  components: {LiveTicker, Slider, PostListHome, Logos, QuickLinks},
   props: ['info'],
   directives: {
       ObserveVisibility

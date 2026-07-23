@@ -59,15 +59,15 @@
 
         <div style="display: flex; align-items: center; justify-content: space-evenly;">
 
-          <div class="special-container">
-            <i class="material-icons">code</i>
-            <h5>Daten</h5>
-            <div v-for="s in specialData" :key="s.id">
-              <a @click="selectSpecial(s)" :class="s.id === currPost.id ? ['special-btn-active'] : []" class="special-btn waves-effect waves-light btn-large">
-                {{ s.name }}
-              </a>
-            </div>
-          </div>
+<!--          <div class="special-container">-->
+<!--            <i class="material-icons">code</i>-->
+<!--            <h5>Daten</h5>-->
+<!--            <div v-for="s in specialData" :key="s.id">-->
+<!--              <a @click="selectSpecial(s)" :class="s.id === currPost.id ? ['special-btn-active'] : []" class="special-btn waves-effect waves-light btn-large">-->
+<!--                {{ s.name }}-->
+<!--              </a>-->
+<!--            </div>-->
+<!--          </div>-->
 
           <div class="special-container">
             <i class="material-icons">dashboard</i>

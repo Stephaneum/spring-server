@@ -143,16 +143,16 @@ export const specialSites = {
         info: "Der Titel \"Impressum\" ist vorgegeben.",
         plain: false
     },
-    history: {
-        id: 8,
-        name: "Geschichte",
-        info: "Die Geschichte erreicht man über das Klicken auf das Stephaneum-Logo auf der linken Seite.<br>a) Link, dann bitte mit 'http' anfangen<br>b) (sonst) interne Lösung",
-        plain: false
-    },
-    euSa: {
-        id: 9,
-        name: "EU und S.-A.",
-        info: "Die Seite erreicht man über das Klicken auf das Stephaneum-Logo auf der linken Seite.<br>a) Link, dann bitte mit 'http' anfangen<br>b) (sonst) interne Lösung",
-        plain: false
-    },
+    // history: {
+    //     id: 8,
+    //     name: "Geschichte",
+    //     info: "Die Geschichte erreicht man über das Klicken auf das Stephaneum-Logo auf der linken Seite.<br>a) Link, dann bitte mit 'http' anfangen<br>b) (sonst) interne Lösung",
+    //     plain: false
+    // },
+    // euSa: {
+    //     id: 9,
+    //     name: "EU und S.-A.",
+    //     info: "Die Seite erreicht man über das Klicken auf das Stephaneum-Logo auf der linken Seite.<br>a) Link, dann bitte mit 'http' anfangen<br>b) (sonst) interne Lösung",
+    //     plain: false
+    // },
 };
