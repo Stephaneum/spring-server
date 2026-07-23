@@ -171,6 +171,7 @@ class PublicAPI (
 
     @GetMapping("/access-log")
     fun accessLog(): Array<String?> {
+        Session.getUser(adminOnly = true)
         return countService.getHistory()
     }
 
