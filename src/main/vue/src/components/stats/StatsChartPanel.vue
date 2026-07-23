@@ -124,14 +124,14 @@ export default {
                         labels: this.statsBrowser.map((s) => s.browser),
                         datasets: [{
                             data: this.statsBrowser.map((s) => s.count),
-                            backgroundColor: ['#ff9800', '#ffeb3b', '#2196f3', '#0d47a1', '#607d8b', '#673ab7']
+                            backgroundColor: ['#ff9800', '#ffeb3b', '#2196f3', '#03a9f4', '#f44336', '#3f51b5', '#673ab7']
                         }]
                     };
                     this.osData = {
                         labels: this.statsOS.map((s) => s.os),
                         datasets: [{
                             data: this.statsOS.map((s) => s.count),
-                            backgroundColor: ['#ff9800', '#2196f3', '#0d47a1', '#607d8b', '#263238', '#cfd8dc', '#2FA8CC', '#673ab7']
+                            backgroundColor: ['#2196f3', '#607d8b', '#263238', '#cfd8dc', '#4caf50', '#673ab7']
                         }]
                     };
                     break;
