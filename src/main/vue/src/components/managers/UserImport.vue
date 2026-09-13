@@ -34,7 +34,7 @@
       <div class="input-field col s7">
         <select v-model="format">
           <option value="0">Vorname | Nachname | Anmeldename | Passwort | Klasse</option>
-          <option value="1">Anmeldename | Anrede | Nachname | Vorname</option>
+          <option value="1">E-Mail | Anrede | Nachname | Vorname</option>
           <option value="2">Klasse | Nachname | Vorname</option>
           <option value="3">Klasse | Vorname | Nachname</option>
           <option value="4">Vorname | Nachname | Klasse</option>
@@ -130,7 +130,7 @@
         }
         switch(parseInt(this.format)) {
           case 0: return firstName + s + lastName + s + login + s + password + s + clazz;
-          case 1: return login + s + salutation + s + lastName + s + firstName;
+          case 1: return login + '@beispiel.de' + s + salutation + s + lastName + s + firstName;
           case 2: return clazz + s + lastName + s + firstName;
           case 3: return clazz + s + firstName + s + lastName;
           case 4: return firstName + s + lastName + s + clazz;

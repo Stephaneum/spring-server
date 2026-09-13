@@ -22,6 +22,7 @@ class UserAPI (
         private val codeService: CodeService,
         private val classService: ClassService,
         private val configScheduler: ConfigScheduler,
+        private val inputValidator: InputValidator,
         private val userRepo: UserRepo,
         private val postRepo: PostRepo,
         private val userGroupRepo: UserGroupRepo,
@@ -239,7 +240,7 @@ class UserAPI (
                 }
             }
             1 -> {
-                // emailPrefix - salutation - lastName - firstName (no student)
+                // email - salutation - lastName - firstName (no student)
                 if (import.role == ROLE_STUDENT)
                     throw ErrorCode(412, "no student")
 
@@ -249,6 +250,10 @@ class UserAPI (
                 if (raw.any { row -> row.size != 4 })
                     throw ErrorCode(410, "syntax error")
 
+                val invalidEmails = raw.map { row -> row[0].trim().lowercase() }.filter { email -> !inputValidator.validateEmail(email) }
+                if (invalidEmails.isNotEmpty())
+                    throw ErrorCode(423, "invalid emails: $invalidEmails")
+
                 raw.map { row ->
                     val firstName = row[3]
                     val lastName = row[2]
@@ -257,7 +262,7 @@ class UserAPI (
                         "Frau" -> SEX_FEMALE
                         else -> SEX_UNKNOWN
                     }
-                    val email = row[0].formatEmail() + emailSuffix
+                    val email = row[0].trim().lowercase()
                     User(firstName = firstName, lastName = lastName, email = digestEmail(email, emailMap), password = import.password, gender = gender)
                 }
             }
@@ -295,8 +300,8 @@ class UserAPI (
         val count = emailMap[email]
         if(count != null) {
             emailMap[email] = count + 1
-            val split = email.split("@")
-            return split[0] + count + emailSuffix
+            val index = email.lastIndexOf("@")
+            return email.substring(0, index) + count + email.substring(index)
         } else {
             emailMap[email] = 1
             return email
