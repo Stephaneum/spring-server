@@ -131,12 +131,6 @@ export const specialFragments = {
 };
 
 export const specialSites = {
-    contact: {
-        id: 6,
-        name: "Kontakt",
-        info: "Der Titel \"Kontakt\" ist vorgegeben.",
-        plain: false
-    },
     imprint: {
         id: 7,
         name: "Impressum",

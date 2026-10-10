@@ -32,6 +32,9 @@ services:
       SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/s4?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Berlin&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true"
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: foradmin
+      # Gmail account used for the contact form (export these before running compose)
+      SPRING_MAIL_USERNAME: "${MAIL_USERNAME:-}"
+      SPRING_MAIL_PASSWORD: "${MAIL_PASSWORD:-}"
 
 volumes:
   stephaneum-db-data:
