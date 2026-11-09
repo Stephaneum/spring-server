@@ -17,6 +17,10 @@ class CryptoService {
 
     @ExperimentalUnsignedTypes
     fun checkPassword(password: String, hash: String): Boolean {
+        // accounts without a password (e.g. Office 365 users) have an empty hash and must never match
+        if (hash.length <= 32)
+            return false
+
         val salt = hash.substring(32)
         return hashMD5(password+salt+PEPPER)+salt == hash
     }

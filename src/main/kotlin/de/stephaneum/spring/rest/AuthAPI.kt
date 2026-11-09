@@ -33,7 +33,7 @@ class AuthAPI (
               @RequestHeader(value="X-Forwarded-For", required = false) forwardedIP: String?,
               httpServletRequest: HttpServletRequest) {
         val user = userRepo.findByEmail(request.email ?: "") ?: throw ErrorCode(403, "Login failed")
-        if(!cryptoService.checkPassword(request.password ?: "", user.password) && !user.openId) {
+        if(!cryptoService.checkPassword(request.password ?: "", user.password)) {
             Thread.sleep(2000)
             throw ErrorCode(403, "Login failed")
         }
@@ -57,13 +57,15 @@ class AuthAPI (
 
         val code = codeRepo.findByCodeAndUsed(payload.code, false) ?: throw ErrorCode(400, "invalid code")
 
-        if(payload.firstName.isBlank() || payload.lastName.isBlank() || payload.email.isBlank() || payload.password.isBlank())
+        val email = payload.email.trim().lowercase()
+
+        if(payload.firstName.isBlank() || payload.lastName.isBlank() || email.isBlank() || payload.password.isBlank())
             throw ErrorCode(400, "missing fields")
 
-        if(!inputValidator.validateEmail(payload.email))
+        if(!inputValidator.validateEmail(email))
             throw ErrorCode(423, "invalid email")
 
-        if(userRepo.existsByEmail(payload.email))
+        if(userRepo.existsByEmail(email))
             throw ErrorCode(409, "email already exists")
 
         val storage = if(code.role == ROLE_STUDENT)
@@ -73,7 +75,7 @@ class AuthAPI (
 
         val user = userRepo.save(User(
                 code = code,
-                email = payload.email,
+                email = email,
                 password = cryptoService.hashPassword(payload.password),
                 firstName = payload.firstName,
                 lastName = payload.lastName,
